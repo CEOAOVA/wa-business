@@ -71,7 +71,6 @@ temp
 Dockerfile
 docker-compose.yml
 .dockerignore
-nginx.conf
 
 # Archivos de CI/CD
 .github
