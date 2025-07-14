@@ -1,0 +1,629 @@
+chatbot-llm/
+├── src/
+│   ├── services/
+│   │   ├── llm/
+│   │   │   ├── openai-client.ts
+│   │   │   ├── conversation-service.ts
+│   │   │   ├── function-service.ts
+│   │   │   └── function-handler.ts
+│   │   └── external/
+│   │       └── your-apis.ts
+│   ├── routes/
+│   │   └── chat.ts
+│   ├── models/
+│   │   └── conversation.ts
+│   ├── config/
+│   │   └── index.ts
+│   └── utils/
+│       └── text-processing.ts
+└── package.json
+
+🔧 2. Implementación Paso a Paso
+A. OpenAI Client (Proveedor LLM)
+// src/services/llm/openai-client.ts
+import axios from 'axios';
+
+export interface ChatMessage {
+  role: 'system' | 'user' | 'assistant' | 'function';
+  content: string | null;
+  name?: string;
+  function_call?: { name: string; arguments: string };
+}
+
+export interface ChatCompletionOptions {
+  messages: ChatMessage[];
+  temperature?: number;
+  max_tokens?: number;
+  functions?: FunctionDefinition[];
+  function_call?: 'none' | 'auto' | { name: string };
+}
+
+export interface ChatCompletionResponse {
+  content: string;
+  role: 'assistant' | 'function';
+  function_call?: { name: string; arguments: string };
+  tool_calls?: ToolCall[];
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+}
+
+export class OpenAIClient {
+  private readonly apiKey: string;
+  private readonly baseURL: string;
+  private readonly defaultModel: string;
+
+  constructor() {
+    this.apiKey = process.env.OPENAI_API_KEY || process.env.OPENROUTER_API_KEY!;
+    this.baseURL = process.env.OPENROUTER_BASE_URL || 'https://api.openai.com/v1';
+    this.defaultModel = process.env.DEFAULT_MODEL || 'gpt-4o-mini';
+  }
+
+  async createChatCompletion(options: ChatCompletionOptions & { model?: string }): Promise<ChatCompletionResponse> {
+    const model = options.model || this.defaultModel;
+    
+    const requestPayload = {
+      model,
+      messages: options.messages,
+      temperature: options.temperature || 0.7,
+      max_tokens: options.max_tokens || 1000
+    };
+
+    // Manejo de functions/tools según el proveedor
+    if (this.baseURL.includes('openrouter.ai')) {
+      if (options.functions) {
+        requestPayload.tools = options.functions.map(func => ({
+          type: "function",
+          function: func
+        }));
+      }
+    } else {
+      if (options.functions) requestPayload.functions = options.functions;
+      if (options.function_call) requestPayload.function_call = options.function_call;
+    }
+
+    try {
+      const response = await axios.post(`${this.baseURL}/chat/completions`, requestPayload, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 60000
+      });
+
+      const choice = response.data.choices[0];
+      return {
+        content: choice.message.content,
+        role: choice.message.role,
+        function_call: choice.message.function_call,
+        tool_calls: choice.message.tool_calls,
+        usage: response.data.usage
+      };
+    } catch (error) {
+      console.error('[OpenAIClient] Error:', error);
+      throw error;
+    }
+  }
+}
+
+B. Function Service (Tu Lógica de Negocio)
+// src/services/llm/function-service.ts
+export interface FunctionDefinition {
+  name: string;
+  description: string;
+  parameters: {
+    type: string;
+    properties: Record<string, any>;
+    required?: string[];
+  };
+}
+
+export interface FunctionResult {
+  success: boolean;
+  data?: any;
+  error?: string;
+}
+
+export class FunctionService {
+  private handlers = new Map<string, (args: any, context: any) => Promise<FunctionResult>>();
+  private definitions = new Map<string, FunctionDefinition>();
+
+  constructor() {
+    this.registerYourFunctions();
+  }
+
+  registerFunction(
+    name: string,
+    handler: (args: any, context: any) => Promise<FunctionResult>,
+    definition: FunctionDefinition
+  ): void {
+    this.handlers.set(name, handler);
+    this.definitions.set(name, definition);
+  }
+
+  getFunctionDefinitions(): FunctionDefinition[] {
+    return Array.from(this.definitions.values());
+  }
+
+  async executeFunction(
+    name: string,
+    args: Record<string, any>,
+    context: { userId: string; sessionId?: string }
+  ): Promise<FunctionResult> {
+    if (!this.handlers.has(name)) {
+      return { success: false, error: `Función '${name}' no implementada` };
+    }
+
+    try {
+      console.log(`[FunctionService] Ejecutando ${name} con args:`, args);
+      const result = await this.handlers.get(name)!(args, context);
+      console.log(`[FunctionService] Resultado de ${name}:`, result);
+      return result;
+    } catch (error) {
+      console.error(`[FunctionService] Error en ${name}:`, error);
+      return { success: false, error: (error as Error).message };
+    }
+  }
+
+  private registerYourFunctions(): void {
+    // EJEMPLO: Función para buscar información
+    this.registerFunction(
+      'buscar_informacion',
+      async (args, context) => {
+        const { consulta, categoria } = args;
+        
+        // AQUÍ VAN TUS LLAMADAS A APIS EXTERNAS
+        // const resultado = await tuApiExterna.buscar(consulta);
+        
+        return {
+          success: true,
+          data: {
+            resultados: [
+              { titulo: "Resultado 1", descripcion: "..." },
+              { titulo: "Resultado 2", descripcion: "..." }
+            ],
+            mensaje: `Encontré información sobre "${consulta}"`
+          }
+        };
+      },
+      {
+        name: 'buscar_informacion',
+        description: 'Busca información en bases de datos externas',
+        parameters: {
+          type: 'object',
+          properties: {
+            consulta: { type: 'string', description: 'Término de búsqueda' },
+            categoria: { type: 'string', description: 'Categoría de búsqueda' }
+          },
+          required: ['consulta']
+        }
+      }
+    );
+
+    // EJEMPLO: Función para enviar notificaciones
+    this.registerFunction(
+      'enviar_notificacion',
+      async (args, context) => {
+        const { tipo, mensaje, destinatario } = args;
+        
+        // TU LÓGICA AQUÍ
+        console.log(`Enviando ${tipo} a ${destinatario}: ${mensaje}`);
+        
+        return {
+          success: true,
+          data: { mensaje: 'Notificación enviada correctamente' }
+        };
+      },
+      {
+        name: 'enviar_notificacion',
+        description: 'Envía notificaciones a usuarios',
+        parameters: {
+          type: 'object',
+          properties: {
+            tipo: { type: 'string', enum: ['email', 'sms', 'push'] },
+            mensaje: { type: 'string' },
+            destinatario: { type: 'string' }
+          },
+          required: ['tipo', 'mensaje', 'destinatario']
+        }
+      }
+    );
+  }
+}
+
+C. Function Handler (Dispatcher)
+// src/services/llm/function-handler.ts
+import { FunctionService } from './function-service';
+import { OpenAIClient, ChatCompletionOptions, ChatCompletionResponse } from './openai-client';
+
+export interface FunctionCallInfo {
+  name: string;
+  arguments: string;
+}
+
+export class FunctionCallHandler {
+  constructor(
+    private readonly functionService: FunctionService,
+    private readonly openaiClient: OpenAIClient
+  ) {}
+
+  async processFunctionCall(
+    functionCallInfo: FunctionCallInfo,
+    messages: Array<any>,
+    options: ChatCompletionOptions,
+    context: { userId: string; sessionId?: string }
+  ): Promise<ChatCompletionResponse> {
+    let functionArgs: Record<string, any> = {};
+    
+    try {
+      functionArgs = JSON.parse(functionCallInfo.arguments);
+    } catch (err) {
+      console.error(`[FunctionCallHandler] Error parsing arguments:`, err);
+      functionArgs = {};
+    }
+
+    console.log(`[FunctionCallHandler] Ejecutando ${functionCallInfo.name}(${JSON.stringify(functionArgs)})`);
+
+    // Ejecutar la función
+    const result = await this.functionService.executeFunction(
+      functionCallInfo.name,
+      functionArgs,
+      context
+    );
+
+    // Agregar resultado a la conversación
+    messages.push({
+      role: 'function',
+      name: functionCallInfo.name,
+      content: JSON.stringify(result)
+    });
+
+    // Generar respuesta final del LLM
+    const response = await this.openaiClient.createChatCompletion({
+      ...options,
+      messages: messages
+    });
+
+    return response;
+  }
+
+  extractFunctionCall(response: ChatCompletionResponse): FunctionCallInfo | null {
+    // Manejar tool_calls (OpenRouter) y function_call (OpenAI)
+    if (response.tool_calls && response.tool_calls.length > 0) {
+      const toolCall = response.tool_calls[0];
+      return {
+        name: toolCall.function.name,
+        arguments: toolCall.function.arguments
+      };
+    }
+
+    if (response.function_call) {
+      return {
+        name: response.function_call.name,
+        arguments: response.function_call.arguments
+      };
+    }
+
+    return null;
+  }
+}
+
+D. Conversation Service (Core del Sistema)
+// src/services/llm/conversation-service.ts
+import { OpenAIClient } from './openai-client';
+import { FunctionService } from './function-service';
+import { FunctionCallHandler } from './function-handler';
+
+interface SessionData {
+  conversationId: string;
+  userId: string;
+  messages: any[];
+  createdAt: Date;
+  lastActivity: Date;
+  context?: Record<string, any>;
+}
+
+export class ConversationService {
+  private sessions = new Map<string, SessionData>();
+  private readonly SESSION_TIMEOUT_MS = 20 * 60 * 1000; // 20 minutos
+
+  constructor(
+    private readonly openaiClient: OpenAIClient,
+    private readonly fnService: FunctionService,
+    private readonly fnHandler: FunctionCallHandler,
+    private readonly defaultModel?: string
+  ) {
+    // Limpieza automática de sesiones
+    setInterval(() => this.cleanupExpiredSessions(), 2 * 60 * 1000);
+  }
+
+  async startConversation(conversationId: string, userId: string): Promise<string> {
+    console.log(`[ConversationService] Iniciando conversación ${conversationId} para usuario ${userId}`);
+    
+    const sessionData: SessionData = {
+      conversationId,
+      userId,
+      messages: [],
+      createdAt: new Date(),
+      lastActivity: new Date(),
+      context: {}
+    };
+    
+    this.sessions.set(conversationId, sessionData);
+    
+    // Mensaje de bienvenida personalizable
+    return "¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?";
+  }
+
+  async processMessage(
+    conversationId: string,
+    query: string,
+    userId: string,
+    context?: Record<string, any>
+  ): Promise<{
+    content: string;
+    functionCalled: boolean;
+    functionName?: string;
+    functionResult?: any;
+  }> {
+    let sessionData = this.getSessionData(conversationId);
+    
+    if (!sessionData) {
+      // Crear nueva sesión si no existe
+      await this.startConversation(conversationId, userId);
+      sessionData = this.getSessionData(conversationId)!;
+    }
+
+    // Actualizar actividad
+    sessionData.lastActivity = new Date();
+    if (context) {
+      sessionData.context = { ...sessionData.context, ...context };
+    }
+
+    // Agregar mensaje del usuario
+    sessionData.messages.push({
+      role: 'user',
+      content: query
+    });
+
+    // Generar mensajes para el LLM
+    const messages = this.buildMessages(sessionData);
+
+    try {
+      // Primera llamada al LLM
+      const response = await this.openaiClient.createChatCompletion({
+        messages,
+        functions: this.fnService.getFunctionDefinitions(),
+        function_call: 'auto',
+        model: this.defaultModel
+      });
+
+      // Verificar si hay function call
+      const functionCall = this.fnHandler.extractFunctionCall(response);
+      
+      if (functionCall) {
+        console.log(`[ConversationService] Function call detectado: ${functionCall.name}`);
+        
+        // Procesar function call
+        const functionResponse = await this.fnHandler.processFunctionCall(
+          functionCall,
+          messages,
+          {
+            messages,
+            functions: this.fnService.getFunctionDefinitions(),
+            model: this.defaultModel
+          },
+          { userId, sessionId: conversationId }
+        );
+
+        // Agregar respuesta del asistente
+        sessionData.messages.push({
+          role: 'assistant',
+          content: functionResponse.content
+        });
+
+        return {
+          content: functionResponse.content,
+          functionCalled: true,
+          functionName: functionCall.name
+        };
+      } else {
+        // Respuesta directa sin function call
+        sessionData.messages.push({
+          role: 'assistant',
+          content: response.content
+        });
+
+        return {
+          content: response.content,
+          functionCalled: false
+        };
+      }
+
+    } catch (error) {
+      console.error(`[ConversationService] Error procesando mensaje:`, error);
+      const errorMsg = 'Lo siento, ocurrió un error al procesar tu mensaje. ¿Puedes intentar de nuevo?';
+      
+      sessionData.messages.push({
+        role: 'assistant',
+        content: errorMsg
+      });
+
+      return {
+        content: errorMsg,
+        functionCalled: false
+      };
+    }
+  }
+
+  private buildMessages(sessionData: SessionData): any[] {
+    const systemPrompt = {
+      role: 'system',
+      content: `Eres un asistente virtual inteligente y útil. Tu objetivo es ayudar a los usuarios de la mejor manera posible.
+
+INSTRUCCIONES:
+- Mantén un tono amigable y profesional
+- Si necesitas información adicional, usa las funciones disponibles
+- Proporciona respuestas claras y concisas
+- Si no puedes ayudar con algo, explica por qué y ofrece alternativas
+
+CONTEXTO DE USUARIO:
+${sessionData.context ? JSON.stringify(sessionData.context, null, 2) : 'No hay contexto adicional'}
+
+HISTORIAL RECIENTE:
+${this.buildConversationHistory(sessionData.messages.slice(-6))}`
+    };
+
+    return [systemPrompt, ...sessionData.messages.slice(-10)]; // Últimos 10 mensajes
+  }
+
+  private buildConversationHistory(messages: any[]): string {
+    return messages
+      .map(msg => `${msg.role === 'user' ? 'Usuario' : 'Asistente'}: ${msg.content}`)
+      .join('\n');
+  }
+
+  private getSessionData(conversationId: string): SessionData | undefined {
+    return this.sessions.get(conversationId);
+  }
+
+  private cleanupExpiredSessions(): void {
+    const now = Date.now();
+    for (const [id, session] of this.sessions.entries()) {
+      if (now - session.lastActivity.getTime() > this.SESSION_TIMEOUT_MS) {
+        this.sessions.delete(id);
+        console.log(`[ConversationService] Sesión expirada eliminada: ${id}`);
+      }
+    }
+  }
+
+  getStats() {
+    return {
+      totalSessions: this.sessions.size,
+      sessionDetails: Array.from(this.sessions.entries()).map(([id, session]) => ({
+        id,
+        userId: session.userId,
+        messageCount: session.messages.length,
+        createdAt: session.createdAt,
+        lastActivity: session.lastActivity
+      }))
+    };
+  }
+}
+E. Chat Router (API Endpoints)
+// src/routes/chat.ts
+import { Router, Request, Response } from 'express';
+import { OpenAIClient } from '../services/llm/openai-client';
+import { FunctionService } from '../services/llm/function-service';
+import { FunctionCallHandler } from '../services/llm/function-handler';
+import { ConversationService } from '../services/llm/conversation-service';
+
+const router = Router();
+
+// Inicializar servicios
+const openaiClient = new OpenAIClient();
+const fnService = new FunctionService();
+const fnHandler = new FunctionCallHandler(fnService, openaiClient);
+const conversationService = new ConversationService(
+  openaiClient,
+  fnService,
+  fnHandler,
+  'gpt-4o-mini' // Tu modelo preferido
+);
+
+// Endpoint principal para chat
+router.post('/message', async (req: Request, res: Response) => {
+  try {
+    const { message, userId, conversationId, context } = req.body;
+
+    if (!message || !userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Se requieren message y userId'
+      });
+    }
+
+    const convId = conversationId || `chat-${userId}-${Date.now()}`;
+    
+    console.log(`[chat] Procesando mensaje de ${userId}: "${message.substring(0, 50)}..."`);
+
+    const result = await conversationService.processMessage(
+      convId,
+      message,
+      userId,
+      context
+    );
+
+    res.json({
+      success: true,
+      conversationId: convId,
+      response: result.content,
+      functionCalled: result.functionCalled,
+      functionName: result.functionName
+    });
+
+  } catch (error) {
+    console.error('[chat] Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor'
+    });
+  }
+});
+
+// Endpoint para iniciar nueva conversación
+router.post('/start', async (req: Request, res: Response) => {
+  try {
+    const { userId, context } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Se requiere userId'
+      });
+    }
+
+    const conversationId = `chat-${userId}-${Date.now()}`;
+    const welcomeMessage = await conversationService.startConversation(conversationId, userId);
+
+    res.json({
+      success: true,
+      conversationId,
+      welcomeMessage,
+      context
+    });
+
+  } catch (error) {
+    console.error('[chat] Error iniciando conversación:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor'
+    });
+  }
+});
+
+// Endpoint para estadísticas (opcional)
+router.get('/stats', (req: Request, res: Response) => {
+  const stats = conversationService.getStats();
+  res.json(stats);
+});
+
+export default router;
+
+🚀 4. Flujo de Funcionamiento
+Secuencia de Procesamiento
+
+1. Usuario envía mensaje → Chat Router
+2. Router → ConversationService.processMessage()
+3. ConversationService construye contexto + historial
+4. Primera llamada a OpenAI con functions disponibles
+5. Si hay function_call:
+   a. FunctionHandler extrae la llamada
+   b. FunctionService ejecuta la función
+   c. Resultado se agrega a conversación
+   d. Segunda llamada a OpenAI para respuesta final
+6. Respuesta se guarda en sesión y se retorna
+
+

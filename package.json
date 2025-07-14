@@ -1,0 +1,24 @@
+{
+  "name": "whtsppbsnss",
+  "version": "1.0.0",
+  "description": "Una plataforma tipo \"WhatsApp Web personalizada\" para empresas, donde cada agente se conecta con su cuenta a un panel web y responde mensajes de clientes a través de su propio número de WhatsApp Business, usando exclusivamente la API oficial de WhatsApp Cloud (de Meta).",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend/test-tailwind\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "react-router-dom": "^7.6.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "tailwindcss": "^3.4.17"
+  }
+}

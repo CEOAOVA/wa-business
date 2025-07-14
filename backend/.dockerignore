@@ -1,0 +1,90 @@
+# Dependencias
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de desarrollo
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de build
+dist
+build
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos de editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentación
+*.md
+!README.md
+
+# Archivos de test
+test
+tests
+__tests__
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+coverage
+
+# Archivos temporales
+tmp
+temp
+*.tmp
+*.temp
+
+# Archivos de configuración local
+.env.example
+.env.template
+
+# Archivos de Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Archivos de CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# Archivos de uploads (se crean en runtime)
+uploads/media/*
+uploads/temp/*
+!uploads/media/.gitkeep
+!uploads/temp/.gitkeep
+
+# Base de datos local
+prisma/whatsapp.db
+prisma/whatsapp.db-journal
+
+# Scripts específicos del sistema
+*.bat
+*.ps1
+run-migration.* 

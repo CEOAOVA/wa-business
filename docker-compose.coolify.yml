@@ -1,0 +1,216 @@
+version: '3.8'
+
+services:
+  # Backend - WhatsApp Business API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "3002"
+    environment:
+      # App Configuration
+      - NODE_ENV=production
+      - PORT=3002
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # WhatsApp Business API
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+      - WHATSAPP_API_VERSION=${WHATSAPP_API_VERSION:-v22.0}
+      - WHATSAPP_BASE_URL=${WHATSAPP_BASE_URL:-https://graph.facebook.com}
+      - WEBHOOK_VERIFY_TOKEN=${WEBHOOK_VERIFY_TOKEN}
+      - WEBHOOK_PATH=${WEBHOOK_PATH:-/api/chat/webhook}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET}
+      
+      # OpenRouter AI Configuration
+      - OPEN_ROUTER_API_KEY=${OPEN_ROUTER_API_KEY}
+      - OPEN_ROUTER_BASE_URL=${OPEN_ROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      - OPEN_ROUTER_DEFAULT_MODEL=${OPEN_ROUTER_DEFAULT_MODEL:-google/gemini-flash-1.5}
+      - DEFAULT_TEMPERATURE=${DEFAULT_TEMPERATURE:-0.7}
+      - DEFAULT_MAX_TOKENS=${DEFAULT_MAX_TOKENS:-1000}
+      - LLM_TIMEOUT_MS=${LLM_TIMEOUT_MS:-60000}
+      
+      # SOAP Services (Embler Integration)
+      - EMBLER_WSDL_URL=${EMBLER_WSDL_URL}
+      - EMBLER_ENDPOINT_URL=${EMBLER_ENDPOINT_URL}
+      - TOKEN_CACHE_DURATION=${TOKEN_CACHE_DURATION:-10}
+      - INVENTORY_CACHE_TTL=${INVENTORY_CACHE_TTL:-300000}
+      - SOAP_CONNECTION_RETRIES=${SOAP_CONNECTION_RETRIES:-3}
+      
+      # POS Configuration
+      - DEFAULT_POS_ID=${DEFAULT_POS_ID:-SAT}
+      - VALID_POS_IDS=${VALID_POS_IDS:-ME,CUA,ECA,IZT,LIND,PORT,QRO,SAT,TPN,VC}
+      - POS_CREDENTIALS=${POS_CREDENTIALS}
+      
+      # Supabase Configuration (Base de datos)
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+      
+      # Authentication
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-8h}
+      - AUTHORIZED_USERS=${AUTHORIZED_USERS}
+      - TEMP_PASSWORD=${TEMP_PASSWORD}
+      
+      # External APIs
+      - API_NINJAS_KEY=${API_NINJAS_KEY}
+      
+      # CORS Configuration
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      
+      # Security Configuration
+      - HOSTNAME=0.0.0.0
+      - TRUST_PROXY=true
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-60000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      
+      # System Configuration
+      - ENABLE_DETAILED_LOGS=${ENABLE_DETAILED_LOGS:-false}
+      
+    restart: unless-stopped
+    
+    # Labels para SSL/HTTPS automático con Traefik
+    labels:
+      - "coolify.managed=true"
+      - "coolify.version=4"
+      - "coolify.service=wa-business-backend"
+      - "traefik.enable=true"
+      
+      # Router principal
+      - "traefik.http.routers.wa-business-backend.rule=Host(`dev-apiwaprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-backend.tls=true"
+      - "traefik.http.routers.wa-business-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wa-business-backend.entrypoints=websecure"
+      
+      # Redirect HTTP a HTTPS
+      - "traefik.http.routers.wa-business-backend-http.rule=Host(`dev-apiwaprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-backend-http.entrypoints=web"
+      - "traefik.http.routers.wa-business-backend-http.middlewares=wa-api-redirect-https"
+      - "traefik.http.middlewares.wa-api-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.wa-api-redirect-https.redirectscheme.permanent=true"
+      
+      # Service configuration
+      - "traefik.http.services.wa-business-backend.loadbalancer.server.port=3002"
+      
+      # Security headers específicos para API
+      - "traefik.http.middlewares.wa-api-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.wa-api-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.wa-api-headers.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.wa-api-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.wa-api-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.wa-api-headers.headers.customrequestheaders.X-Forwarded-For="
+      
+      # CORS headers para API
+      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolallowheaders=Content-Type,Authorization,X-Requested-With,Accept,Origin,X-CSRF-Token"
+      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolalloworiginlistregex=^https://(.*\\.)?aova\\.mx$"
+      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolmaxage=86400"
+      
+      # Chain middlewares
+      - "traefik.http.routers.wa-business-backend.middlewares=wa-api-headers,wa-api-cors"
+    
+    # Configuración de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 30s
+    
+    # Configuración de red y seguridad
+    networks:
+      - coolify
+
+  # Frontend - React WhatsApp Business Panel
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "80"
+    environment:
+      # App Configuration
+      - NODE_ENV=production
+      - PORT=80
+      
+      # Backend API Connection
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL:-https://dev-apiwaprueba.aova.mx}
+      
+      # SSL/Security Configuration
+      - NGINX_HOST=0.0.0.0
+      - NGINX_PORT=80
+      - HOSTNAME=0.0.0.0
+      - TRUST_PROXY=true
+      
+    restart: unless-stopped
+    
+    # Labels para SSL/HTTPS automático con Traefik
+    labels:
+      - "coolify.managed=true"
+      - "coolify.version=4"
+      - "coolify.service=wa-business-frontend"
+      - "coolify.type=frontend"
+      - "traefik.enable=true"
+      
+      # Router principal
+      - "traefik.http.routers.wa-business-frontend.rule=Host(`dev-waprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-frontend.tls=true"
+      - "traefik.http.routers.wa-business-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wa-business-frontend.entrypoints=websecure"
+      
+      # Redirect HTTP a HTTPS
+      - "traefik.http.routers.wa-business-frontend-http.rule=Host(`dev-waprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-frontend-http.entrypoints=web"
+      - "traefik.http.routers.wa-business-frontend-http.middlewares=wa-frontend-redirect-https"
+      - "traefik.http.middlewares.wa-frontend-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.wa-frontend-redirect-https.redirectscheme.permanent=true"
+      
+      # Service configuration
+      - "traefik.http.services.wa-business-frontend.loadbalancer.server.port=80"
+      
+      # Security headers
+      - "traefik.http.middlewares.wa-frontend-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.wa-frontend-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      
+      # CSP header para aplicación web
+      - "traefik.http.middlewares.wa-frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss:; font-src 'self' https:; object-src 'none';"
+      
+      # Chain middlewares
+      - "traefik.http.routers.wa-business-frontend.middlewares=wa-frontend-headers,wa-frontend-csp"
+    
+    # Configuración de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    
+    # Configuración de red y seguridad
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true 

@@ -1,0 +1,87 @@
+# Dependencias
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de desarrollo
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de build
+dist
+build
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos de editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentación
+*.md
+!README.md
+
+# Archivos de test
+test
+tests
+__tests__
+*.test.js
+*.test.ts
+*.test.jsx
+*.test.tsx
+*.spec.js
+*.spec.ts
+*.spec.jsx
+*.spec.tsx
+coverage
+
+# Archivos temporales
+tmp
+temp
+*.tmp
+*.temp
+
+# Archivos de configuración local
+.env.example
+.env.template
+
+# Archivos de Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+nginx.conf
+
+# Archivos de CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# Archivos de desarrollo específicos de Vite
+.vite
+test-tailwind
+
+# Archivos de ESLint
+.eslintcache 
