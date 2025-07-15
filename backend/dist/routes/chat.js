@@ -236,18 +236,239 @@ router.post('/webhook', (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
     catch (error) {
-        console.error(`❌ [${requestId}] Error procesando webhook:`, error.message);
-        // Log de seguridad para errores
-        console.log(`⚠️ [${requestId}] Security alert - Error en webhook:`, {
-            ip: clientIp,
-            userAgent: userAgent.substring(0, 100),
-            error: error.message,
-            timestamp: new Date().toISOString()
+        console.error(`❌ [${requestId}] Error procesando webhook:`, error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: 'Error processing webhook',
+            requestId // Para debugging
         });
-        // Siempre responder 200 a WhatsApp para evitar reenvíos
-        res.status(200).json({
+    }
+}));
+// ============================================
+// NUEVAS RUTAS PARA TAKEOVER Y RESÚMENES
+// ============================================
+// POST /api/chat/conversations/:id/set-mode - Cambiar modo de IA (takeover)
+router.post('/conversations/:id/set-mode', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: conversationId } = req.params;
+        const { mode, agentId } = req.body;
+        // Validación
+        if (!mode || !['active', 'inactive'].includes(mode)) {
+            return res.status(400).json({
+                success: false,
+                error: 'El campo "mode" es requerido y debe ser "active" o "inactive"'
+            });
+        }
+        if (mode === 'inactive' && !agentId) {
+            return res.status(400).json({
+                success: false,
+                error: 'El campo "agentId" es requerido cuando se desactiva la IA'
+            });
+        }
+        console.log(`🤖 [Takeover] Cambiando modo IA: ${conversationId} -> ${mode}`, mode === 'inactive' ? `(Agente: ${agentId})` : '');
+        // TODO: IMPLEMENTAR CON SUPABASE
+        // const result = await databaseService.setConversationAIMode(conversationId, mode, agentId);
+        // IMPLEMENTACIÓN TEMPORAL CON PRISMA (mientras no hay Supabase)
+        // Por ahora simulamos la respuesta exitosa
+        const result = { success: true };
+        if (result.success) {
+            // Emitir evento WebSocket para notificar cambio en tiempo real
+            whatsapp_service_1.whatsappService.emitSocketEvent('conversation_ai_mode_changed', {
+                conversationId,
+                aiMode: mode,
+                assignedAgentId: mode === 'inactive' ? agentId : null,
+                timestamp: new Date().toISOString()
+            });
+            res.json({
+                success: true,
+                message: `Modo IA ${mode === 'active' ? 'activado' : 'desactivado'} exitosamente`,
+                conversationId,
+                aiMode: mode,
+                assignedAgentId: mode === 'inactive' ? agentId : null
+            });
+        }
+        else {
+            res.status(500).json({
+                success: false,
+                error: 'Error actualizando modo IA'
+            });
+        }
+    }
+    catch (error) {
+        console.error('[Takeover] Error en set-mode:', error);
+        res.status(500).json({
             success: false,
-            error: 'Internal processing error'
+            error: 'Error interno del servidor'
+        });
+    }
+}));
+// GET /api/chat/conversations/:id/mode - Obtener modo actual de IA
+router.get('/conversations/:id/mode', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: conversationId } = req.params;
+        console.log(`🔍 [Takeover] Consultando modo IA para: ${conversationId}`);
+        // TODO: IMPLEMENTAR CON SUPABASE
+        // const result = await databaseService.getConversationAIMode(conversationId);
+        // IMPLEMENTACIÓN TEMPORAL
+        const result = {
+            aiMode: 'active',
+            assignedAgentId: null
+        };
+        if (result) {
+            res.json({
+                success: true,
+                conversationId,
+                aiMode: result.aiMode,
+                assignedAgentId: result.assignedAgentId
+            });
+        }
+        else {
+            res.status(404).json({
+                success: false,
+                error: 'Conversación no encontrada'
+            });
+        }
+    }
+    catch (error) {
+        console.error('[Takeover] Error obteniendo modo IA:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor'
+        });
+    }
+}));
+// GET /api/chat/conversations/:id/summary - Generar resumen de conversación
+router.get('/conversations/:id/summary', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: conversationId } = req.params;
+        const { forceRegenerate } = req.query;
+        console.log(`📝 [Summary] Generando resumen para: ${conversationId}`, forceRegenerate ? '(Forzar regeneración)' : '');
+        // 1. Verificar caché si no se fuerza regeneración
+        if (!forceRegenerate) {
+            // TODO: IMPLEMENTAR CON SUPABASE
+            // const cachedSummary = await databaseService.getConversationSummary(conversationId);
+            // if (cachedSummary) {
+            //   return res.json({
+            //     success: true,
+            //     summary: cachedSummary.summary,
+            //     keyPoints: cachedSummary.keyPoints,
+            //     isFromCache: cachedSummary.isFromCache,
+            //     conversationId
+            //   });
+            // }
+        }
+        // 2. Obtener historial de mensajes
+        // TODO: IMPLEMENTAR CON SUPABASE
+        // const messages = await databaseService.getConversationHistory(conversationId);
+        // IMPLEMENTACIÓN TEMPORAL - Simular algunos mensajes
+        const messages = [
+            { role: 'user', content: 'Necesito pastillas de freno para mi Toyota Corolla 2018', timestamp: new Date() },
+            { role: 'assistant', content: 'Te ayudo a encontrar pastillas de freno. Para tu Toyota Corolla 2018, ¿qué tipo de motor tiene?', timestamp: new Date() },
+            { role: 'user', content: 'Es 1.8L', timestamp: new Date() },
+            { role: 'assistant', content: 'Perfecto. Tenemos pastillas de freno para Toyota Corolla 2018 1.8L. Mi nombre es María, ¿cuál es tu nombre?', timestamp: new Date() },
+            { role: 'user', content: 'Me llamo Carlos y vivo en 06100', timestamp: new Date() }
+        ];
+        if (messages.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'No se encontraron mensajes para esta conversación'
+            });
+        }
+        // 3. Generar resumen con IA
+        const chatbotService = require('../services/chatbot.service').chatbotService;
+        const summary = yield chatbotService.generateConversationSummary(conversationId, messages);
+        // 4. Guardar en caché
+        // TODO: IMPLEMENTAR CON SUPABASE
+        // await databaseService.saveConversationSummary(
+        //   conversationId, 
+        //   summary.text, 
+        //   summary.keyPoints, 
+        //   messages.length
+        // );
+        console.log(`✅ [Summary] Resumen generado exitosamente para: ${conversationId}`);
+        res.json({
+            success: true,
+            summary: summary.text,
+            keyPoints: summary.keyPoints,
+            isFromCache: false,
+            conversationId,
+            messageCount: messages.length,
+            generatedAt: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        console.error('[Summary] Error generando resumen:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Error generando resumen de conversación'
+        });
+    }
+}));
+// GET /api/chat/conversations/:id/messages - Obtener historial de mensajes
+router.get('/conversations/:id/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: conversationId } = req.params;
+        const { limit, offset } = req.query;
+        console.log(`📨 [Messages] Obteniendo historial para: ${conversationId}`);
+        // TODO: IMPLEMENTAR CON SUPABASE
+        // const messages = await databaseService.getConversationHistory(conversationId);
+        // IMPLEMENTACIÓN TEMPORAL
+        const messages = [
+            {
+                id: '1',
+                role: 'user',
+                content: 'Necesito pastillas de freno para mi Toyota Corolla 2018',
+                timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+                metadata: {}
+            },
+            {
+                id: '2',
+                role: 'assistant',
+                content: 'Te ayudo a encontrar pastillas de freno. Para tu Toyota Corolla 2018, ¿qué tipo de motor tiene?',
+                timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
+                metadata: { function_called: 'buscarYConsultarInventario' }
+            },
+            {
+                id: '3',
+                role: 'user',
+                content: 'Es 1.8L',
+                timestamp: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+                metadata: {}
+            },
+            {
+                id: '4',
+                role: 'assistant',
+                content: 'Perfecto. Tenemos pastillas de freno para Toyota Corolla 2018 1.8L. Mi nombre es María, ¿cuál es tu nombre?',
+                timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+                metadata: { function_called: 'recopilarDatosUsuario' }
+            },
+            {
+                id: '5',
+                role: 'user',
+                content: 'Me llamo Carlos y vivo en 06100',
+                timestamp: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
+                metadata: {}
+            }
+        ];
+        // Aplicar paginación si se especifica
+        let paginatedMessages = messages;
+        if (limit) {
+            const limitNum = parseInt(limit);
+            const offsetNum = parseInt(offset) || 0;
+            paginatedMessages = messages.slice(offsetNum, offsetNum + limitNum);
+        }
+        res.json({
+            success: true,
+            messages: paginatedMessages,
+            total: messages.length,
+            conversationId
+        });
+    }
+    catch (error) {
+        console.error('[Messages] Error obteniendo historial:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error obteniendo historial de mensajes'
         });
     }
 }));

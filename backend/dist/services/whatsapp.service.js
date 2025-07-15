@@ -17,6 +17,7 @@ const axios_1 = __importDefault(require("axios"));
 const whatsapp_1 = require("../config/whatsapp");
 const database_service_1 = require("./database.service");
 const prisma_1 = require("../generated/prisma");
+const chatbot_service_1 = require("./chatbot.service"); // NUEVO: Import del chatbot
 class WhatsAppService {
     // Inicializar servicio de base de datos
     initialize(socketIo) {
@@ -34,6 +35,18 @@ class WhatsAppService {
                 throw error;
             }
         });
+    }
+    /**
+     * Emitir evento WebSocket (método público para uso externo)
+     */
+    emitSocketEvent(event, data) {
+        if (this.io) {
+            this.io.emit(event, data);
+            console.log(`🌐 [Socket] Evento '${event}' emitido:`, data);
+        }
+        else {
+            console.log(`⚠️ [Socket] No hay conexión WebSocket para emitir evento '${event}'`);
+        }
     }
     /**
      * Enviar mensaje de texto
@@ -218,7 +231,7 @@ class WhatsAppService {
      */
     processWebhook(body) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f;
             console.log('📨 Procesando webhook de WhatsApp:', JSON.stringify(body, null, 2));
             const processedMessages = [];
             try {
@@ -272,6 +285,65 @@ class WhatsAppService {
                                         };
                                         processedMessages.push(processedMessage);
                                         console.log('📩 Mensaje guardado en BD:', processedMessage);
+                                        // ============================================
+                                        // NUEVA LÓGICA DE TAKEOVER - VERIFICAR MODO AI
+                                        // ============================================
+                                        // Solo procesar con IA si es un mensaje de texto del usuario
+                                        if (message.type === 'text' && ((_d = message.text) === null || _d === void 0 ? void 0 : _d.body)) {
+                                            try {
+                                                // TODO: VERIFICAR MODO AI CON SUPABASE
+                                                // const aiModeInfo = await databaseService.getConversationAIMode(result.conversation.id);
+                                                // const isAIActive = aiModeInfo?.aiMode === 'active';
+                                                // IMPLEMENTACIÓN TEMPORAL - Asumir IA activa por defecto
+                                                const isAIActive = true; // Cambiar a false para probar modo manual
+                                                if (isAIActive) {
+                                                    console.log(`🤖 [Takeover] IA está ACTIVA para conversación: ${result.conversation.id}`);
+                                                    // Procesar mensaje con IA
+                                                    const chatbotResponse = yield chatbot_service_1.chatbotService.processWhatsAppMessage(message.from, content);
+                                                    // Si el chatbot quiere enviar una respuesta
+                                                    if (chatbotResponse.shouldSend && chatbotResponse.response) {
+                                                        console.log(`🤖 [Takeover] Enviando respuesta automática de IA: ${chatbotResponse.response.substring(0, 100)}...`);
+                                                        // Enviar respuesta automática
+                                                        const autoResponse = yield this.sendMessage({
+                                                            to: message.from,
+                                                            message: chatbotResponse.response
+                                                        });
+                                                        if (autoResponse.success) {
+                                                            console.log(`✅ [Takeover] Respuesta IA enviada exitosamente`);
+                                                        }
+                                                        else {
+                                                            console.error(`❌ [Takeover] Error enviando respuesta IA:`, autoResponse.error);
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log(`🤖 [Takeover] IA procesó mensaje pero no requiere respuesta`);
+                                                    }
+                                                }
+                                                else {
+                                                    console.log(`👤 [Takeover] IA está INACTIVA para conversación: ${result.conversation.id} - Esperando agente humano`);
+                                                    // TODO: Emitir evento especial para notificar que necesita atención humana
+                                                    if (this.io) {
+                                                        this.io.emit('conversation_needs_human_attention', {
+                                                            conversationId: result.conversation.id,
+                                                            message: processedMessage,
+                                                            timestamp: new Date().toISOString()
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                            catch (chatbotError) {
+                                                console.error(`❌ [Takeover] Error procesando con IA:`, chatbotError);
+                                                // En caso de error de IA, notificar que necesita atención humana
+                                                if (this.io) {
+                                                    this.io.emit('conversation_needs_human_attention', {
+                                                        conversationId: result.conversation.id,
+                                                        message: processedMessage,
+                                                        error: 'Error en procesamiento IA',
+                                                        timestamp: new Date().toISOString()
+                                                    });
+                                                }
+                                            }
+                                        }
                                         // Emitir evento de Socket.IO para nuevo mensaje
                                         if (this.io) {
                                             this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
@@ -292,8 +364,8 @@ class WhatsAppService {
                                             console.log('🌐 Evento Socket.IO emitido para nuevo mensaje');
                                         }
                                         // Respuesta automática (solo para mensajes de texto)
-                                        if (message.type === 'text' && ((_d = message.text) === null || _d === void 0 ? void 0 : _d.body)) {
-                                            this.sendAutoReply(message.from, ((_e = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _e === void 0 ? void 0 : _e.name) || 'Cliente');
+                                        if (message.type === 'text' && ((_e = message.text) === null || _e === void 0 ? void 0 : _e.body)) {
+                                            this.sendAutoReply(message.from, ((_f = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _f === void 0 ? void 0 : _f.name) || 'Cliente');
                                         }
                                     }
                                     catch (dbError) {

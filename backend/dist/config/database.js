@@ -20,6 +20,8 @@ class DatabaseService {
     constructor() {
         this.connectionPool = new Map();
         this.isConnected = false;
+        // NUEVO: Caché en memoria para resúmenes (más barato que Redis)
+        this.summaryCache = new Map();
         const appConfig = (0, index_1.getConfig)();
         this.config = {
             supabaseUrl: appConfig.database.supabaseUrl,
@@ -43,6 +45,8 @@ class DatabaseService {
             }
         });
         this.initializeConnection();
+        // NUEVO: Limpiar caché expirado cada 10 minutos
+        setInterval(() => this.cleanExpiredSummaryCache(), 10 * 60 * 1000);
     }
     /**
      * Inicializa la conexión y crea las tablas si no existen
@@ -79,13 +83,15 @@ class DatabaseService {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('[DatabaseService] Creando esquema de base de datos...');
             const tableSchemas = [
-                // Tabla de conversaciones
+                // Tabla de conversaciones (ACTUALIZADA con ai_mode)
                 `CREATE TABLE IF NOT EXISTS conversations (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
         phone_number TEXT NOT NULL,
         point_of_sale_id TEXT NOT NULL,
         status TEXT DEFAULT 'active',
+        ai_mode TEXT DEFAULT 'active' CHECK (ai_mode IN ('active', 'inactive')),
+        assigned_agent_id TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         metadata JSONB DEFAULT '{}'::jsonb
@@ -126,14 +132,27 @@ class DatabaseService {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );`,
+                // NUEVA: Tabla de resúmenes de conversación
+                `CREATE TABLE IF NOT EXISTS conversation_summaries (
+        id TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+        summary_text TEXT NOT NULL,
+        key_points JSONB DEFAULT '{}'::jsonb,
+        last_message_count INTEGER NOT NULL,
+        generated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        expires_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '24 hours')
+      );`,
                 // Índices para performance
                 `CREATE INDEX IF NOT EXISTS idx_conversations_phone ON conversations(phone_number);`,
                 `CREATE INDEX IF NOT EXISTS idx_conversations_pos ON conversations(point_of_sale_id);`,
                 `CREATE INDEX IF NOT EXISTS idx_conversations_updated ON conversations(updated_at);`,
+                `CREATE INDEX IF NOT EXISTS idx_conversations_ai_mode ON conversations(ai_mode);`, // NUEVO
                 `CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);`,
                 `CREATE INDEX IF NOT EXISTS idx_messages_timestamp ON messages(timestamp);`,
                 `CREATE INDEX IF NOT EXISTS idx_user_profiles_phone ON user_profiles(phone_number);`,
-                `CREATE INDEX IF NOT EXISTS idx_memory_conversation ON conversation_memory(conversation_id);`
+                `CREATE INDEX IF NOT EXISTS idx_memory_conversation ON conversation_memory(conversation_id);`,
+                `CREATE INDEX IF NOT EXISTS idx_summaries_conversation ON conversation_summaries(conversation_id);`, // NUEVO
+                `CREATE INDEX IF NOT EXISTS idx_summaries_expires ON conversation_summaries(expires_at);` // NUEVO
             ];
             for (const schema of tableSchemas) {
                 try {
@@ -385,21 +404,215 @@ class DatabaseService {
             }
         });
     }
+    // NUEVOS MÉTODOS PARA TAKEOVER
+    /**
+     * Cambia el modo de IA para una conversación (takeover)
+     */
+    setConversationAIMode(conversationId, mode, agentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const updateData = {
+                    ai_mode: mode,
+                    updated_at: new Date().toISOString()
+                };
+                if (mode === 'inactive' && agentId) {
+                    updateData.assigned_agent_id = agentId;
+                }
+                else if (mode === 'active') {
+                    updateData.assigned_agent_id = null;
+                }
+                const { error } = yield this.supabase
+                    .from('conversations')
+                    .update(updateData)
+                    .eq('id', conversationId);
+                if (error) {
+                    console.error('[DatabaseService] Error actualizando modo IA:', error);
+                    return { success: false, error: error.message };
+                }
+                console.log(`[DatabaseService] ✅ Modo IA actualizado: ${conversationId} -> ${mode}`);
+                return { success: true };
+            }
+            catch (error) {
+                console.error('[DatabaseService] Error en setConversationAIMode:', error);
+                return { success: false, error: error.message };
+            }
+        });
+    }
+    /**
+     * Obtiene el modo de IA para una conversación
+     */
+    getConversationAIMode(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { data, error } = yield this.supabase
+                    .from('conversations')
+                    .select('ai_mode, assigned_agent_id')
+                    .eq('id', conversationId)
+                    .single();
+                if (error || !data) {
+                    console.error('[DatabaseService] Error obteniendo modo IA:', error);
+                    return null;
+                }
+                return {
+                    aiMode: data.ai_mode,
+                    assignedAgentId: data.assigned_agent_id
+                };
+            }
+            catch (error) {
+                console.error('[DatabaseService] Error en getConversationAIMode:', error);
+                return null;
+            }
+        });
+    }
+    // NUEVOS MÉTODOS PARA RESÚMENES
+    /**
+     * Obtiene un resumen de conversación desde caché o base de datos
+     */
+    getConversationSummary(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // 1. Verificar caché en memoria primero
+                const cached = this.summaryCache.get(conversationId);
+                if (cached && cached.expiresAt > new Date()) {
+                    console.log(`[DatabaseService] ✅ Resumen desde caché: ${conversationId}`);
+                    return {
+                        summary: cached.summary,
+                        keyPoints: cached.keyPoints,
+                        isFromCache: true
+                    };
+                }
+                // 2. Verificar base de datos
+                const { data, error } = yield this.supabase
+                    .from('conversation_summaries')
+                    .select('summary_text, key_points, last_message_count')
+                    .eq('conversation_id', conversationId)
+                    .gt('expires_at', new Date().toISOString())
+                    .order('generated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                if (!error && data) {
+                    // Agregar al caché en memoria
+                    this.summaryCache.set(conversationId, {
+                        summary: data.summary_text,
+                        keyPoints: data.key_points,
+                        messageCount: data.last_message_count,
+                        cachedAt: new Date(),
+                        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
+                    });
+                    console.log(`[DatabaseService] ✅ Resumen desde BD: ${conversationId}`);
+                    return {
+                        summary: data.summary_text,
+                        keyPoints: data.key_points,
+                        isFromCache: false
+                    };
+                }
+                return null;
+            }
+            catch (error) {
+                console.error('[DatabaseService] Error obteniendo resumen:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Guarda un nuevo resumen de conversación
+     */
+    saveConversationSummary(conversationId, summary, keyPoints, messageCount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const summaryData = {
+                    id: `summary_${conversationId}_${Date.now()}`,
+                    conversation_id: conversationId,
+                    summary_text: summary,
+                    key_points: keyPoints,
+                    last_message_count: messageCount,
+                    generated_at: new Date().toISOString(),
+                    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 horas
+                };
+                const { error } = yield this.supabase
+                    .from('conversation_summaries')
+                    .insert(summaryData);
+                if (error) {
+                    console.error('[DatabaseService] Error guardando resumen:', error);
+                    return { success: false, error: error.message };
+                }
+                // Actualizar caché en memoria
+                this.summaryCache.set(conversationId, {
+                    summary,
+                    keyPoints,
+                    messageCount,
+                    cachedAt: new Date(),
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+                });
+                console.log(`[DatabaseService] ✅ Resumen guardado: ${conversationId}`);
+                return { success: true };
+            }
+            catch (error) {
+                console.error('[DatabaseService] Error en saveConversationSummary:', error);
+                return { success: false, error: error.message };
+            }
+        });
+    }
+    /**
+     * Obtiene el historial completo de mensajes para una conversación
+     */
+    getConversationHistory(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { data, error } = yield this.supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('conversation_id', conversationId)
+                    .order('timestamp', { ascending: true });
+                if (error) {
+                    console.error('[DatabaseService] Error obteniendo historial:', error);
+                    return [];
+                }
+                return data || [];
+            }
+            catch (error) {
+                console.error('[DatabaseService] Error en getConversationHistory:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Limpia resúmenes expirados del caché en memoria
+     */
+    cleanExpiredSummaryCache() {
+        const now = new Date();
+        const expiredKeys = [];
+        for (const [key, cached] of this.summaryCache.entries()) {
+            if (cached.expiresAt <= now) {
+                expiredKeys.push(key);
+            }
+        }
+        expiredKeys.forEach(key => this.summaryCache.delete(key));
+        if (expiredKeys.length > 0) {
+            console.log(`[DatabaseService] 🧹 Limpieza de caché: ${expiredKeys.length} resúmenes expirados eliminados`);
+        }
+    }
     getStats() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const [conversations, messages, profiles, memory] = yield Promise.all([
+                const [conversations, messages, profiles, memory, summaries] = yield Promise.all([
                     this.supabase.from('conversations').select('count'),
                     this.supabase.from('messages').select('count'),
                     this.supabase.from('user_profiles').select('count'),
-                    this.supabase.from('conversation_memory').select('count')
+                    this.supabase.from('conversation_memory').select('count'),
+                    this.supabase.from('conversation_summaries').select('count') // NUEVO
                 ]);
                 return {
                     isConnected: this.isConnected,
                     conversations: conversations.count || 0,
                     messages: messages.count || 0,
                     userProfiles: profiles.count || 0,
-                    conversationMemory: memory.count || 0
+                    conversationMemory: memory.count || 0,
+                    conversationSummaries: summaries.count || 0, // NUEVO
+                    cacheStats: {
+                        summariesInCache: this.summaryCache.size,
+                        cacheHitRate: 'N/A' // Se puede calcular con métricas adicionales
+                    }
                 };
             }
             catch (error) {

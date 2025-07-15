@@ -6,7 +6,38 @@ import { useMediaUpload } from "../hooks/useMediaUpload";
 import { MESSAGES } from "../constants/messages";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
+import whatsappApi from "../services/whatsapp-api"; // NUEVO: Import para takeover y resúmenes
 import type { Message } from "../types";
+
+// NUEVOS: Interfaces para takeover y resúmenes
+interface AIMode {
+  aiMode: 'active' | 'inactive';
+  assignedAgentId?: string;
+}
+
+interface ConversationSummary {
+  summary: string;
+  keyPoints: {
+    clientName?: string;
+    product?: string;
+    vehicle?: {
+      brand?: string;
+      model?: string;
+      year?: number;
+      engine?: string;
+    };
+    location?: {
+      postalCode?: string;
+      city?: string;
+    };
+    status?: string;
+    nextAction?: string;
+    estimatedValue?: string;
+  };
+  isFromCache: boolean;
+  messageCount: number;
+  generatedAt: string;
+}
 
 // Componente para una burbuja de mensaje individual
 const MessageBubble: React.FC<{ 
@@ -117,46 +148,259 @@ const MessageBubble: React.FC<{
   );
 };
 
-// Componente principal del panel de chat
+// NUEVO: Modal para mostrar resumen de conversación
+const SummaryModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  summary: ConversationSummary | null;
+  isLoading: boolean;
+  error: string | null;
+  onRegenerate: () => void;
+}> = ({ isOpen, onClose, summary, isLoading, error, onRegenerate }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-embler-dark border border-embler-accent rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-embler-accent">
+          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+              <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 2a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"/>
+            </svg>
+            Resumen de Conversación
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onRegenerate}
+              disabled={isLoading}
+              className="px-3 py-1 text-sm bg-embler-accent text-white rounded hover:bg-embler-accent/80 disabled:opacity-50"
+            >
+              {isLoading ? '⟳' : '🔄'} Regenerar
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white"
+              title="Cerrar resumen"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 overflow-y-auto max-h-[calc(80vh-140px)]">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-embler-yellow"></div>
+              <span className="ml-3 text-gray-300">Generando resumen con IA...</span>
+            </div>
+          ) : error ? (
+            <div className="text-red-400 bg-red-400/10 border border-red-400/20 rounded p-4">
+              <strong>Error:</strong> {error}
+            </div>
+          ) : summary ? (
+            <div className="space-y-6">
+              {/* Resumen principal */}
+              <div>
+                <h4 className="text-white font-medium mb-2">📄 Resumen</h4>
+                <p className="text-gray-300 leading-relaxed bg-gray-800/50 rounded p-3">
+                  {summary.summary}
+                </p>
+              </div>
+
+              {/* Puntos clave */}
+              <div>
+                <h4 className="text-white font-medium mb-3">🔍 Información Clave</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
+                  {summary.keyPoints.clientName && (
+                    <div className="bg-gray-800/50 rounded p-3">
+                      <span className="text-embler-yellow font-medium">👤 Cliente:</span>
+                      <span className="text-gray-300 ml-2">{summary.keyPoints.clientName}</span>
+                    </div>
+                  )}
+
+                  {summary.keyPoints.product && (
+                    <div className="bg-gray-800/50 rounded p-3">
+                      <span className="text-embler-yellow font-medium">🔧 Producto:</span>
+                      <span className="text-gray-300 ml-2">{summary.keyPoints.product}</span>
+                    </div>
+                  )}
+
+                  {summary.keyPoints.vehicle && Object.keys(summary.keyPoints.vehicle).length > 0 && (
+                    <div className="bg-gray-800/50 rounded p-3 md:col-span-2">
+                      <span className="text-embler-yellow font-medium">🚗 Vehículo:</span>
+                      <div className="text-gray-300 ml-2 mt-1">
+                        {summary.keyPoints.vehicle.brand && summary.keyPoints.vehicle.model && 
+                          `${summary.keyPoints.vehicle.brand} ${summary.keyPoints.vehicle.model}`}
+                        {summary.keyPoints.vehicle.year && ` (${summary.keyPoints.vehicle.year})`}
+                        {summary.keyPoints.vehicle.engine && ` - ${summary.keyPoints.vehicle.engine}`}
+                      </div>
+                    </div>
+                  )}
+
+                  {summary.keyPoints.location?.postalCode && (
+                    <div className="bg-gray-800/50 rounded p-3">
+                      <span className="text-embler-yellow font-medium">📍 Ubicación:</span>
+                      <span className="text-gray-300 ml-2">
+                        CP {summary.keyPoints.location.postalCode}
+                        {summary.keyPoints.location.city && `, ${summary.keyPoints.location.city}`}
+                      </span>
+                    </div>
+                  )}
+
+                  {summary.keyPoints.status && (
+                    <div className="bg-gray-800/50 rounded p-3">
+                      <span className="text-embler-yellow font-medium">📊 Estado:</span>
+                      <span className="text-gray-300 ml-2">{summary.keyPoints.status}</span>
+                    </div>
+                  )}
+
+                  {summary.keyPoints.nextAction && (
+                    <div className="bg-gray-800/50 rounded p-3 md:col-span-2">
+                      <span className="text-embler-yellow font-medium">➡️ Próxima acción:</span>
+                      <span className="text-gray-300 ml-2">{summary.keyPoints.nextAction}</span>
+                    </div>
+                  )}
+
+                  {summary.keyPoints.estimatedValue && (
+                    <div className="bg-gray-800/50 rounded p-3">
+                      <span className="text-embler-yellow font-medium">💰 Valor estimado:</span>
+                      <span className="text-gray-300 ml-2">{summary.keyPoints.estimatedValue}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Metadata */}
+              <div className="text-xs text-gray-500 border-t border-gray-700 pt-3">
+                📊 {summary.messageCount} mensajes analizados • 
+                {summary.isFromCache ? ' 📋 Desde caché' : ' 🆕 Generado'} • 
+                {new Date(summary.generatedAt).toLocaleString('es-MX')}
+              </div>
+            </div>
+          ) : (
+            <div className="text-gray-400 text-center py-8">
+              No hay resumen disponible
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ChatPanel: React.FC = () => {
+  const { currentChat, messages, sendMessage, markAsRead } = useChat();
+  const { user } = useAuth();
+  const { sendMessage: sendWhatsAppMessage } = useWhatsApp();
+  const { uploadAndSend, isUploading, uploadProgress, error: uploadError } = useMediaUpload({
+    apiBaseUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002',
+  });
+
+  // States existentes
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [whatsappMode, setWhatsappMode] = useState(false);
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [showMediaUpload, setShowMediaUpload] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  const { 
-    currentChat, 
-    currentMessages, 
-    sendMessage, 
-    getRelativeTime,
-    isOwnMessage 
-  } = useChat();
-  
-  const { state: authState, logout } = useAuth();
-  
-  // WhatsApp integration
-  const {
-    isConnected: whatsappConnected,
-    connectionStatus,
-    sendMessage: sendWhatsAppMessage,
-    formatPhone,
-    validatePhone,
-    checkConnection: checkWhatsAppConnection
-  } = useWhatsApp();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Media upload integration
-  const {
-    uploadAndSend,
-    isUploading,
-    error: uploadError
-  } = useMediaUpload();
+  // NUEVOS: Estados para takeover y resúmenes
+  const [aiMode, setAiMode] = useState<AIMode>({ aiMode: 'active' });
+  const [isChangingMode, setIsChangingMode] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [conversationSummary, setConversationSummary] = useState<ConversationSummary | null>(null);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+
+  // NUEVOS: Funciones para takeover y resúmenes
+  const getCurrentConversationId = (): string | null => {
+    if (!currentChat?.clientPhone) return null;
+    return whatsappApi.formatConversationId(currentChat.clientPhone);
+  };
+
+  const loadAIMode = async () => {
+    const conversationId = getCurrentConversationId();
+    if (!conversationId) return;
+
+    try {
+      const response = await whatsappApi.getConversationMode(conversationId);
+      if (response.success && response.data) {
+        setAiMode({
+          aiMode: response.data.aiMode,
+          assignedAgentId: response.data.assignedAgentId
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando modo IA:', error);
+    }
+  };
+
+  const handleToggleAI = async () => {
+    const conversationId = getCurrentConversationId();
+    if (!conversationId || isChangingMode) return;
+
+    setIsChangingMode(true);
+    try {
+      const newMode = aiMode.aiMode === 'active' ? 'inactive' : 'active';
+      const agentId = newMode === 'inactive' ? user?.id || 'agent-1' : undefined;
+
+      const response = await whatsappApi.setConversationMode(conversationId, newMode, agentId);
+      
+      if (response.success && response.data) {
+        setAiMode({
+          aiMode: response.data.aiMode,
+          assignedAgentId: response.data.assignedAgentId
+        });
+        
+        console.log(`✅ Modo IA cambiado a: ${newMode}`);
+      } else {
+        console.error('Error cambiando modo IA:', response.error);
+      }
+    } catch (error) {
+      console.error('Error en toggleAI:', error);
+    } finally {
+      setIsChangingMode(false);
+    }
+  };
+
+  const handleGenerateSummary = async (forceRegenerate: boolean = false) => {
+    const conversationId = getCurrentConversationId();
+    if (!conversationId) return;
+
+    setIsSummaryLoading(true);
+    setSummaryError(null);
+    
+    try {
+      const response = await whatsappApi.generateConversationSummary(conversationId, forceRegenerate);
+      
+      if (response.success && response.data) {
+        setConversationSummary(response.data);
+        setShowSummaryModal(true);
+      } else {
+        setSummaryError(response.error || 'Error generando resumen');
+      }
+    } catch (error: any) {
+      setSummaryError(error.message || 'Error de conexión');
+    } finally {
+      setIsSummaryLoading(false);
+    }
+  };
+
+  // Cargar modo IA al cambiar de chat
+  useEffect(() => {
+    if (currentChat) {
+      loadAIMode();
+    }
+  }, [currentChat?.id]);
 
   // Auto-scroll al final cuando llegan nuevos mensajes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentMessages]);
+  }, [messages]);
 
   // Simular indicador de escritura
   useEffect(() => {
@@ -392,7 +636,10 @@ const ChatPanel: React.FC = () => {
           )}
           
           {/* Botón de información */}
-          <button className="p-2 rounded-lg hover:bg-embler-dark/20 transition-colors text-gray-400 hover:text-white">
+          <button 
+            className="p-2 rounded-lg hover:bg-embler-dark/20 transition-colors text-gray-400 hover:text-white"
+            title="Información del chat"
+          >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

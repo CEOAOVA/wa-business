@@ -265,6 +265,150 @@ class WhatsAppApiService {
       method: 'DELETE'
     });
   }
+
+  /**
+   * Obtener archivos de media
+   */
+  async getMediaFiles(): Promise<ApiResponse<any[]>> {
+    return this.request<any[]>('/media/stats');
+  }
+
+  // ============================================
+  // NUEVOS MÉTODOS PARA TAKEOVER Y RESÚMENES
+  // ============================================
+
+  /**
+   * Cambiar modo de IA para una conversación (takeover)
+   */
+  async setConversationMode(conversationId: string, mode: 'active' | 'inactive', agentId?: string): Promise<ApiResponse<{
+    conversationId: string;
+    aiMode: 'active' | 'inactive';
+    assignedAgentId?: string;
+  }>> {
+    console.log(`🤖 [WhatsAppApi] Cambiando modo IA: ${conversationId} -> ${mode}`, agentId ? `(Agente: ${agentId})` : '');
+    
+    const requestData: any = { mode };
+    if (mode === 'inactive' && agentId) {
+      requestData.agentId = agentId;
+    }
+
+    return this.request<{
+      conversationId: string;
+      aiMode: 'active' | 'inactive';
+      assignedAgentId?: string;
+    }>(`/conversations/${conversationId}/set-mode`, {
+      method: 'POST',
+      body: JSON.stringify(requestData)
+    });
+  }
+
+  /**
+   * Obtener modo actual de IA para una conversación
+   */
+  async getConversationMode(conversationId: string): Promise<ApiResponse<{
+    conversationId: string;
+    aiMode: 'active' | 'inactive';
+    assignedAgentId?: string;
+  }>> {
+    console.log(`🔍 [WhatsAppApi] Consultando modo IA para: ${conversationId}`);
+    
+    return this.request<{
+      conversationId: string;
+      aiMode: 'active' | 'inactive';
+      assignedAgentId?: string;
+    }>(`/conversations/${conversationId}/mode`);
+  }
+
+  /**
+   * Generar resumen de conversación
+   */
+  async generateConversationSummary(conversationId: string, forceRegenerate: boolean = false): Promise<ApiResponse<{
+    summary: string;
+    keyPoints: {
+      clientName?: string;
+      product?: string;
+      vehicle?: {
+        brand?: string;
+        model?: string;
+        year?: number;
+        engine?: string;
+      };
+      location?: {
+        postalCode?: string;
+        city?: string;
+      };
+      status?: string;
+      nextAction?: string;
+      estimatedValue?: string;
+    };
+    isFromCache: boolean;
+    conversationId: string;
+    messageCount: number;
+    generatedAt: string;
+  }>> {
+    console.log(`📝 [WhatsAppApi] Generando resumen para: ${conversationId}`, forceRegenerate ? '(Forzar regeneración)' : '');
+    
+    const queryParams = forceRegenerate ? '?forceRegenerate=true' : '';
+    
+    return this.request<{
+      summary: string;
+      keyPoints: any;
+      isFromCache: boolean;
+      conversationId: string;
+      messageCount: number;
+      generatedAt: string;
+    }>(`/conversations/${conversationId}/summary${queryParams}`);
+  }
+
+  /**
+   * Obtener historial de mensajes de una conversación
+   */
+  async getConversationMessages(conversationId: string, limit?: number, offset?: number): Promise<ApiResponse<{
+    messages: Array<{
+      id: string;
+      role: 'user' | 'assistant' | 'system';
+      content: string;
+      timestamp: string;
+      metadata: any;
+    }>;
+    total: number;
+    conversationId: string;
+  }>> {
+    console.log(`📨 [WhatsAppApi] Obteniendo historial para: ${conversationId}`);
+    
+    const queryParams = new URLSearchParams();
+    if (limit) queryParams.append('limit', limit.toString());
+    if (offset) queryParams.append('offset', offset.toString());
+    
+    const queryString = queryParams.toString();
+    const endpoint = `/conversations/${conversationId}/messages${queryString ? `?${queryString}` : ''}`;
+    
+    return this.request<{
+      messages: any[];
+      total: number;
+      conversationId: string;
+    }>(endpoint);
+  }
+
+  // ============================================
+  // MÉTODOS DE UTILIDAD
+  // ============================================
+
+  /**
+   * Formatear ID de conversación desde número de teléfono
+   */
+  static formatConversationId(phoneNumber: string): string {
+    // Remover caracteres no numéricos y agregar prefijo
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    return `whatsapp-${cleanPhone}`;
+  }
+
+  /**
+   * Extraer número de teléfono desde ID de conversación
+   */
+  static extractPhoneFromConversationId(conversationId: string): string {
+    return conversationId.replace('whatsapp-', '');
+  }
 }
 
 // Instancia singleton

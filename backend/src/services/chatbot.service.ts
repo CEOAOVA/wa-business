@@ -249,7 +249,11 @@ export class ChatbotService {
   /**
    * Llamar a OpenRouter API
    */
-  private async callOpenRouter(messages: OpenRouterMessage[], tools?: OpenRouterTool[]): Promise<OpenRouterResponse> {
+  private async callOpenRouter(
+    messages: OpenRouterMessage[], 
+    tools?: OpenRouterTool[], 
+    options?: { temperature?: number; maxTokens?: number }
+  ): Promise<OpenRouterResponse> {
     const apiKey = process.env.OPENROUTER_API_KEY;
     
     if (!apiKey) {
@@ -261,8 +265,8 @@ export class ChatbotService {
       messages: messages,
       tools: tools || undefined,
       tool_choice: tools ? 'auto' : undefined,
-      temperature: 0.7,
-      max_tokens: 1000,
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 1000,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0
@@ -502,6 +506,167 @@ En la conversación sé natural e inteligente.`
 
     if (cleaned > 0) {
       console.log(`[ChatbotService] Limpiadas ${cleaned} sesiones expiradas`);
+    }
+  }
+
+  /**
+   * Genera un resumen inteligente de la conversación usando IA
+   */
+  async generateConversationSummary(conversationId: string, messages: any[]): Promise<{
+    text: string;
+    keyPoints: {
+      clientName?: string;
+      clientPhone?: string;
+      product?: string;
+      vehicle?: {
+        brand?: string;
+        model?: string;
+        year?: number;
+        engine?: string;
+        vin?: string;
+      };
+      location?: {
+        postalCode?: string;
+        city?: string;
+      };
+      status?: string;
+      nextAction?: string;
+      estimatedValue?: string;
+    };
+  }> {
+    try {
+      console.log(`[ChatbotService] 📝 Generando resumen para conversación: ${conversationId}`);
+
+      // 1. Formatear historial de mensajes para el prompt
+      const conversationHistory = messages.map(msg => {
+        const timestamp = new Date(msg.timestamp).toLocaleString('es-MX');
+        const role = msg.role === 'user' ? 'Cliente' : 'Asistente';
+        return `[${timestamp}] ${role}: ${msg.content}`;
+      }).join('\n');
+
+      // 2. Crear prompt especializado para resumen
+      const summaryPrompt = `Analiza la siguiente conversación de WhatsApp entre un cliente y un asistente de refacciones automotrices.
+
+CONVERSACIÓN:
+${conversationHistory}
+
+INSTRUCCIONES:
+1. Genera un resumen conciso de la conversación en 2-3 oraciones.
+2. Extrae la información clave del cliente y su necesidad.
+3. Responde en formato JSON con la estructura especificada.
+
+FORMATO DE RESPUESTA JSON:
+{
+  "summary": "Resumen breve de la conversación",
+  "keyPoints": {
+    "clientName": "Nombre del cliente si se mencionó",
+    "product": "Producto o refacción solicitada",
+    "vehicle": {
+      "brand": "Marca del vehículo",
+      "model": "Modelo del vehículo", 
+      "year": año_del_vehículo,
+      "engine": "Motor/Cilindrada"
+    },
+    "location": {
+      "postalCode": "Código postal",
+      "city": "Ciudad"
+    },
+    "status": "Estado actual de la conversación",
+    "nextAction": "Próxima acción recomendada",
+    "estimatedValue": "Valor estimado si se mencionó"
+  }
+}
+
+EJEMPLO:
+{
+  "summary": "Cliente Carlos solicita pastillas de freno para su Toyota Corolla 2018 1.8L. Se recopiló información básica y está listo para cotización.",
+  "keyPoints": {
+    "clientName": "Carlos",
+    "product": "Pastillas de freno",
+    "vehicle": {
+      "brand": "Toyota",
+      "model": "Corolla",
+      "year": 2018,
+      "engine": "1.8L"
+    },
+    "location": {
+      "postalCode": "06100"
+    },
+    "status": "Información recopilada",
+    "nextAction": "Generar cotización"
+  }
+}`;
+
+      // 3. Llamar a OpenRouter para generar el resumen
+      const response = await this.callOpenRouter([
+        {
+          role: 'system',
+          content: 'Eres un asistente especializado en generar resúmenes de conversaciones de ventas de refacciones automotrices. Siempre respondes en formato JSON válido.'
+        },
+        {
+          role: 'user',
+          content: summaryPrompt
+        }
+      ], undefined, {
+        temperature: 0.3, // Baja temperatura para respuestas más consistentes
+        maxTokens: 800
+      });
+
+      // 4. Parsear respuesta JSON
+      let summaryData;
+      try {
+        const responseText = response.choices[0]?.message?.content?.trim() || '{}';
+        // Extraer JSON si viene con texto adicional
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        const jsonText = jsonMatch ? jsonMatch[0] : responseText;
+        summaryData = JSON.parse(jsonText);
+      } catch (parseError) {
+        console.error('[ChatbotService] Error parseando JSON del resumen:', parseError);
+        // Fallback: generar resumen básico
+        summaryData = {
+          summary: `Conversación con ${messages.length} mensajes. Última actividad: ${new Date().toLocaleString('es-MX')}`,
+          keyPoints: {
+            status: 'En proceso',
+            nextAction: 'Revisar conversación manualmente'
+          }
+        };
+      }
+
+      // 5. Validar y completar datos faltantes
+      const result = {
+        text: summaryData.summary || 'Resumen no disponible',
+        keyPoints: {
+          clientName: summaryData.keyPoints?.clientName,
+          product: summaryData.keyPoints?.product,
+          vehicle: summaryData.keyPoints?.vehicle || {},
+          location: summaryData.keyPoints?.location || {},
+          status: summaryData.keyPoints?.status || 'En proceso',
+          nextAction: summaryData.keyPoints?.nextAction || 'Continuar conversación',
+          estimatedValue: summaryData.keyPoints?.estimatedValue
+        }
+      };
+
+      console.log(`[ChatbotService] ✅ Resumen generado exitosamente:`, {
+        conversationId,
+        summaryLength: result.text.length,
+        hasClientName: !!result.keyPoints.clientName,
+        hasProduct: !!result.keyPoints.product,
+        hasVehicle: Object.keys(result.keyPoints.vehicle).length > 0
+      });
+
+      return result;
+
+    } catch (error: any) {
+      console.error('[ChatbotService] Error generando resumen:', error);
+      
+      // Fallback en caso de error
+      return {
+        text: `Error generando resumen automático. Conversación con ${messages.length} mensajes del ${new Date().toLocaleDateString('es-MX')}.`,
+        keyPoints: {
+          status: 'Error en resumen',
+          nextAction: 'Revisar conversación manualmente'
+        }
+      };
     }
   }
 
