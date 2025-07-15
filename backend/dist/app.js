@@ -22,6 +22,7 @@ const contacts_1 = __importDefault(require("./routes/contacts"));
 const media_upload_1 = __importDefault(require("./routes/media-upload"));
 const chatbot_1 = __importDefault(require("./routes/chatbot"));
 const auth_1 = __importDefault(require("./routes/auth"));
+const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const whatsapp_1 = require("./config/whatsapp");
 const whatsapp_service_1 = require("./services/whatsapp.service");
 const security_1 = require("./middleware/security");
@@ -81,6 +82,8 @@ app.use('/api/contacts', contacts_1.default);
 app.use('/api/media', media_upload_1.default);
 // Rutas del chatbot con IA
 app.use('/api/chatbot', chatbot_1.default);
+// Rutas del dashboard
+app.use('/api/dashboard', dashboard_1.default);
 // Información de la API
 app.get('/api', (_req, res) => {
     res.json({
@@ -127,6 +130,14 @@ app.get('/api', (_req, res) => {
                 conversation: '/api/chatbot/conversation/:phoneNumber',
                 stats: '/api/chatbot/stats',
                 testAI: '/api/chatbot/test-ai'
+            },
+            dashboard: {
+                stats: '/api/dashboard/stats',
+                conversations: '/api/dashboard/conversations',
+                popularProducts: '/api/dashboard/products/popular',
+                analytics: '/api/dashboard/analytics/summary',
+                health: '/api/dashboard/system/health',
+                testChatbot: '/api/dashboard/test/chatbot'
             }
         },
         websocket: {

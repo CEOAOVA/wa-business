@@ -81,39 +81,40 @@ services:
       - "coolify.service=wa-business-backend"
       - "traefik.enable=true"
       
-      # Router principal
+      # Router HTTPS principal
       - "traefik.http.routers.wa-business-backend.rule=Host(`dev-apiwaprueba.aova.mx`)"
       - "traefik.http.routers.wa-business-backend.tls=true"
-      - "traefik.http.routers.wa-business-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wa-business-backend.tls.certresolver=myresolver"
       - "traefik.http.routers.wa-business-backend.entrypoints=websecure"
+      - "traefik.http.routers.wa-business-backend.service=wa-business-backend"
       
-      # Redirect HTTP a HTTPS
+      # Router HTTP (redirect a HTTPS)
       - "traefik.http.routers.wa-business-backend-http.rule=Host(`dev-apiwaprueba.aova.mx`)"
       - "traefik.http.routers.wa-business-backend-http.entrypoints=web"
-      - "traefik.http.routers.wa-business-backend-http.middlewares=wa-api-redirect-https"
-      - "traefik.http.middlewares.wa-api-redirect-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.wa-api-redirect-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.wa-business-backend-http.middlewares=backend-redirect-https"
+      - "traefik.http.routers.wa-business-backend-http.service=wa-business-backend"
+      
+      # Middleware para redirect HTTPS del backend
+      - "traefik.http.middlewares.backend-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.backend-redirect-https.redirectscheme.permanent=true"
       
       # Service configuration
       - "traefik.http.services.wa-business-backend.loadbalancer.server.port=3002"
       
-      # Security headers específicos para API
-      - "traefik.http.middlewares.wa-api-headers.headers.forcestsheader=true"
-      - "traefik.http.middlewares.wa-api-headers.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.wa-api-headers.headers.stsseconds=31536000"
-      - "traefik.http.middlewares.wa-api-headers.headers.stspreload=true"
-      - "traefik.http.middlewares.wa-api-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.wa-api-headers.headers.customrequestheaders.X-Forwarded-For="
+      # Security headers middleware
+      - "traefik.http.middlewares.backend-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.backend-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.backend-headers.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.backend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       
-      # CORS headers para API
-      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
-      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolallowheaders=Content-Type,Authorization,X-Requested-With,Accept,Origin,X-CSRF-Token"
-      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolalloworiginlistregex=^https://(.*\\.)?aova\\.mx$"
-      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolallowcredentials=true"
-      - "traefik.http.middlewares.wa-api-cors.headers.accesscontrolmaxage=86400"
+      # CORS middleware
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=Content-Type,Authorization,X-Requested-With,Accept,Origin,X-CSRF-Token,X-Hub-Signature-256"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlistregex=^https://(.*\\.)?aova\\.mx$"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowcredentials=true"
       
-      # Chain middlewares
-      - "traefik.http.routers.wa-business-backend.middlewares=wa-api-headers,wa-api-cors"
+      # Apply middlewares to HTTPS router
+      - "traefik.http.routers.wa-business-backend.middlewares=backend-headers,backend-cors"
     
     # Configuración de recursos
     deploy:
@@ -165,37 +166,40 @@ services:
       - "coolify.type=frontend"
       - "traefik.enable=true"
       
-      # Router principal
+      # Router HTTPS principal
       - "traefik.http.routers.wa-business-frontend.rule=Host(`dev-waprueba.aova.mx`)"
       - "traefik.http.routers.wa-business-frontend.tls=true"
-      - "traefik.http.routers.wa-business-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wa-business-frontend.tls.certresolver=myresolver"
       - "traefik.http.routers.wa-business-frontend.entrypoints=websecure"
+      - "traefik.http.routers.wa-business-frontend.service=wa-business-frontend"
       
-      # Redirect HTTP a HTTPS
+      # Router HTTP (redirect a HTTPS)
       - "traefik.http.routers.wa-business-frontend-http.rule=Host(`dev-waprueba.aova.mx`)"
       - "traefik.http.routers.wa-business-frontend-http.entrypoints=web"
-      - "traefik.http.routers.wa-business-frontend-http.middlewares=wa-frontend-redirect-https"
-      - "traefik.http.middlewares.wa-frontend-redirect-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.wa-frontend-redirect-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.wa-business-frontend-http.middlewares=frontend-redirect-https"
+      - "traefik.http.routers.wa-business-frontend-http.service=wa-business-frontend"
+      
+      # Middleware para redirect HTTPS del frontend
+      - "traefik.http.middlewares.frontend-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.frontend-redirect-https.redirectscheme.permanent=true"
       
       # Service configuration
       - "traefik.http.services.wa-business-frontend.loadbalancer.server.port=80"
       
-      # Security headers
-      - "traefik.http.middlewares.wa-frontend-headers.headers.forcestsheader=true"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.stsseconds=31536000"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.stspreload=true"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.frameDeny=true"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.wa-frontend-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      # Security headers middleware
+      - "traefik.http.middlewares.frontend-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.frontend-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.frontend-headers.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.frontend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.frontend-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.frontend-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.frontend-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
       
-      # CSP header para aplicación web
-      - "traefik.http.middlewares.wa-frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss:; font-src 'self' https:; object-src 'none';"
+      # CSP middleware
+      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss:; font-src 'self' https:; object-src 'none';"
       
-      # Chain middlewares
-      - "traefik.http.routers.wa-business-frontend.middlewares=wa-frontend-headers,wa-frontend-csp"
+      # Apply middlewares to HTTPS router
+      - "traefik.http.routers.wa-business-frontend.middlewares=frontend-headers,frontend-csp"
     
     # Configuración de recursos
     deploy:

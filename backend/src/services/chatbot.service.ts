@@ -4,6 +4,7 @@
  */
 import axios from 'axios';
 import { whatsappService } from './whatsapp.service';
+import { databaseService } from './database.service';
 
 // Interfaces para el chatbot
 interface ChatbotMessage {
@@ -133,6 +134,9 @@ export class ChatbotService {
       
       conversation.messages.push(userMsg);
 
+      // Guardar mensaje del usuario en la base de datos
+      await this.saveMessageToDatabase(conversation.phoneNumber, userMsg);
+
       // Generar respuesta con IA
       const aiResponse = await this.generateAIResponse(conversation);
       
@@ -148,10 +152,16 @@ export class ChatbotService {
 
       conversation.messages.push(assistantMsg);
 
+      // Guardar respuesta del asistente en la base de datos
+      await this.saveMessageToDatabase(conversation.phoneNumber, assistantMsg);
+
       // Actualizar estado de la conversación si se procesó datos
       if (aiResponse.updatedClientInfo) {
         conversation.clientInfo = { ...conversation.clientInfo, ...aiResponse.updatedClientInfo };
         conversation.status = this.determineNextStatus(conversation.clientInfo);
+        
+        // Guardar resumen actualizado en la base de datos
+        await this.saveConversationSummary(conversation);
       }
 
       // Guardar conversación actualizada
@@ -181,6 +191,14 @@ export class ChatbotService {
    */
   private async startConversation(conversationId: string, phoneNumber: string): Promise<ConversationState> {
     const welcomeMessage = "¡Hola! 👋 Soy tu asistente especializado en repuestos automotrices de Embler. Te ayudo a encontrar exactamente lo que necesitas para tu vehículo. ¿En qué puedo ayudarte hoy?";
+
+    // Crear o obtener conversación en la base de datos
+    try {
+      const dbResult = await databaseService.getOrCreateConversationByPhone(phoneNumber);
+      console.log(`[ChatbotService] Conversación DB creada/obtenida para ${phoneNumber}`);
+    } catch (error) {
+      console.error('[ChatbotService] Error creando conversación en DB:', error);
+    }
 
     const conversation: ConversationState = {
       conversationId,
@@ -722,7 +740,99 @@ EJEMPLO:
       };
     }
   }
-}
+
+  /**
+   * Guardar mensaje en la base de datos
+   */
+  private async saveMessageToDatabase(phoneNumber: string, message: ChatbotMessage): Promise<void> {
+    try {
+      // Obtener conversación de la base de datos
+      const dbResult = await databaseService.getOrCreateConversationByPhone(phoneNumber);
+      
+      // Determinar el ID de conversación para Supabase
+      let conversationId: string | undefined;
+      
+      if (dbResult) {
+        conversationId = dbResult.id;
+      }
+
+      if (!conversationId) {
+        console.warn(`[ChatbotService] No se pudo obtener conversationId para ${phoneNumber}`);
+        return;
+      }
+
+      // Guardar mensaje usando el servicio híbrido
+      const result = await databaseService.createChatbotMessage({
+        conversationId,
+        contactPhone: phoneNumber,
+        senderType: message.role === 'user' ? 'user' : 'bot',
+        content: message.content,
+        messageType: 'text',
+        metadata: {
+          chatbotId: message.id,
+          functionCalled: message.functionCalled,
+          clientData: message.clientData
+        }
+      });
+
+      if (result.success) {
+        console.log(`[ChatbotService] Mensaje guardado en DB: ${result.messageId}`);
+      } else {
+        console.warn(`[ChatbotService] No se pudo guardar mensaje en DB para ${phoneNumber}`);
+      }
+         } catch (error) {
+       console.error('[ChatbotService] Error guardando mensaje en DB:', error);
+     }
+   }
+
+   /**
+    * Guardar resumen de conversación en la base de datos
+    */
+   private async saveConversationSummary(conversation: ConversationState): Promise<void> {
+     try {
+       // Obtener conversación de la base de datos
+       const dbResult = await databaseService.getOrCreateConversationByPhone(conversation.phoneNumber);
+       
+       // Determinar el ID de conversación para Supabase
+       let conversationId: string | undefined;
+       
+       if (dbResult) {
+         conversationId = dbResult.id;
+       }
+
+       if (!conversationId) {
+         console.warn(`[ChatbotService] No se pudo obtener conversationId para resumen de ${conversation.phoneNumber}`);
+         return;
+       }
+
+       // Crear datos del resumen
+       const summaryData = {
+         conversationId: conversation.conversationId,
+         phoneNumber: conversation.phoneNumber,
+         status: conversation.status,
+         clientInfo: conversation.clientInfo,
+         messageCount: conversation.messages.length,
+         lastActivity: conversation.lastActivity,
+         createdAt: conversation.createdAt
+       };
+
+       // Guardar resumen usando el servicio híbrido
+       const result = await databaseService.saveChatbotConversationSummary(
+         conversationId,
+         summaryData,
+         'gemini-2.5-flash-chatbot'
+       );
+
+       if (result.success) {
+         console.log(`[ChatbotService] Resumen guardado en DB: ${result.summaryId}`);
+       } else {
+         console.warn(`[ChatbotService] No se pudo guardar resumen en DB para ${conversation.phoneNumber}`);
+       }
+     } catch (error) {
+       console.error('[ChatbotService] Error guardando resumen en DB:', error);
+     }
+   }
+ }
 
 // Instancia singleton
 export const chatbotService = new ChatbotService(); 

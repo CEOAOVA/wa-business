@@ -7,30 +7,27 @@ import dotenv from 'dotenv';
 // Cargar variables de entorno
 dotenv.config();
 
-// Validar que las variables críticas estén presentes
-const requiredEnvVars = [
-  'WHATSAPP_ACCESS_TOKEN',
-  'WHATSAPP_PHONE_NUMBER_ID',
-  'WEBHOOK_VERIFY_TOKEN'
-];
+// Verificar si WhatsApp está configurado (modo opcional para desarrollo)
+const isWhatsAppConfigured = !!(
+  process.env.WHATSAPP_ACCESS_TOKEN && 
+  process.env.WHATSAPP_PHONE_NUMBER_ID && 
+  process.env.WEBHOOK_VERIFY_TOKEN
+);
 
-// Variables opcionales para seguridad avanzada
-const optionalSecurityVars = [
-  'WHATSAPP_APP_SECRET', // Para verificación HMAC de webhooks
-];
-
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    throw new Error(`Variable de entorno requerida no encontrada: ${envVar}. Por favor, revisa tu archivo .env`);
-  }
+if (!isWhatsAppConfigured) {
+  console.warn('⚠️ WhatsApp no está configurado. El servidor funcionará sin capacidades de WhatsApp.');
+  console.warn('📝 Para habilitar WhatsApp, configura: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WEBHOOK_VERIFY_TOKEN');
 }
 
 export const whatsappConfig = {
+  // Indicador de si WhatsApp está configurado
+  isConfigured: isWhatsAppConfigured,
+  
   // Token de acceso de WhatsApp Business API
-  accessToken: process.env.WHATSAPP_ACCESS_TOKEN!,
+  accessToken: process.env.WHATSAPP_ACCESS_TOKEN || 'not_configured',
   
   // ID del número de teléfono de WhatsApp Business
-  phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID!,
+  phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || 'not_configured',
   
   // Versión de la API de WhatsApp
   apiVersion: process.env.WHATSAPP_API_VERSION || 'v22.0',
@@ -40,7 +37,7 @@ export const whatsappConfig = {
   
   // Configuración del webhook
   webhook: {
-    verifyToken: process.env.WEBHOOK_VERIFY_TOKEN!,
+    verifyToken: process.env.WEBHOOK_VERIFY_TOKEN || 'not_configured',
     path: process.env.WEBHOOK_PATH || '/api/chat/webhook',
     url: process.env.WEBHOOK_URL, // URL completa del webhook (para ngrok)
     appSecret: process.env.WHATSAPP_APP_SECRET, // App Secret para verificación HMAC
@@ -72,7 +69,17 @@ export const buildApiUrl = (endpoint: string): string => {
 };
 
 // Headers comunes para las peticiones
-export const getHeaders = () => ({
-  'Authorization': `Bearer ${whatsappConfig.accessToken}`,
-  'Content-Type': 'application/json'
-}); 
+export const getHeaders = () => {
+  if (!whatsappConfig.isConfigured) {
+    console.warn('⚠️ WhatsApp no configurado - headers simulados');
+    return {
+      'Authorization': 'Bearer not_configured',
+      'Content-Type': 'application/json'
+    };
+  }
+  
+  return {
+    'Authorization': `Bearer ${whatsappConfig.accessToken}`,
+    'Content-Type': 'application/json'
+  };
+}; 

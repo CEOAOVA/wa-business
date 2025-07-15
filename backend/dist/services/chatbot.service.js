@@ -19,6 +19,7 @@ exports.chatbotService = exports.ChatbotService = void 0;
  */
 const axios_1 = __importDefault(require("axios"));
 const whatsapp_service_1 = require("./whatsapp.service");
+const database_service_1 = require("./database.service");
 class ChatbotService {
     constructor() {
         this.conversations = new Map();
@@ -54,6 +55,8 @@ class ChatbotService {
                     timestamp: new Date()
                 };
                 conversation.messages.push(userMsg);
+                // Guardar mensaje del usuario en la base de datos
+                yield this.saveMessageToDatabase(conversation.phoneNumber, userMsg);
                 // Generar respuesta con IA
                 const aiResponse = yield this.generateAIResponse(conversation);
                 // Agregar respuesta del asistente
@@ -66,10 +69,14 @@ class ChatbotService {
                     clientData: conversation.clientInfo
                 };
                 conversation.messages.push(assistantMsg);
+                // Guardar respuesta del asistente en la base de datos
+                yield this.saveMessageToDatabase(conversation.phoneNumber, assistantMsg);
                 // Actualizar estado de la conversación si se procesó datos
                 if (aiResponse.updatedClientInfo) {
                     conversation.clientInfo = Object.assign(Object.assign({}, conversation.clientInfo), aiResponse.updatedClientInfo);
                     conversation.status = this.determineNextStatus(conversation.clientInfo);
+                    // Guardar resumen actualizado en la base de datos
+                    yield this.saveConversationSummary(conversation);
                 }
                 // Guardar conversación actualizada
                 this.conversations.set(conversationId, conversation);
@@ -96,6 +103,14 @@ class ChatbotService {
     startConversation(conversationId, phoneNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const welcomeMessage = "¡Hola! 👋 Soy tu asistente especializado en repuestos automotrices de Embler. Te ayudo a encontrar exactamente lo que necesitas para tu vehículo. ¿En qué puedo ayudarte hoy?";
+            // Crear o obtener conversación en la base de datos
+            try {
+                const dbResult = yield database_service_1.databaseService.getOrCreateConversationByPhone(phoneNumber);
+                console.log(`[ChatbotService] Conversación DB creada/obtenida para ${phoneNumber}`);
+            }
+            catch (error) {
+                console.error('[ChatbotService] Error creando conversación en DB:', error);
+            }
             const conversation = {
                 conversationId,
                 phoneNumber,
@@ -565,6 +580,89 @@ EJEMPLO:
                     success: false,
                     error: error.message
                 };
+            }
+        });
+    }
+    /**
+     * Guardar mensaje en la base de datos
+     */
+    saveMessageToDatabase(phoneNumber, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Obtener conversación de la base de datos
+                const dbResult = yield database_service_1.databaseService.getOrCreateConversationByPhone(phoneNumber);
+                // Determinar el ID de conversación para Supabase
+                let conversationId;
+                if (dbResult) {
+                    conversationId = dbResult.id;
+                }
+                if (!conversationId) {
+                    console.warn(`[ChatbotService] No se pudo obtener conversationId para ${phoneNumber}`);
+                    return;
+                }
+                // Guardar mensaje usando el servicio híbrido
+                const result = yield database_service_1.databaseService.createChatbotMessage({
+                    conversationId,
+                    contactPhone: phoneNumber,
+                    senderType: message.role === 'user' ? 'user' : 'bot',
+                    content: message.content,
+                    messageType: 'text',
+                    metadata: {
+                        chatbotId: message.id,
+                        functionCalled: message.functionCalled,
+                        clientData: message.clientData
+                    }
+                });
+                if (result.success) {
+                    console.log(`[ChatbotService] Mensaje guardado en DB: ${result.messageId}`);
+                }
+                else {
+                    console.warn(`[ChatbotService] No se pudo guardar mensaje en DB para ${phoneNumber}`);
+                }
+            }
+            catch (error) {
+                console.error('[ChatbotService] Error guardando mensaje en DB:', error);
+            }
+        });
+    }
+    /**
+     * Guardar resumen de conversación en la base de datos
+     */
+    saveConversationSummary(conversation) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Obtener conversación de la base de datos
+                const dbResult = yield database_service_1.databaseService.getOrCreateConversationByPhone(conversation.phoneNumber);
+                // Determinar el ID de conversación para Supabase
+                let conversationId;
+                if (dbResult) {
+                    conversationId = dbResult.id;
+                }
+                if (!conversationId) {
+                    console.warn(`[ChatbotService] No se pudo obtener conversationId para resumen de ${conversation.phoneNumber}`);
+                    return;
+                }
+                // Crear datos del resumen
+                const summaryData = {
+                    conversationId: conversation.conversationId,
+                    phoneNumber: conversation.phoneNumber,
+                    status: conversation.status,
+                    clientInfo: conversation.clientInfo,
+                    messageCount: conversation.messages.length,
+                    lastActivity: conversation.lastActivity,
+                    createdAt: conversation.createdAt
+                };
+                // Guardar resumen usando el servicio híbrido
+                const result = yield database_service_1.databaseService.saveChatbotConversationSummary(conversationId, summaryData, 'gemini-2.5-flash-chatbot');
+                if (result.success) {
+                    console.log(`[ChatbotService] Resumen guardado en DB: ${result.summaryId}`);
+                }
+                else {
+                    console.warn(`[ChatbotService] No se pudo guardar resumen en DB para ${conversation.phoneNumber}`);
+                }
+            }
+            catch (error) {
+                console.error('[ChatbotService] Error guardando resumen en DB:', error);
             }
         });
     }

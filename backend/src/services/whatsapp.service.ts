@@ -527,7 +527,7 @@ export class WhatsAppService {
 
     return {
         success: true,
-        messages: messages.map(msg => ({
+        messages: messages.map((msg: any) => ({
           id: msg.id,
           waMessageId: msg.waMessageId,
           content: msg.content,

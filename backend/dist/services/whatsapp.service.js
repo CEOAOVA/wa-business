@@ -464,7 +464,7 @@ class WhatsAppService {
                 const messages = yield database_service_1.databaseService.getConversationMessages(conversationId, limit, offset);
                 return {
                     success: true,
-                    messages: messages.map(msg => ({
+                    messages: messages.map((msg) => ({
                         id: msg.id,
                         waMessageId: msg.waMessageId,
                         content: msg.content,

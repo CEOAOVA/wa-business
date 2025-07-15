@@ -7,6 +7,7 @@ import contactRoutes from './routes/contacts';
 import mediaRoutes from './routes/media-upload';
 import chatbotRoutes from './routes/chatbot';
 import authRoutes from './routes/auth';
+import dashboardRoutes from './routes/dashboard';
 import { whatsappConfig } from './config/whatsapp';
 import { whatsappService } from './services/whatsapp.service';
 import { applySecurity } from './middleware/security';
@@ -82,6 +83,9 @@ app.use('/api/media', mediaRoutes);
 // Rutas del chatbot con IA
 app.use('/api/chatbot', chatbotRoutes);
 
+// Rutas del dashboard
+app.use('/api/dashboard', dashboardRoutes);
+
 // Información de la API
 app.get('/api', (_req, res) => {
   res.json({ 
@@ -128,6 +132,14 @@ app.get('/api', (_req, res) => {
         conversation: '/api/chatbot/conversation/:phoneNumber',
         stats: '/api/chatbot/stats',
         testAI: '/api/chatbot/test-ai'
+      },
+      dashboard: {
+        stats: '/api/dashboard/stats',
+        conversations: '/api/dashboard/conversations',
+        popularProducts: '/api/dashboard/products/popular',
+        analytics: '/api/dashboard/analytics/summary',
+        health: '/api/dashboard/system/health',
+        testChatbot: '/api/dashboard/test/chatbot'
       }
     },
     websocket: {
