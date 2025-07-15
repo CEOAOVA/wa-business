@@ -13,9 +13,19 @@ export const MESSAGES = {
     MODE_TITLE: "Modo WhatsApp",
     STATUS_CONNECTED: "Conectado",
     STATUS_DISCONNECTED: "Desconectado",
+    STATUS_CONNECTING: "Conectando...",
+    STATUS_ERROR: "Error de conexión",
     INSTRUCTIONS: "Ingresa un número y envía mensajes directamente por WhatsApp",
     BUTTON_TEXT: "Usar WhatsApp",
     RECONNECT: "Reconectar"
+  },
+
+  // Input de mensajes
+  INPUT: {
+    PLACEHOLDER_CHAT: "Escribe tu mensaje...",
+    PLACEHOLDER_WHATSAPP: "Escribe mensaje para WhatsApp...",
+    BUTTON_SEND: "Enviar",
+    BUTTON_SENDING: "Enviando..."
   },
 
   // Búsqueda y navegación

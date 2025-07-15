@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { AppState, Chat, Message, Client, Notification, AppAction } from '../types';
+import type { AppState, Chat, Message, Notification, AppAction } from '../types';
 import { whatsappApi, type IncomingMessage } from '../services/whatsapp-api';
 import { useWebSocket, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocket';
 

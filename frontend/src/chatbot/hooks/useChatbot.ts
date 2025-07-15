@@ -327,7 +327,7 @@ export function useChatbotClientInfo(userId?: string) {
   return {
     clientInfo: chatbot.clientInfo,
     progress: chatbot.collectionProgress,
-    isComplete: chatbot.isDataComplete(),
-    nextField: chatbot.getNextField()
+    isComplete: chatbot.isDataComplete?.() ?? false,
+    nextField: chatbot.getNextField?.() ?? null
   };
 } 

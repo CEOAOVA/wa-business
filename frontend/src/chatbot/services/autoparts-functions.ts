@@ -1,7 +1,7 @@
 import type {
   FunctionResult,
   FunctionContext,
-  CollectClientDataArgs,
+  // CollectClientDataArgs,
   GenerateQuoteArgs,
   ValidateVehicleDataArgs,
   OpenRouterTool,
@@ -471,9 +471,11 @@ export class AutopartsFunctionService {
     };
   }
 
-  /**
+  /*
    * Recopilar un dato específico del cliente (mantenido por compatibilidad)
+   * @deprecated Esta función está mantenida por compatibilidad pero no se usa actualmente
    */
+  /*
   private async handleCollectClientData(args: CollectClientDataArgs, context: FunctionContext): Promise<FunctionResult> {
     const { campo, valor } = args;
     const { currentClientInfo } = context;
@@ -595,11 +597,13 @@ export class AutopartsFunctionService {
       message: `✅ ${campo} guardado: ${processedValue}`
     };
   }
+  */
 
   /**
    * Validar datos del vehículo
    */
-  private async handleValidateVehicleData(args: ValidateVehicleDataArgs, context: FunctionContext): Promise<FunctionResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleValidateVehicleData(args: ValidateVehicleDataArgs, _context: FunctionContext): Promise<FunctionResult> {
     const { vehiculo } = args;
 
     console.log('[AutopartsFunctions] Validando datos del vehículo:', vehiculo);
@@ -640,7 +644,8 @@ export class AutopartsFunctionService {
   /**
    * Generar cotización preliminar
    */
-  private async handleGenerateQuote(args: GenerateQuoteArgs, context: FunctionContext): Promise<FunctionResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleGenerateQuote(args: GenerateQuoteArgs, _context: FunctionContext): Promise<FunctionResult> {
     const { clientInfo, includeAlternatives = false } = args;
 
     console.log('[AutopartsFunctions] Generando cotización para:', clientInfo);
@@ -666,7 +671,8 @@ export class AutopartsFunctionService {
   /**
    * Determinar próximo paso en la recopilación
    */
-  private async handleDetermineNextStep(args: { clientInfo: ClientInfo }, context: FunctionContext): Promise<FunctionResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleDetermineNextStep(args: { clientInfo: ClientInfo }, _context: FunctionContext): Promise<FunctionResult> {
     const { clientInfo } = args;
     
     const missing = this.getMissingFields(clientInfo);
@@ -795,26 +801,27 @@ export class AutopartsFunctionService {
   /**
    * Actualizar información del cliente
    */
-  private updateClientInfo(currentInfo: ClientInfo, campo: string, valor: any): ClientInfo {
-    const updated = { ...currentInfo };
+  // private updateClientInfo(currentInfo: ClientInfo, campo: string, valor: any): ClientInfo {
+  //   const updated = { ...currentInfo };
 
-    if (campo === 'nombre') {
-      updated.nombre = valor;
-    } else if (campo === 'pieza') {
-      updated.piezaNecesaria = valor;
-    } else {
-      // Campos del vehículo
-      updated.vehiculo = { ...updated.vehiculo };
-      (updated.vehiculo as any)[campo === 'año' ? 'año' : campo] = valor;
-    }
+  //   if (campo === 'nombre') {
+  //     updated.nombre = valor;
+  //   } else if (campo === 'pieza') {
+  //     updated.piezaNecesaria = valor;
+  //   } else {
+  //     // Campos del vehículo
+  //     updated.vehiculo = { ...updated.vehiculo };
+  //     (updated.vehiculo as any)[campo === 'año' ? 'año' : campo] = valor;
+  //   }
 
-    return updated;
-  }
+  //   return updated;
+  // }
 
   /**
    * Validar combinación marca-modelo-año
    */
-  private validateBrandModelYear(marca: string, modelo: string, año: number): { valid: boolean; error?: string } {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private validateBrandModelYear(_marca: string, _modelo: string, año: number): { valid: boolean; error?: string } {
     // Validaciones básicas de lógica automotriz
     const currentYear = new Date().getFullYear();
     
@@ -834,7 +841,8 @@ export class AutopartsFunctionService {
   /**
    * Validar litraje para marca/modelo específico
    */
-  private validateEngineForModel(marca: string, modelo: string, litraje: string): { valid: boolean; error?: string } {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private validateEngineForModel(_marca: string, _modelo: string, litraje: string): { valid: boolean; error?: string } {
     // Validaciones básicas de motores comunes
     const engineValue = parseFloat(litraje.replace('L', ''));
     

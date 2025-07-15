@@ -2,7 +2,6 @@ import type {
   OpenRouterResponse,
   OpenRouterMessage,
   OpenRouterOptions,
-  OpenRouterToolCall,
   FunctionResult,
   FunctionContext
 } from '../types/chatbot';
@@ -209,12 +208,6 @@ export class AutopartsFunctionHandler {
 
     // Procesar cada tool call secuencialmente
     for (const toolCall of toolCalls) {
-      const toolCallInfo: ToolCallInfo = {
-        id: toolCall.id,
-        name: toolCall.function.name,
-        arguments: toolCall.function.arguments
-      };
-
       // Ejecutar función
       let functionArgs: Record<string, any> = {};
       try {
