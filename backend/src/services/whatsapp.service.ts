@@ -628,15 +628,52 @@ export class WhatsAppService {
    * Verificar webhook (para Facebook)
    */
   verifyWebhook(mode: string, token: string, challenge: string) {
-    console.log('🔐 Verificando webhook:', { mode, token, challenge });
+    console.log('🔐 Verificando webhook:', { 
+      mode, 
+      token: token ? `${token.substring(0, 10)}...` : 'undefined', 
+      challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined',
+      expectedToken: whatsappConfig.webhook.verifyToken ? `${whatsappConfig.webhook.verifyToken.substring(0, 10)}...` : 'undefined'
+    });
+
+    // Debug detallado de comparación
+    console.log('🔐 Token comparison:', {
+      receivedToken: token,
+      expectedToken: whatsappConfig.webhook.verifyToken,
+      tokensMatch: token === whatsappConfig.webhook.verifyToken,
+      modeCorrect: mode === 'subscribe'
+    });
 
     if (mode === 'subscribe' && token === whatsappConfig.webhook.verifyToken) {
-      console.log('✅ Webhook verificado exitosamente');
+      console.log('✅ Webhook verificado exitosamente, devolviendo challenge:', challenge);
       return challenge;
     } else {
-      console.error('❌ Token de verificación incorrecto');
+      console.error('❌ Token de verificación incorrecto o modo inválido:', {
+        modeReceived: mode,
+        modeExpected: 'subscribe',
+        tokenReceived: token,
+        tokenExpected: whatsappConfig.webhook.verifyToken,
+        modeMatch: mode === 'subscribe',
+        tokenMatch: token === whatsappConfig.webhook.verifyToken
+      });
       return null;
     }
+  }
+
+  /**
+   * Obtener información de debug del webhook
+   */
+  getWebhookDebugInfo() {
+    return {
+      url: whatsappConfig.webhook.url,
+      path: whatsappConfig.webhook.path,
+      verifyTokenConfigured: !!whatsappConfig.webhook.verifyToken,
+      verifyTokenLength: whatsappConfig.webhook.verifyToken?.length || 0,
+      appSecretConfigured: !!whatsappConfig.webhook.appSecret,
+      signatureVerificationEnabled: whatsappConfig.webhook.enableSignatureVerification,
+      accessTokenConfigured: !!whatsappConfig.accessToken,
+      phoneNumberIdConfigured: !!whatsappConfig.phoneNumberId,
+      apiVersion: whatsappConfig.apiVersion
+    };
   }
 
   /**

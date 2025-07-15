@@ -575,15 +575,51 @@ class WhatsAppService {
      * Verificar webhook (para Facebook)
      */
     verifyWebhook(mode, token, challenge) {
-        console.log('🔐 Verificando webhook:', { mode, token, challenge });
+        console.log('🔐 Verificando webhook:', {
+            mode,
+            token: token ? `${token.substring(0, 10)}...` : 'undefined',
+            challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined',
+            expectedToken: whatsapp_1.whatsappConfig.webhook.verifyToken ? `${whatsapp_1.whatsappConfig.webhook.verifyToken.substring(0, 10)}...` : 'undefined'
+        });
+        // Debug detallado de comparación
+        console.log('🔐 Token comparison:', {
+            receivedToken: token,
+            expectedToken: whatsapp_1.whatsappConfig.webhook.verifyToken,
+            tokensMatch: token === whatsapp_1.whatsappConfig.webhook.verifyToken,
+            modeCorrect: mode === 'subscribe'
+        });
         if (mode === 'subscribe' && token === whatsapp_1.whatsappConfig.webhook.verifyToken) {
-            console.log('✅ Webhook verificado exitosamente');
+            console.log('✅ Webhook verificado exitosamente, devolviendo challenge:', challenge);
             return challenge;
         }
         else {
-            console.error('❌ Token de verificación incorrecto');
+            console.error('❌ Token de verificación incorrecto o modo inválido:', {
+                modeReceived: mode,
+                modeExpected: 'subscribe',
+                tokenReceived: token,
+                tokenExpected: whatsapp_1.whatsappConfig.webhook.verifyToken,
+                modeMatch: mode === 'subscribe',
+                tokenMatch: token === whatsapp_1.whatsappConfig.webhook.verifyToken
+            });
             return null;
         }
+    }
+    /**
+     * Obtener información de debug del webhook
+     */
+    getWebhookDebugInfo() {
+        var _a;
+        return {
+            url: whatsapp_1.whatsappConfig.webhook.url,
+            path: whatsapp_1.whatsappConfig.webhook.path,
+            verifyTokenConfigured: !!whatsapp_1.whatsappConfig.webhook.verifyToken,
+            verifyTokenLength: ((_a = whatsapp_1.whatsappConfig.webhook.verifyToken) === null || _a === void 0 ? void 0 : _a.length) || 0,
+            appSecretConfigured: !!whatsapp_1.whatsappConfig.webhook.appSecret,
+            signatureVerificationEnabled: whatsapp_1.whatsappConfig.webhook.enableSignatureVerification,
+            accessTokenConfigured: !!whatsapp_1.whatsappConfig.accessToken,
+            phoneNumberIdConfigured: !!whatsapp_1.whatsappConfig.phoneNumberId,
+            apiVersion: whatsapp_1.whatsappConfig.apiVersion
+        };
     }
     /**
      * Configurar webhook URL (programáticamente)

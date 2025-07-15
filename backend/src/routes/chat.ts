@@ -174,21 +174,48 @@ router.post('/test', async (req: any, res: any) => {
 
 // GET /api/chat/webhook - Verificación del webhook
 router.get('/webhook', (req: any, res: any) => {
+  const requestId = `verify_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+  
   try {
+    console.log(`🔐 [${requestId}] Webhook verification request from IP: ${clientIp}`);
+    console.log(`🔐 [${requestId}] Headers:`, JSON.stringify(req.headers, null, 2));
+    console.log(`🔐 [${requestId}] Query params:`, JSON.stringify(req.query, null, 2));
+    
     const mode = req.query['hub.mode'] as string;
     const token = req.query['hub.verify_token'] as string;
     const challenge = req.query['hub.challenge'] as string;
 
+    console.log(`🔐 [${requestId}] Parsed values:`, {
+      mode,
+      token: token ? `${token.substring(0, 10)}...` : 'undefined',
+      challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined'
+    });
+
+    // Validate required parameters
+    if (!mode || !token || !challenge) {
+      console.error(`❌ [${requestId}] Missing required parameters:`, {
+        mode: !!mode,
+        token: !!token,
+        challenge: !!challenge
+      });
+      return res.status(400).send('Missing required parameters: hub.mode, hub.verify_token, hub.challenge');
+    }
+
     const result = whatsappService.verifyWebhook(mode, token, challenge);
     if (result) {
+      console.log(`✅ [${requestId}] Webhook verification successful, returning challenge`);
       res.status(200).send(result);
     } else {
+      console.error(`❌ [${requestId}] Webhook verification failed`);
       res.status(403).send('Token de verificación incorrecto');
     }
   } catch (error: any) {
+    console.error(`❌ [${requestId}] Error in webhook verification:`, error);
     res.status(500).json({
       success: false,
-      error: 'Error en verificación de webhook'
+      error: 'Error en verificación de webhook',
+      requestId
     });
   }
 });
@@ -743,6 +770,46 @@ router.post('/simulate-message', async (req: any, res: any) => {
       success: false,
       error: 'Error simulando mensaje',
       details: error.message
+    });
+  }
+});
+
+// GET /api/chat/webhook/debug - Debug información del webhook
+router.get('/webhook/debug', (req: any, res: any) => {
+  try {
+    console.log('🔍 Debug webhook configuration requested');
+    
+    const config = whatsappService.getWebhookDebugInfo();
+    
+    res.json({
+      success: true,
+      webhook: {
+        url: config.url,
+        path: config.path,
+        verifyTokenConfigured: config.verifyTokenConfigured,
+        verifyTokenLength: config.verifyTokenLength,
+        appSecretConfigured: config.appSecretConfigured,
+        signatureVerificationEnabled: config.signatureVerificationEnabled
+      },
+      whatsapp: {
+        accessTokenConfigured: config.accessTokenConfigured,
+        phoneNumberIdConfigured: config.phoneNumberIdConfigured,
+        apiVersion: config.apiVersion
+      },
+      server: {
+        nodeEnv: process.env.NODE_ENV,
+        port: process.env.PORT,
+        timestamp: new Date().toISOString()
+      },
+      tests: {
+        verificationUrl: `https://dev-apiwaprueba.aova.mx/api/chat/webhook?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=YOUR_TOKEN`,
+        instructions: "Reemplaza YOUR_TOKEN con tu WEBHOOK_VERIFY_TOKEN real para probar"
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error obteniendo información de debug'
     });
   }
 });
