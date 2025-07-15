@@ -3,7 +3,7 @@
  * Versión simplificada para compilación sin multer
  */
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import path from 'path';
 import { mediaService } from '../services/media.service';
 import { whatsappService } from '../services/whatsapp.service';
@@ -15,7 +15,7 @@ const router = express.Router();
  * GET /api/media/download/:mediaId
  * Descargar archivo multimedia desde WhatsApp
  */
-router.get('/download/:mediaId', async (req: Request, res: Response) => {
+router.get('/download/:mediaId', async (req: any, res: any) => {
   try {
     const { mediaId } = req.params;
     
@@ -58,7 +58,7 @@ router.get('/download/:mediaId', async (req: Request, res: Response) => {
  * GET /api/media/file/:filename
  * Servir archivo multimedia estático
  */
-router.get('/file/:filename', async (req: Request, res: Response) => {
+router.get('/file/:filename', async (req: any, res: any) => {
   try {
     const { filename } = req.params;
     const filePath = path.join(process.cwd(), 'uploads', 'media', filename);
@@ -87,7 +87,7 @@ router.get('/file/:filename', async (req: Request, res: Response) => {
  * GET /api/media/thumbnail/:filename
  * Servir thumbnail de archivo multimedia
  */
-router.get('/thumbnail/:filename', async (req: Request, res: Response) => {
+router.get('/thumbnail/:filename', async (req: any, res: any) => {
   try {
     const { filename } = req.params;
     const thumbnailPath = path.join(process.cwd(), 'uploads', 'thumbnails', filename);
@@ -114,7 +114,7 @@ router.get('/thumbnail/:filename', async (req: Request, res: Response) => {
  * POST /api/media/send
  * Enviar mensaje multimedia usando un archivo ya subido
  */
-router.post('/send', async (req: Request, res: Response) => {
+router.post('/send', async (req: any, res: any) => {
   try {
     const { to, mediaId, mediaType, caption, filename } = req.body;
     
@@ -180,7 +180,7 @@ router.post('/send', async (req: Request, res: Response) => {
  * GET /api/media/stats
  * Obtener estadísticas de almacenamiento de medios
  */
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', async (req: any, res: any) => {
   try {
     const stats = await mediaService.getStorageStats();
     
@@ -207,7 +207,7 @@ router.get('/stats', async (req: Request, res: Response) => {
  * DELETE /api/media/cleanup
  * Limpiar archivos antiguos
  */
-router.delete('/cleanup', async (req: Request, res: Response) => {
+router.delete('/cleanup', async (req: any, res: any) => {
   try {
     const { days = 30 } = req.query;
     const daysNumber = parseInt(days as string) || 30;
@@ -243,7 +243,7 @@ router.delete('/cleanup', async (req: Request, res: Response) => {
  * GET /api/media/types
  * Obtener tipos de archivos soportados
  */
-router.get('/types', (req: Request, res: Response) => {
+router.get('/types', (req: any, res: any) => {
   try {
     const supportedTypes = {
       image: ['image/jpeg', 'image/png', 'image/webp'],
@@ -287,7 +287,7 @@ router.get('/types', (req: Request, res: Response) => {
  * POST /api/media/upload (placeholder)
  * Endpoint reservado para subida de archivos (requiere multer)
  */
-router.post('/upload', (req: Request, res: Response) => {
+router.post('/upload', (req: any, res: any) => {
   res.status(501).json({
     success: false,
     error: 'Upload endpoint no disponible sin multer instalado',

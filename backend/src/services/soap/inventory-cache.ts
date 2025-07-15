@@ -22,7 +22,7 @@ export class InventoryCache {
 
   constructor() {
     const config = getConfig();
-    this.ttl = config.inventoryCacheTtl; // TTL en milisegundos
+    this.ttl = config.inventoryCacheTtl || 300000; // TTL en milisegundos
   }
 
   /**

@@ -3,7 +3,7 @@
  * Migrado desde Backend-Embler para WhatsApp Business
  */
 import * as soap from 'soap';
-import * as Sentry from '@sentry/node';
+import * as Sentry from '../../utils/sentry-stub';
 import { getConfig } from '../../config';
 import { tokenManager } from './token-manager';
 import { inventoryCache } from './inventory-cache';
@@ -111,7 +111,7 @@ export class SoapService {
     if (!this.client) throw new Error('Cliente SOAP no inicializado');
 
     const config = getConfig();
-    const creds = config.posCredentials[posId];
+    const creds = config.posCredentials?.[posId];
     if (!creds) throw new Error(`No hay credenciales configuradas para punto de venta ${posId}`);
 
     console.log(`[SOAP] Login en ${posId} con usuario ${creds.user}`);

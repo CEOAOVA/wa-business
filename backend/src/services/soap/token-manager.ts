@@ -16,7 +16,7 @@ export class TokenManager {
 
   constructor() {
     const config = getConfig();
-    this.cacheDuration = config.tokenCacheDuration * 60 * 1000; // Convertir minutos a ms
+    this.cacheDuration = (config.tokenCacheDuration || 10) * 60 * 1000; // Convertir minutos a ms
   }
 
   /**

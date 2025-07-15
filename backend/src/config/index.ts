@@ -42,6 +42,14 @@ export interface AppConfig {
     connectionRetries: number;
   };
   
+  // Legacy properties for backward compatibility
+  soapWsdlUrl?: string;
+  soapEndpoint?: string;
+  tokenCacheDuration?: number;
+  inventoryCacheTtl?: number;
+  posCredentials?: Record<string, { user: string; pwd: string }>;
+  apiNinjasKey?: string;
+  
   // POS Configuration (nuevo)
   pos: {
     defaultPosId: string;
@@ -181,6 +189,14 @@ export function getConfig(): AppConfig {
       logLevel: getEnv('LOG_LEVEL', isDev ? 'debug' : 'info'),
       enableDetailedLogs: getEnv('ENABLE_DETAILED_LOGS', 'false').toLowerCase() === 'true',
     },
+    
+    // Legacy properties for backward compatibility
+    soapWsdlUrl: getEnv('EMBLER_WSDL_URL'),
+    soapEndpoint: getEnv('EMBLER_ENDPOINT_URL'),
+    tokenCacheDuration: parseInt(getEnv('TOKEN_CACHE_DURATION', '10'), 10),
+    inventoryCacheTtl: parseInt(getEnv('INVENTORY_CACHE_TTL', '300000'), 10),
+    posCredentials: parsePosCredentials(),
+    apiNinjasKey: getEnv('API_NINJAS_KEY', ''),
   };
 }
 

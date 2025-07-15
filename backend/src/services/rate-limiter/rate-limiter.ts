@@ -418,7 +418,7 @@ export class RateLimiter extends EventEmitter {
     const rateLimitStats = {
       activeWindows: this.windows.size,
       totalServices: this.serviceStats.size,
-      circuitBreakers: {}
+      circuitBreakers: {} as Record<string, any>
     };
 
     // Estadísticas de circuit breakers

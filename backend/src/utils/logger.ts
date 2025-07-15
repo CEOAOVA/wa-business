@@ -16,6 +16,45 @@ export interface LogContext {
   responseTime?: number;
   error?: any;
   metadata?: any;
+  service?: string;
+  outcome?: string;
+  model?: string;
+  endpoint?: string;
+  operation?: string;
+  securityEvent?: string;
+  method?: string;
+  config?: any;
+  key?: string;
+  pattern?: string;
+  evictedCount?: number;
+  cleanedCount?: number;
+  healthCheck?: any;
+  metrics?: any;
+  alert?: any;
+  alertId?: string;
+  metricsHistorySize?: number;
+  identifier?: string;
+  serviceName?: string;
+  cleanedWindows?: number;
+  duration?: number;
+  tokens?: number;
+  table?: string;
+  details?: any;
+  threshold?: number;
+  url?: string;
+  ttl?: number;
+  invalidatedCount?: number;
+  freedSpace?: number;
+  activeAlerts?: number;
+  requests?: number;
+  activeWindows?: number;
+  windowSizeMs?: number;
+  limit?: number;
+  ip?: string;
+  statusCode?: number;
+  requiredSize?: number;
+  remainingItems?: number;
+  userAgent?: string;
 }
 
 export interface SystemMetrics {
@@ -28,9 +67,9 @@ export interface SystemMetrics {
 }
 
 export class Logger {
-  private winston: winston.Logger;
+  private winston!: winston.Logger;
   private config: any;
-  private metrics: SystemMetrics;
+  private metrics!: SystemMetrics;
   private requestCounter: number = 0;
   private errorCounter: number = 0;
   private responseTimes: number[] = [];
@@ -87,9 +126,10 @@ export class Logger {
         
         // Agregar error si existe
         if (meta.error) {
-          logMessage += `\n  Error: ${meta.error.message || meta.error}`;
-          if (meta.error.stack && isDevelopment) {
-            logMessage += `\n  Stack: ${meta.error.stack}`;
+          const error = meta.error as any;
+          logMessage += `\n  Error: ${error.message || error}`;
+          if (error.stack && isDevelopment) {
+            logMessage += `\n  Stack: ${error.stack}`;
           }
         }
         

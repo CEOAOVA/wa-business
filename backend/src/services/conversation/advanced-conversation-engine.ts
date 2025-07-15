@@ -4,9 +4,11 @@
  */
 
 import { openAIClient } from '../../config/openai-client';
-import { functionHandler } from '../llm/function-handler';
+import { FunctionCallHandler } from '../llm/function-handler';
 import { conceptsService } from '../concepts-service';
 import { conversationMemoryManager, ConversationMemory } from './conversation-memory';
+
+const functionHandler = new FunctionCallHandler();
 import { dynamicPromptGenerator, PromptContext } from './dynamic-prompt-generator';
 
 export interface ConversationRequest {
@@ -169,7 +171,7 @@ export class AdvancedConversationEngine {
     let processed = message.toLowerCase().trim();
     
     // Convertir términos coloquiales mexicanos
-    processed = conceptsService.normalizeQuery(processed);
+    processed = conceptsService.normalizeSearchTerm(processed);
     
     // Limpiar caracteres especiales manteniendo acentos
     processed = processed.replace(/[^\w\sáéíóúüñ]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -304,7 +306,7 @@ export class AdvancedConversationEngine {
       context.availableFunctions.includes(f.name)
     );
     
-    const response = await openAIClient.chat.completions.create({
+    const response = await openAIClient.createChatCompletion({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: prompt },
@@ -340,9 +342,14 @@ Responde de manera profesional y usa funciones cuando sea necesario.`;
     
     if (llmResponse.function_call) {
       try {
-        const result = await functionHandler.handleFunctionCall(
+        const result = await functionHandler.processFunctionCall(
           llmResponse.function_call,
-          conversationId
+          [],
+          { 
+            model: "gpt-4o-mini",
+            messages: []
+          },
+          { pointOfSaleId: conversationId }
         );
         functionResults.push(result);
       } catch (error) {
@@ -386,7 +393,7 @@ Responde de manera profesional y usa funciones cuando sea necesario.`;
         Genera una respuesta mejorada que integre los datos de manera natural.`;
         
         try {
-          const enhancedResponse = await openAIClient.chat.completions.create({
+          const enhancedResponse = await openAIClient.createChatCompletion({
             model: "gpt-4o-mini",
             messages: [
               { role: "system", content: contextualPrompt },

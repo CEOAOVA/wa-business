@@ -82,7 +82,7 @@ export interface MonitoringConfig {
 export class MonitoringService extends EventEmitter {
   private config: MonitoringConfig;
   private healthChecks: Map<string, () => Promise<HealthCheckResult>> = new Map();
-  private metrics: PerformanceMetrics;
+  private metrics!: PerformanceMetrics;
   private alerts: Alert[] = [];
   private responseTimes: number[] = [];
   private isRunning: boolean = false;

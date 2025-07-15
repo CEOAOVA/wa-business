@@ -26,7 +26,7 @@ export class VinDecoderService {
 
   constructor() {
     const config = getConfig();
-    this.apiKey = config.apiNinjasKey;
+    this.apiKey = config.apiNinjasKey || '';
   }
 
   /**

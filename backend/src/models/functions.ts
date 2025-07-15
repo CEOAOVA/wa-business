@@ -17,6 +17,9 @@ export interface FunctionDefinition {
       minimum?: number;
       maximum?: number;
       pattern?: string;
+      items?: any;
+      properties?: any;
+      required?: string[];
     }>;
     required: string[];
   };

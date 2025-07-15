@@ -636,6 +636,7 @@ export class FunctionService {
           properties: {
             productos: {
               type: 'array',
+              description: 'Lista de productos a comprar',
               items: {
                 type: 'object',
                 properties: {
@@ -648,6 +649,7 @@ export class FunctionService {
             },
             datosUsuario: {
               type: 'object',
+              description: 'Datos del usuario para la compra',
               properties: {
                 nombre: { type: 'string' },
                 telefono: { type: 'string' },
@@ -656,6 +658,7 @@ export class FunctionService {
             },
             tipoCompra: {
               type: 'string',
+              description: 'Tipo de compra: local o envío',
               enum: ['local', 'envio']
             }
           },
@@ -723,6 +726,7 @@ export class FunctionService {
           properties: {
             productos: {
               type: 'array',
+              description: 'Lista de productos para consulta',
               items: {
                 type: 'object',
                 properties: {
@@ -735,6 +739,7 @@ export class FunctionService {
             },
             datosUsuario: {
               type: 'object',
+              description: 'Datos del usuario para la consulta',
               properties: {
                 nombre: { type: 'string' },
                 telefono: { type: 'string' },
@@ -890,6 +895,7 @@ export class FunctionService {
             },
             datosContacto: {
               type: 'object',
+              description: 'Datos de contacto del usuario',
               properties: {
                 nombre: { type: 'string' },
                 telefono: { type: 'string' }
@@ -978,6 +984,7 @@ export class FunctionService {
           properties: {
             productos: {
               type: 'array',
+              description: 'Lista de productos para envío',
               items: {
                 type: 'object',
                 properties: {
@@ -990,6 +997,7 @@ export class FunctionService {
             },
             direccionEnvio: {
               type: 'object',
+              description: 'Dirección de envío del pedido',
               properties: {
                 calle: { type: 'string' },
                 colonia: { type: 'string' },

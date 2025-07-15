@@ -263,13 +263,14 @@ export class DatabaseService {
    */
   
   async createConversation(conversation: Omit<ConversationRecord, 'created_at' | 'updated_at'>): Promise<ConversationRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('conversations')
         .insert(conversation)
         .select()
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error creando conversación:', error);
@@ -280,13 +281,14 @@ export class DatabaseService {
   }
 
   async getConversation(conversationId: string): Promise<ConversationRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('conversations')
         .select('*')
         .eq('id', conversationId)
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error obteniendo conversación:', error);
@@ -297,12 +299,13 @@ export class DatabaseService {
   }
 
   async updateConversation(conversationId: string, updates: Partial<ConversationRecord>): Promise<boolean> {
-    const { error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('conversations')
         .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', conversationId)
-    );
+        .eq('id', conversationId);
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error actualizando conversación:', error);
@@ -317,13 +320,14 @@ export class DatabaseService {
    */
   
   async createMessage(message: Omit<MessageRecord, 'timestamp'>): Promise<MessageRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('messages')
         .insert({ ...message, timestamp: new Date().toISOString() })
         .select()
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error creando mensaje:', error);
@@ -334,14 +338,15 @@ export class DatabaseService {
   }
 
   async getConversationMessages(conversationId: string, limit: number = 50): Promise<MessageRecord[]> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('messages')
         .select('*')
         .eq('conversation_id', conversationId)
         .order('timestamp', { ascending: false })
-        .limit(limit)
-    );
+        .limit(limit);
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error obteniendo mensajes:', error);
@@ -356,16 +361,17 @@ export class DatabaseService {
    */
   
   async createOrUpdateUserProfile(profile: Omit<UserProfileRecord, 'created_at' | 'updated_at'>): Promise<UserProfileRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('user_profiles')
         .upsert({ 
           ...profile, 
           updated_at: new Date().toISOString() 
         })
         .select()
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error creando/actualizando perfil:', error);
@@ -376,13 +382,14 @@ export class DatabaseService {
   }
 
   async getUserProfile(phoneNumber: string): Promise<UserProfileRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('user_profiles')
         .select('*')
         .eq('phone_number', phoneNumber)
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error && error.code !== 'PGRST116') {
       console.error('[DatabaseService] Error obteniendo perfil:', error);
@@ -396,16 +403,17 @@ export class DatabaseService {
    */
   
   async createOrUpdateConversationMemory(memory: Omit<ConversationMemoryRecord, 'created_at' | 'updated_at'>): Promise<ConversationMemoryRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+        const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('conversation_memory')
-        .upsert({ 
-          ...memory, 
-          updated_at: new Date().toISOString() 
+        .upsert({
+          ...memory,
+          updated_at: new Date().toISOString()
         })
         .select()
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error) {
       console.error('[DatabaseService] Error creando/actualizando memoria:', error);
@@ -416,13 +424,14 @@ export class DatabaseService {
   }
 
   async getConversationMemory(conversationId: string): Promise<ConversationMemoryRecord | null> {
-    const { data, error } = await this.executeWithRetry(() =>
-      this.supabase
+    const { data, error } = await this.executeWithRetry(async () => {
+      const result = await this.supabase
         .from('conversation_memory')
         .select('*')
         .eq('conversation_id', conversationId)
-        .single()
-    );
+        .single();
+      return result;
+    });
 
     if (error && error.code !== 'PGRST116') {
       console.error('[DatabaseService] Error obteniendo memoria:', error);

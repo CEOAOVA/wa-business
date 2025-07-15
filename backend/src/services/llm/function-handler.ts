@@ -64,14 +64,11 @@ export class FunctionCallHandler {
       const updatedMessages = [...messages, functionMessage];
 
       // Llamar a OpenAI con el resultado de la función
-      const response = await this.openaiClient.createChatCompletion(
-        updatedMessages,
-        {
-          ...options,
-          functions: undefined, // No incluir funciones en respuesta después de function call
-          tools: undefined
-        }
-      );
+      const response = await this.openaiClient.createChatCompletion({
+        ...options,
+        messages: updatedMessages,
+        tools: undefined
+      });
 
       // Procesar respuesta
       if (response.content) {
@@ -87,6 +84,7 @@ export class FunctionCallHandler {
       const errorMessage = this.generateErrorMessage(functionCallInfo.name, error);
       
       return {
+        choices: [{ message: { role: 'assistant', content: errorMessage, tool_calls: [] }, finish_reason: 'error' }],
         content: errorMessage,
         model: options.model || 'error',
         usage: {
@@ -134,6 +132,7 @@ export class FunctionCallHandler {
         
         // En caso de error, devolver resultado de error
         return {
+          choices: [{ message: { role: 'assistant', content: this.generateErrorMessage(functionCall.name, error), tool_calls: [] }, finish_reason: 'error' }],
           content: this.generateErrorMessage(functionCall.name, error),
           model: options.model || 'error',
           usage: {
@@ -148,6 +147,13 @@ export class FunctionCallHandler {
     return lastResponse || {
       content: 'Error procesando funciones múltiples',
       model: options.model || 'error',
+      choices: [{
+        message: {
+          role: 'assistant',
+          content: 'Error procesando funciones múltiples'
+        },
+        finish_reason: 'error'
+      }],
       usage: {
         prompt_tokens: 0,
         completion_tokens: 0,
@@ -361,7 +367,8 @@ Responde en español mexicano de manera amigable y profesional.`;
     // Testear conexión OpenAI
     let openaiConnected = false;
     try {
-      openaiConnected = await this.openaiClient.testConnection();
+      const connectionResult = await this.openaiClient.testConnection();
+      openaiConnected = connectionResult.success;
     } catch (error) {
       console.error('[FunctionCallHandler] Error testing OpenAI connection:', error);
     }
