@@ -23,6 +23,9 @@ const app = express();
 const httpServer = createServer(app);
 const PORT = whatsappConfig.server.port;
 
+// Configurar trust proxy para Docker/Coolify (ANTES de seguridad)
+app.set('trust proxy', true);
+
 // Aplicar configuración de seguridad ANTES de cualquier otra cosa
 applySecurity(app);
 

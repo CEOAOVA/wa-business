@@ -103,7 +103,16 @@ function getEnv(key: string, defaultValue?: string): string {
 function parsePosCredentials(): Record<string, { user: string; pwd: string }> {
   try {
     const credentialsStr = getEnv('POS_CREDENTIALS', '{}');
-    const credentials = JSON.parse(credentialsStr);
+    
+    // Limpiar caracteres problemáticos comunes
+    const cleanedStr = credentialsStr
+      .replace(/\\\"/g, '"')  // Escapar comillas dobles
+      .replace(/\\\\/g, '\\') // Escapar backslashes
+      .trim();
+    
+    console.log(`[Config] Parseando POS_CREDENTIALS: ${cleanedStr.substring(0, 50)}...`);
+    
+    const credentials = JSON.parse(cleanedStr);
     
     // Validar estructura
     for (const [posId, creds] of Object.entries(credentials)) {
@@ -116,13 +125,31 @@ function parsePosCredentials(): Record<string, { user: string; pwd: string }> {
       }
     }
     
+    console.log(`[Config] POS_CREDENTIALS parseado exitosamente para: ${Object.keys(credentials).join(', ')}`);
     return credentials;
   } catch (error) {
-    console.warn(`Error parseando POS_CREDENTIALS: ${error}. Usando credenciales por defecto.`);
-    return {
-      ME: { user: 'test', pwd: 'test' },
-      SAT: { user: 'test', pwd: 'test' }
-    };
+    console.warn(`[Config] Error parseando POS_CREDENTIALS: ${error}. Usando credenciales por defecto.`);
+    
+    // Fallback más completo basado en variables individuales
+    const fallbackCredentials: Record<string, { user: string; pwd: string }> = {};
+    
+    // Intentar obtener credenciales individuales
+    const posIds = ['ME', 'CUA', 'ECA', 'IZT', 'LIND', 'PORT', 'QRO', 'SAT', 'TPN', 'VC'];
+    
+    posIds.forEach(posId => {
+      const user = process.env[`POS_${posId}_USER`];
+      const pwd = process.env[`POS_${posId}_PWD`];
+      
+      if (user && pwd) {
+        fallbackCredentials[posId] = { user, pwd };
+      } else {
+        // Usar credenciales de prueba
+        fallbackCredentials[posId] = { user: 'test', pwd: 'test' };
+      }
+    });
+    
+    console.log(`[Config] Usando credenciales fallback para: ${Object.keys(fallbackCredentials).join(', ')}`);
+    return fallbackCredentials;
   }
 }
 

@@ -34,6 +34,8 @@ console.log('🔍 Estado de variables de entorno:', (0, env_loader_1.getEnvDebug
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 const PORT = whatsapp_1.whatsappConfig.server.port;
+// Configurar trust proxy para Docker/Coolify (ANTES de seguridad)
+app.set('trust proxy', true);
 // Aplicar configuración de seguridad ANTES de cualquier otra cosa
 (0, security_1.applySecurity)(app);
 // Configurar Socket.IO con CORS
