@@ -51,6 +51,7 @@ export interface WhatsAppWebhookMessage {
 
 export class WhatsAppService {
   private io?: Server;
+  private lastMessages: Map<string, string> = new Map(); // Almacenar últimos mensajes temporalmente
 
   // Inicializar servicio de base de datos
   async initialize(socketIo?: Server) {
@@ -342,6 +343,9 @@ export class WhatsAppService {
                   
                   // Solo procesar con IA si es un mensaje de texto del usuario
                   if (message.type === 'text' && message.text?.body) {
+                    // Almacenar el último mensaje para referencia futura
+                    this.lastMessages.set(message.from, content);
+                    
                     try {
                       // TODO: VERIFICAR MODO AI CON SUPABASE
                       // const aiModeInfo = await databaseService.getConversationAIMode(result.conversation.id);
@@ -363,46 +367,30 @@ export class WhatsAppService {
                         if (chatbotResponse.shouldSend && chatbotResponse.response) {
                           console.log(`🤖 [Takeover] Enviando respuesta automática de IA: ${chatbotResponse.response.substring(0, 100)}...`);
                           
-                          // Enviar respuesta automática
-                          const autoResponse = await this.sendMessage({
-                            to: message.from,
-                            message: chatbotResponse.response
-                          });
-                          
-                          if (autoResponse.success) {
-                            console.log(`✅ [Takeover] Respuesta IA enviada exitosamente`);
-                          } else {
-                            console.error(`❌ [Takeover] Error enviando respuesta IA:`, autoResponse.error);
-                          }
+                          // Enviar respuesta automática con delay natural
+                          setTimeout(async () => {
+                            await this.sendMessage({
+                              to: message.from,
+                              message: chatbotResponse.response
+                            });
+                            console.log('✅ Respuesta IA enviada exitosamente');
+                          }, 2000);
                         } else {
-                          console.log(`🤖 [Takeover] IA procesó mensaje pero no requiere respuesta`);
+                          console.log(`⚠️ [Takeover] IA decidió no responder para: ${message.from}`);
                         }
-                        
                       } else {
-                        console.log(`👤 [Takeover] IA está INACTIVA para conversación: ${result.conversation.id} - Esperando agente humano`);
-                        
-                        // TODO: Emitir evento especial para notificar que necesita atención humana
-                        if (this.io) {
-                          this.io.emit('conversation_needs_human_attention', {
-                            conversationId: result.conversation.id,
-                            message: processedMessage,
-                            timestamp: new Date().toISOString()
-                          });
-                        }
+                        console.log(`👤 [Takeover] IA está INACTIVA, mensaje disponible para agente humano`);
                       }
-                      
-                    } catch (chatbotError) {
-                      console.error(`❌ [Takeover] Error procesando con IA:`, chatbotError);
-                      
-                      // En caso de error de IA, notificar que necesita atención humana
-                      if (this.io) {
-                        this.io.emit('conversation_needs_human_attention', {
-                          conversationId: result.conversation.id,
-                          message: processedMessage,
-                          error: 'Error en procesamiento IA',
-                          timestamp: new Date().toISOString()
+                    } catch (aiError) {
+                      console.error('❌ Error procesando con IA:', aiError);
+                      // En caso de error, enviar respuesta de fallback
+                      const fallbackMessage = `¡Hola! 👋 Hemos recibido tu mensaje. Un agente te responderá pronto.\n\n*Embler - Siempre conectados* 🚀`;
+                      setTimeout(async () => {
+                        await this.sendMessage({
+                          to: message.from,
+                          message: fallbackMessage
                         });
-                      }
+                      }, 2000);
                     }
                   }
 
@@ -428,10 +416,7 @@ export class WhatsAppService {
                     console.log('🌐 Evento Socket.IO emitido para nuevo mensaje');
                   }
 
-                  // Respuesta automática (solo para mensajes de texto)
-                if (message.type === 'text' && message.text?.body) {
-                  this.sendAutoReply(message.from, contact?.profile?.name || 'Cliente');
-                  }
+                  // El procesamiento con IA ya se realiza arriba
                 } catch (dbError) {
                   console.error('❌ Error guardando mensaje en BD:', dbError);
                   // Continuar procesando otros mensajes
@@ -458,24 +443,66 @@ export class WhatsAppService {
   }
 
   /**
-   * Enviar respuesta automática
+   * Procesar mensaje con IA y enviar respuesta inteligente
    */
   private async sendAutoReply(to: string, clientName: string) {
     try {
-      const autoReplyMessage = `¡Hola! 👋\n\nGracias por contactarnos. Hemos recibido tu mensaje y un agente se pondrá en contacto contigo pronto.\n\n*Embler - Siempre conectados* 🚀`;
+      console.log('🤖 Procesando mensaje con IA para:', to);
       
-      console.log('🤖 Enviando respuesta automática a:', to);
+      // Obtener el último mensaje del usuario para enviarlo al chatbot
+      const lastUserMessage = await this.getLastUserMessage(to);
       
-      // Esperar 2 segundos antes de responder (más natural)
+      if (!lastUserMessage) {
+        console.warn('⚠️ No se encontró mensaje del usuario para procesar');
+        return;
+      }
+      
+      // Procesar mensaje con el servicio de chatbot
+      const chatbotResult = await chatbotService.processWhatsAppMessage(to, lastUserMessage);
+      
+      if (chatbotResult.shouldSend && chatbotResult.response) {
+        console.log(`🧠 Respuesta IA generada: ${chatbotResult.response.substring(0, 100)}...`);
+        
+        // Esperar 2 segundos antes de responder (más natural)
+        setTimeout(async () => {
+          await this.sendMessage({
+            to: to,
+            message: chatbotResult.response
+          });
+          
+          console.log('✅ Respuesta IA enviada exitosamente');
+        }, 2000);
+        
+      } else {
+        console.warn('⚠️ El chatbot decidió no enviar respuesta');
+      }
+      
+    } catch (error: any) {
+      console.error('❌ Error procesando mensaje con IA:', error);
+      
+      // Fallback a respuesta básica en caso de error
+      const fallbackMessage = `¡Hola ${clientName}! 👋\n\nGracias por contactarnos. Estamos procesando tu mensaje y te responderemos pronto.\n\n*Embler - Siempre conectados* 🚀`;
+      
       setTimeout(async () => {
         await this.sendMessage({
           to: to,
-          message: autoReplyMessage
+          message: fallbackMessage
         });
       }, 2000);
-      
-    } catch (error: any) {
-      console.error('❌ Error enviando respuesta automática:', error);
+    }
+  }
+
+  /**
+   * Obtener el último mensaje del usuario para procesarlo con IA
+   */
+  private async getLastUserMessage(phoneNumber: string): Promise<string | null> {
+    try {
+      // TODO: En producción esto vendría de la base de datos
+      // Por ahora, como es una simulación, vamos a almacenar temporalmente los últimos mensajes
+      return this.lastMessages.get(phoneNumber) || null;
+    } catch (error) {
+      console.error('❌ Error obteniendo último mensaje:', error);
+      return null;
     }
   }
 

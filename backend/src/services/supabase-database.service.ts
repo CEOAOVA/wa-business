@@ -79,7 +79,16 @@ export class SupabaseDatabaseService {
   async getOrCreateConversation(contactPhone: string): Promise<SupabaseConversation | null> {
     if (!this.isEnabled || !supabase) {
       console.log('📋 Simulación: getOrCreateConversation para', contactPhone);
-      return null;
+      // Retornar conversación simulada para desarrollo
+      return {
+        id: `sim-conv-${contactPhone.replace(/\D/g, '').slice(-10)}`,
+        contact_phone: contactPhone,
+        status: 'active',
+        ai_mode: 'active',
+        assigned_agent_id: undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
     }
 
     try {
@@ -222,7 +231,17 @@ export class SupabaseDatabaseService {
   }): Promise<SupabaseMessage | null> {
     if (!this.isEnabled || !supabase) {
       console.log('📋 Simulación: createMessage para conversación', data.conversationId);
-      return null;
+      // Retornar mensaje simulado para desarrollo
+      return {
+        id: parseInt(`${Date.now()}${Math.floor(Math.random() * 1000)}`),
+        conversation_id: data.conversationId,
+        sender_type: data.senderType,
+        content: data.content,
+        message_type: data.messageType || 'text',
+        whatsapp_message_id: data.whatsappMessageId,
+        metadata: data.metadata,
+        created_at: new Date().toISOString()
+      };
     }
 
     try {
