@@ -315,21 +315,22 @@ export class WhatsAppService {
                     contactName: contact?.profile?.name
                   });
                 
-                const processedMessage = {
-                    id: result.message.id,
+                  // Generar estructura temporal si el método es un stub
+                  const processedMessage = {
+                    id: result?.message?.id || `temp-msg-${Date.now()}`,
                     waMessageId: message.id,
-                  from: message.from,
-                  to: value.metadata.phone_number_id,
+                    from: message.from,
+                    to: value.metadata.phone_number_id,
                     message: content,
-                    timestamp: result.message.timestamp,
-                  type: message.type,
-                  contact: contact ? {
-                    name: contact.profile.name,
-                    wa_id: contact.wa_id
-                  } : undefined,
+                    timestamp: result?.message?.timestamp || new Date(),
+                    type: message.type,
+                    contact: contact ? {
+                      name: contact.profile.name,
+                      wa_id: contact.wa_id
+                    } : undefined,
                     read: false,
-                    conversationId: result.conversation.id,
-                    contactId: result.contact.id
+                    conversationId: result?.conversation?.id || `temp-conv-${message.from}`,
+                    contactId: result?.contact?.id || `temp-contact-${message.from}`
                   };
 
                   processedMessages.push(processedMessage);
@@ -407,21 +408,21 @@ export class WhatsAppService {
 
                   // Emitir evento de Socket.IO para nuevo mensaje
                   if (this.io) {
-                    this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
+                    this.io.to(`conversation_${processedMessage.conversationId}`).emit('new_message', {
                       message: processedMessage,
                       conversation: {
-                        id: result.conversation.id,
-                        contactId: result.contact.id,
-                        contactName: result.contact.name || result.contact.waId,
-                        unreadCount: result.conversation.unreadCount
+                        id: processedMessage.conversationId,
+                        contactId: processedMessage.contactId,
+                        contactName: (result?.contact?.name || contact?.profile?.name || result?.contact?.waId || message.from),
+                        unreadCount: result?.conversation?.unreadCount || 1
                       }
                     });
                     
                     // También emitir a todos los clientes para actualizar lista de conversaciones
                     this.io.emit('conversation_updated', {
-                      conversationId: result.conversation.id,
+                      conversationId: processedMessage.conversationId,
                       lastMessage: processedMessage,
-                      unreadCount: result.conversation.unreadCount
+                      unreadCount: result?.conversation?.unreadCount || 1
                     });
                     
                     console.log('🌐 Evento Socket.IO emitido para nuevo mensaje');

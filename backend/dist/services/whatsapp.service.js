@@ -231,7 +231,7 @@ class WhatsAppService {
      */
     processWebhook(body) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e, _f;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
             console.log('📨 Procesando webhook de WhatsApp:', JSON.stringify(body, null, 2));
             const processedMessages = [];
             try {
@@ -267,21 +267,22 @@ class WhatsAppService {
                                             timestamp: new Date(parseInt(message.timestamp) * 1000),
                                             contactName: (_c = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _c === void 0 ? void 0 : _c.name
                                         });
+                                        // Generar estructura temporal si el método es un stub
                                         const processedMessage = {
-                                            id: result.message.id,
+                                            id: ((_d = result === null || result === void 0 ? void 0 : result.message) === null || _d === void 0 ? void 0 : _d.id) || `temp-msg-${Date.now()}`,
                                             waMessageId: message.id,
                                             from: message.from,
                                             to: value.metadata.phone_number_id,
                                             message: content,
-                                            timestamp: result.message.timestamp,
+                                            timestamp: ((_e = result === null || result === void 0 ? void 0 : result.message) === null || _e === void 0 ? void 0 : _e.timestamp) || new Date(),
                                             type: message.type,
                                             contact: contact ? {
                                                 name: contact.profile.name,
                                                 wa_id: contact.wa_id
                                             } : undefined,
                                             read: false,
-                                            conversationId: result.conversation.id,
-                                            contactId: result.contact.id
+                                            conversationId: ((_f = result === null || result === void 0 ? void 0 : result.conversation) === null || _f === void 0 ? void 0 : _f.id) || `temp-conv-${message.from}`,
+                                            contactId: ((_g = result === null || result === void 0 ? void 0 : result.contact) === null || _g === void 0 ? void 0 : _g.id) || `temp-contact-${message.from}`
                                         };
                                         processedMessages.push(processedMessage);
                                         console.log('📩 Mensaje guardado en BD:', processedMessage);
@@ -289,7 +290,7 @@ class WhatsAppService {
                                         // NUEVA LÓGICA DE TAKEOVER - VERIFICAR MODO AI
                                         // ============================================
                                         // Solo procesar con IA si es un mensaje de texto del usuario
-                                        if (message.type === 'text' && ((_d = message.text) === null || _d === void 0 ? void 0 : _d.body)) {
+                                        if (message.type === 'text' && ((_h = message.text) === null || _h === void 0 ? void 0 : _h.body)) {
                                             try {
                                                 // TODO: VERIFICAR MODO AI CON SUPABASE
                                                 // const aiModeInfo = await databaseService.getConversationAIMode(result.conversation.id);
@@ -346,26 +347,26 @@ class WhatsAppService {
                                         }
                                         // Emitir evento de Socket.IO para nuevo mensaje
                                         if (this.io) {
-                                            this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
+                                            this.io.to(`conversation_${processedMessage.conversationId}`).emit('new_message', {
                                                 message: processedMessage,
                                                 conversation: {
-                                                    id: result.conversation.id,
-                                                    contactId: result.contact.id,
-                                                    contactName: result.contact.name || result.contact.waId,
-                                                    unreadCount: result.conversation.unreadCount
+                                                    id: processedMessage.conversationId,
+                                                    contactId: processedMessage.contactId,
+                                                    contactName: (((_j = result === null || result === void 0 ? void 0 : result.contact) === null || _j === void 0 ? void 0 : _j.name) || ((_k = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _k === void 0 ? void 0 : _k.name) || ((_l = result === null || result === void 0 ? void 0 : result.contact) === null || _l === void 0 ? void 0 : _l.waId) || message.from),
+                                                    unreadCount: ((_m = result === null || result === void 0 ? void 0 : result.conversation) === null || _m === void 0 ? void 0 : _m.unreadCount) || 1
                                                 }
                                             });
                                             // También emitir a todos los clientes para actualizar lista de conversaciones
                                             this.io.emit('conversation_updated', {
-                                                conversationId: result.conversation.id,
+                                                conversationId: processedMessage.conversationId,
                                                 lastMessage: processedMessage,
-                                                unreadCount: result.conversation.unreadCount
+                                                unreadCount: ((_o = result === null || result === void 0 ? void 0 : result.conversation) === null || _o === void 0 ? void 0 : _o.unreadCount) || 1
                                             });
                                             console.log('🌐 Evento Socket.IO emitido para nuevo mensaje');
                                         }
                                         // Respuesta automática (solo para mensajes de texto)
-                                        if (message.type === 'text' && ((_e = message.text) === null || _e === void 0 ? void 0 : _e.body)) {
-                                            this.sendAutoReply(message.from, ((_f = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _f === void 0 ? void 0 : _f.name) || 'Cliente');
+                                        if (message.type === 'text' && ((_p = message.text) === null || _p === void 0 ? void 0 : _p.body)) {
+                                            this.sendAutoReply(message.from, ((_q = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _q === void 0 ? void 0 : _q.name) || 'Cliente');
                                         }
                                     }
                                     catch (dbError) {

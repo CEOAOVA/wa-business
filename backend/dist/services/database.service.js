@@ -436,34 +436,154 @@ class DatabaseService {
             return messages.slice(offset, offset + limit);
         });
     }
-    processOutgoingMessage(data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('📤 processOutgoingMessage - método temporal');
-            return { success: true, messageId: 'temp-' + Date.now() };
-        });
-    }
+    // ===== MÉTODOS PARA WHATSAPP WEBHOOK =====
+    /**
+     * Procesar mensaje entrante de WhatsApp
+     */
     processIncomingMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('📥 processIncomingMessage - método temporal');
-            return { success: true, messageId: 'temp-' + Date.now() };
+            try {
+                console.log(`📥 Procesando mensaje entrante de ${data.fromWaId}: ${data.content.substring(0, 50)}...`);
+                // 1. Obtener o crear conversación usando el método existente
+                const conversation = yield this.getOrCreateConversationByPhone(data.fromWaId);
+                if (!conversation) {
+                    throw new Error(`No se pudo crear conversación para ${data.fromWaId}`);
+                }
+                // 2. Crear mensaje en Supabase usando la interfaz correcta
+                const message = yield supabase_database_service_1.supabaseDatabaseService.createMessage({
+                    conversationId: conversation.id,
+                    senderType: 'user',
+                    content: data.content,
+                    messageType: data.messageType || 'text',
+                    whatsappMessageId: data.waMessageId,
+                    metadata: {
+                        from_wa_id: data.fromWaId,
+                        to_wa_id: data.toWaId,
+                        contact_name: data.contactName,
+                        media_url: data.mediaUrl,
+                        media_caption: data.mediaCaption,
+                        processed_at: new Date().toISOString()
+                    }
+                });
+                if (!message) {
+                    throw new Error('No se pudo crear el mensaje en la base de datos');
+                }
+                console.log(`✅ Mensaje entrante guardado: ID=${message.id}, Conv=${conversation.id}`);
+                return {
+                    success: true,
+                    message: {
+                        id: message.id,
+                        timestamp: new Date(message.created_at),
+                        content: message.content
+                    },
+                    conversation: {
+                        id: conversation.id,
+                        unreadCount: 1 // Incrementar contador por mensaje entrante
+                    },
+                    contact: {
+                        id: conversation.contact_phone,
+                        name: data.contactName || conversation.contact_phone,
+                        waId: data.fromWaId
+                    }
+                };
+            }
+            catch (error) {
+                console.error('❌ Error procesando mensaje entrante:', error);
+                throw error;
+            }
+        });
+    }
+    /**
+     * Procesar mensaje saliente de WhatsApp
+     */
+    processOutgoingMessage(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`📤 Procesando mensaje saliente a ${data.toWaId}: ${data.content.substring(0, 50)}...`);
+                // 1. Obtener o crear conversación usando el método existente
+                const conversation = yield this.getOrCreateConversationByPhone(data.toWaId);
+                if (!conversation) {
+                    throw new Error(`No se pudo crear conversación para ${data.toWaId}`);
+                }
+                // 2. Crear mensaje en Supabase usando la interfaz correcta
+                const message = yield supabase_database_service_1.supabaseDatabaseService.createMessage({
+                    conversationId: conversation.id,
+                    senderType: 'agent', // Los mensajes salientes se consideran del agente
+                    content: data.content,
+                    messageType: data.messageType || 'text',
+                    whatsappMessageId: data.waMessageId,
+                    metadata: {
+                        to_wa_id: data.toWaId,
+                        media_url: data.mediaUrl,
+                        media_caption: data.mediaCaption,
+                        sent_at: new Date().toISOString()
+                    }
+                });
+                if (!message) {
+                    throw new Error('No se pudo crear el mensaje en la base de datos');
+                }
+                console.log(`✅ Mensaje saliente guardado: ID=${message.id}, Conv=${conversation.id}`);
+                return {
+                    success: true,
+                    message: {
+                        id: message.id,
+                        timestamp: new Date(message.created_at),
+                        content: message.content
+                    },
+                    conversation: {
+                        id: conversation.id,
+                        unreadCount: 0 // Los mensajes salientes no incrementan el contador
+                    },
+                    contact: {
+                        id: conversation.contact_phone,
+                        name: conversation.contact_phone,
+                        waId: data.toWaId
+                    }
+                };
+            }
+            catch (error) {
+                console.error('❌ Error procesando mensaje saliente:', error);
+                throw error;
+            }
         });
     }
     markMessageAsRead(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('✅ markMessageAsRead - método temporal');
-            return true;
+            try {
+                // Implementar cuando sea necesario marcar mensajes como leídos
+                console.log(`✅ markMessageAsRead: ${messageId}`);
+                return true;
+            }
+            catch (error) {
+                console.error('❌ Error en markMessageAsRead:', error);
+                return false;
+            }
         });
     }
     markConversationAsRead(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('✅ markConversationAsRead - método temporal');
-            return true;
+            try {
+                // Implementar cuando sea necesario marcar conversaciones como leídas
+                console.log(`✅ markConversationAsRead: ${conversationId}`);
+                return true;
+            }
+            catch (error) {
+                console.error('❌ Error en markConversationAsRead:', error);
+                return false;
+            }
         });
     }
     cleanupOldMessages(olderThanHours) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('🧹 cleanupOldMessages - método temporal');
-            return 0;
+            try {
+                // Implementar limpieza de mensajes antiguos cuando sea necesario
+                console.log(`🧹 cleanupOldMessages: ${olderThanHours} horas`);
+                return 0;
+            }
+            catch (error) {
+                console.error('❌ Error en cleanupOldMessages:', error);
+                return 0;
+            }
         });
     }
 }
