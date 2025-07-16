@@ -2,14 +2,11 @@
 /**
  * Configuración de WhatsApp Business API - Usando variables de entorno
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHeaders = exports.buildApiUrl = exports.whatsappConfig = void 0;
-const dotenv_1 = __importDefault(require("dotenv"));
-// Cargar variables de entorno
-dotenv_1.default.config();
+const env_loader_1 = require("./env-loader");
+// Cargar variables de entorno con soporte para Unicode
+(0, env_loader_1.loadEnvWithUnicodeSupport)();
 // Verificar si WhatsApp está configurado (modo opcional para desarrollo)
 const isWhatsAppConfigured = !!(process.env.WHATSAPP_ACCESS_TOKEN &&
     process.env.WHATSAPP_PHONE_NUMBER_ID &&

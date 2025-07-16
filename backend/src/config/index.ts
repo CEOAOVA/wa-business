@@ -3,6 +3,11 @@
  * Migrado desde Backend-Embler y adaptado para WhatsApp Business
  */
 
+import { loadEnvWithUnicodeSupport } from './env-loader';
+
+// Cargar variables de entorno con soporte Unicode antes de cualquier configuración
+loadEnvWithUnicodeSupport();
+
 /**
  * Interfaz de configuración de la aplicación
  */

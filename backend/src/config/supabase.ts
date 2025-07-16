@@ -1,7 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+/**
+ * Configuración de Supabase - Database Service
+ */
 
-dotenv.config({ path: '.env' });
+import { loadEnvWithUnicodeSupport } from './env-loader';
+import { createClient } from '@supabase/supabase-js';
+
+// Cargar variables de entorno con soporte Unicode
+loadEnvWithUnicodeSupport();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;

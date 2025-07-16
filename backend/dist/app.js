@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.io = void 0;
 const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const chat_1 = __importDefault(require("./routes/chat"));
@@ -23,11 +22,15 @@ const media_upload_1 = __importDefault(require("./routes/media-upload"));
 const chatbot_1 = __importDefault(require("./routes/chatbot"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
+const env_loader_1 = require("./config/env-loader");
 const whatsapp_1 = require("./config/whatsapp");
 const whatsapp_service_1 = require("./services/whatsapp.service");
 const security_1 = require("./middleware/security");
 const security_2 = require("./middleware/security");
-dotenv_1.default.config();
+// Cargar variables de entorno con soporte Unicode
+(0, env_loader_1.loadEnvWithUnicodeSupport)();
+// Debug de variables de entorno
+console.log('🔍 Estado de variables de entorno:', (0, env_loader_1.getEnvDebugInfo)());
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 const PORT = whatsapp_1.whatsappConfig.server.port;

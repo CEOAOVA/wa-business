@@ -7,6 +7,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConfig = getConfig;
 exports.validateCriticalConfig = validateCriticalConfig;
 exports.logConfigSummary = logConfigSummary;
+const env_loader_1 = require("./env-loader");
+// Cargar variables de entorno con soporte Unicode antes de cualquier configuración
+(0, env_loader_1.loadEnvWithUnicodeSupport)();
 /**
  * Obtiene una variable de entorno con valor por defecto
  */

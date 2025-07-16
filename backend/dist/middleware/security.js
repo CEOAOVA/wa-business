@@ -175,9 +175,16 @@ const securityLogger = (req, res, next) => {
 };
 exports.securityLogger = securityLogger;
 /**
- * Middleware para validar User-Agent (solo en producción)
+ * Middleware para validar User-Agent (con excepciones para APIs)
  */
 const validateUserAgent = (req, res, next) => {
+    var _a;
+    // Excluir rutas de API de la validación estricta de User-Agent
+    // Las APIs tienen sus propios mecanismos de autenticación y seguridad
+    if (req.url.startsWith('/api/') || ((_a = req.path) === null || _a === void 0 ? void 0 : _a.startsWith('/api/'))) {
+        return next();
+    }
+    // Solo aplicar en producción
     if (process.env.NODE_ENV !== 'production') {
         return next();
     }
@@ -190,20 +197,31 @@ const validateUserAgent = (req, res, next) => {
             code: 'MISSING_USER_AGENT'
         });
     }
-    // Lista de User-Agents permitidos (puedes ajustar según tus necesidades)
+    // Lista de User-Agents permitidos (incluyendo Meta/WhatsApp)
     const allowedUserAgents = [
-        /Mozilla\/5\.0/, // Navegadores modernos
+        // Navegadores modernos
+        /Mozilla\/5\.0/,
         /Chrome/,
         /Firefox/,
         /Safari/,
         /Edge/,
-        /PostmanRuntime/, // Para testing
-        /curl/, // Para testing
-        /axios/, // Para testing
+        // Herramientas de testing
+        /PostmanRuntime/,
+        /curl/,
+        /axios/,
+        /node/,
+        // WhatsApp y Meta
+        /WhatsApp/i,
+        /facebookplatform/i,
+        /Meta/i,
+        /facebook/i,
+        // APIs y bots legítimos
+        /webhook/i,
+        /test/i // Para testing
     ];
     const isAllowed = allowedUserAgents.some(pattern => pattern.test(userAgent));
     if (!isAllowed) {
-        console.warn(`[Security] ⚠️ User-Agent no permitido: ${userAgent} desde IP: ${req.ip}`);
+        console.warn(`[Security] ⚠️ User-Agent no permitido: ${userAgent} desde IP: ${req.ip} para ruta: ${req.url}`);
         return res.status(403).json({
             success: false,
             error: 'User-Agent no permitido',

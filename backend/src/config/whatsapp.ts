@@ -2,10 +2,10 @@
  * Configuración de WhatsApp Business API - Usando variables de entorno
  */
 
-import dotenv from 'dotenv';
+import { loadEnvWithUnicodeSupport } from './env-loader';
 
-// Cargar variables de entorno
-dotenv.config();
+// Cargar variables de entorno con soporte para Unicode
+loadEnvWithUnicodeSupport();
 
 // Verificar si WhatsApp está configurado (modo opcional para desarrollo)
 const isWhatsAppConfigured = !!(

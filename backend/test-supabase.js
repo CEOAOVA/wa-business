@@ -1,9 +1,9 @@
 // Script simple para probar la conexión con Supabase
 const { createClient } = require('@supabase/supabase-js');
-const dotenv = require('dotenv');
+const { loadEnvWithUnicodeSupport } = require('./dist/config/env-loader');
 
-// Cargar variables de entorno
-dotenv.config({ path: '.env' });
+// Cargar variables de entorno con soporte Unicode
+loadEnvWithUnicodeSupport();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;

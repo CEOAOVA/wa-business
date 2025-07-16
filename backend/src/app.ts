@@ -1,5 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import chatRoutes from './routes/chat';
@@ -8,12 +7,17 @@ import mediaRoutes from './routes/media-upload';
 import chatbotRoutes from './routes/chatbot';
 import authRoutes from './routes/auth';
 import dashboardRoutes from './routes/dashboard';
+import { loadEnvWithUnicodeSupport, getEnvDebugInfo } from './config/env-loader';
 import { whatsappConfig } from './config/whatsapp';
 import { whatsappService } from './services/whatsapp.service';
 import { applySecurity } from './middleware/security';
 import { authRateLimit } from './middleware/security';
 
-dotenv.config();
+// Cargar variables de entorno con soporte Unicode
+loadEnvWithUnicodeSupport();
+
+// Debug de variables de entorno
+console.log('🔍 Estado de variables de entorno:', getEnvDebugInfo());
 
 const app = express();
 const httpServer = createServer(app);

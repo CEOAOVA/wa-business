@@ -181,9 +181,16 @@ export const securityLogger = (req: Request, res: Response, next: NextFunction) 
 };
 
 /**
- * Middleware para validar User-Agent (solo en producción)
+ * Middleware para validar User-Agent (con excepciones para APIs)
  */
 export const validateUserAgent = (req: Request, res: Response, next: NextFunction) => {
+  // Excluir rutas de API de la validación estricta de User-Agent
+  // Las APIs tienen sus propios mecanismos de autenticación y seguridad
+  if (req.url.startsWith('/api/') || req.path?.startsWith('/api/')) {
+    return next();
+  }
+
+  // Solo aplicar en producción
   if (process.env.NODE_ENV !== 'production') {
     return next();
   }
@@ -199,22 +206,36 @@ export const validateUserAgent = (req: Request, res: Response, next: NextFunctio
     });
   }
 
-  // Lista de User-Agents permitidos (puedes ajustar según tus necesidades)
+  // Lista de User-Agents permitidos (incluyendo Meta/WhatsApp)
   const allowedUserAgents = [
-    /Mozilla\/5\.0/,  // Navegadores modernos
+    // Navegadores modernos
+    /Mozilla\/5\.0/,
     /Chrome/,
     /Firefox/,
     /Safari/,
     /Edge/,
-    /PostmanRuntime/,  // Para testing
-    /curl/,  // Para testing
-    /axios/,  // Para testing
+    
+    // Herramientas de testing
+    /PostmanRuntime/,
+    /curl/,
+    /axios/,
+    /node/,
+    
+    // WhatsApp y Meta
+    /WhatsApp/i,
+    /facebookplatform/i,
+    /Meta/i,
+    /facebook/i,
+    
+    // APIs y bots legítimos
+    /webhook/i,
+    /test/i  // Para testing
   ];
 
   const isAllowed = allowedUserAgents.some(pattern => pattern.test(userAgent));
   
   if (!isAllowed) {
-    console.warn(`[Security] ⚠️ User-Agent no permitido: ${userAgent} desde IP: ${req.ip}`);
+    console.warn(`[Security] ⚠️ User-Agent no permitido: ${userAgent} desde IP: ${req.ip} para ruta: ${req.url}`);
     return res.status(403).json({
       success: false,
       error: 'User-Agent no permitido',

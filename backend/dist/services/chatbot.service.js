@@ -18,8 +18,11 @@ exports.chatbotService = exports.ChatbotService = void 0;
  * Adaptado desde la implementación frontend para integrar con WhatsApp
  */
 const axios_1 = __importDefault(require("axios"));
+const env_loader_1 = require("../config/env-loader");
 const whatsapp_service_1 = require("./whatsapp.service");
 const database_service_1 = require("./database.service");
+// Cargar variables de entorno con soporte Unicode
+(0, env_loader_1.loadEnvWithUnicodeSupport)();
 class ChatbotService {
     constructor() {
         this.conversations = new Map();

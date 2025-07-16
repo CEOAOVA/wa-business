@@ -3,8 +3,12 @@
  * Adaptado desde la implementación frontend para integrar con WhatsApp
  */
 import axios from 'axios';
+import { loadEnvWithUnicodeSupport } from '../config/env-loader';
 import { whatsappService } from './whatsapp.service';
 import { databaseService } from './database.service';
+
+// Cargar variables de entorno con soporte Unicode
+loadEnvWithUnicodeSupport();
 
 // Interfaces para el chatbot
 interface ChatbotMessage {
