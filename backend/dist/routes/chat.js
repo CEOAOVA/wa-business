@@ -190,7 +190,7 @@ router.get('/webhook', (req, res) => {
             token: token ? `${token.substring(0, 10)}...` : 'undefined',
             challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined'
         });
-        // Validate required parameters
+        // Validate required parameters según Meta webhook requirements
         if (!mode || !token || !challenge) {
             console.error(`❌ [${requestId}] Missing required parameters:`, {
                 mode: !!mode,
@@ -199,23 +199,28 @@ router.get('/webhook', (req, res) => {
             });
             return res.status(400).send('Missing required parameters: hub.mode, hub.verify_token, hub.challenge');
         }
+        // Verificar modo de suscripción
+        if (mode !== 'subscribe') {
+            console.error(`❌ [${requestId}] Invalid mode: ${mode}, expected: subscribe`);
+            return res.status(403).send('Invalid mode. Expected: subscribe');
+        }
+        // Verificar token - esto es crítico para la seguridad
         const result = whatsapp_service_1.whatsappService.verifyWebhook(mode, token, challenge);
         if (result) {
-            console.log(`✅ [${requestId}] Webhook verification successful, returning challenge`);
+            console.log(`✅ [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
+            // 🚀 IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
+            // Meta espera exactamente el challenge string, no un objeto JSON
             res.status(200).send(result);
         }
         else {
-            console.error(`❌ [${requestId}] Webhook verification failed`);
-            res.status(403).send('Token de verificación incorrecto');
+            console.error(`❌ [${requestId}] Webhook verification failed - token mismatch`);
+            console.error(`❌ [${requestId}] Expected token: ${whatsapp_service_1.whatsappService.getWebhookDebugInfo().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
+            res.status(403).send('Forbidden: Invalid verify token');
         }
     }
     catch (error) {
         console.error(`❌ [${requestId}] Error in webhook verification:`, error);
-        res.status(500).json({
-            success: false,
-            error: 'Error en verificación de webhook',
-            requestId
-        });
+        res.status(500).send('Internal server error during webhook verification');
     }
 });
 // POST /api/chat/webhook - Recibir mensajes (con seguridad integrada)
@@ -223,24 +228,29 @@ router.post('/webhook', (req, res) => __awaiter(void 0, void 0, void 0, function
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
     const userAgent = req.get('User-Agent') || 'unknown';
+    // 🚀 RESPONDER INMEDIATAMENTE CON 200 para evitar reenvíos de WhatsApp
+    // Según las mejores prácticas, WhatsApp reenvía si no recibe 200 rápidamente
+    res.status(200).json({
+        success: true,
+        message: 'received'
+    });
     try {
         console.log(`🔒 [${requestId}] Webhook recibido desde IP: ${clientIp}`);
         // Validación básica de estructura
         if (!req.body || typeof req.body !== 'object') {
             console.warn(`⚠️ [${requestId}] Webhook con payload inválido`);
-            return res.status(400).json({
-                error: 'Bad Request',
-                message: 'Invalid payload structure'
-            });
+            return; // Ya respondimos con 200, solo loggeamos
         }
         // Verificar estructura básica de webhook de WhatsApp
         const { object, entry } = req.body;
         if (!object || !Array.isArray(entry)) {
             console.warn(`⚠️ [${requestId}] Estructura de webhook inválida`);
-            return res.status(400).json({
-                error: 'Bad Request',
-                message: 'Invalid WhatsApp webhook structure'
-            });
+            return; // Ya respondimos con 200, solo loggeamos
+        }
+        // Verificar que es de WhatsApp Business
+        if (object !== 'whatsapp_business_account') {
+            console.warn(`⚠️ [${requestId}] Objeto de webhook no es whatsapp_business_account: ${object}`);
+            return; // Ya respondimos con 200, solo loggeamos
         }
         // Log detallado solo en desarrollo
         if (process.env.NODE_ENV === 'development') {
@@ -250,21 +260,26 @@ router.post('/webhook', (req, res) => __awaiter(void 0, void 0, void 0, function
             // En producción, log resumido por seguridad
             console.log(`📊 [${requestId}] Webhook: ${object}, entries: ${entry.length}, UA: ${userAgent.substring(0, 50)}`);
         }
-        const result = yield whatsapp_service_1.whatsappService.processWebhook(req.body);
-        console.log(`✅ [${requestId}] Webhook procesado exitosamente: ${result.processed} mensajes`);
-        res.status(200).json({
-            success: true,
-            processed: result.processed,
-            messages: result.messages.length // Solo enviar count por seguridad
-        });
+        // Procesar webhook de forma asíncrona (no bloqueante)
+        setImmediate(() => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const result = yield whatsapp_service_1.whatsappService.processWebhook(req.body);
+                console.log(`✅ [${requestId}] Webhook procesado exitosamente: ${result.processed} mensajes`);
+                // Opcional: Notificar via Socket.IO a clientes conectados
+                if (result.messages.length > 0) {
+                    // TODO: Implementar notificación en tiempo real si es necesario
+                    console.log(`📢 [${requestId}] ${result.messages.length} nuevos mensajes procesados`);
+                }
+            }
+            catch (error) {
+                console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente:`, error);
+                // No podemos responder al webhook aquí, pero loggeamos para debugging
+            }
+        }));
     }
     catch (error) {
-        console.error(`❌ [${requestId}] Error procesando webhook:`, error);
-        res.status(500).json({
-            error: 'Internal Server Error',
-            message: 'Error processing webhook',
-            requestId // Para debugging
-        });
+        console.error(`❌ [${requestId}] Error inicial en webhook:`, error);
+        // Ya respondimos con 200, así que solo loggeamos
     }
 }));
 // ============================================
@@ -799,4 +814,59 @@ router.post('/webhook/config', (req, res) => __awaiter(void 0, void 0, void 0, f
         });
     }
 }));
+// GET /api/chat/webhook/health - Verificar salud del webhook (para debugging)
+router.get('/webhook/health', (req, res) => {
+    try {
+        const config = whatsapp_service_1.whatsappService.getWebhookDebugInfo();
+        const timestamp = new Date().toISOString();
+        // Verificar configuración crítica
+        const issues = [];
+        if (!config.verifyTokenConfigured)
+            issues.push('WEBHOOK_VERIFY_TOKEN no configurado');
+        if (!config.accessTokenConfigured)
+            issues.push('WHATSAPP_ACCESS_TOKEN no configurado');
+        if (!config.phoneNumberIdConfigured)
+            issues.push('WHATSAPP_PHONE_NUMBER_ID no configurado');
+        const isHealthy = issues.length === 0;
+        res.status(isHealthy ? 200 : 500).json({
+            healthy: isHealthy,
+            timestamp,
+            webhook: {
+                url: config.url,
+                path: config.path,
+                verifyTokenConfigured: config.verifyTokenConfigured,
+                verifyTokenLength: config.verifyTokenLength,
+                signatureVerificationEnabled: config.signatureVerificationEnabled,
+                getEndpoint: `${req.protocol}://${req.get('host')}/api/chat/webhook`,
+                postEndpoint: `${req.protocol}://${req.get('host')}/api/chat/webhook`
+            },
+            whatsapp: {
+                accessTokenConfigured: config.accessTokenConfigured,
+                phoneNumberIdConfigured: config.phoneNumberIdConfigured,
+                apiVersion: config.apiVersion
+            },
+            environment: {
+                nodeEnv: process.env.NODE_ENV,
+                port: process.env.PORT,
+                timestamp
+            },
+            issues: issues.length > 0 ? issues : null,
+            tests: {
+                verificationUrl: `${req.protocol}://${req.get('host')}/api/chat/webhook?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=YOUR_TOKEN`,
+                instructions: [
+                    "1. Reemplaza YOUR_TOKEN con tu WEBHOOK_VERIFY_TOKEN real",
+                    "2. Usa esta URL en el webhook de Meta para verificar",
+                    "3. El webhook debe responder con 'test123' si está configurado correctamente"
+                ]
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            healthy: false,
+            error: 'Error obteniendo información de salud del webhook',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
 exports.default = router;

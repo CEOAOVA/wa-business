@@ -5,8 +5,7 @@ FROM node:18-alpine AS base
 RUN apk add --no-cache \
     python3 \
     make \
-    g++ \
-    sqlite
+    g++
 
 # Crear directorio de trabajo
 WORKDIR /app
@@ -26,9 +25,6 @@ RUN npm ci
 # Copiar código fuente
 COPY . .
 
-# Generar cliente de Prisma
-RUN npx prisma generate
-
 # Etapa de producción
 FROM base AS production
 
@@ -38,9 +34,6 @@ COPY . .
 # Instalar dependencias de desarrollo para build
 RUN npm ci
 
-# Generar cliente de Prisma
-RUN npx prisma generate
-
 # Compilar TypeScript
 RUN npm run build
 
@@ -48,7 +41,7 @@ RUN npm run build
 RUN npm ci --only=production && npm cache clean --force
 
 # Crear directorio para uploads
-RUN mkdir -p uploads/media uploads/temp
+RUN mkdir -p uploads/media uploads/temp uploads/images uploads/documents uploads/video uploads/audio uploads/stickers uploads/thumbnails
 
 # Crear directorio para logs
 RUN mkdir -p logs
