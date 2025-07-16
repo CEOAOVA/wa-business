@@ -77,7 +77,7 @@ async function testWebhook() {
     const verifyParams = new URLSearchParams({
       'hub.mode': 'subscribe',
       'hub.challenge': 'test_challenge_123',
-      'hub.verify_token': 'verify_embler_token_2025@' // Cambia este valor por tu token real
+      'hub.verify_token': 'secret' // Cambia este valor por tu token real
     });
     
     try {

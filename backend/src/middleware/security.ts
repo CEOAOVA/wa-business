@@ -184,20 +184,27 @@ export const securityLogger = (req: Request, res: Response, next: NextFunction) 
  * Middleware para validar User-Agent (con excepciones para APIs)
  */
 export const validateUserAgent = (req: Request, res: Response, next: NextFunction) => {
+  const userAgent = req.get('User-Agent') || 'unknown';
+  const requestPath = req.path || req.url || '';
+  const nodeEnv = process.env.NODE_ENV || 'development';
+
+  // Log para debugging
+  console.log(`[Security] ValidateUserAgent: ${req.method} ${requestPath}, UA: ${userAgent.substring(0, 50)}, ENV: ${nodeEnv}`);
+
   // Excluir rutas de API de la validación estricta de User-Agent
   // Las APIs tienen sus propios mecanismos de autenticación y seguridad
-  if (req.url.startsWith('/api/') || req.path?.startsWith('/api/')) {
+  if (requestPath.startsWith('/api/') || req.url?.startsWith('/api/')) {
+    console.log(`[Security] ✅ Ruta API excluida de validación User-Agent: ${requestPath}`);
     return next();
   }
 
   // Solo aplicar en producción
-  if (process.env.NODE_ENV !== 'production') {
+  if (nodeEnv !== 'production') {
+    console.log(`[Security] ✅ Modo desarrollo - User-Agent no validado: ${nodeEnv}`);
     return next();
   }
 
-  const userAgent = req.get('User-Agent');
-  
-  if (!userAgent) {
+  if (!userAgent || userAgent === 'unknown') {
     console.warn(`[Security] ⚠️ Request sin User-Agent desde IP: ${req.ip}`);
     return res.status(400).json({
       success: false,
@@ -235,7 +242,7 @@ export const validateUserAgent = (req: Request, res: Response, next: NextFunctio
   const isAllowed = allowedUserAgents.some(pattern => pattern.test(userAgent));
   
   if (!isAllowed) {
-    console.warn(`[Security] ⚠️ User-Agent no permitido: ${userAgent} desde IP: ${req.ip} para ruta: ${req.url}`);
+    console.warn(`[Security] ⚠️ User-Agent no permitido: ${userAgent} desde IP: ${req.ip} para ruta: ${requestPath}`);
     return res.status(403).json({
       success: false,
       error: 'User-Agent no permitido',
@@ -243,6 +250,7 @@ export const validateUserAgent = (req: Request, res: Response, next: NextFunctio
     });
   }
 
+  console.log(`[Security] ✅ User-Agent permitido: ${userAgent.substring(0, 30)}`);
   next();
 };
 
@@ -264,8 +272,15 @@ export const applySecurity = (app: any) => {
   // Logging de seguridad
   app.use(securityLogger);
   
-  // Validación de User-Agent en producción
-  app.use(validateUserAgent);
+  // Validación de User-Agent solo si está habilitada explícitamente
+  const disableUserAgentValidation = process.env.DISABLE_USER_AGENT_VALIDATION === 'true' || process.env.NODE_ENV === 'development';
+  
+  if (!disableUserAgentValidation) {
+    console.log('[Security] 🔍 User-Agent validation habilitada');
+    app.use(validateUserAgent);
+  } else {
+    console.log('[Security] ⚠️ User-Agent validation DESACTIVADA (desarrollo o configuración manual)');
+  }
   
   console.log('[Security] ✅ Configuración de seguridad aplicada');
 }; 
