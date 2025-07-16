@@ -21,6 +21,7 @@ const axios_1 = __importDefault(require("axios"));
 const env_loader_1 = require("../config/env-loader");
 const whatsapp_service_1 = require("./whatsapp.service");
 const database_service_1 = require("./database.service");
+const config_1 = require("../config");
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 class ChatbotService {
@@ -175,9 +176,10 @@ class ChatbotService {
     callOpenRouter(messages, tools, options) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c;
-            const apiKey = process.env.OPENROUTER_API_KEY;
+            const config = (0, config_1.getConfig)();
+            const apiKey = config.llm.openRouterApiKey;
             if (!apiKey) {
-                throw new Error('OpenRouter API key no configurada. Agregar OPENROUTER_API_KEY al archivo .env');
+                throw new Error('OpenRouter API key no configurada. Agregar OPEN_ROUTER_API_KEY al archivo .env');
             }
             const payload = {
                 model: this.openRouterConfig.model,

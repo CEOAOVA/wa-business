@@ -6,6 +6,7 @@ import axios from 'axios';
 import { loadEnvWithUnicodeSupport } from '../config/env-loader';
 import { whatsappService } from './whatsapp.service';
 import { databaseService } from './database.service';
+import { getConfig } from '../config';
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -276,10 +277,11 @@ export class ChatbotService {
     tools?: OpenRouterTool[], 
     options?: { temperature?: number; maxTokens?: number }
   ): Promise<OpenRouterResponse> {
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const config = getConfig();
+    const apiKey = config.llm.openRouterApiKey;
     
     if (!apiKey) {
-      throw new Error('OpenRouter API key no configurada. Agregar OPENROUTER_API_KEY al archivo .env');
+      throw new Error('OpenRouter API key no configurada. Agregar OPEN_ROUTER_API_KEY al archivo .env');
     }
 
     const payload = {
