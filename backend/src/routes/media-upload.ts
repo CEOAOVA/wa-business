@@ -9,7 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import { mediaService } from '../services/media.service';
 import { whatsappService } from '../services/whatsapp.service';
-import { MessageType } from '../generated/prisma';
+import { MessageType } from '../types/database';
 
 const router = express.Router();
 

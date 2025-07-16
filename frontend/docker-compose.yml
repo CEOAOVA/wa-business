@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # Frontend - React WhatsApp Business Panel
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "80"
+    environment:
+      # App Configuration
+      - NODE_ENV=production
+      - PORT=80
+      
+      # Backend API Connection
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL:-https://dev-apiwaprueba.aova.mx}
+      
+      # SSL/Security Configuration
+      - NGINX_HOST=0.0.0.0
+      - NGINX_PORT=80
+      - HOSTNAME=0.0.0.0
+      - TRUST_PROXY=true
+      
+    restart: unless-stopped
+    
+    # Labels para SSL/HTTPS automático con Traefik
+    labels:
+      - "coolify.managed=true"
+      - "coolify.version=4"
+      - "coolify.service=wa-business-frontend"
+      - "coolify.type=frontend"
+      - "traefik.enable=true"
+      
+      # Router HTTPS principal
+      - "traefik.http.routers.wa-business-frontend.rule=Host(`dev-waprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-frontend.tls=true"
+      - "traefik.http.routers.wa-business-frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.wa-business-frontend.entrypoints=websecure"
+      - "traefik.http.routers.wa-business-frontend.service=wa-business-frontend"
+      
+      # Router HTTP (redirect a HTTPS)
+      - "traefik.http.routers.wa-business-frontend-http.rule=Host(`dev-waprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-frontend-http.entrypoints=web"
+      - "traefik.http.routers.wa-business-frontend-http.middlewares=frontend-redirect-https"
+      - "traefik.http.routers.wa-business-frontend-http.service=wa-business-frontend"
+      
+      # Middleware para redirect HTTPS del frontend
+      - "traefik.http.middlewares.frontend-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.frontend-redirect-https.redirectscheme.permanent=true"
+      
+      # Service configuration
+      - "traefik.http.services.wa-business-frontend.loadbalancer.server.port=80"
+      
+      # Security headers middleware
+      - "traefik.http.middlewares.frontend-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.frontend-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.frontend-headers.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.frontend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.frontend-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.frontend-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.frontend-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      
+      # CSP middleware
+      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss:; font-src 'self' https:; object-src 'none';"
+      
+      # Apply middlewares to HTTPS router
+      - "traefik.http.routers.wa-business-frontend.middlewares=frontend-headers,frontend-csp"
+    
+    # Configuración de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 30s
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Configuración de red
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true 

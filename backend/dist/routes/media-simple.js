@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const prisma_1 = require("../generated/prisma");
+const database_1 = require("../types/database");
 const router = express_1.default.Router();
 /**
  * GET /api/media/types
@@ -33,7 +33,7 @@ router.get('/types', (req, res) => {
         data: {
             supportedTypes,
             maxFileSize: '16MB',
-            messageTypes: Object.values(prisma_1.MessageType),
+            messageTypes: Object.values(database_1.MessageType),
             status: 'Sistema multimedia configurado - Multer pendiente de instalación'
         }
     });

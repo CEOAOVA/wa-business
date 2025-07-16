@@ -22,7 +22,7 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const media_service_1 = require("../services/media.service");
 const whatsapp_service_1 = require("../services/whatsapp.service");
-const prisma_1 = require("../generated/prisma");
+const database_1 = require("../types/database");
 const router = express_1.default.Router();
 // Configuración de multer para upload de archivos
 const storage = multer_1.default.diskStorage({
@@ -192,18 +192,18 @@ router.post('/upload-and-send', upload.single('file'), (req, res) => __awaiter(v
         // Subir archivo a WhatsApp Business API
         const mediaId = yield media_service_1.mediaService.uploadMediaToWhatsApp(file.path, file.filename);
         // Determinar tipo de mensaje
-        let messageType = prisma_1.MessageType.DOCUMENT;
+        let messageType = database_1.MessageType.DOCUMENT;
         if (file.mimetype.startsWith('image/')) {
-            messageType = prisma_1.MessageType.IMAGE;
+            messageType = database_1.MessageType.IMAGE;
         }
         else if (file.mimetype.startsWith('video/')) {
-            messageType = prisma_1.MessageType.VIDEO;
+            messageType = database_1.MessageType.VIDEO;
         }
         else if (file.mimetype.startsWith('audio/')) {
-            messageType = prisma_1.MessageType.AUDIO;
+            messageType = database_1.MessageType.AUDIO;
         }
         else if (file.mimetype === 'image/webp' && file.originalname.includes('sticker')) {
-            messageType = prisma_1.MessageType.STICKER;
+            messageType = database_1.MessageType.STICKER;
         }
         // Enviar mensaje multimedia
         const sendResult = yield media_service_1.mediaService.sendMediaMessage({

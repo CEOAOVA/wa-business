@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # Backend - WhatsApp Business API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "3002"
+    environment:
+      # App Configuration
+      - NODE_ENV=production
+      - PORT=3002
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # WhatsApp Business API
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+      - WHATSAPP_API_VERSION=${WHATSAPP_API_VERSION:-v22.0}
+      - WHATSAPP_BASE_URL=${WHATSAPP_BASE_URL:-https://graph.facebook.com}
+      - WEBHOOK_VERIFY_TOKEN=${WEBHOOK_VERIFY_TOKEN}
+      - WEBHOOK_PATH=${WEBHOOK_PATH:-/api/chat/webhook}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET}
+      
+      # OpenRouter AI Configuration
+      - OPEN_ROUTER_API_KEY=${OPEN_ROUTER_API_KEY}
+      - OPEN_ROUTER_BASE_URL=${OPEN_ROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      - OPEN_ROUTER_DEFAULT_MODEL=${OPEN_ROUTER_DEFAULT_MODEL:-google/gemini-flash-1.5}
+      - DEFAULT_TEMPERATURE=${DEFAULT_TEMPERATURE:-0.7}
+      - DEFAULT_MAX_TOKENS=${DEFAULT_MAX_TOKENS:-1000}
+      - LLM_TIMEOUT_MS=${LLM_TIMEOUT_MS:-60000}
+      
+      # SOAP Services (Embler Integration)
+      - EMBLER_WSDL_URL=${EMBLER_WSDL_URL}
+      - EMBLER_ENDPOINT_URL=${EMBLER_ENDPOINT_URL}
+      - TOKEN_CACHE_DURATION=${TOKEN_CACHE_DURATION:-10}
+      - INVENTORY_CACHE_TTL=${INVENTORY_CACHE_TTL:-300000}
+      - SOAP_CONNECTION_RETRIES=${SOAP_CONNECTION_RETRIES:-3}
+      
+      # POS Configuration
+      - DEFAULT_POS_ID=${DEFAULT_POS_ID:-SAT}
+      - VALID_POS_IDS=${VALID_POS_IDS:-ME,CUA,ECA,IZT,LIND,PORT,QRO,SAT,TPN,VC}
+      - POS_CREDENTIALS=${POS_CREDENTIALS}
+      
+      # Database Configuration
+      - DATABASE_URL=${DATABASE_URL:-file:./prisma/whatsapp.db}
+      
+      # Supabase Configuration (opcional)
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+      
+      # Authentication
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-8h}
+      - AUTHORIZED_USERS=${AUTHORIZED_USERS}
+      - TEMP_PASSWORD=${TEMP_PASSWORD}
+      
+      # External APIs
+      - API_NINJAS_KEY=${API_NINJAS_KEY}
+      
+      # CORS Configuration
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      
+      # Security Configuration
+      - HOSTNAME=0.0.0.0
+      - TRUST_PROXY=true
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-60000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      
+      # System Configuration
+      - ENABLE_DETAILED_LOGS=${ENABLE_DETAILED_LOGS:-false}
+      
+    restart: unless-stopped
+    
+    # Labels para SSL/HTTPS automático con Traefik
+    labels:
+      - "coolify.managed=true"
+      - "coolify.version=4"
+      - "coolify.service=wa-business-backend"
+      - "traefik.enable=true"
+      
+      # Router HTTPS principal
+      - "traefik.http.routers.wa-business-backend.rule=Host(`dev-apiwaprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-backend.tls=true"
+      - "traefik.http.routers.wa-business-backend.tls.certresolver=myresolver"
+      - "traefik.http.routers.wa-business-backend.entrypoints=websecure"
+      - "traefik.http.routers.wa-business-backend.service=wa-business-backend"
+      
+      # Router HTTP (redirect a HTTPS)
+      - "traefik.http.routers.wa-business-backend-http.rule=Host(`dev-apiwaprueba.aova.mx`)"
+      - "traefik.http.routers.wa-business-backend-http.entrypoints=web"
+      - "traefik.http.routers.wa-business-backend-http.middlewares=backend-redirect-https"
+      - "traefik.http.routers.wa-business-backend-http.service=wa-business-backend"
+      
+      # Middleware para redirect HTTPS del backend
+      - "traefik.http.middlewares.backend-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.backend-redirect-https.redirectscheme.permanent=true"
+      
+      # Service configuration
+      - "traefik.http.services.wa-business-backend.loadbalancer.server.port=3002"
+      
+      # Security headers middleware
+      - "traefik.http.middlewares.backend-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.backend-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.backend-headers.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.backend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      
+      # CORS middleware
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=Content-Type,Authorization,X-Requested-With,Accept,Origin,X-CSRF-Token,X-Hub-Signature-256"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlistregex=^https://(.*\\.)?aova\\.mx$"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowcredentials=true"
+      
+      # Apply middlewares to HTTPS router
+      - "traefik.http.routers.wa-business-backend.middlewares=backend-headers,backend-cors"
+    
+    # Configuración de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 30s
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3002/api/chat/webhook/debug", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Volúmenes para persistir datos
+    volumes:
+      - ./prisma:/app/prisma
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    
+    # Configuración de red
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true 

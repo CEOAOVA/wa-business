@@ -20,7 +20,7 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const media_service_1 = require("../services/media.service");
 const whatsapp_service_1 = require("../services/whatsapp.service");
-const prisma_1 = require("../generated/prisma");
+const database_1 = require("../types/database");
 const router = express_1.default.Router();
 /**
  * GET /api/media/download/:mediaId
@@ -125,7 +125,7 @@ router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         console.log('📱 Enviando mensaje multimedia:', { to, mediaId, mediaType });
         // Validar tipo de mensaje
-        const validTypes = Object.values(prisma_1.MessageType);
+        const validTypes = Object.values(database_1.MessageType);
         if (!validTypes.includes(mediaType)) {
             return res.status(400).json({
                 success: false,
@@ -255,7 +255,7 @@ router.get('/types', (req, res) => {
             data: {
                 supportedTypes,
                 maxFileSize: '16MB',
-                messageTypes: Object.values(prisma_1.MessageType),
+                messageTypes: Object.values(database_1.MessageType),
                 note: 'Upload endpoint disponible después de instalar multer'
             }
         });

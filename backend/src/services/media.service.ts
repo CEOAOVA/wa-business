@@ -9,7 +9,7 @@ import path from 'path';
 import { promises as fsPromises } from 'fs';
 import { whatsappConfig, buildApiUrl, getHeaders } from '../config/whatsapp';
 import { databaseService } from './database.service';
-import { MessageType } from '../generated/prisma';
+import { MessageType } from '../types/database';
 
 // Tipos de medios soportados
 export interface MediaFile {

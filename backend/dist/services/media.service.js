@@ -22,7 +22,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const fs_2 = require("fs");
 const whatsapp_1 = require("../config/whatsapp");
-const prisma_1 = require("../generated/prisma");
+const database_1 = require("../types/database");
 class MediaService {
     constructor() {
         // Tipos MIME soportados por WhatsApp
@@ -68,16 +68,16 @@ class MediaService {
      */
     getMessageType(mimeType) {
         if (this.supportedMimeTypes.image.includes(mimeType))
-            return prisma_1.MessageType.IMAGE;
+            return database_1.MessageType.IMAGE;
         if (this.supportedMimeTypes.document.includes(mimeType))
-            return prisma_1.MessageType.DOCUMENT;
+            return database_1.MessageType.DOCUMENT;
         if (this.supportedMimeTypes.audio.includes(mimeType))
-            return prisma_1.MessageType.AUDIO;
+            return database_1.MessageType.AUDIO;
         if (this.supportedMimeTypes.video.includes(mimeType))
-            return prisma_1.MessageType.VIDEO;
+            return database_1.MessageType.VIDEO;
         if (this.supportedMimeTypes.sticker.includes(mimeType))
-            return prisma_1.MessageType.STICKER;
-        return prisma_1.MessageType.DOCUMENT; // Por defecto
+            return database_1.MessageType.STICKER;
+        return database_1.MessageType.DOCUMENT; // Por defecto
     }
     /**
      * Validar archivo multimedia
@@ -192,31 +192,31 @@ class MediaService {
                 };
                 // Configurar cuerpo del mensaje según el tipo
                 switch (mediaType) {
-                    case prisma_1.MessageType.IMAGE:
+                    case database_1.MessageType.IMAGE:
                         messageBody.image = {
                             id: mediaId,
                             caption: caption || ''
                         };
                         break;
-                    case prisma_1.MessageType.DOCUMENT:
+                    case database_1.MessageType.DOCUMENT:
                         messageBody.document = {
                             id: mediaId,
                             caption: caption || '',
                             filename: filename || 'document'
                         };
                         break;
-                    case prisma_1.MessageType.AUDIO:
+                    case database_1.MessageType.AUDIO:
                         messageBody.audio = {
                             id: mediaId
                         };
                         break;
-                    case prisma_1.MessageType.VIDEO:
+                    case database_1.MessageType.VIDEO:
                         messageBody.video = {
                             id: mediaId,
                             caption: caption || ''
                         };
                         break;
-                    case prisma_1.MessageType.STICKER:
+                    case database_1.MessageType.STICKER:
                         messageBody.sticker = {
                             id: mediaId
                         };
@@ -243,11 +243,11 @@ class MediaService {
                 console.log('🔄 Procesando archivo multimedia recibido:', mediaId);
                 const mediaFile = yield this.downloadMediaFromWhatsApp(mediaId);
                 // Generar thumbnail si es imagen o video
-                if (messageType === prisma_1.MessageType.IMAGE || messageType === prisma_1.MessageType.VIDEO) {
+                if (messageType === database_1.MessageType.IMAGE || messageType === database_1.MessageType.VIDEO) {
                     yield this.generateThumbnail(mediaFile);
                 }
                 // Extraer metadata adicional
-                if (messageType === prisma_1.MessageType.AUDIO || messageType === prisma_1.MessageType.VIDEO) {
+                if (messageType === database_1.MessageType.AUDIO || messageType === database_1.MessageType.VIDEO) {
                     mediaFile.metadata = yield this.extractMediaMetadata(mediaFile.path);
                 }
                 console.log('✅ Archivo multimedia procesado exitosamente');

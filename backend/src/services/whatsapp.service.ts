@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Server } from 'socket.io';
 import { whatsappConfig, buildApiUrl, getHeaders } from '../config/whatsapp';
 import { databaseService } from './database.service';
-import { MessageType } from '../generated/prisma';
+import { MessageType } from '../types/database';
 import { chatbotService } from './chatbot.service'; // NUEVO: Import del chatbot
 
 export interface SendMessageRequest {

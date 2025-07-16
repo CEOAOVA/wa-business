@@ -16,7 +16,7 @@ exports.whatsappService = exports.WhatsAppService = void 0;
 const axios_1 = __importDefault(require("axios"));
 const whatsapp_1 = require("../config/whatsapp");
 const database_service_1 = require("./database.service");
-const prisma_1 = require("../generated/prisma");
+const database_1 = require("../types/database");
 const chatbot_service_1 = require("./chatbot.service"); // NUEVO: Import del chatbot
 class WhatsAppService {
     // Inicializar servicio de base de datos
@@ -81,7 +81,7 @@ class WhatsAppService {
                             waMessageId: messageId,
                             toWaId: data.to,
                             content: data.message,
-                            messageType: prisma_1.MessageType.TEXT,
+                            messageType: database_1.MessageType.TEXT,
                             timestamp: new Date()
                         });
                         // Emitir evento de Socket.IO para mensaje enviado
@@ -245,7 +245,7 @@ class WhatsAppService {
                                     const contact = (_a = value.contacts) === null || _a === void 0 ? void 0 : _a.find(c => c.wa_id === message.from);
                                     try {
                                         // Determinar tipo de mensaje
-                                        let messageType = prisma_1.MessageType.TEXT;
+                                        let messageType = database_1.MessageType.TEXT;
                                         let content = '';
                                         if (message.type === 'text' && ((_b = message.text) === null || _b === void 0 ? void 0 : _b.body)) {
                                             content = message.text.body;

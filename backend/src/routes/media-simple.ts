@@ -3,7 +3,7 @@
  */
 
 import express from 'express';
-import { MessageType } from '../generated/prisma';
+import { MessageType } from '../types/database';
 
 const router = express.Router();
 
