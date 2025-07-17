@@ -2,14 +2,21 @@
  * Servicio para registrar y despachar llamadas a funciones LLM
  * Migrado desde Backend-Embler para WhatsApp Business
  */
-import { FunctionDefinition, FunctionResult, FunctionHandler } from '../../models/functions';
+import { FunctionDefinition, FunctionResult, FunctionHandler, FunctionContext } from '../../models/functions';
 import { soapService } from '../soap/soap-service';
 import { getConfig } from '../../config';
-import { priceToText } from '../../utils/text-processing';
-import { convertSucursalToFriendlyName, convertSucursalesToFriendlyNames, processSucursalesFromSOAP } from '../../utils/sucursal-mapping';
+import { priceToText, processSucursalesFromSOAP } from '../../utils/soap-utils';
+import { convertSucursalToFriendlyName, convertSucursalesToFriendlyNames } from '../../utils/sucursal-mapping';
 import { vinDecoderService } from '../vin-decoder-service';
 import { csvInventoryService } from '../inventory/csv-inventory-service';
 import { conceptsService } from '../concepts-service';
+import path from 'path';
+
+interface FunctionCall {
+  name: string;
+  description: string;
+  parameters: any;
+}
 
 /**
  * Servicio para registrar y despachar llamadas a funciones LLM
@@ -20,11 +27,12 @@ export class FunctionService {
   private authenticatedPOS = new Map<string, boolean>();
 
   constructor() {
+    this.registerClientValidationFunctions();
+    this.registerImageFunctions();
     this.registerInventoryFunctions();
     this.registerSearchFunctions();
     this.registerTransactionFunctions();
     this.registerVinFunctions();
-    this.registerAdvisorFunctions();
     this.registerShippingFunctions();
   }
 
@@ -54,7 +62,7 @@ export class FunctionService {
   async executeFunction(
     functionName: string,
     args: any,
-    context: { pointOfSaleId: string; userId?: string; sessionId?: string }
+    context: FunctionContext
   ): Promise<FunctionResult> {
     const handler = this.handlers.get(functionName);
     if (!handler) {
@@ -92,79 +100,520 @@ export class FunctionService {
   }
 
   /**
-   * Registra funciones de inventario
+   * Registra funciones de validación de datos del cliente
+   */
+  private registerClientValidationFunctions(): void {
+    // recopilarDatosCliente - función mejorada para conversaciones nuevas y existentes
+    this.registerFunction(
+      'recopilarDatosCliente',
+      async (args, context) => {
+        const { 
+          nombre, 
+          codigoPostal, 
+          direccion, 
+          telefono,
+          esConversacionExistente = false,
+          soloParaCompra = false 
+        } = args as {
+          nombre?: string;
+          codigoPostal?: string;
+          direccion?: string;
+          telefono?: string;
+          esConversacionExistente?: boolean;
+          soloParaCompra?: boolean;
+        };
+
+        console.log(`[FunctionService] Recopilando datos del cliente... (Existente: ${esConversacionExistente}, Solo para compra: ${soloParaCompra})`);
+
+        // Si es conversación existente y solo necesitamos datos para compra, ser más específico
+        if (esConversacionExistente && soloParaCompra) {
+          // Verificar si ya tenemos datos completos
+          if (context.clientInfo?.nombre && (context.clientInfo?.direccion || context.clientInfo?.codigoPostal)) {
+            console.log(`[FunctionService] Cliente existente con datos completos para compra`);
+            return {
+              success: true,
+              data: {
+                datosCompletos: true,
+                cliente: context.clientInfo,
+                mensaje: `Perfecto, procedo con la compra utilizando tus datos registrados.`
+              }
+            };
+          }
+
+          // Si faltan datos para la compra específicamente
+          let mensajeCompra = "Para procesar tu compra, ";
+          if (!context.clientInfo?.nombre) {
+            mensajeCompra += "necesito confirmar tu nombre completo. ";
+          }
+          if (!context.clientInfo?.direccion && !context.clientInfo?.codigoPostal) {
+            mensajeCompra += "y tu dirección completa para el envío. ";
+          }
+          mensajeCompra += "¿Puedes proporcionarme esta información?";
+
+          return {
+            success: false,
+            data: {
+              mensaje: mensajeCompra,
+              requiereCompletarDatos: true,
+              esParaCompra: true
+            }
+          };
+        }
+
+        // Para conversaciones nuevas, validar paso a paso
+        // Validar que al menos tengamos nombre
+        if (!nombre || nombre.trim().length < 2) {
+          return {
+            success: false,
+            data: {
+              mensaje: "¡Hola! Soy tu asistente de refacciones. Para poder ayudarte mejor, necesito conocer tu nombre. ¿Cómo te llamas? 😊",
+              requiereNombre: true,
+              esConversacionNueva: !esConversacionExistente
+            }
+          };
+        }
+
+        // Para conversaciones nuevas, requerir dirección completa (no solo código postal)
+        if (!esConversacionExistente) {
+          if (!direccion || direccion.trim().length < 10) {
+            return {
+              success: false,
+              data: {
+                mensaje: `Mucho gusto ${nombre}! Para ofrecerte el mejor servicio, necesito tu dirección completa. Esto me ayuda a verificar disponibilidad en tu zona y calcular envíos. ¿Podrías compartir tu dirección? 📍\n\nEjemplo: "Calle Reforma 123, Col. Centro, CP 06100, Ciudad de México"`,
+                requiereDireccionCompleta: true,
+                nombreConfirmado: nombre,
+                esConversacionNueva: true
+              }
+            };
+          }
+
+          // Extraer código postal de la dirección si no se proporciona separadamente
+          let finalCodigoPostal = codigoPostal;
+          if (!finalCodigoPostal) {
+            const cpMatch = direccion.match(/\b(\d{5})\b/);
+            if (cpMatch) {
+              finalCodigoPostal = cpMatch[1];
+            }
+          }
+        } else {
+          // Para conversaciones existentes, código postal O dirección es suficiente
+          if (!codigoPostal && !direccion) {
+            return {
+              success: false,
+              data: {
+                mensaje: `Hola de nuevo ${nombre}! Para verificar disponibilidad en tu zona, necesito tu código postal o dirección. ¿Podrías compartirlo conmigo? 📍`,
+                requiereUbicacion: true,
+                nombreConfirmado: nombre,
+                esConversacionExistente: true
+              }
+            };
+          }
+        }
+
+        // Validar formato de código postal si se proporciona
+        if (codigoPostal && !/^\d{5}$/.test(codigoPostal.trim())) {
+          return {
+            success: false,
+            data: {
+              mensaje: `${nombre}, el código postal debe tener 5 dígitos. ¿Podrías verificarlo? Por ejemplo: 06100`,
+              requiereCodigoPostalValido: true,
+              nombreConfirmado: nombre
+            }
+          };
+        }
+
+        const clienteCompleto = {
+          nombre: nombre.trim(),
+          codigoPostal: codigoPostal?.trim(),
+          direccion: direccion?.trim(),
+          telefono: telefono?.trim() || context.phoneNumber,
+          direccionCompleta: direccion?.trim() || `CP ${codigoPostal?.trim()}`
+        };
+
+        return {
+          success: true,
+          data: {
+            datosCompletos: true,
+            cliente: clienteCompleto,
+            mensaje: esConversacionExistente 
+              ? `¡Perfecto ${nombre}! Datos actualizados. ¿En qué puedo ayudarte hoy?`
+              : `¡Excelente ${nombre}! Tengo tus datos completos. Ahora puedo ayudarte a buscar las refacciones que necesitas. ¿Qué producto estás buscando?`,
+            esConversacionNueva: !esConversacionExistente
+          }
+        };
+      },
+      {
+        name: 'recopilarDatosCliente',
+        description: 'Recopila y valida los datos básicos del cliente. Para conversaciones nuevas requiere dirección completa. Para conversaciones existentes puede validar solo para compra.',
+        parameters: {
+          type: 'object',
+          properties: {
+            nombre: {
+              type: 'string',
+              description: 'Nombre completo del cliente'
+            },
+            codigoPostal: {
+              type: 'string',
+              description: 'Código postal de 5 dígitos del cliente'
+            },
+            direccion: {
+              type: 'string',
+              description: 'Dirección completa del cliente. OBLIGATORIA para conversaciones nuevas'
+            },
+            telefono: {
+              type: 'string',
+              description: 'Número de teléfono del cliente'
+            },
+            esConversacionExistente: {
+              type: 'boolean',
+              description: 'Indica si es una conversación con un cliente que ya ha interactuado antes'
+            },
+            soloParaCompra: {
+              type: 'boolean',
+              description: 'Indica si solo se necesita validar datos para procesar una compra específica'
+            }
+          },
+          required: ['nombre']
+        }
+      }
+    );
+
+    // validarDatosAntesBusqueda - función helper para validar antes de búsquedas
+    this.registerFunction(
+      'validarDatosAntesBusqueda',
+      async (args, context) => {
+        console.log(`[FunctionService] Validando datos del cliente antes de búsqueda...`);
+
+        const datosCompletos = this.hasRequiredClientData(context);
+        
+        if (!datosCompletos.valid) {
+          return {
+            success: false,
+            data: {
+              mensaje: datosCompletos.message,
+              requiereDatos: true,
+              detallesFaltantes: datosCompletos.missing
+            }
+          };
+        }
+
+        return {
+          success: true,
+          data: {
+            datosValidados: true,
+            cliente: context.clientInfo,
+            mensaje: "Datos del cliente validados. Procediendo con la búsqueda..."
+          }
+        };
+      },
+      {
+        name: 'validarDatosAntesBusqueda',
+        description: 'Valida que se tengan los datos mínimos del cliente antes de realizar cualquier búsqueda de productos',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+      }
+    );
+  }
+
+  /**
+   * Registra función para mostrar imagen de productos
+   */
+  private registerImageFunctions(): void {
+    // mostrarImagenPieza - función para enviar imagen de producto
+    this.registerFunction(
+      'mostrarImagenPieza',
+      async (args, context) => {
+        const { codigoProducto, nombreProducto, solicitadaPorCliente = false } = args as {
+          codigoProducto?: string;
+          nombreProducto?: string;
+          solicitadaPorCliente?: boolean;
+        };
+
+        console.log(`[FunctionService] mostrarImagenPieza - Código: "${codigoProducto}", Nombre: "${nombreProducto}", Solicitada: ${solicitadaPorCliente}`);
+
+        try {
+          // Importar media service para enviar imagen
+          const { mediaService } = await import('../media.service');
+          
+          // Buscar imagen del producto
+          let imagenEncontrada = false;
+          let rutaImagen = '';
+          let mensajeImagen = '';
+
+          // Si tenemos código de producto, buscar imagen específica
+          if (codigoProducto && codigoProducto.trim()) {
+            // Buscar en directorio de imágenes estático
+            const path = require('path');
+            const fs = require('fs');
+            
+            const directorioImagenes = path.join(process.cwd(), 'public', 'productos');
+            const posiblesExtensiones = ['.jpg', '.jpeg', '.png', '.webp'];
+            
+            for (const ext of posiblesExtensiones) {
+              const rutaPosible = path.join(directorioImagenes, `${codigoProducto}${ext}`);
+              if (fs.existsSync(rutaPosible)) {
+                rutaImagen = rutaPosible;
+                imagenEncontrada = true;
+                break;
+              }
+            }
+          }
+
+          // Si no se encontró imagen específica, buscar imagen genérica por categoría
+          if (!imagenEncontrada && nombreProducto) {
+            const categorias = {
+              'filtro': 'filtro-generico.jpg',
+              'balata': 'balatas-genericas.jpg', 
+              'freno': 'frenos-genericos.jpg',
+              'aceite': 'aceite-motor.jpg',
+              'bujia': 'bujias-genericas.jpg',
+              'amortiguador': 'amortiguadores.jpg',
+              'llanta': 'llantas-genericas.jpg',
+              'bateria': 'bateria-auto.jpg'
+            };
+
+            const nombreLower = nombreProducto.toLowerCase();
+            for (const [categoria, imagen] of Object.entries(categorias)) {
+              if (nombreLower.includes(categoria)) {
+                const path = require('path');
+                rutaImagen = path.join(process.cwd(), 'public', 'productos', 'genericas', imagen);
+                imagenEncontrada = true;
+                mensajeImagen = `Esta es una imagen de referencia de ${categoria}.`;
+                break;
+              }
+            }
+          }
+
+          if (imagenEncontrada) {
+            try {
+              // Subir imagen a WhatsApp
+              const mediaId = await mediaService.uploadMediaToWhatsApp(rutaImagen, path.basename(rutaImagen));
+              
+              // Enviar imagen al cliente
+              await mediaService.sendMediaMessage({
+                to: context.phoneNumber || '',
+                mediaId: mediaId,
+                mediaType: 'image' as any,
+                caption: mensajeImagen || `Imagen de: ${nombreProducto || codigoProducto}`
+              });
+
+              return {
+                success: true,
+                data: {
+                  imagenEnviada: true,
+                  mensaje: solicitadaPorCliente 
+                    ? `Aquí tienes la imagen de ${nombreProducto || codigoProducto}. ¿Es la pieza que buscas?`
+                    : `Te muestro la imagen del producto para que confirmes que es lo que necesitas.`,
+                  codigoProducto,
+                  nombreProducto
+                }
+              };
+            } catch (error) {
+              console.error('[FunctionService] Error enviando imagen:', error);
+              return {
+                success: false,
+                data: {
+                  mensaje: solicitadaPorCliente
+                    ? `Disculpa, tengo problemas técnicos para mostrar la imagen en este momento. ¿Podrías describirme más específicamente qué pieza necesitas?`
+                    : `Continúo sin la imagen del producto.`,
+                  errorTecnico: true
+                }
+              };
+            }
+          } else {
+            return {
+              success: false,
+              data: {
+                mensaje: solicitadaPorCliente
+                  ? `No tengo imagen disponible de ${nombreProducto || codigoProducto} en este momento. ¿Podrías describirme más detalles de la pieza que necesitas?`
+                  : `Continúo sin imagen del producto, pero tengo toda la información técnica.`,
+                sinImagen: true,
+                codigoProducto,
+                nombreProducto
+              }
+            };
+          }
+        } catch (error) {
+          console.error('[FunctionService] Error en mostrarImagenPieza:', error);
+          return {
+            success: false,
+            data: {
+              mensaje: "Tengo un problema técnico para mostrar imágenes. ¿Continúo con la información del producto?",
+              errorTecnico: true
+            }
+          };
+        }
+      },
+      {
+        name: 'mostrarImagenPieza',
+        description: 'Muestra imagen del producto al cliente vía WhatsApp. Se puede usar cuando el cliente la solicita o automáticamente antes de una compra.',
+        parameters: {
+          type: 'object',
+          properties: {
+            codigoProducto: {
+              type: 'string',
+              description: 'Código específico del producto para buscar imagen exacta'
+            },
+            nombreProducto: {
+              type: 'string',
+              description: 'Nombre del producto para buscar imagen de categoría si no hay imagen específica'
+            },
+            solicitadaPorCliente: {
+              type: 'boolean',
+              description: 'Indica si el cliente solicitó específicamente ver la imagen'
+            }
+          },
+          required: []
+        }
+      }
+    );
+  }
+
+  /**
+   * Verifica si tenemos los datos mínimos requeridos del cliente
+   */
+  private hasRequiredClientData(context: FunctionContext): {
+    valid: boolean;
+    message: string;
+    missing: string[];
+  } {
+    const missing: string[] = [];
+
+    if (!context.clientInfo?.nombre) {
+      missing.push('nombre');
+    }
+
+    if (!context.clientInfo?.codigoPostal && !context.clientInfo?.direccion) {
+      missing.push('ubicacion');
+    }
+
+    if (missing.length > 0) {
+      let message = "Para poder ayudarte mejor, necesito algunos datos básicos. ";
+      
+      if (missing.includes('nombre') && missing.includes('ubicacion')) {
+        message += "¿Podrías decirme tu nombre y código postal (o dirección)? Esto me ayuda a verificar disponibilidad en tu zona. 😊";
+      } else if (missing.includes('nombre')) {
+        message += "¿Cómo te llamas? 😊";
+      } else if (missing.includes('ubicacion')) {
+        message += "¿Cuál es tu código postal o dirección? Esto me ayuda a verificar disponibilidad en tu zona. 📍";
+      }
+
+      return {
+        valid: false,
+        message,
+        missing
+      };
+    }
+
+    return {
+      valid: true,
+      message: "Datos del cliente validados",
+      missing: []
+    };
+  }
+
+  /**
+   * Registra funciones de inventario CON VALIDACIÓN OBLIGATORIA DE CLIENTE
    */
   private registerInventoryFunctions(): void {
-    // consultarInventario
+    // consultarInventario - NUEVA ESTRATEGIA: Validar cliente primero, luego inventario general, después específico
     this.registerFunction(
       'consultarInventario',
       async (args, context) => {
         const { codigoProducto, nombreProducto } = args as { codigoProducto?: string; nombreProducto?: string };
         console.log(`[FunctionService] consultarInventario - Código: "${codigoProducto}", Nombre: "${nombreProducto}"`);
         
+        // ⚠️ VALIDACIÓN OBLIGATORIA: Verificar datos del cliente primero
+        const datosCompletos = this.hasRequiredClientData(context);
+        if (!datosCompletos.valid) {
+          return {
+            success: false,
+            data: {
+              mensaje: datosCompletos.message,
+              requiereDatos: true,
+              detallesFaltantes: datosCompletos.missing
+            }
+          };
+        }
+
+        const nombreCliente = context.clientInfo?.nombre || 'Cliente';
+        
         if (codigoProducto) {
-          console.log(`[FunctionService] Consultando inventario para código ${codigoProducto}`);
+          console.log(`[FunctionService] ✅ Cliente validado (${nombreCliente}). Consultando inventario para código ${codigoProducto}`);
           
           try {
             await this.ensureAuthenticated(context.pointOfSaleId);
-            const resultado = await soapService.consultarInventarioPorPunto(codigoProducto, context.pointOfSaleId);
             
-            const disponible = resultado.CantidadDisponible > 0;
-            const precioTexto = priceToText(resultado.Precio);
+            // NUEVA ESTRATEGIA: Inventario GENERAL primero
+            console.log(`[FunctionService] 🔍 Paso 1: Consultando disponibilidad general para ${codigoProducto}`);
+            const inventarioGeneral = await soapService.consultarInventarioGeneral(codigoProducto, context.pointOfSaleId);
+            const sucursalesConStock = processSucursalesFromSOAP(inventarioGeneral);
             
-            if (disponible) {
+            if (sucursalesConStock.length === 0) {
               return { 
                 success: true, 
                 data: { 
+                  sinStock: true,
                   producto: nombreProducto || codigoProducto, 
-                  marca: 'N/A', 
-                  disponible, 
-                  cantidad: resultado.CantidadDisponible, 
-                  precio: resultado.Precio, 
-                  precioTexto, 
-                  sucursal: context.pointOfSaleId, 
-                  mensaje: `Producto disponible en sucursal ${context.pointOfSaleId}` 
-                } 
+                  mensaje: `Lo siento ${nombreCliente}, ${nombreProducto || codigoProducto} no está disponible actualmente en ninguna sucursal. Te conectaré con un asesor para verificar con proveedores.`,
+                  requiereAsesor: true
+                }
               };
-            } else {
-              // Consultar inventario general
-              const general = await soapService.consultarInventarioGeneral(codigoProducto, context.pointOfSaleId);
-              const sucursalesConStock = processSucursalesFromSOAP(general);
-              
-              if (sucursalesConStock.length > 0) {
-                const precioGeneral = sucursalesConStock[0].precio || resultado.Precio;
-                const precioGeneralTexto = priceToText(precioGeneral);
-                const sucursalesNombres = sucursalesConStock.map(s => s.nombreAmigable).join(', ');
+            }
 
+            const precioGeneral = sucursalesConStock[0].precio;
+            const precioTexto = priceToText(precioGeneral);
+            
+            // Si tenemos código postal, consultar sucursal específica
+            if (context.clientInfo?.codigoPostal) {
+              console.log(`[FunctionService] 🔍 Paso 2: Consultando sucursal específica para CP ${context.clientInfo.codigoPostal}`);
+              const resultadoLocal = await soapService.consultarInventarioPorPunto(codigoProducto, context.pointOfSaleId);
+              const disponibleLocal = resultadoLocal.CantidadDisponible > 0;
+              
+              if (disponibleLocal) {
+                return { 
+                  success: true, 
+                  data: { 
+                    stockLocal: true,
+                    producto: {
+                      codigo: codigoProducto,
+                      nombre: nombreProducto || codigoProducto,
+                      precio: resultadoLocal.Precio,
+                      precioTexto: priceToText(resultadoLocal.Precio),
+                      cantidad: resultadoLocal.CantidadDisponible
+                    },
+                  sucursal: context.pointOfSaleId, 
+                    cliente: nombreCliente,
+                    mensaje: `¡Perfecto ${nombreCliente}! Tenemos ${nombreProducto || codigoProducto} disponible en tu zona por ${priceToText(resultadoLocal.Precio)}. Hay ${resultadoLocal.CantidadDisponible} unidades en stock.`,
+                    tipoCompra: 'local'
+                  } 
+                };
+              }
+            }
+            
+            // Stock disponible solo en otras sucursales
+                const sucursalesNombres = sucursalesConStock.map(s => s.nombreAmigable).join(', ');
                 return {
                   success: true,
                   data: {
                     stockGeneral: true,
-                    sinStockLocal: true,
+                sinStockLocal: context.clientInfo?.codigoPostal ? true : undefined,
                     producto: {
                       codigo: codigoProducto,
                       nombre: nombreProducto || codigoProducto,
                       precio: precioGeneral,
-                      precioTexto: precioGeneralTexto
+                  precioTexto: precioTexto
                     },
                     sucursalesDisponibles: sucursalesConStock,
-                    mensaje: `${nombreProducto || codigoProducto} está disponible en: ${sucursalesNombres}. El precio es ${precioGeneralTexto}. ¿Deseas que te lo enviemos a casa?`,
+                cliente: nombreCliente,
+                mensaje: `${nombreCliente}, ${nombreProducto || codigoProducto} está disponible en: ${sucursalesNombres} por ${precioTexto}. ¿Te gustaría que te lo enviemos a casa?`,
                     esperandoConfirmacionEnvio: true,
                     tipoCompra: 'envio'
                   }
                 };
-              } else {
-                return {
-                  success: true,
-                  data: {
-                    sinStock: true,
-                    producto: nombreProducto || codigoProducto,
-                    mensaje: `Lo siento, ${nombreProducto || codigoProducto} no está disponible actualmente en ninguna sucursal. Te conectaré con un asesor para verificar con proveedores.`,
-                    requiereAsesor: true
-                  }
-                };
-              }
-            }
           } catch (error) {
             console.error(`[FunctionService] Error en consultarInventario:`, error);
             return {
@@ -243,17 +692,17 @@ export class FunctionService {
   }
 
   /**
-   * Registra funciones de búsqueda
+   * Registra funciones de búsqueda CON VALIDACIÓN OBLIGATORIA DE CLIENTE
    */
   private registerSearchFunctions(): void {
-    // buscarYConsultarInventario
+    // buscarYConsultarInventario - NUEVA ESTRATEGIA con validación obligatoria
     this.registerFunction(
       'buscarYConsultarInventario',
       async (args, context) => {
         const { 
           termino, 
           codigoEspecifico, 
-          incluirTodasSucursales = false,
+          incluirTodasSucursales = true, // Cambiado a true por defecto
           sucursalEspecifica 
         } = args as { 
           termino: string; 
@@ -263,6 +712,22 @@ export class FunctionService {
         };
 
         console.log(`[FunctionService] buscarYConsultarInventario - Término: "${termino}", Código: "${codigoEspecifico}"`);
+
+        // ⚠️ VALIDACIÓN OBLIGATORIA: Verificar datos del cliente primero
+        const datosCompletos = this.hasRequiredClientData(context);
+        if (!datosCompletos.valid) {
+          return {
+            success: false,
+            data: {
+              mensaje: datosCompletos.message,
+              requiereDatos: true,
+              detallesFaltantes: datosCompletos.missing
+            }
+          };
+        }
+
+        const nombreCliente = context.clientInfo?.nombre || 'Cliente';
+        console.log(`[FunctionService] ✅ Cliente validado (${nombreCliente}). Procediendo con búsqueda...`);
 
         try {
           let productos: any[] = [];
@@ -279,13 +744,34 @@ export class FunctionService {
 
             const codigo = String(codigoEspecifico).trim();
             
-            // Ejecutar consultas SOAP
+            // Ejecutar consultas SOAP - NUEVA ESTRATEGIA: General primero
             await this.ensureAuthenticated(context.pointOfSaleId);
             
-            // Consultar inventario local
+            console.log(`[FunctionService] 🔍 Paso 1: Consultando disponibilidad general para ${codigo}`);
+            const inventarioGeneral = await soapService.consultarInventarioGeneral(codigo, context.pointOfSaleId);
+            const sucursalesConStock = processSucursalesFromSOAP(inventarioGeneral);
+
+            if (sucursalesConStock.length === 0) {
+              return {
+                success: true,
+                data: {
+                  sinStock: true,
+                  producto: termino,
+                  cliente: nombreCliente,
+                  mensaje: `Lo siento ${nombreCliente}, ${termino} no está disponible actualmente en ninguna sucursal. Te conectaré con un asesor para verificar con proveedores.`,
+                  requiereAsesor: true
+                }
+              };
+            }
+
+            const precioGeneral = sucursalesConStock[0].precio;
+            const precioTexto = priceToText(precioGeneral);
+
+            // Si tenemos código postal, consultar sucursal específica  
+            if (context.clientInfo?.codigoPostal) {
+              console.log(`[FunctionService] 🔍 Paso 2: Consultando sucursal específica para CP ${context.clientInfo.codigoPostal}`);
             const inventarioLocal = await soapService.consultarInventarioPorPunto(codigo, context.pointOfSaleId);
             const disponibleLocal = inventarioLocal.CantidadDisponible > 0;
-            const precioTexto = priceToText(inventarioLocal.Precio);
 
             if (disponibleLocal) {
               return {
@@ -296,57 +782,37 @@ export class FunctionService {
                     codigo: codigo,
                     nombre: termino,
                     precio: inventarioLocal.Precio,
-                    precioTexto: precioTexto,
+                      precioTexto: priceToText(inventarioLocal.Precio),
                     cantidad: inventarioLocal.CantidadDisponible
                   },
                   sucursal: context.pointOfSaleId,
-                  mensaje: `¡Perfecto! Tenemos ${termino} disponible en esta sucursal por ${precioTexto} con ${inventarioLocal.CantidadDisponible} unidades en stock.`,
+                    cliente: nombreCliente,
+                    mensaje: `¡Perfecto ${nombreCliente}! Tenemos ${termino} disponible en tu zona por ${priceToText(inventarioLocal.Precio)}. Hay ${inventarioLocal.CantidadDisponible} unidades en stock.`,
                   tipoCompra: 'local'
                 }
               };
-            } else if (incluirTodasSucursales) {
-              // Consultar inventario general
-              const inventarioGeneral = await soapService.consultarInventarioGeneral(codigo, context.pointOfSaleId);
-              const sucursalesConStock = processSucursalesFromSOAP(inventarioGeneral);
+              }
+            }
 
-              if (sucursalesConStock.length > 0) {
-                const precioGeneral = sucursalesConStock[0].precio || inventarioLocal.Precio;
-                const precioGeneralTexto = priceToText(precioGeneral);
+            // Stock disponible solo en otras sucursales
                 const sucursalesNombres = sucursalesConStock.map(s => s.nombreAmigable).join(', ');
-
                 return {
                   success: true,
                   data: {
                     stockGeneral: true,
-                    sinStockLocal: true,
+                sinStockLocal: context.clientInfo?.codigoPostal ? true : undefined,
                     producto: {
                       codigo: codigo,
                       nombre: termino,
                       precio: precioGeneral,
-                      precioTexto: precioGeneralTexto,
+                  precioTexto: precioTexto,
                       cantidad: 1
                     },
                     sucursalesDisponibles: sucursalesConStock,
-                    mensaje: `${termino} está disponible en: ${sucursalesNombres}. El precio es ${precioGeneralTexto}. ¿Deseas que te lo enviemos a casa?`,
+                cliente: nombreCliente,
+                mensaje: `${nombreCliente}, ${termino} está disponible en: ${sucursalesNombres} por ${precioTexto}. ¿Te gustaría que te lo enviemos a casa?`,
                     esperandoConfirmacionEnvio: true,
                     tipoCompra: 'envio'
-                  }
-                };
-              }
-            }
-
-            return {
-              success: true,
-              data: {
-                sinStockLocal: true,
-                producto: {
-                  codigo: codigo,
-                  nombre: termino,
-                  precio: inventarioLocal.Precio,
-                  precioTexto: precioTexto
-                },
-                mensaje: `No tenemos ${termino} en esta sucursal. ¿Te interesa que consulte otras sucursales o prefieres que te conecte con un asesor?`,
-                requiereAsesor: true
               }
             };
           }
@@ -667,19 +1133,74 @@ export class FunctionService {
       }
     );
 
-    // confirmarCompra
+    // confirmarCompra - CON IMAGEN AUTOMÁTICA ANTES DE COMPRA
     this.registerFunction(
       'confirmarCompra',
       async (args, context) => {
-        const { productos, datosUsuario, metodoPago = 'efectivo' } = args as {
+        const { 
+          productos, 
+          datosUsuario, 
+          metodoPago = 'efectivo',
+          mostrarImagenAntes = true,
+          direccionCompleta
+        } = args as {
           productos: Array<{ codigo: string; nombre: string; cantidad: number; precio: number }>;
           datosUsuario: { nombre: string; telefono: string; codigoPostal?: string };
           metodoPago?: string;
+          mostrarImagenAntes?: boolean;
+          direccionCompleta?: string;
         };
 
-        console.log(`[FunctionService] Confirmando compra para ${productos.length} productos`);
+        console.log(`[FunctionService] Confirmando compra para ${productos.length} productos (mostrar imagen: ${mostrarImagenAntes})`);
 
         try {
+          // 🖼️ PASO 1: MOSTRAR IMAGEN AUTOMÁTICAMENTE ANTES DE COMPRA (100% confirmación)
+          if (mostrarImagenAntes && productos.length > 0) {
+            console.log(`[FunctionService] 🖼️ Mostrando imagen automática del producto principal antes de compra`);
+            
+            try {
+                             const productoPrincipal = productos[0]; // Tomar el primer producto
+               const resultadoImagen = await this.executeFunction('mostrarImagenPieza', {
+                 codigoProducto: productoPrincipal.codigo,
+                 nombreProducto: productoPrincipal.nombre,
+                 solicitadaPorCliente: false
+               }, context);
+
+              if (resultadoImagen.success) {
+                console.log(`[FunctionService] ✅ Imagen enviada automáticamente para confirmación`);
+              } else {
+                console.log(`[FunctionService] ⚠️ No se pudo enviar imagen, continuando con compra`);
+              }
+            } catch (imagenError) {
+              console.warn(`[FunctionService] Error enviando imagen automática:`, imagenError);
+              // No detenemos la compra si hay error con imagen
+            }
+          }
+
+          // 📋 PASO 2: VALIDAR DATOS COMPLETOS DEL CLIENTE
+          if (!datosUsuario.nombre || datosUsuario.nombre.trim().length < 2) {
+            return {
+              success: false,
+              data: {
+                mensaje: "Para procesar la compra, necesito confirmar tu nombre completo. ¿Podrías proporcionarlo?",
+                requiereDatos: true,
+                faltaNombre: true
+              }
+            };
+          }
+
+          if (!datosUsuario.codigoPostal && !direccionCompleta) {
+            return {
+              success: false,
+              data: {
+                mensaje: `${datosUsuario.nombre}, para procesar tu compra necesito tu código postal o dirección completa para el envío. ¿Podrías proporcionarla?`,
+                requiereDatos: true,
+                faltaDireccion: true
+              }
+            };
+          }
+
+          // 🔄 PASO 3: PROCESAR TRANSACCIÓN
           const articulos = productos.map(p => ({
             code: p.codigo,
             quantity: p.cantidad,
@@ -693,6 +1214,11 @@ export class FunctionService {
           const total = productos.reduce((sum, p) => sum + (p.precio * p.cantidad), 0);
           const totalTexto = priceToText(total);
 
+          // 📦 PASO 4: DETERMINAR TIPO DE ENTREGA
+          const tipoEntrega = context.pointOfSaleId && datosUsuario.codigoPostal 
+            ? 'envio_a_domicilio' 
+            : 'recoger_en_sucursal';
+
           return {
             success: true,
             data: {
@@ -702,7 +1228,15 @@ export class FunctionService {
               total: total,
               totalTexto: totalTexto,
               metodoPago: metodoPago,
-              mensaje: `¡Compra confirmada! Transacción: ${transaccion.NumeroTransaccion || 'N/A'}. Total: ${totalTexto}. Método de pago: ${metodoPago}.`
+              tipoEntrega: tipoEntrega,
+              datosCliente: {
+                ...datosUsuario,
+                direccionCompleta: direccionCompleta || `CP ${datosUsuario.codigoPostal}`
+              },
+              mensaje: `✅ ¡Compra confirmada!\n\n📄 Transacción: ${transaccion.NumeroTransaccion || 'N/A'}\n💰 Total: ${totalTexto}\n👤 Cliente: ${datosUsuario.nombre}\n\n${tipoEntrega === 'envio_a_domicilio' 
+                ? `📦 Se enviará a: ${direccionCompleta || datosUsuario.codigoPostal}\n🚚 Un asesor te contactará para coordinar la entrega.`
+                : '🏪 Puedes recoger en la sucursal. Un asesor te dará los detalles.'
+              }`
             }
           };
 
@@ -712,15 +1246,20 @@ export class FunctionService {
             success: false,
             error: 'Error confirmando compra',
             data: {
-              mensaje: 'Hubo un problema confirmando la compra. Te conectaré con un asesor.',
-              requiereAsesor: true
+              mensaje: 'Hubo un problema confirmando la compra. Te conectaré con un asesor para completar tu pedido.',
+              requiereAsesor: true,
+              datosCompra: {
+                productos: productos,
+                cliente: datosUsuario,
+                error: error instanceof Error ? error.message : String(error)
+              }
             }
           };
         }
       },
       {
         name: 'confirmarCompra',
-        description: 'Confirma una compra y genera la transacción correspondiente',
+        description: 'Confirma una compra y genera la transacción correspondiente. AUTOMÁTICAMENTE muestra imagen del producto para confirmación al 100%.',
         parameters: {
           type: 'object',
           properties: {
@@ -739,16 +1278,24 @@ export class FunctionService {
             },
             datosUsuario: {
               type: 'object',
-              description: 'Datos del usuario para la consulta',
+              description: 'Datos completos del usuario OBLIGATORIOS para la compra',
               properties: {
-                nombre: { type: 'string' },
-                telefono: { type: 'string' },
-                codigoPostal: { type: 'string' }
+                nombre: { type: 'string', description: 'Nombre completo OBLIGATORIO' },
+                telefono: { type: 'string', description: 'Teléfono del cliente' },
+                codigoPostal: { type: 'string', description: 'Código postal para envío' }
               }
             },
             metodoPago: {
               type: 'string',
-              description: 'Método de pago preferido'
+              description: 'Método de pago preferido (efectivo por defecto)'
+            },
+            mostrarImagenAntes: {
+              type: 'boolean',
+              description: 'Si mostrar imagen automática antes de compra (true por defecto)'
+            },
+            direccionCompleta: {
+              type: 'string',
+              description: 'Dirección completa del cliente para envío'
             }
           },
           required: ['productos', 'datosUsuario']
@@ -844,21 +1391,55 @@ export class FunctionService {
    * Registra funciones de asesor
    */
   private registerAdvisorFunctions(): void {
-    // solicitarAsesor
+    // solicitarAsesor - CON RESUMEN INTELIGENTE DE CONVERSACIÓN
     this.registerFunction(
       'solicitarAsesor',
       async (args, context) => {
-        const { motivo, datosContacto, prioridad = 'normal' } = args as {
+        const { 
+          motivo, 
+          datosContacto, 
+          prioridad = 'normal',
+          productosConsultados,
+          ultimaAccion,
+          resumenConversacion 
+        } = args as {
           motivo: string;
           datosContacto?: { nombre?: string; telefono?: string };
           prioridad?: 'baja' | 'normal' | 'alta';
+          productosConsultados?: Array<{ codigo?: string; nombre: string; precio?: number }>;
+          ultimaAccion?: string;
+          resumenConversacion?: string;
         };
 
         console.log(`[FunctionService] Solicitud de asesor - Motivo: ${motivo}, Prioridad: ${prioridad}`);
 
+        // 📊 GENERAR DATOS DE CLIENTE PARA USO EN TRY/CATCH
+        const clienteInfo = context.clientInfo || datosContacto;
+
         try {
-          // Simular notificación a asesor
+          // 📊 GENERAR RESUMEN INTELIGENTE DE LA CONVERSACIÓN
+          const resumenCompleto = this.generarResumenInteligente({
+            motivo,
+            cliente: clienteInfo,
+            productosConsultados,
+            ultimaAccion,
+            resumenConversacion,
+            puntoVenta: context.pointOfSaleId,
+            telefono: context.phoneNumber
+          });
+
+          // 🚨 DETERMINAR PRIORIDAD AUTOMÁTICA INTELIGENTE
+          const prioridadInteligente = this.determinarPrioridadInteligente(motivo, ultimaAccion, productosConsultados);
+          const prioridadFinal = prioridad === 'normal' ? prioridadInteligente : prioridad;
+
+          // 📞 GENERAR SOLICITUD DE ASESOR CON TODA LA INFORMACIÓN
           const numeroSolicitud = `ASE-${Date.now()}`;
+          const tiempoEstimado = prioridadFinal === 'alta' ? '2-5 minutos' : prioridadFinal === 'normal' ? '5-10 minutos' : '10-15 minutos';
+          
+          console.log(`[FunctionService] 📋 Resumen para asesor generado:`, resumenCompleto);
+
+          // TODO: Aquí se integraría con sistema real de notificaciones (WhatsApp Business, email, etc.)
+          // await this.notificarAsesorReal(resumenCompleto, prioridadFinal);
           
           return {
             success: true,
@@ -866,9 +1447,11 @@ export class FunctionService {
               asesorSolicitado: true,
               numeroSolicitud: numeroSolicitud,
               motivo: motivo,
-              prioridad: prioridad,
-              tiempoEstimado: prioridad === 'alta' ? '2-5 minutos' : '5-10 minutos',
-              mensaje: `¡Perfecto! He notificado a un asesor especializado. Tu número de solicitud es ${numeroSolicitud}. Un asesor te contactará en ${prioridad === 'alta' ? '2-5 minutos' : '5-10 minutos'}.`
+              prioridad: prioridadFinal,
+              tiempoEstimado: tiempoEstimado,
+              resumenParaAsesor: resumenCompleto,
+              mensaje: `✅ ¡Asesor especializado notificado!\n\n🎫 Número de solicitud: ${numeroSolicitud}\n⏱️ Tiempo estimado: ${tiempoEstimado}\n🔥 Prioridad: ${prioridadFinal.toUpperCase()}\n\n📋 He enviado al asesor todos los detalles de nuestra conversación para que pueda ayudarte de la mejor manera.\n\n${prioridadFinal === 'alta' ? '🚨 Solicitud urgente procesada.' : 'Un asesor te contactará pronto.'}`,
+              conversacionTerminada: true
             }
           };
 
@@ -878,20 +1461,25 @@ export class FunctionService {
             success: false,
             error: 'Error solicitando asesor',
             data: {
-              mensaje: 'Hubo un problema notificando al asesor. Por favor, intenta contactarnos directamente por teléfono.'
+              mensaje: 'Hubo un problema notificando al asesor. Por favor, intenta contactarnos directamente por teléfono.',
+              datosEmergencia: {
+                cliente: clienteInfo,
+                motivo: motivo,
+                error: error instanceof Error ? error.message : String(error)
+              }
             }
           };
         }
       },
       {
         name: 'solicitarAsesor',
-        description: 'Solicita la intervención de un asesor humano especializado',
+        description: 'Solicita la intervención de un asesor humano especializado con resumen inteligente completo de la conversación',
         parameters: {
           type: 'object',
           properties: {
             motivo: {
               type: 'string',
-              description: 'Motivo por el cual se solicita el asesor'
+              description: 'Motivo específico por el cual se solicita el asesor'
             },
             datosContacto: {
               type: 'object',
@@ -904,13 +1492,129 @@ export class FunctionService {
             prioridad: {
               type: 'string',
               enum: ['baja', 'normal', 'alta'],
-              description: 'Prioridad de la solicitud'
+              description: 'Prioridad de la solicitud (se determina automáticamente si no se especifica)'
+            },
+            productosConsultados: {
+              type: 'array',
+              description: 'Lista de productos que el cliente consultó durante la conversación',
+              items: {
+                type: 'object',
+                properties: {
+                  codigo: { type: 'string' },
+                  nombre: { type: 'string' },
+                  precio: { type: 'number' }
+                }
+              }
+            },
+            ultimaAccion: {
+              type: 'string',
+              description: 'Última acción importante realizada antes de solicitar asesor'
+            },
+            resumenConversacion: {
+              type: 'string',
+              description: 'Resumen breve de la conversación completa'
             }
           },
           required: ['motivo']
         }
       }
     );
+  }
+
+  /**
+   * Genera un resumen inteligente de la conversación para el asesor
+   */
+  private generarResumenInteligente(datos: {
+    motivo: string;
+    cliente?: any;
+    productosConsultados?: Array<any>;
+    ultimaAccion?: string;
+    resumenConversacion?: string;
+    puntoVenta?: string;
+    telefono?: string;
+  }): string {
+    const { motivo, cliente, productosConsultados, ultimaAccion, resumenConversacion, puntoVenta, telefono } = datos;
+    
+    let resumen = `🎯 SOLICITUD DE ASESOR - ${new Date().toLocaleString('es-MX')}\n\n`;
+    
+    // Información del cliente
+    resumen += `👤 CLIENTE:\n`;
+    if (cliente?.nombre) resumen += `  • Nombre: ${cliente.nombre}\n`;
+    if (telefono) resumen += `  • Teléfono: ${telefono}\n`;
+    if (cliente?.codigoPostal) resumen += `  • Código Postal: ${cliente.codigoPostal}\n`;
+    if (cliente?.direccion) resumen += `  • Dirección: ${cliente.direccion}\n`;
+    
+    // Punto de venta
+    if (puntoVenta) {
+      resumen += `\n🏪 SUCURSAL: ${puntoVenta.toUpperCase()}\n`;
+    }
+    
+    // Motivo principal
+    resumen += `\n❓ MOTIVO: ${motivo}\n`;
+    
+    // Productos consultados
+    if (productosConsultados && productosConsultados.length > 0) {
+      resumen += `\n🔧 PRODUCTOS CONSULTADOS:\n`;
+      productosConsultados.forEach((producto, index) => {
+        resumen += `  ${index + 1}. ${producto.nombre}`;
+        if (producto.codigo) resumen += ` (${producto.codigo})`;
+        if (producto.precio) resumen += ` - $${producto.precio}`;
+        resumen += `\n`;
+      });
+    }
+    
+    // Última acción
+    if (ultimaAccion) {
+      resumen += `\n⚡ ÚLTIMA ACCIÓN: ${ultimaAccion}\n`;
+    }
+    
+    // Resumen de conversación
+    if (resumenConversacion) {
+      resumen += `\n💬 RESUMEN DE CONVERSACIÓN:\n${resumenConversacion}\n`;
+    }
+    
+    resumen += `\n⏰ Solicitud generada automáticamente por WhatsApp Bot`;
+    
+    return resumen;
+  }
+
+  /**
+   * Determina la prioridad inteligente basada en el contexto
+   */
+  private determinarPrioridadInteligente(
+    motivo: string, 
+    ultimaAccion?: string, 
+    productos?: Array<any>
+  ): 'baja' | 'normal' | 'alta' {
+    const motivoLower = motivo.toLowerCase();
+    const accionLower = ultimaAccion?.toLowerCase() || '';
+    
+    // Prioridad ALTA
+    if (
+      motivoLower.includes('error') ||
+      motivoLower.includes('fallo') ||
+      motivoLower.includes('problema técnico') ||
+      motivoLower.includes('urgente') ||
+      motivoLower.includes('no funciona') ||
+      accionLower.includes('error en compra') ||
+      accionLower.includes('falla transacción')
+    ) {
+      return 'alta';
+    }
+    
+    // Prioridad NORMAL
+    if (
+      motivoLower.includes('consulta') ||
+      motivoLower.includes('disponibilidad') ||
+      motivoLower.includes('precio') ||
+      motivoLower.includes('envío') ||
+      productos && productos.length > 0
+    ) {
+      return 'normal';
+    }
+    
+         // Prioridad BAJA por defecto
+     return 'baja';
   }
 
   /**

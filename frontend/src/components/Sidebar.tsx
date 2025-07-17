@@ -4,6 +4,7 @@ import { useChat } from "../hooks/useChat";
 import { useDebounce } from "../hooks/useDebounce";
 import { useNotifications } from "../hooks/useNotifications";
 import { useAuth } from "../context/AuthContext";
+import { useApp } from "../context/AppContext";
 import { MESSAGES } from "../constants/messages";
 import { WebSocketStatus } from "./WebSocketStatus";
 import type { Chat } from "../types";
@@ -93,6 +94,7 @@ const ChatItem: React.FC<{
 
 const Sidebar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const navigate = useNavigate();
   
@@ -108,6 +110,7 @@ const Sidebar: React.FC = () => {
   
   const { unreadCount } = useNotifications();
   const { state: authState, logout } = useAuth();
+  const { loadWhatsAppMessages } = useApp();
 
   // Filtrar chats según la búsqueda
   const filteredChats = useMemo(() => {
@@ -128,6 +131,19 @@ const Sidebar: React.FC = () => {
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
+  };
+
+  // Función para cargar conversaciones manualmente (DEBUG)
+  const handleLoadMessages = async () => {
+    setIsLoadingMessages(true);
+    try {
+      await loadWhatsAppMessages();
+      console.log('🔄 Conversaciones cargadas manualmente');
+    } catch (error) {
+      console.error('❌ Error cargando conversaciones:', error);
+    } finally {
+      setIsLoadingMessages(false);
+    }
   };
 
   return (
@@ -178,6 +194,7 @@ const Sidebar: React.FC = () => {
             <button 
               onClick={() => setSearchQuery('')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              title="Limpiar búsqueda"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -199,6 +216,22 @@ const Sidebar: React.FC = () => {
       {/* Estado de WebSocket */}
       <div className="px-4 py-2 border-b border-embler-accent/50">
         <WebSocketStatus />
+        {/* Botón DEBUG: Cargar conversaciones */}
+        <button
+          onClick={handleLoadMessages}
+          disabled={isLoadingMessages}
+          className="mt-2 w-full px-3 py-1 bg-embler-yellow text-embler-dark text-xs font-medium rounded-lg hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title="Cargar conversaciones desde backend (DEBUG)"
+        >
+          {isLoadingMessages ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-3 h-3 border border-embler-dark border-t-transparent rounded-full animate-spin"></div>
+              Cargando...
+            </div>
+          ) : (
+            '🔄 Cargar Conversaciones'
+          )}
+        </button>
       </div>
 
       {/* Lista de chats */}

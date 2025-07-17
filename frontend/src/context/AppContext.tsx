@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { AppState, Chat, Message, Notification, AppAction } from '../types';
 import { whatsappApi, type IncomingMessage } from '../services/whatsapp-api';
@@ -124,10 +124,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
   }
 };
 
-// Datos mock modernos y realistas
-const mockChats: Chat[] = [];
-
-const mockMessages: Record<string, Message[]> = {};
+// Datos mock modernos y realistas (eliminados por no uso)
 
 // Contexto
 interface AppContextType {
@@ -159,11 +156,7 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(appReducer, {
-    ...initialState,
-    chats: mockChats,
-    messages: mockMessages,
-  });
+  const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Integración WebSocket para mensajería en tiempo real
   const webSocket = useWebSocket();
@@ -281,7 +274,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   // Cargar mensajes de WhatsApp
-  const loadWhatsAppMessages = async () => {
+  const loadWhatsAppMessages = useCallback(async () => {
     console.log('🔍 [AppContext] Iniciando carga de mensajes de WhatsApp...');
     
     try {
@@ -368,14 +361,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('❌ [AppContext] Error cargando mensajes de WhatsApp:', error);
     }
-  };
+  }, [state.messages]);
 
   // Polling para nuevos mensajes cada 30 segundos
   useEffect(() => {
     loadWhatsAppMessages();
     const interval = setInterval(loadWhatsAppMessages, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadWhatsAppMessages]);
 
   // Funciones de conveniencia
   const selectChat = (chat: Chat) => {
