@@ -1,1 +1,291 @@
-/* Archivo limpio - sin estilos que interfieran */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS personalizadas */
+:root {
+  --embler-gradient-primary: linear-gradient(135deg, #FFD600 0%, #E6C200 100%);
+  --embler-gradient-secondary: linear-gradient(135deg, #FFE55C 0%, #FFD600 100%);
+  --embler-gradient-accent: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+  --embler-gradient-dark: linear-gradient(135deg, #000000 0%, #0A0A0A 100%);
+  --embler-gradient-gold: linear-gradient(135deg, #FFD600 0%, #FFE55C 100%);
+  --embler-gradient-modern: linear-gradient(135deg, #FFD600 0%, #E6C200 50%, #FFE55C 100%);
+}
+
+/* Estilos base modernos */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--embler-gradient-dark);
+  min-height: 100vh;
+}
+
+/* Gradientes de fondo modernos */
+.bg-gradient-primary {
+  background: var(--embler-gradient-primary);
+}
+
+.bg-gradient-secondary {
+  background: var(--embler-gradient-secondary);
+}
+
+.bg-gradient-accent {
+  background: var(--embler-gradient-accent);
+}
+
+.bg-gradient-dark {
+  background: var(--embler-gradient-dark);
+}
+
+.bg-gradient-gold {
+  background: var(--embler-gradient-gold);
+}
+
+.bg-gradient-modern {
+  background: var(--embler-gradient-modern);
+}
+
+/* Efectos de glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Sombras suaves modernas */
+.shadow-soft {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.shadow-glow-yellow {
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
+}
+
+/* Animaciones personalizadas */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 0, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(255, 214, 0, 0.7); }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.5s ease-out;
+}
+
+/* Botones modernos con gradientes */
+.btn-gradient-primary {
+  background: var(--embler-gradient-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gradient-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 214, 0, 0.5);
+}
+
+.btn-gradient-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-gradient-primary:hover::before {
+  left: 100%;
+}
+
+.btn-gradient-secondary {
+  background: var(--embler-gradient-secondary);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 214, 0, 0.4);
+}
+
+/* Cards modernas */
+.card-modern {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.card-modern:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Inputs modernos */
+.input-modern {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.input-modern:focus {
+  border-color: rgba(255, 214, 0, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FFD600 0%, #E6C200 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #FFE55C 0%, #FFD600 100%);
+}
+
+/* Efectos de hover para elementos interactivos */
+.hover-lift {
+  transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradientes de texto */
+.text-gradient-primary {
+  background: var(--embler-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-secondary {
+  background: var(--embler-gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Efectos de partículas de fondo */
+.particles-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.particles-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 214, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 214, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 214, 0, 0.08) 0%, transparent 50%);
+  animation: float 20s ease-in-out infinite;
+}
+
+/* Estilos para el header con logo */
+header {
+  pointer-events: auto;
+}
+
+header img {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Asegurar que el contenido principal no se superponga con el header */
+.min-h-screen {
+  padding-top: 80px; /* Espacio para el header fijo */
+}
+
+/* Responsive design mejorado */
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: blur(5px);
+  }
+  
+  .card-modern {
+    border-radius: 12px;
+  }
+}
+
+/* Estados de carga modernos */
+.loading-shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

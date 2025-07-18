@@ -69,7 +69,7 @@ npm run dev
 ngrok http 3001
 
 # Terminal 3: Frontend  
-cd frontend/test-tailwind
+cd frontend
 npm run dev
 ```
 

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend/test-tailwind\"",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "start": "npm run dev --prefix backend",
     "backend": "npm run dev --prefix backend",
     "frontend": "npm run dev --prefix frontend",

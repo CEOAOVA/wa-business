@@ -73,7 +73,7 @@ const NotificationItem: React.FC<{
       case 'system':
         return 'bg-gray-600/20 border-gray-600/30 text-gray-300';
       case 'warning':
-        return 'bg-red-500/20 border-red-500/30 text-red-400';
+        return 'bg-embler-yellow/20 border-embler-yellow/30 text-embler-yellow';
       default:
         return 'bg-gray-500/20 border-gray-500/30 text-gray-400';
     }

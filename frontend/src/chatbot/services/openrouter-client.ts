@@ -83,7 +83,7 @@ export class OpenRouterClient {
             'Authorization': `Bearer ${this.config.apiKey}`,
             'Content-Type': 'application/json',
             'HTTP-Referer': 'https://localhost:3000', // Para OpenRouter
-            'X-Title': 'Embler Autoparts Chatbot', // Para OpenRouter
+            'X-Title': 'Autoparts Chatbot', // Para OpenRouter
           },
           timeout: this.config.timeoutMs,
         }
@@ -260,7 +260,7 @@ export function getSharedOpenRouterClient(config?: Partial<ChatbotConfig>): Open
 export function createAutomotiveSystemMessage(): OpenRouterMessage {
   return {
     role: 'system',
-    content: `Eres un especialista en refacciones automotrices que trabaja para Embler en la Ciudad de México. Eres conversacional e inteligente - extraes información del contexto y NO repites preguntas innecesarias. Mantén un tono informal y amigable.
+    content: `Eres un especialista en refacciones automotrices que trabaja en la Ciudad de México. Eres conversacional e inteligente - extraes información del contexto y NO repites preguntas innecesarias. Mantén un tono informal y amigable.
 
 INFORMACIÓN QUE NECESITAS:
 - Nombre del cliente

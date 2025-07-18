@@ -85,6 +85,26 @@ export class WhatsAppService {
    */
   async sendMessage(data: SendMessageRequest) {
     try {
+      // Validar configuración de WhatsApp
+      if (!whatsappConfig.isConfigured) {
+        console.warn('⚠️ WhatsApp no está configurado - simulando envío');
+        return {
+          success: false,
+          error: 'WhatsApp no está configurado',
+          details: 'Configura WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID y WEBHOOK_VERIFY_TOKEN'
+        };
+      }
+
+      // Validar token de acceso
+      if (!whatsappConfig.accessToken || whatsappConfig.accessToken === 'not_configured') {
+        console.error('❌ Token de acceso de WhatsApp no configurado');
+        return {
+          success: false,
+          error: 'Token de acceso no configurado',
+          details: 'Configura WHATSAPP_ACCESS_TOKEN en las variables de entorno'
+        };
+      }
+
       const url = buildApiUrl(`${whatsappConfig.phoneNumberId}/messages`);
       
       const payload = {
@@ -99,7 +119,9 @@ export class WhatsAppService {
       console.log('📤 Enviando mensaje WhatsApp:', {
         to: data.to,
         message: data.message.substring(0, 50) + '...',
-        url
+        url,
+        tokenConfigured: !!whatsappConfig.accessToken,
+        tokenLength: whatsappConfig.accessToken?.length || 0
       });
 
       const response = await axios.post(url, payload, {
@@ -519,16 +541,16 @@ export class WhatsAppService {
         conversations: conversations.map((conv: any) => ({
           id: conv.id,
           contactId: conv.contactId,
-          contactName: conv.contact.name || conv.contact.waId,
-          contactWaId: conv.contact.waId,
+          contactName: conv.contact?.name || conv.contact?.waId || 'Contacto Desconocido',
+          contactWaId: conv.contact?.waId || 'N/A',
           lastMessage: conv.lastMessage ? {
             id: conv.lastMessage.id,
             content: conv.lastMessage.content,
             timestamp: conv.lastMessage.timestamp,
             isFromUs: conv.lastMessage.isFromUs
           } : null,
-          unreadCount: conv.unreadCount,
-          totalMessages: conv._count.messages,
+          unreadCount: conv.unreadCount || 0,
+          totalMessages: conv._count?.messages || 0,
           updatedAt: conv.updatedAt
         })),
         total: stats.totalConversations,

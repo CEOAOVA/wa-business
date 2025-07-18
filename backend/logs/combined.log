@@ -1,0 +1,2616 @@
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 171, heapTotal: 177 },
+    uptime: 32,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 11:59:08.056'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 62,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 11:59:38.060'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 92,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:00:08.067'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 179 },
+    uptime: 122,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:00:38.070'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 175, heapTotal: 180 },
+    uptime: 152,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:01:08.080'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 175, heapTotal: 180 },
+    uptime: 182,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:01:38.083'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 176, heapTotal: 180 },
+    uptime: 212,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:02:08.097'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 176, heapTotal: 182 },
+    uptime: 242,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:02:38.102'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 176, heapTotal: 182 },
+    uptime: 272,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:03:08.106'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 238, heapUsed: 177, heapTotal: 182 },
+    uptime: 302,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:03:38.116'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 238, heapUsed: 178, heapTotal: 182 },
+    uptime: 332,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:04:08.124'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 239, heapUsed: 178, heapTotal: 184 },
+    uptime: 362,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:04:38.134'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 223, heapUsed: 169, heapTotal: 175 },
+    uptime: 32,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:05:25.924'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 170, heapTotal: 175 },
+    uptime: 62,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:05:55.935'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 171, heapTotal: 175 },
+    uptime: 92,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:06:25.944'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 172, heapTotal: 176 },
+    uptime: 122,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:06:55.945'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:07:17.415'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:07:17.417'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:07:17.417'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:07:17.580'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:07:17.581'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:07:17.582'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 176 },
+    uptime: 32,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:07:36.007'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:08:01.467'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:08:01.470'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:08:01.471'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:08:08.482'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:08:08.484'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:08:08.484'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 178 },
+    uptime: 33,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:08:25.929'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 173, heapTotal: 177 },
+    uptime: 63,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:08:55.942'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 173, heapTotal: 178 },
+    uptime: 93,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:09:25.945'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:09:30.949'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:09:30.950'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:09:30.950'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 174, heapTotal: 179 },
+    uptime: 123,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:09:55.957'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:11:03.136'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at AuthService.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\services\\auth.service.js:88:27)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\services\\auth.service.js:5:58)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:11:03.138'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at AuthService.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\services\\auth.service.js:88:27)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\services\\auth.service.js:5:58)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:11:03.139'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:11:25.844'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:11:25.847'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:11:25.848'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:28:25.414'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:28:25.418'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:28:25.420'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:28:27.915'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:28:27.916'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:28:27.917'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 229, heapUsed: 172, heapTotal: 178 },
+    uptime: 33,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:28:49.481'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 172, heapTotal: 177 },
+    uptime: 63,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:29:19.489'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 173, heapTotal: 178 },
+    uptime: 93,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:29:49.494'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 174, heapTotal: 179 },
+    uptime: 123,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:30:19.500'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 174, heapTotal: 180 },
+    uptime: 153,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:30:49.511'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 175, heapTotal: 179 },
+    uptime: 183,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:31:19.526'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:36:57.866'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:36:57.870'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:36:57.873'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 33,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:37:18.483'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:37:42.995'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:37:42.996'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:37:42.997'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 173, heapTotal: 178 },
+    uptime: 63,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:37:48.496'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 173, heapTotal: 179 },
+    uptime: 93,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:38:18.512'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:38:31.127'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:38:31.128'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:109:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:38:31.128'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 174, heapTotal: 179 },
+    uptime: 123,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:38:48.515'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 174, heapTotal: 179 },
+    uptime: 153,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:39:18.525'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:43:16.123'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:43:16.130'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:43:16.132'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 172, heapTotal: 177 },
+    uptime: 34,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:43:28.646'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:43:29.467'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:43:29.469'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:43:29.470'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 173, heapTotal: 178 },
+    uptime: 64,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:43:58.648'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:51:08.222'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:51:08.227'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:51:08.230'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 172, heapTotal: 177 },
+    uptime: 33,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:51:19.832'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 173, heapTotal: 177 },
+    uptime: 63,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:51:49.834'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 174, heapTotal: 178 },
+    uptime: 93,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:52:19.838'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 174, heapTotal: 179 },
+    uptime: 123,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:52:49.844'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 174, heapTotal: 179 },
+    uptime: 153,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:53:19.848'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:53:35.556'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:53:35.557'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:53:35.558'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 175, heapTotal: 180 },
+    uptime: 183,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:53:49.857'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:54:03.799'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:54:03.802'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:54:03.804'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 175, heapTotal: 180 },
+    uptime: 213,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:54:19.870'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-18 12:55:37.404'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-18 12:55:37.406'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-18 12:55:37.409'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 229, heapUsed: 171, heapTotal: 177 },
+    uptime: 33,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:55:45.637'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 12:56:34.591'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 33,
+    requests: 1,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:57:00.334'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 63,
+    requests: 1,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:57:30.349'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 12:57:39.927'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 12:57:58.060'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 175, heapTotal: 181 },
+    uptime: 93,
+    requests: 3,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:58:00.352'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 12:58:36.090'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 12:58:36.472'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 12:58:49.643'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 172, heapTotal: 178 },
+    uptime: 33,
+    requests: 1,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:59:04.541'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 173, heapTotal: 178 },
+    uptime: 63,
+    requests: 1,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 12:59:34.541'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: elisa.n@synaracare.com',
+  timestamp: '2025-07-18 12:59:54.926'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 174, heapTotal: 179 },
+    uptime: 93,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:00:04.552'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:09:36.690'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 171, heapTotal: 177 },
+    uptime: 33,
+    requests: 1,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:10:00.195'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 178 },
+    uptime: 63,
+    requests: 1,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:10:30.200'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 173, heapTotal: 178 },
+    uptime: 93,
+    requests: 1,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:11:00.201'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:11:23.043'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 174, heapTotal: 179 },
+    uptime: 123,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:11:30.212'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 176, heapTotal: 181 },
+    uptime: 153,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:12:00.224'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 177, heapTotal: 181 },
+    uptime: 183,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:12:30.224'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 177, heapTotal: 182 },
+    uptime: 213,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:13:00.238'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 238, heapUsed: 178, heapTotal: 183 },
+    uptime: 243,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:13:30.246'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 240, heapUsed: 179, heapTotal: 184 },
+    uptime: 273,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:14:00.245'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 241, heapUsed: 179, heapTotal: 184 },
+    uptime: 303,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:14:30.257'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 241, heapUsed: 180, heapTotal: 185 },
+    uptime: 333,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:15:00.267'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 242, heapUsed: 180, heapTotal: 186 },
+    uptime: 363,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:15:30.281'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 243, heapUsed: 181, heapTotal: 187 },
+    uptime: 393,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:16:00.284'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: elisa.n@synaracare.com',
+  timestamp: '2025-07-18 13:16:21.049'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 244, heapUsed: 182, heapTotal: 187 },
+    uptime: 423,
+    requests: 3,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:16:30.298'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:16:34.948'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 245, heapUsed: 183, heapTotal: 188 },
+    uptime: 453,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:17:00.308'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 245, heapUsed: 183, heapTotal: 188 },
+    uptime: 483,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:17:30.320'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 246, heapUsed: 184, heapTotal: 189 },
+    uptime: 513,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:18:00.322'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 247, heapUsed: 184, heapTotal: 189 },
+    uptime: 543,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:18:30.328'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 248, heapUsed: 185, heapTotal: 191 },
+    uptime: 573,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:19:00.340'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 248, heapUsed: 185, heapTotal: 190 },
+    uptime: 603,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:19:30.351'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 246, heapUsed: 173, heapTotal: 190 },
+    uptime: 633,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:20:00.361'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:20:01.863'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 246, heapUsed: 174, heapTotal: 191 },
+    uptime: 663,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:20:30.362'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 246, heapUsed: 174, heapTotal: 191 },
+    uptime: 693,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:21:00.368'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 13:21:10.772'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 179, heapTotal: 193 },
+    uptime: 723,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:21:30.380'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 250, heapUsed: 182, heapTotal: 192 },
+    uptime: 753,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:22:00.386'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 13:22:16.504'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 13:22:16.898'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 13:22:19.331'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 171, heapTotal: 177 },
+    uptime: 33,
+    requests: 1,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:22:44.988'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 242, heapUsed: 177, heapTotal: 181 },
+    uptime: 63,
+    requests: 1,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:23:14.990'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 170, heapTotal: 175 },
+    uptime: 33,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:24:23.836'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 171, heapTotal: 177 },
+    uptime: 63,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:24:53.843'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 172, heapTotal: 176 },
+    uptime: 93,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:25:23.849'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 13:34:18.262'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 13:34:18.558'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 13:34:45.560'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 172, heapTotal: 178 },
+    uptime: 33,
+    requests: 1,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:34:47.517'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: elisa.n@synaracare.com',
+  timestamp: '2025-07-18 13:34:55.612'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:35:05.753'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 240, heapUsed: 175, heapTotal: 179 },
+    uptime: 63,
+    requests: 3,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:35:17.532'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 13:35:27.956'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 241, heapUsed: 176, heapTotal: 182 },
+    uptime: 93,
+    requests: 4,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:35:47.540'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 242, heapUsed: 177, heapTotal: 183 },
+    uptime: 123,
+    requests: 4,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:36:17.552'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 243, heapUsed: 178, heapTotal: 183 },
+    uptime: 153,
+    requests: 4,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:36:47.557'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 243, heapUsed: 178, heapTotal: 184 },
+    uptime: 183,
+    requests: 4,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:37:17.570'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 244, heapUsed: 179, heapTotal: 183 },
+    uptime: 213,
+    requests: 4,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:37:47.580'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:38:11.619'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 246, heapUsed: 180, heapTotal: 186 },
+    uptime: 243,
+    requests: 5,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:38:17.584'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:38:24.164'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 247, heapUsed: 181, heapTotal: 188 },
+    uptime: 273,
+    requests: 6,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:38:47.593'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 247, heapUsed: 182, heapTotal: 187 },
+    uptime: 303,
+    requests: 6,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:39:17.608'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 248, heapUsed: 182, heapTotal: 188 },
+    uptime: 333,
+    requests: 6,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:39:47.618'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 13:40:09.380'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 183, heapTotal: 190 },
+    uptime: 363,
+    requests: 7,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:40:17.619'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 184, heapTotal: 189 },
+    uptime: 393,
+    requests: 7,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:40:47.622'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 250, heapUsed: 185, heapTotal: 190 },
+    uptime: 423,
+    requests: 7,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:41:17.626'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 250, heapUsed: 185, heapTotal: 191 },
+    uptime: 453,
+    requests: 7,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:41:47.632'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 251, heapUsed: 186, heapTotal: 192 },
+    uptime: 483,
+    requests: 7,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:42:17.636'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:42:19.074'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 174, heapTotal: 195 },
+    uptime: 513,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:42:47.639'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 175, heapTotal: 193 },
+    uptime: 543,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:43:17.651'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 175, heapTotal: 192 },
+    uptime: 573,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:43:47.654'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 175, heapTotal: 192 },
+    uptime: 603,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:44:17.657'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 176, heapTotal: 193 },
+    uptime: 633,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:44:47.662'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 176, heapTotal: 193 },
+    uptime: 663,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:45:17.673'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 177, heapTotal: 192 },
+    uptime: 693,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:45:47.681'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 178, heapTotal: 192 },
+    uptime: 723,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:46:17.691'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 249, heapUsed: 178, heapTotal: 193 },
+    uptime: 753,
+    requests: 8,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:46:47.708'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 13:47:13.788'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 13:47:14.189'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 13:47:18.549'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 13:47:30.738'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 174, heapTotal: 181 },
+    uptime: 33,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:47:43.000'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 240, heapUsed: 179, heapTotal: 187 },
+    uptime: 63,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 13:48:13.003'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 220, heapUsed: 168, heapTotal: 174 },
+    uptime: 34,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:13:46.369'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 226, heapUsed: 170, heapTotal: 174 },
+    uptime: 64,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:14:16.383'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 226, heapUsed: 170, heapTotal: 174 },
+    uptime: 94,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:14:46.388'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 14:15:02.355'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 14:15:02.667'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 229, heapUsed: 173, heapTotal: 177 },
+    uptime: 124,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:15:16.397'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 14:15:23.858'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-18 14:15:33.336'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 175, heapTotal: 180 },
+    uptime: 154,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:15:46.411'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 239, heapUsed: 179, heapTotal: 186 },
+    uptime: 184,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:16:16.419'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 14:16:29.005'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-18 14:16:29.416'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 14:16:33.932'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-18 14:16:55.166'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 34,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:16:58.189'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 173, heapTotal: 177 },
+    uptime: 64,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:17:28.191'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 174, heapTotal: 178 },
+    uptime: 94,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:17:58.192'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 174, heapTotal: 179 },
+    uptime: 124,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:18:28.200'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 174, heapTotal: 180 },
+    uptime: 154,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:18:58.211'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 175, heapTotal: 180 },
+    uptime: 184,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:19:28.223'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 176, heapTotal: 180 },
+    uptime: 214,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:19:58.233'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 176, heapTotal: 181 },
+    uptime: 244,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:20:28.245'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 237, heapUsed: 177, heapTotal: 182 },
+    uptime: 274,
+    requests: 2,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-18 14:20:58.253'
+}

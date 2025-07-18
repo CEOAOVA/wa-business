@@ -1,45 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
-
-// Placeholder del servicio (lo crearemos después)
-const authService = {
-  login: async (credentials: LoginCredentials): Promise<User> => {
-    // Simulación de login para desarrollo
-    if (credentials.email === 'admin@embler.com' && credentials.password === 'admin123') {
-      const user: User = {
-        id: '1',
-        name: 'Admin Embler',
-        email: credentials.email,
-        whatsappNumber: '+1234567890',
-        role: 'admin',
-        isOnline: true,
-        lastSeen: new Date(),
-        status: 'active',
-      };
-      localStorage.setItem('authToken', 'fake-jwt-token');
-      return user;
-    }
-    throw new Error('Credenciales inválidas');
-  },
-  logout: async (): Promise<void> => {
-    // Simulación de logout
-    await new Promise(resolve => setTimeout(resolve, 500));
-  },
-  getCurrentUser: async (): Promise<User> => {
-    // Simulación de obtener usuario actual
-    return {
-      id: '1',
-      name: 'Admin Embler',
-      email: 'admin@embler.com',
-      whatsappNumber: '+1234567890',
-      role: 'admin',
-      isOnline: true,
-      lastSeen: new Date(),
-      status: 'active',
-    };
-  },
-};
+import { authApiService } from '../services/auth-api';
 
 // Estado inicial
 const initialState: AuthState = {
@@ -134,7 +96,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      const user = await authService.login(credentials);
+      const response = await authApiService.login({
+        email: credentials.email,
+        password: credentials.password,
+      });
+      const user = authApiService.convertToUser(response.user);
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
       
       // Guardar token si es necesario
@@ -150,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await authService.logout();
+      await authApiService.logout();
       localStorage.removeItem('rememberAuth');
       localStorage.removeItem('authToken');
       dispatch({ type: 'LOGOUT' });
@@ -175,7 +141,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!token) return;
 
       dispatch({ type: 'AUTH_START' });
-      const user = await authService.getCurrentUser();
+      const profile = await authApiService.getProfile();
+      const user = authApiService.convertToUser(profile);
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
     } catch (error) {
       localStorage.removeItem('authToken');

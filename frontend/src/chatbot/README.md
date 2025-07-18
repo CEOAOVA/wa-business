@@ -27,7 +27,7 @@ Recopilar información específica del cliente y su vehículo para generar cotiz
 ## 🏗️ Arquitectura
 
 ```
-frontend/test-tailwind/src/chatbot/
+frontend/src/chatbot/
 ├── services/
 │   ├── openrouter-client.ts      # Cliente OpenRouter + Gemini
 │   ├── autoparts-functions.ts    # Functions para datos automotrices
@@ -45,7 +45,7 @@ frontend/test-tailwind/src/chatbot/
 ### Paso 1: Mover estructura al backend
 ```bash
 # Copiar carpeta completa
-cp -r frontend/test-tailwind/src/chatbot/ backend/src/services/chatbot/
+cp -r frontend/src/chatbot/ backend/src/services/chatbot/
 ```
 
 ### Paso 2: Adaptar para WhatsApp Business
@@ -58,7 +58,7 @@ cp -r frontend/test-tailwind/src/chatbot/ backend/src/services/chatbot/
 
 #### Frontend (actual):
 ```env
-# Archivo: frontend/test-tailwind/.env.local
+# Archivo: frontend/.env.local
 VITE_OPENROUTER_API_KEY=your_openrouter_key_here
 ```
 
@@ -75,7 +75,7 @@ WHATSAPP_VERIFY_TOKEN=your_verify_token
 ```
 
 #### Configuración actual:
-1. Crear archivo `.env.local` en `frontend/test-tailwind/`
+1. Crear archivo `.env.local` en `frontend/`
 2. Agregar: `VITE_OPENROUTER_API_KEY=tu_key_aqui`
 3. Obtener key gratuita en: https://openrouter.ai/keys
 4. Reiniciar servidor de desarrollo

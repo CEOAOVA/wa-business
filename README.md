@@ -67,7 +67,7 @@ La integración del chatbot con IA está completamente funcional y disponible en
    cd backend && npm run dev
    
    # Frontend
-   cd frontend/test-tailwind && npm run dev
+   cd frontend && npm run dev
    ```
 
 3. **Probar en WhatsApp Test**:

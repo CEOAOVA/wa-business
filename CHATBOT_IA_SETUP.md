@@ -12,8 +12,8 @@ Se ha agregado exitosamente la infraestructura para que el chatbot pueda generar
 - **Integración con WhatsApp**: Conecta directamente con `whatsapp.service.ts`
 
 ### Frontend (React)
-- **Servicio API**: `frontend/test-tailwind/src/services/chatbot-api.ts`
-- **Interfaz UI**: Integrada en `frontend/test-tailwind/src/pages/WhatsAppTest.tsx`
+- **Servicio API**: `frontend/src/services/chatbot-api.ts`
+- **Interfaz UI**: Integrada en `frontend/src/pages/WhatsAppTest.tsx`
 
 ## 🔧 Configuración Necesaria
 
@@ -58,7 +58,7 @@ cd backend
 npm run dev
 
 # Terminal 2: Frontend
-cd frontend/test-tailwind
+cd frontend
 npm run dev
 ```
 

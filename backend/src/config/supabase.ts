@@ -10,6 +10,7 @@ loadEnvWithUnicodeSupport();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
@@ -20,6 +21,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase =
   supabaseUrl && supabaseAnonKey
     ? createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: false,
+        },
+      })
+    : null;
+
+// Cliente de Supabase con clave de servicio para operaciones administrativas
+export const supabaseAdmin =
+  supabaseUrl && supabaseServiceKey
+    ? createClient(supabaseUrl, supabaseServiceKey, {
         auth: {
           persistSession: false,
         },

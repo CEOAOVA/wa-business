@@ -54,15 +54,15 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
   const getFileIcon = (type: string) => {
     switch (type) {
       case 'image':
-        return <Image className="w-8 h-8 text-green-500" />;
+        return <Image className="w-8 h-8 text-embler-yellow" />;
       case 'video':
-        return <Video className="w-8 h-8 text-blue-500" />;
+        return <Video className="w-8 h-8 text-embler-yellow" />;
       case 'audio':
-        return <Music className="w-8 h-8 text-purple-500" />;
+        return <Music className="w-8 h-8 text-embler-yellow" />;
       case 'document':
-        return <FileText className="w-8 h-8 text-red-500" />;
+        return <FileText className="w-8 h-8 text-embler-yellow" />;
       default:
-        return <File className="w-8 h-8 text-gray-500" />;
+        return <File className="w-8 h-8 text-gray-400" />;
     }
   };
 
@@ -142,7 +142,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-white">
       {!selectedFile ? (
         <div
-          className={`text-center ${dragActive ? 'border-blue-500 bg-blue-50' : ''}`}
+          className={`text-center ${dragActive ? 'border-embler-yellow bg-embler-yellow/10' : ''}`}
           onDragOver={(e) => {
             e.preventDefault();
             setDragActive(true);
@@ -171,7 +171,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
           <button
             onClick={() => inputRef.current?.click()}
             disabled={isUploading}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+            className="inline-flex items-center px-4 py-2 bg-embler-yellow text-black rounded-md hover:bg-embler-yellowDark disabled:bg-gray-400"
           >
             <Paperclip className="mr-2 h-4 w-4" />
             Seleccionar archivo
@@ -248,7 +248,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
             <button
               onClick={handleUpload}
               disabled={isUploading}
-              className="flex-1 flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
+              className="flex-1 flex items-center justify-center px-4 py-2 bg-embler-yellow text-black rounded-md hover:bg-embler-yellowDark disabled:bg-gray-400"
             >
               <Upload className="mr-2 h-4 w-4" />
               {isUploading ? 'Subiendo...' : 'Solo subir'}
@@ -258,7 +258,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
               <button
                 onClick={handleUploadAndSend}
                 disabled={isUploading}
-                className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+                className="flex-1 flex items-center justify-center px-4 py-2 bg-embler-gray hover:bg-embler-grayLight text-white rounded-md disabled:bg-gray-400"
               >
                 <Send className="mr-2 h-4 w-4" />
                 {isUploading ? 'Enviando...' : 'Subir y enviar'}

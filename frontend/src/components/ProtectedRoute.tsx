@@ -1,39 +1,49 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import type { ReactNode } from 'react';
 
-// Componente para proteger rutas que requieren autenticación
 interface ProtectedRouteProps {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: React.ReactNode;
+  requiredRole?: 'admin' | 'agent';
+  redirectTo?: string;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  fallback 
+  requiredRole,
+  redirectTo 
 }) => {
   const { state } = useAuth();
+  const location = useLocation();
 
-  // Mostrar loading mientras se verifica la autenticación
-  if (state.isLoading) {
-    return (
-      fallback || (
-        <div className="min-h-screen bg-embler-dark flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-embler-yellow border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-white text-lg">Verificando autenticación...</p>
-          </div>
-        </div>
-      )
-    );
-  }
-
-  // Redirigir al login si no está autenticado
+  // Si no está autenticado, redirigir al login
   if (!state.isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Renderizar los children si está autenticado
+  // Si se requiere un rol específico y el usuario no lo tiene
+  if (requiredRole && state.user?.role !== requiredRole) {
+    // Redirigir según el rol del usuario
+    const userRole = state.user?.role;
+    let targetRoute = redirectTo;
+
+    if (!targetRoute) {
+      switch (userRole) {
+        case 'admin':
+          targetRoute = '/admin/dashboard';
+          break;
+        case 'agent':
+          targetRoute = '/chats';
+          break;
+        default:
+          targetRoute = '/chats';
+      }
+    }
+
+    return <Navigate to={targetRoute} replace />;
+  }
+
   return <>{children}</>;
-}; 
+};
+
+export default ProtectedRoute; 

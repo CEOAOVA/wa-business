@@ -22,15 +22,15 @@ const MediaMessage: React.FC<MediaMessageProps> = ({ message, onDownload }) => {
   const getFileIcon = (type: string) => {
     switch (type) {
       case 'IMAGE':
-        return <Image className="w-6 h-6 text-green-500" />;
-      case 'VIDEO':
-        return <Video className="w-6 h-6 text-blue-500" />;
-      case 'AUDIO':
-        return <Music className="w-6 h-6 text-purple-500" />;
-      case 'DOCUMENT':
-        return <FileText className="w-6 h-6 text-red-500" />;
-      default:
-        return <File className="w-6 h-6 text-gray-500" />;
+        return <Image className="w-6 h-6 text-embler-yellow" />;
+              case 'VIDEO':
+          return <Video className="w-6 h-6 text-embler-yellow" />;
+        case 'AUDIO':
+          return <Music className="w-6 h-6 text-embler-yellow" />;
+        case 'DOCUMENT':
+          return <FileText className="w-6 h-6 text-embler-yellow" />;
+        default:
+          return <File className="w-6 h-6 text-gray-400" />;
     }
   };
 

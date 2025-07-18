@@ -4,6 +4,29 @@ import chatbotApi from '../services/chatbot-api';
 import { useApp } from '../context/AppContext';
 import { MESSAGES } from '../constants/messages';
 
+// Estilos específicos para ocultar elementos decorativos en WhatsAppTest
+const whatsappTestStyles = `
+  .whatsapp-test-page {
+    background: white !important;
+    position: relative;
+    z-index: 9999;
+    isolation: isolate;
+  }
+  
+  .whatsapp-test-page::before,
+  .whatsapp-test-page::after {
+    display: none !important;
+  }
+  
+  .whatsapp-test-page .absolute {
+    display: none !important;
+  }
+  
+  .whatsapp-test-page .animate-float {
+    display: none !important;
+  }
+`;
+
 interface TestResult {
   id: string;
   timestamp: Date;
@@ -46,6 +69,19 @@ const WhatsAppTest: React.FC = () => {
   useEffect(() => {
     checkStatus();
     checkChatbotStatus();
+  }, []);
+
+  // Inyectar estilos para ocultar elementos decorativos
+  useEffect(() => {
+    // Crear y agregar estilos
+    const styleElement = document.createElement('style');
+    styleElement.textContent = whatsappTestStyles;
+    document.head.appendChild(styleElement);
+
+    // Limpiar al desmontar
+    return () => {
+      document.head.removeChild(styleElement);
+    };
   }, []);
 
   // Verificar estado
@@ -248,7 +284,7 @@ const WhatsAppTest: React.FC = () => {
     }
   };
 
-  // Test Manual: Simular mensaje ENVIADO por nosotros
+  // Test Manual: Simular mensaje ENVIADO por un agente
   const handleManualOutgoingTest = () => {
     console.log('🧪 [WhatsAppTest] Simulando mensaje ENVIADO...');
     
@@ -256,7 +292,7 @@ const WhatsAppTest: React.FC = () => {
       injectTestOutgoingMessage(
         '525549679734',
         MESSAGES.TESTING.SIMULATE_OUTGOING,
-        MESSAGES.TESTING.CLIENT_SIMULATED
+        'Agente Test'
       );
       
       addResult('Simulate Outgoing Message', true, { 
@@ -271,46 +307,44 @@ const WhatsAppTest: React.FC = () => {
     }
   };
 
-  // Test Manual: Crear múltiples mensajes
+  // Test Manual: Crear múltiples chats
   const handleMultipleMessages = () => {
-    console.log('🧪 [WhatsAppTest] Creando múltiples mensajes...');
+    console.log('🧪 [WhatsAppTest] Creando múltiples chats...');
     
     try {
-      const messages = [
-        { from: '525549679734', message: MESSAGES.TESTING.TEST_MESSAGE_1, name: MESSAGES.TESTING.CLIENT_ONE },
-        { from: '525555123456', message: MESSAGES.TESTING.TEST_MESSAGE_2, name: MESSAGES.TESTING.CLIENT_TWO },
-        { from: '525549679734', message: MESSAGES.TESTING.TEST_MESSAGE_3, name: MESSAGES.TESTING.CLIENT_ONE }
+      const testNumbers = ['525549679734', '525512345678', '525598765432'];
+      const testMessages = [
+        'Hola, necesito información sobre repuestos',
+        '¿Tienen filtros de aceite?',
+        'Quiero cotizar una batería'
       ];
       
-      messages.forEach((msg, index) => {
-        setTimeout(() => {
-          injectTestWhatsAppMessage(msg.from, msg.message, msg.name);
-        }, index * 500); // Espaciar mensajes por 500ms
+      testNumbers.forEach((number, index) => {
+        injectTestWhatsAppMessage(
+          number,
+          testMessages[index],
+          `Cliente Test ${index + 1}`
+        );
       });
       
-      addResult('Multiple Test Messages', true, { 
-        count: messages.length,
-        message: 'Múltiples mensajes creados' 
+      addResult('Create Multiple Chats', true, { 
+        count: testNumbers.length,
+        numbers: testNumbers 
       });
       
-      console.log('✅ [WhatsAppTest] Múltiples mensajes creados exitosamente');
+      console.log('✅ [WhatsAppTest] Múltiples chats creados exitosamente');
     } catch (error: any) {
-      console.error('❌ [WhatsAppTest] Error creando múltiples mensajes:', error);
-      addResult('Multiple Test Messages', false, undefined, error.message);
+      console.error('❌ [WhatsAppTest] Error creando múltiples chats:', error);
+      addResult('Create Multiple Chats', false, undefined, error.message);
     }
   };
 
-  // Limpiar resultados
   const clearResults = () => {
     setResults([]);
   };
 
-  // ============================================
-  // FUNCIONES DEL CHATBOT CON IA
-  // ============================================
-
-  // Verificar estado del chatbot
   const checkChatbotStatus = async () => {
+    setIsLoading(true);
     try {
       const [connectionOk, statsResponse] = await Promise.all([
         chatbotApi.checkConnection(),
@@ -326,20 +360,17 @@ const WhatsAppTest: React.FC = () => {
       }
     } catch (error: any) {
       addResult('Chatbot Status Check', false, null, error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Enviar mensaje al chatbot y generar respuesta con IA
   const handleChatbotSendMessage = async () => {
-    console.log('🧪 [DEBUG] handleChatbotSendMessage ejecutándose...', { phoneNumber, message });
-    
     if (!phoneNumber || !message) {
-      console.log('❌ [DEBUG] Faltan datos en sendMessage:', { phoneNumber, message });
-      addResult('Chatbot Send Message', false, null, 'Número y mensaje son requeridos');
+      addResult('Chatbot Send', false, null, 'Número y mensaje son requeridos');
       return;
     }
 
-    console.log('✅ [DEBUG] Iniciando llamada a chatbotApi.sendMessage...');
     setIsLoading(true);
     try {
       const result = await chatbotApi.sendMessage({
@@ -347,30 +378,20 @@ const WhatsAppTest: React.FC = () => {
         message: message
       });
 
-      addResult('Chatbot Send Message', result.success, result, result.error);
-      
-      // Actualizar conversación si existe
-      if (result.conversationState) {
-        setChatbotConversation(result.conversationState);
-      }
+      addResult('Chatbot Send', result.success, result, result.error);
     } catch (error: any) {
-      addResult('Chatbot Send Message', false, null, error.message);
+      addResult('Chatbot Send', false, null, error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Probar respuesta de IA sin enviar por WhatsApp
   const handleTestAI = async () => {
-    console.log('🧪 [DEBUG] handleTestAI ejecutándose...', { phoneNumber, message });
-    
     if (!phoneNumber || !message) {
-      console.log('❌ [DEBUG] Faltan datos:', { phoneNumber, message });
-      addResult('Test AI Response', false, null, 'Número y mensaje son requeridos');
+      addResult('Test AI', false, null, 'Número y mensaje son requeridos');
       return;
     }
 
-    console.log('✅ [DEBUG] Iniciando llamada a chatbotApi.testAI...');
     setIsLoading(true);
     try {
       const result = await chatbotApi.testAI({
@@ -378,34 +399,29 @@ const WhatsAppTest: React.FC = () => {
         message: message
       });
 
-      addResult('Test AI Response', result.success, result, result.error);
-      
-      // Actualizar conversación si existe
-      if (result.conversationState) {
-        setChatbotConversation(result.conversationState);
-      }
+      addResult('Test AI', result.success, result, result.error);
     } catch (error: any) {
-      addResult('Test AI Response', false, null, error.message);
+      addResult('Test AI', false, null, error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Obtener conversación del chatbot
   const handleGetConversation = async () => {
     if (!phoneNumber) {
-      addResult('Get Conversation', false, null, 'Número de teléfono requerido');
+      addResult('Get Conversation', false, null, 'Número requerido');
       return;
     }
 
     setIsLoading(true);
     try {
       const result = await chatbotApi.getConversation(phoneNumber);
-
-      addResult('Get Conversation', result.success, result.conversation, result.message);
       
-      if (result.conversation) {
+      if (result.success) {
         setChatbotConversation(result.conversation);
+        addResult('Get Conversation', true, result.conversation);
+      } else {
+        addResult('Get Conversation', false, null, result.message);
       }
     } catch (error: any) {
       addResult('Get Conversation', false, null, error.message);
@@ -414,7 +430,6 @@ const WhatsAppTest: React.FC = () => {
     }
   };
 
-  // Simular webhook entrante con chatbot
   const handleChatbotWebhook = async () => {
     if (!phoneNumber || !message) {
       addResult('Chatbot Webhook', false, null, 'Número y mensaje son requeridos');
@@ -430,11 +445,6 @@ const WhatsAppTest: React.FC = () => {
       });
 
       addResult('Chatbot Webhook', result.success, result, result.error);
-      
-      // Actualizar conversación si existe
-      if (result.conversationState) {
-        setChatbotConversation(result.conversationState);
-      }
     } catch (error: any) {
       addResult('Chatbot Webhook', false, null, error.message);
     } finally {
@@ -442,54 +452,77 @@ const WhatsAppTest: React.FC = () => {
     }
   };
 
-  // Actualizar estadísticas del chatbot
   const handleRefreshChatbotStats = async () => {
     setIsLoading(true);
     try {
       const result = await chatbotApi.getStats();
-
+      
       if (result.success) {
         setChatbotStats(result.stats);
-        addResult('Refresh Chatbot Stats', true, result.stats);
+        addResult('Refresh Stats', true, result.stats);
       } else {
-        addResult('Refresh Chatbot Stats', false, null, result.error);
+        addResult('Refresh Stats', false, null, result.error);
       }
     } catch (error: any) {
-      addResult('Refresh Chatbot Stats', false, null, error.message);
+      addResult('Refresh Stats', false, null, error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   const formatPhone = (phone: string) => {
-    const validation = whatsappApi.validatePhoneNumber(phone);
-    return validation.isValid ? whatsappApi.formatPhoneForDisplay(validation.formatted) : phone;
+    if (!phone) return 'No especificado';
+    return phone.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '$1 $2 $3 $4');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+    <div 
+      className="min-h-screen bg-white whatsapp-test-page" 
+      style={{ 
+        background: 'white !important',
+        position: 'relative',
+        zIndex: 9999,
+        isolation: 'isolate'
+      }}
+    >
+      {/* Overlay sólido para ocultar completamente elementos decorativos */}
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          background: 'white',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}
+      />
+      
+      <div 
+        className="max-w-7xl mx-auto px-4 py-6 relative" 
+        style={{ 
+          zIndex: 2,
+          position: 'relative'
+        }}
+      >
+        {/* Header simple */}
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <h1 className="text-2xl font-bold text-gray-900">
             WhatsApp Business API - Pruebas
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mt-1">
             Interfaz de pruebas para la integración de WhatsApp Business API
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Panel de Control */}
-          <div className="space-y-6">
-            {/* Estado del Chatbot con IA */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">🤖 Chatbot con IA</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Panel de Control - Chatbot */}
+          <div className="space-y-4">
+            {/* Estado del Chatbot */}
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <h2 className="text-lg font-semibold mb-3">🤖 Chatbot con IA</h2>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
                   <span>Backend AI:</span>
-                  <span className={`px-2 py-1 rounded text-sm ${
+                  <span className={`px-2 py-1 rounded text-xs ${
                     isChatbotConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {isChatbotConnected ? 'Conectado' : 'Desconectado'}
@@ -498,119 +531,117 @@ const WhatsAppTest: React.FC = () => {
 
                 {chatbotStats && (
                   <>
-                    <div className="flex items-center justify-between">
-                      <span>Conversaciones Activas:</span>
-                      <span className="text-sm font-mono">{chatbotStats.activeConversations}</span>
+                    <div className="flex justify-between">
+                      <span>Conversaciones:</span>
+                      <span className="font-mono">{chatbotStats.activeConversations}</span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between">
                       <span>Total Mensajes:</span>
-                      <span className="text-sm font-mono">{chatbotStats.totalMessages}</span>
+                      <span className="font-mono">{chatbotStats.totalMessages}</span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <span>Promedio por Conversación:</span>
-                      <span className="text-sm font-mono">{chatbotStats.avgMessagesPerConversation?.toFixed(1) || '0.0'}</span>
+                    <div className="flex justify-between">
+                      <span>Promedio:</span>
+                      <span className="font-mono">{chatbotStats.avgMessagesPerConversation?.toFixed(1) || '0.0'}</span>
                     </div>
                   </>
                 )}
 
-                <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <button
                     onClick={checkChatbotStatus}
                     disabled={isLoading}
-                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50 text-sm"
+                    className="bg-blue-600 text-white py-1 px-2 rounded text-xs hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {isLoading ? 'Verificando...' : 'Verificar Estado'}
+                    {isLoading ? 'Verificando...' : 'Verificar'}
                   </button>
                   
                   <button
                     onClick={handleRefreshChatbotStats}
                     disabled={isLoading}
-                    className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 disabled:opacity-50 text-sm"
+                    className="bg-purple-600 text-white py-1 px-2 rounded text-xs hover:bg-purple-700 disabled:opacity-50"
                   >
-                    {isLoading ? 'Actualizando...' : 'Actualizar Stats'}
+                    {isLoading ? 'Actualizando...' : 'Stats'}
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Acciones del Chatbot */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">🧠 Acciones del Chatbot</h2>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h2 className="text-lg font-semibold mb-3">🧠 Acciones del Chatbot</h2>
               
-              <div className="grid grid-cols-1 gap-3">
+              <div className="space-y-2">
                 <button
                   onClick={handleTestAI}
                   disabled={isLoading}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 font-medium"
+                  className="w-full bg-purple-600 text-white py-2 px-3 rounded text-sm hover:bg-purple-700 disabled:opacity-50"
                 >
-                  🤖 Probar Respuesta de IA (Solo Test)
+                  🤖 Probar IA (Solo Test)
                 </button>
 
                 <button
                   onClick={handleChatbotSendMessage}
                   disabled={isLoading}
-                  className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 px-4 rounded hover:from-green-700 hover:to-blue-700 disabled:opacity-50 font-medium"
+                  className="w-full bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 disabled:opacity-50"
                 >
-                  💬 Generar IA + Enviar WhatsApp
+                  💬 IA + Enviar WhatsApp
                 </button>
 
                 <button
                   onClick={handleChatbotWebhook}
                   disabled={isLoading}
-                  className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-4 rounded hover:from-orange-700 hover:to-red-700 disabled:opacity-50 font-medium"
+                  className="w-full bg-orange-600 text-white py-2 px-3 rounded text-sm hover:bg-orange-700 disabled:opacity-50"
                 >
-                  🔄 Simular Webhook + Respuesta IA
+                  🔄 Webhook + IA
                 </button>
 
                 <button
                   onClick={handleGetConversation}
                   disabled={isLoading}
-                  className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 disabled:opacity-50"
+                  className="w-full bg-gray-600 text-white py-2 px-3 rounded text-sm hover:bg-gray-700 disabled:opacity-50"
                 >
                   📋 Ver Conversación
                 </button>
               </div>
               
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                <p className="text-sm text-yellow-800">
-                  <strong>💡 Tip:</strong> Para probar el chatbot, configura un número de teléfono y escribe un mensaje como "Necesito un filtro de aceite para mi Toyota Corolla 2018"
-                </p>
+              <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                <strong>💡 Tip:</strong> Prueba con "Necesito un filtro de aceite para mi Toyota Corolla 2018"
               </div>
             </div>
 
             {/* Conversación Actual */}
             {chatbotConversation && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-4">💬 Conversación Actual</h2>
+              <div className="border border-gray-200 rounded-lg p-4 bg-blue-50">
+                <h2 className="text-lg font-semibold mb-3">💬 Conversación Actual</h2>
                 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Teléfono:</span>
-                    <span className="text-sm font-mono">{chatbotConversation.phoneNumber}</span>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Teléfono:</span>
+                    <span className="font-mono">{chatbotConversation.phoneNumber}</span>
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Estado:</span>
-                    <span className="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded">{chatbotConversation.status}</span>
+                  <div className="flex justify-between">
+                    <span>Estado:</span>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{chatbotConversation.status}</span>
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Mensajes:</span>
-                    <span className="text-sm">{chatbotConversation.messagesCount || 0}</span>
+                  <div className="flex justify-between">
+                    <span>Mensajes:</span>
+                    <span>{chatbotConversation.messagesCount || 0}</span>
                   </div>
                   
                   {chatbotConversation.clientInfo && Object.keys(chatbotConversation.clientInfo).length > 0 && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded">
-                      <h4 className="text-sm font-medium mb-2">Información del Cliente:</h4>
+                    <div className="mt-2 p-2 bg-white rounded border">
+                      <h4 className="text-xs font-medium mb-1">Info Cliente:</h4>
                       <div className="space-y-1">
                         {Object.entries(chatbotConversation.clientInfo).map(([key, value], index) => {
                           if (!value) return null;
                           return (
-                            <div key={`client-info-${key}-${index}`} className="flex items-center justify-between">
-                              <span className="text-xs font-medium capitalize">{key}:</span>
-                              <span className="text-xs">{String(value)}</span>
+                            <div key={`client-info-${key}-${index}`} className="flex justify-between text-xs">
+                              <span className="capitalize">{key}:</span>
+                              <span>{String(value)}</span>
                             </div>
                           );
                         })}
@@ -622,16 +653,16 @@ const WhatsAppTest: React.FC = () => {
             )}
           </div>
 
-          {/* Segundo Panel - Configuración Original */}
-          <div className="space-y-6">
+          {/* Panel de Configuración */}
+          <div className="space-y-4">
             {/* Estado de Conexión */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">Estado de Conexión</h2>
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <h2 className="text-lg font-semibold mb-3">Estado de Conexión</h2>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
                   <span>Backend:</span>
-                  <span className={`px-2 py-1 rounded text-sm ${
+                  <span className={`px-2 py-1 rounded text-xs ${
                     isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {isConnected ? 'Conectado' : 'Desconectado'}
@@ -640,23 +671,23 @@ const WhatsAppTest: React.FC = () => {
 
                 {status && (
                   <>
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between">
                       <span>WhatsApp:</span>
-                      <span className={`px-2 py-1 rounded text-sm ${
+                      <span className={`px-2 py-1 rounded text-xs ${
                         status.configured ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                       }`}>
                         {status.configured ? 'Configurado' : 'No Configurado'}
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between">
                       <span>Phone ID:</span>
-                      <span className="text-sm font-mono">{status.phoneId}</span>
+                      <span className="font-mono text-xs">{status.phoneId}</span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between">
                       <span>API Version:</span>
-                      <span className="text-sm">{status.apiVersion}</span>
+                      <span className="text-xs">{status.apiVersion}</span>
                     </div>
                   </>
                 )}
@@ -664,18 +695,18 @@ const WhatsAppTest: React.FC = () => {
                 <button
                   onClick={checkStatus}
                   disabled={isLoading}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
+                  className="w-full bg-blue-600 text-white py-2 px-3 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isLoading ? 'Verificando...' : 'Verificar Estado'}
                 </button>
               </div>
             </div>
 
-            {/* Configuración de Pruebas */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">Configuración</h2>
+            {/* Configuración */}
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h2 className="text-lg font-semibold mb-3">Configuración</h2>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Número de Teléfono
@@ -685,10 +716,10 @@ const WhatsAppTest: React.FC = () => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="Número de teléfono"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Formato detectado: {formatPhone(phoneNumber)}
+                    Formato: {formatPhone(phoneNumber)}
                   </p>
                 </div>
 
@@ -701,11 +732,11 @@ const WhatsAppTest: React.FC = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Escribe tu mensaje aquí..."
                     rows={3}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Template
@@ -714,7 +745,7 @@ const WhatsAppTest: React.FC = () => {
                       type="text"
                       value={template}
                       onChange={(e) => setTemplate(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   
@@ -725,7 +756,7 @@ const WhatsAppTest: React.FC = () => {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="es">Español</option>
                       <option value="en">English</option>
@@ -737,14 +768,14 @@ const WhatsAppTest: React.FC = () => {
             </div>
 
             {/* Acciones */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">Acciones de Prueba</h2>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h2 className="text-lg font-semibold mb-3">Acciones de Prueba</h2>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={handleSendMessage}
                   disabled={isLoading}
-                  className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 disabled:opacity-50"
+                  className="bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 disabled:opacity-50"
                 >
                   Enviar Mensaje
                 </button>
@@ -752,7 +783,7 @@ const WhatsAppTest: React.FC = () => {
                 <button
                   onClick={handleSendTemplate}
                   disabled={isLoading}
-                  className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 disabled:opacity-50"
+                  className="bg-purple-600 text-white py-2 px-3 rounded text-sm hover:bg-purple-700 disabled:opacity-50"
                 >
                   Enviar Template
                 </button>
@@ -760,7 +791,7 @@ const WhatsAppTest: React.FC = () => {
                 <button
                   onClick={handleGetPhoneInfo}
                   disabled={isLoading}
-                  className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
+                  className="bg-blue-600 text-white py-2 px-3 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
                 >
                   Info del Número
                 </button>
@@ -768,7 +799,7 @@ const WhatsAppTest: React.FC = () => {
                 <button
                   onClick={handleQuickTest}
                   disabled={isLoading}
-                  className="bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 disabled:opacity-50"
+                  className="bg-orange-600 text-white py-2 px-3 rounded text-sm hover:bg-orange-700 disabled:opacity-50"
                 >
                   Prueba Rápida
                 </button>
@@ -776,7 +807,7 @@ const WhatsAppTest: React.FC = () => {
                 <button
                   onClick={handleDebugLoad}
                   disabled={isLoading}
-                  className="bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700 disabled:opacity-50"
+                  className="bg-yellow-600 text-white py-2 px-3 rounded text-sm hover:bg-yellow-700 disabled:opacity-50"
                 >
                   🧪 Debug Load
                 </button>
@@ -784,36 +815,36 @@ const WhatsAppTest: React.FC = () => {
                 <button
                   onClick={handleSimulateMessage}
                   disabled={isLoading}
-                  className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 disabled:opacity-50"
+                  className="bg-red-600 text-white py-2 px-3 rounded text-sm hover:bg-red-700 disabled:opacity-50"
                 >
                   🧪 Simular Mensaje
                 </button>
               </div>
               
-              {/* Sección de Tests Manuales */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Tests Manuales (Sin Backend)</h3>
-                <div className="grid grid-cols-1 gap-3">
+              {/* Tests Manuales */}
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Tests Manuales (Sin Backend)</h3>
+                <div className="space-y-2">
                   <button
                     onClick={handleManualIncomingTest}
                     disabled={isLoading}
-                    className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:opacity-50 text-sm"
+                    className="w-full bg-green-500 text-white py-2 px-3 rounded text-sm hover:bg-green-600 disabled:opacity-50"
                   >
-                    📥 Simular Mensaje RECIBIDO (Cliente → Agente)
+                    📥 Simular Mensaje RECIBIDO
                   </button>
 
                   <button
                     onClick={handleManualOutgoingTest}
                     disabled={isLoading}
-                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50 text-sm"
+                    className="w-full bg-blue-500 text-white py-2 px-3 rounded text-sm hover:bg-blue-600 disabled:opacity-50"
                   >
-                    📤 Simular Mensaje ENVIADO (Agente → Cliente)
+                    📤 Simular Mensaje ENVIADO
                   </button>
 
                   <button
                     onClick={handleMultipleMessages}
                     disabled={isLoading}
-                    className="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 disabled:opacity-50 text-sm"
+                    className="w-full bg-purple-500 text-white py-2 px-3 rounded text-sm hover:bg-purple-600 disabled:opacity-50"
                   >
                     📱 Crear Múltiples Chats
                   </button>
@@ -823,9 +854,9 @@ const WhatsAppTest: React.FC = () => {
           </div>
 
           {/* Panel de Resultados */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Resultados de Pruebas</h2>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold">Resultados de Pruebas</h2>
               <button
                 onClick={clearResults}
                 className="text-sm text-gray-500 hover:text-gray-700"
@@ -834,40 +865,40 @@ const WhatsAppTest: React.FC = () => {
               </button>
             </div>
 
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-2 max-h-96 overflow-y-auto">
               {results.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-gray-500 text-center py-8 text-sm">
                   No hay resultados aún. Ejecuta una prueba para ver los resultados.
                 </p>
               ) : (
                 results.map((result) => (
                   <div
                     key={result.id}
-                    className={`border rounded-lg p-3 ${
+                    className={`border rounded p-2 text-sm ${
                       result.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
                     }`}
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-1">
                       <span className="font-medium">{result.action}</span>
-                      <span className={`text-xs px-2 py-1 rounded ${
+                      <span className={`text-xs px-1 py-0.5 rounded ${
                         result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {result.success ? 'Éxito' : 'Error'}
                       </span>
                     </div>
                     
-                    <p className="text-xs text-gray-500 mb-2">
+                    <p className="text-xs text-gray-500 mb-1">
                       {result.timestamp.toLocaleString()}
                     </p>
 
                     {result.error && (
-                      <p className="text-sm text-red-600 mb-2">
+                      <p className="text-xs text-red-600 mb-1">
                         Error: {result.error}
                       </p>
                     )}
 
                     {result.data && (
-                      <pre className="text-xs bg-gray-100 rounded p-2 overflow-x-auto">
+                      <pre className="text-xs bg-gray-100 rounded p-1 overflow-x-auto">
                         {JSON.stringify(result.data, null, 2)}
                       </pre>
                     )}
