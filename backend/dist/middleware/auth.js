@@ -1,211 +1,166 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserInfo = exports.loginHandler = exports.authMiddleware = exports.generateAuthToken = void 0;
+exports.optionalAuth = exports.requireAgentOrAdmin = exports.requireAdmin = exports.requirePermission = exports.authMiddleware = void 0;
+const supabase_1 = require("../config/supabase");
+const logger_1 = require("../utils/logger");
+const auth_service_1 = require("../services/auth.service");
 /**
- * Middleware de autenticación restringida para WhatsApp Business Platform
- * Solo permite acceso a usuarios pre-autorizados definidos en variables de entorno
+ * Middleware de autenticación con Supabase
  */
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const ms_1 = __importDefault(require("ms"));
-/**
- * Obtener lista de usuarios autorizados desde variables de entorno
- */
-const getAuthorizedUsers = () => {
-    const authorizedUsers = process.env.AUTHORIZED_USERS;
-    if (!authorizedUsers) {
-        console.warn('[AuthMiddleware] ⚠️ AUTHORIZED_USERS no configurado. Acceso denegado por defecto.');
-        return [];
-    }
-    return authorizedUsers.split(',').map(email => email.trim().toLowerCase());
-};
-/**
- * Verificar si un email está en la lista de usuarios autorizados
- */
-const isAuthorizedUser = (email) => {
-    const authorizedUsers = getAuthorizedUsers();
-    return authorizedUsers.includes(email.toLowerCase());
-};
-/**
- * Generar JWT token para usuario autorizado
- */
-const generateAuthToken = (email, userId, role = 'agent') => {
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-        throw new Error('JWT_SECRET no configurado');
-    }
-    const payload = {
-        email,
-        userId,
-        role,
-    };
-    const expiresInString = (process.env.JWT_EXPIRES_IN || '8h');
-    const expiresInNumber = Math.floor((0, ms_1.default)(expiresInString) / 1000);
-    const options = {
-        expiresIn: expiresInNumber,
-    };
-    return jsonwebtoken_1.default.sign(payload, jwtSecret, options);
-};
-exports.generateAuthToken = generateAuthToken;
-/**
- * Middleware de autenticación JWT
- */
-const authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Obtener token del header Authorization
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            res.status(401).json({
+            return res.status(401).json({
                 success: false,
-                error: 'Token de autenticación requerido',
-                code: 'MISSING_TOKEN'
+                message: 'Token de autenticación requerido'
             });
-            return;
         }
-        const token = authHeader.split(' ')[1];
-        const jwtSecret = process.env.JWT_SECRET;
-        if (!jwtSecret) {
-            console.error('[AuthMiddleware] ❌ JWT_SECRET no configurado');
-            res.status(500).json({
+        const token = authHeader.substring(7); // Remover 'Bearer ' del token
+        // Verificar token con Supabase
+        if (!supabase_1.supabase) {
+            return res.status(500).json({
                 success: false,
-                error: 'Error de configuración del servidor',
-                code: 'SERVER_CONFIG_ERROR'
+                message: 'Servicio de autenticación no disponible'
             });
-            return;
         }
-        // Verificar y decodificar el token
-        const decoded = jsonwebtoken_1.default.verify(token, jwtSecret);
-        // Verificar que el usuario sigue siendo autorizado
-        if (!isAuthorizedUser(decoded.email)) {
-            console.warn(`[AuthMiddleware] ⚠️ Usuario ${decoded.email} ya no está autorizado`);
-            res.status(403).json({
+        const { data: { user }, error } = yield supabase_1.supabase.auth.getUser(token);
+        if (error || !user) {
+            return res.status(401).json({
                 success: false,
-                error: 'Acceso revocado',
-                code: 'ACCESS_REVOKED'
+                message: 'Token inválido o expirado'
             });
-            return;
         }
-        // Agregar información del usuario a la request
-        req.user = {
-            email: decoded.email,
-            userId: decoded.userId,
-            role: decoded.role,
-            exp: decoded.exp
-        };
-        console.log(`[AuthMiddleware] ✅ Usuario autenticado: ${decoded.email}`);
+        // Obtener perfil del usuario
+        const userProfile = yield auth_service_1.AuthService.getUserById(user.id);
+        if (!userProfile) {
+            return res.status(401).json({
+                success: false,
+                message: 'Perfil de usuario no encontrado'
+            });
+        }
+        if (!userProfile.is_active) {
+            return res.status(401).json({
+                success: false,
+                message: 'Cuenta de usuario desactivada'
+            });
+        }
+        // Agregar usuario a la request
+        req.user = userProfile;
         next();
     }
     catch (error) {
-        if (error instanceof jsonwebtoken_1.default.TokenExpiredError) {
-            res.status(401).json({
-                success: false,
-                error: 'Token expirado',
-                code: 'TOKEN_EXPIRED'
-            });
-            return;
-        }
-        if (error instanceof jsonwebtoken_1.default.JsonWebTokenError) {
-            res.status(401).json({
-                success: false,
-                error: 'Token inválido',
-                code: 'INVALID_TOKEN'
-            });
-            return;
-        }
-        console.error('[AuthMiddleware] ❌ Error en autenticación:', error);
-        res.status(500).json({
+        logger_1.logger.error('Auth middleware error:', error);
+        return res.status(500).json({
             success: false,
-            error: 'Error interno de autenticación',
-            code: 'AUTH_ERROR'
+            message: 'Error de autenticación'
         });
     }
-};
+});
 exports.authMiddleware = authMiddleware;
 /**
- * Endpoint de login para usuarios autorizados
+ * Middleware para verificar permisos específicos
  */
-const loginHandler = (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            res.status(400).json({
-                success: false,
-                error: 'Email y contraseña requeridos',
-                code: 'MISSING_CREDENTIALS'
-            });
-            return;
-        }
-        // Verificar que el email está en la lista autorizada
-        if (!isAuthorizedUser(email)) {
-            console.warn(`[LoginHandler] ⚠️ Intento de acceso no autorizado: ${email}`);
-            res.status(403).json({
-                success: false,
-                error: 'Acceso no autorizado',
-                code: 'UNAUTHORIZED_USER'
-            });
-            return;
-        }
-        // En un sistema real, aquí verificarías la contraseña
-        // Para este caso, usaremos una contraseña temporal por usuario
-        const tempPassword = process.env.TEMP_PASSWORD || 'aova2024';
-        if (password !== tempPassword) {
-            res.status(401).json({
-                success: false,
-                error: 'Credenciales inválidas',
-                code: 'INVALID_CREDENTIALS'
-            });
-            return;
-        }
-        // Generar token JWT
-        const userId = email.split('@')[0]; // Usar parte del email como userId
-        const token = (0, exports.generateAuthToken)(email, userId);
-        console.log(`[LoginHandler] ✅ Login exitoso: ${email}`);
-        res.json({
-            success: true,
-            message: 'Login exitoso',
-            data: {
-                token,
-                user: {
-                    email,
-                    userId,
-                    role: 'agent'
-                }
+const requirePermission = (resource, action) => {
+    return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            if (!req.user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Usuario no autenticado'
+                });
             }
-        });
-    }
-    catch (error) {
-        console.error('[LoginHandler] ❌ Error en login:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error interno del servidor',
-            code: 'LOGIN_ERROR'
-        });
-    }
-};
-exports.loginHandler = loginHandler;
-/**
- * Middleware para verificar información del usuario actual
- */
-const getUserInfo = (req, res) => {
-    if (!req.user) {
-        res.status(401).json({
-            success: false,
-            error: 'Usuario no autenticado',
-            code: 'NOT_AUTHENTICATED'
-        });
-        return;
-    }
-    res.json({
-        success: true,
-        data: {
-            email: req.user.email,
-            userId: req.user.userId,
-            role: req.user.role,
-            tokenExpiresAt: new Date(req.user.exp * 1000).toISOString()
+            const hasPermission = yield auth_service_1.AuthService.hasPermission(req.user.id, resource, action);
+            if (!hasPermission) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Permisos insuficientes'
+                });
+            }
+            next();
+        }
+        catch (error) {
+            logger_1.logger.error('Permission middleware error:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al verificar permisos'
+            });
         }
     });
 };
-exports.getUserInfo = getUserInfo;
-exports.default = exports.authMiddleware;
+exports.requirePermission = requirePermission;
+/**
+ * Middleware para verificar rol de administrador
+ */
+const requireAdmin = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: 'Usuario no autenticado'
+        });
+    }
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({
+            success: false,
+            message: 'Se requieren permisos de administrador'
+        });
+    }
+    next();
+};
+exports.requireAdmin = requireAdmin;
+/**
+ * Middleware para verificar rol de agente o admin
+ */
+const requireAgentOrAdmin = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: 'Usuario no autenticado'
+        });
+    }
+    if (req.user.role !== 'admin' && req.user.role !== 'agent') {
+        return res.status(403).json({
+            success: false,
+            message: 'Se requieren permisos de agente o administrador'
+        });
+    }
+    next();
+};
+exports.requireAgentOrAdmin = requireAgentOrAdmin;
+/**
+ * Middleware opcional de autenticación (no falla si no hay token)
+ */
+const optionalAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return next(); // Continuar sin usuario
+        }
+        const token = authHeader.substring(7);
+        if (!supabase_1.supabase) {
+            return next(); // Continuar sin usuario
+        }
+        const { data: { user }, error } = yield supabase_1.supabase.auth.getUser(token);
+        if (!error && user) {
+            const userProfile = yield auth_service_1.AuthService.getUserById(user.id);
+            if (userProfile && userProfile.is_active) {
+                req.user = userProfile;
+            }
+        }
+        next();
+    }
+    catch (error) {
+        logger_1.logger.error('Optional auth middleware error:', error);
+        next(); // Continuar sin usuario en caso de error
+    }
+});
+exports.optionalAuth = optionalAuth;

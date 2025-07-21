@@ -16,13 +16,7 @@ export interface SendTemplateRequest {
   language?: string;
 }
 
-export interface ApiResponse<T = any> {
-  success: boolean;
-  message?: string;
-  error?: string;
-  details?: any;
-  data?: T;
-}
+import type { ApiResponse } from '../types';
 
 export interface WhatsAppStatus {
   configured: boolean;
@@ -95,7 +89,7 @@ class WhatsAppApiService {
   /**
    * Enviar mensaje de texto
    */
-  async sendMessage(data: SendMessageRequest): Promise<ApiResponse> {
+  async sendMessage(data: SendMessageRequest): Promise<ApiResponse<any>> {
     console.log('📤 Enviando mensaje:', data);
     
     return this.request('/send', {
@@ -107,7 +101,7 @@ class WhatsAppApiService {
   /**
    * Enviar template
    */
-  async sendTemplate(data: SendTemplateRequest): Promise<ApiResponse> {
+  async sendTemplate(data: SendTemplateRequest): Promise<ApiResponse<any>> {
     console.log('📤 Enviando template:', data);
     
     return this.request('/template', {
@@ -126,14 +120,14 @@ class WhatsAppApiService {
   /**
    * Obtener información del número
    */
-  async getPhoneInfo(): Promise<ApiResponse> {
+  async getPhoneInfo(): Promise<ApiResponse<any>> {
     return this.request('/info');
   }
 
   /**
    * Ejecutar prueba
    */
-  async runTest(data?: Partial<SendMessageRequest>): Promise<ApiResponse> {
+  async runTest(data?: Partial<SendMessageRequest>): Promise<ApiResponse<any>> {
     return this.request('/test', {
       method: 'POST',
       body: JSON.stringify(data || {})
@@ -143,7 +137,7 @@ class WhatsAppApiService {
   /**
    * Configurar webhook
    */
-  async setWebhook(callbackUrl: string): Promise<ApiResponse> {
+  async setWebhook(callbackUrl: string): Promise<ApiResponse<any>> {
     return this.request('/webhook/config', {
       method: 'POST',
       body: JSON.stringify({ callbackUrl })
@@ -251,7 +245,7 @@ class WhatsAppApiService {
   /**
    * Marcar mensaje como leído
    */
-  async markMessageAsRead(messageId: string): Promise<ApiResponse> {
+  async markMessageAsRead(messageId: string): Promise<ApiResponse<any>> {
     return this.request(`/messages/${messageId}/read`, {
       method: 'PUT'
     });
@@ -260,7 +254,7 @@ class WhatsAppApiService {
   /**
    * Limpiar mensajes antiguos
    */
-  async cleanupOldMessages(hours: number = 24): Promise<ApiResponse> {
+  async cleanupOldMessages(hours: number = 24): Promise<ApiResponse<any>> {
     return this.request(`/messages/cleanup?hours=${hours}`, {
       method: 'DELETE'
     });

@@ -1,271 +1,226 @@
-import { Router, Request, Response } from 'express';
-import { databaseService } from '../services/database.service';
-import { chatbotService } from '../services/chatbot.service';
-import { productService } from '../services/product.service';
+/**
+ * Rutas del dashboard de administrador
+ * Proporciona estadísticas y métricas del sistema
+ */
+import { Router } from 'express';
+import { authMiddleware, requireAdmin } from '../middleware/auth';
+import { AuthService } from '../services/auth.service';
+import { logger } from '../utils/logger';
+import { supabaseAdmin } from '../config/supabase';
 
 const router = Router();
 
 /**
- * GET /api/dashboard/stats
- * Obtener estadísticas generales del sistema
+ * @route GET /api/dashboard/stats
+ * @desc Obtener estadísticas generales del sistema
+ * @access Private (Admin)
  */
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', authMiddleware, requireAdmin, async (req, res) => {
   try {
-    console.log('[Dashboard] Obteniendo estadísticas generales...');
+    if (!supabaseAdmin) {
+      throw new Error('Servicio de base de datos no disponible');
+    }
 
-    // Obtener estadísticas del chatbot
-    const chatbotStats = await databaseService.getChatbotStats();
+    // Obtener estadísticas de usuarios
+    const users = await AuthService.getAllUsers();
     
-    // Obtener estadísticas del chatbot en memoria
-    const memoryStats = chatbotService.getStats();
+    // Obtener estadísticas de conversaciones desde Supabase
+    const { data: conversations, error: convError } = await supabaseAdmin
+      .from('conversations')
+      .select('*');
+    
+    if (convError) {
+      logger.error('Error fetching conversations:', convError);
+    }
 
-    // Combinar estadísticas
+    // Obtener estadísticas de mensajes
+    const { data: messages, error: msgError } = await supabaseAdmin
+      .from('messages')
+      .select('*');
+    
+    if (msgError) {
+      logger.error('Error fetching messages:', msgError);
+    }
+
+    // Obtener estadísticas de pedidos
+    const { data: orders, error: orderError } = await supabaseAdmin
+      .from('orders')
+      .select('*');
+    
+    if (orderError) {
+      logger.error('Error fetching orders:', orderError);
+    }
+
+    // Calcular estadísticas
     const stats = {
+      users: {
+        total: users.length,
+        active: users.filter(u => u.is_active).length,
+        inactive: users.filter(u => !u.is_active).length,
+        admins: users.filter(u => u.role === 'admin').length,
+        agents: users.filter(u => u.role === 'agent').length,
+      },
       conversations: {
-        total: chatbotStats.totalConversations,
-        active: chatbotStats.activeConversations,
-        inMemory: memoryStats.activeConversations
+        total: conversations?.length || 0,
+        active: conversations?.filter(c => c.status === 'active').length || 0,
+        closed: conversations?.filter(c => c.status === 'closed').length || 0,
+        unread: 0, // Esto se calcularía basado en mensajes no leídos
       },
       messages: {
-        total: chatbotStats.totalMessages,
-        averagePerConversation: chatbotStats.totalConversations > 0 
-          ? Math.round(chatbotStats.totalMessages / chatbotStats.totalConversations) 
-          : 0
+        total: messages?.length || 0,
+        today: messages?.filter(m => {
+          const today = new Date();
+          const messageDate = new Date(m.created_at);
+          return messageDate.toDateString() === today.toDateString();
+        }).length || 0,
+        thisWeek: messages?.filter(m => {
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          const messageDate = new Date(m.created_at);
+          return messageDate >= weekAgo;
+        }).length || 0,
       },
       orders: {
-        total: chatbotStats.totalOrders,
-        pending: chatbotStats.totalOrders // Placeholder - en el futuro se puede filtrar por status
+        total: orders?.length || 0,
+        pending: orders?.filter(o => o.status === 'pending').length || 0,
+        completed: orders?.filter(o => o.status === 'completed').length || 0,
+        cancelled: orders?.filter(o => o.status === 'cancelled').length || 0,
       },
       system: {
-        supabaseEnabled: process.env.USE_SUPABASE === 'true',
         uptime: process.uptime(),
-        timestamp: new Date().toISOString()
+        memory: process.memoryUsage(),
+        database: 'Connected',
+        lastBackup: new Date().toISOString(),
       }
     };
 
-    console.log('[Dashboard] Estadísticas obtenidas exitosamente');
     res.json({
       success: true,
       data: stats
     });
   } catch (error) {
-    console.error('[Dashboard] Error obteniendo estadísticas:', error);
+    logger.error('Error fetching dashboard stats:', error);
     res.status(500).json({
       success: false,
-      error: 'Error interno del servidor',
-      message: (error as Error).message
+      message: 'Error al obtener estadísticas del sistema'
     });
   }
 });
 
 /**
- * GET /api/dashboard/conversations
- * Obtener lista de conversaciones recientes
+ * @route GET /api/dashboard/users
+ * @desc Obtener lista detallada de usuarios
+ * @access Private (Admin)
  */
-router.get('/conversations', async (req: Request, res: Response) => {
+router.get('/users', authMiddleware, requireAdmin, async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 10;
-    const offset = parseInt(req.query.offset as string) || 0;
-
-    console.log(`[Dashboard] Obteniendo conversaciones (limit: ${limit}, offset: ${offset})`);
-
-    // Obtener conversaciones desde la base de datos
-    const conversations = await databaseService.getConversations(limit, offset);
-
-    // Obtener conversaciones en memoria del chatbot (simuladas)
-    const memoryConversations: any[] = [];
-
-    res.json({
-      success: true,
-      data: {
-        database: conversations,
-        memory: memoryConversations.slice(offset, offset + limit),
-        pagination: {
-          limit,
-          offset,
-          total: conversations.length
-        }
-      }
-    });
-  } catch (error) {
-    console.error('[Dashboard] Error obteniendo conversaciones:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error interno del servidor',
-      message: (error as Error).message
-    });
-  }
-});
-
-/**
- * GET /api/dashboard/products/popular
- * Obtener productos más populares o buscados
- */
-router.get('/products/popular', async (req: Request, res: Response) => {
-  try {
-    const limit = parseInt(req.query.limit as string) || 5;
-
-    console.log(`[Dashboard] Obteniendo productos populares (limit: ${limit})`);
-
-    const popularProducts = await productService.getPopularProducts(limit);
-
-    res.json({
-      success: true,
-      data: {
-        products: popularProducts,
-        count: popularProducts.length
-      }
-    });
-  } catch (error) {
-    console.error('[Dashboard] Error obteniendo productos populares:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error interno del servidor',
-      message: (error as Error).message
-    });
-  }
-});
-
-/**
- * GET /api/dashboard/analytics/summary
- * Obtener resumen de analíticas para el período especificado
- */
-router.get('/analytics/summary', async (req: Request, res: Response) => {
-  try {
-    const period = req.query.period as string || 'today'; // today, week, month
+    const users = await AuthService.getAllUsers();
     
-    console.log(`[Dashboard] Obteniendo resumen analítico para: ${period}`);
-
-    // Para esta implementación inicial, retornamos datos simulados
-    // En el futuro, esto se calculará basado en datos reales y el período
-    const analytics = {
-      period,
-      metrics: {
-        totalInteractions: 47,
-        successfulQuotes: 12,
-        conversionRate: 25.5, // porcentaje
-        averageResponseTime: 2.3, // segundos
-        customerSatisfaction: 4.2 // de 5
-      },
-      trends: {
-        interactions: {
-          current: 47,
-          previous: 35,
-          change: +34.3 // porcentaje de cambio
-        },
-        quotes: {
-          current: 12,
-          previous: 8,
-          change: +50.0
-        }
-      },
-      topProducts: await productService.getPopularProducts(3),
-      busyHours: [
-        { hour: '09:00', interactions: 8 },
-        { hour: '14:00', interactions: 12 },
-        { hour: '16:00', interactions: 15 },
-        { hour: '18:00', interactions: 9 }
-      ]
-    };
-
     res.json({
       success: true,
-      data: analytics
+      data: users
     });
   } catch (error) {
-    console.error('[Dashboard] Error obteniendo resumen analítico:', error);
+    logger.error('Error fetching users:', error);
     res.status(500).json({
       success: false,
-      error: 'Error interno del servidor',
-      message: (error as Error).message
+      message: 'Error al obtener usuarios'
     });
   }
 });
 
 /**
- * GET /api/dashboard/system/health
- * Obtener estado de salud del sistema
+ * @route GET /api/dashboard/conversations
+ * @desc Obtener estadísticas de conversaciones
+ * @access Private (Admin)
  */
-router.get('/system/health', async (req: Request, res: Response) => {
+router.get('/conversations', authMiddleware, requireAdmin, async (req, res) => {
   try {
-    console.log('[Dashboard] Verificando salud del sistema...');
-
-    const health = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      services: {
-        database: {
-          status: 'connected',
-          type: process.env.USE_SUPABASE === 'true' ? 'supabase' : 'sqlite'
-        },
-        chatbot: {
-          status: 'active',
-          activeConversations: chatbotService.getStats().activeConversations,
-          memoryUsage: process.memoryUsage()
-        },
-        productService: {
-          status: 'active'
-        }
-      },
-      metrics: {
-        uptime: process.uptime(),
-        memoryUsage: process.memoryUsage(),
-        cpuUsage: process.cpuUsage()
-      }
-    };
-
-    res.json({
-      success: true,
-      data: health
-    });
-  } catch (error) {
-    console.error('[Dashboard] Error verificando salud del sistema:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error interno del servidor',
-      message: (error as Error).message
-    });
-  }
-});
-
-/**
- * POST /api/dashboard/test/chatbot
- * Endpoint para probar el chatbot desde el dashboard
- */
-router.post('/test/chatbot', async (req: Request, res: Response) => {
-  try {
-    const { phoneNumber, message } = req.body;
-
-    if (!phoneNumber || !message) {
-      return res.status(400).json({
-        success: false,
-        error: 'phoneNumber y message son requeridos'
-      });
+    if (!supabaseAdmin) {
+      throw new Error('Servicio de base de datos no disponible');
     }
 
-    console.log(`[Dashboard] Test del chatbot: ${phoneNumber} -> "${message}"`);
+    const { data: conversations, error } = await supabaseAdmin
+      .from('conversations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    const result = await chatbotService.processWhatsAppMessage(phoneNumber, message);
+    if (error) {
+      throw error;
+    }
 
     res.json({
       success: true,
-      data: {
-        response: result.response,
-        shouldSend: result.shouldSend,
-        conversationState: result.conversationState ? {
-          status: result.conversationState.status,
-          clientInfo: result.conversationState.clientInfo,
-          messageCount: result.conversationState.messages.length
-        } : null,
-        error: result.error
-      }
+      data: conversations || []
     });
   } catch (error) {
-    console.error('[Dashboard] Error en test del chatbot:', error);
+    logger.error('Error fetching conversations:', error);
     res.status(500).json({
       success: false,
-      error: 'Error interno del servidor',
-      message: (error as Error).message
+      message: 'Error al obtener conversaciones'
+    });
+  }
+});
+
+/**
+ * @route GET /api/dashboard/orders
+ * @desc Obtener estadísticas de pedidos
+ * @access Private (Admin)
+ */
+router.get('/orders', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      throw new Error('Servicio de base de datos no disponible');
+    }
+
+    const { data: orders, error } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    res.json({
+      success: true,
+      data: orders || []
+    });
+  } catch (error) {
+    logger.error('Error fetching orders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener pedidos'
+    });
+  }
+});
+
+/**
+ * @route GET /api/dashboard/system
+ * @desc Obtener información del sistema
+ * @access Private (Admin)
+ */
+router.get('/system', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const systemInfo = {
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      version: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      nodeEnv: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString(),
+    };
+
+    res.json({
+      success: true,
+      data: systemInfo
+    });
+  } catch (error) {
+    logger.error('Error fetching system info:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener información del sistema'
     });
   }
 });

@@ -43,7 +43,7 @@ export class AutopartsConversationService {
   }> {
     console.log(`[ConversationService] Iniciando conversación ${conversationId} para usuario ${userId}`);
 
-    const welcomeMessage = "¡Hola! 👋 Soy tu asistente especializado en repuestos automotrices de Embler. Te ayudo a encontrar exactamente lo que necesitas para tu vehículo. ¿En qué puedo ayudarte hoy?";
+    const welcomeMessage = "¡Hola! 👋 Soy tu asistente especializado en repuestos automotrices. Te ayudo a encontrar exactamente lo que necesitas para tu vehículo. ¿En qué puedo ayudarte hoy?";
 
     const conversationState: ConversationState = {
       conversationId,

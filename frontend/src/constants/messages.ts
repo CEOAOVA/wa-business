@@ -2,7 +2,7 @@
 export const MESSAGES = {
   // Mensajes de bienvenida y estado vacío
   WELCOME: {
-    TITLE: "Bienvenido a Embler Chat",
+    TITLE: "Bienvenido",
     SUBTITLE: "Selecciona una conversación para comenzar a chatear",
     NO_MESSAGES: "No hay mensajes en esta conversación",
     SEND_FIRST: "Envía el primer mensaje para comenzar"
@@ -80,7 +80,6 @@ export const MESSAGES = {
 
   // UI General
   UI: {
-    BRAND_NAME: "EMBLER",
     CHAT_LABEL: "Chat",
     WHATSAPP_TEST: "WhatsApp Test",
     LOGOUT_CONFIRM: "¿Estás seguro de que quieres cerrar sesión?",

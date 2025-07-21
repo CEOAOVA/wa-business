@@ -9,253 +9,211 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Rutas del dashboard de administrador
+ * Proporciona estadísticas y métricas del sistema
+ */
 const express_1 = require("express");
-const database_service_1 = require("../services/database.service");
-const chatbot_service_1 = require("../services/chatbot.service");
-const product_service_1 = require("../services/product.service");
+const auth_1 = require("../middleware/auth");
+const auth_service_1 = require("../services/auth.service");
+const logger_1 = require("../utils/logger");
+const supabase_1 = require("../config/supabase");
 const router = (0, express_1.Router)();
 /**
- * GET /api/dashboard/stats
- * Obtener estadísticas generales del sistema
+ * @route GET /api/dashboard/stats
+ * @desc Obtener estadísticas generales del sistema
+ * @access Private (Admin)
  */
-router.get('/stats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/stats', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('[Dashboard] Obteniendo estadísticas generales...');
-        // Obtener estadísticas del chatbot
-        const chatbotStats = yield database_service_1.databaseService.getChatbotStats();
-        // Obtener estadísticas del chatbot en memoria
-        const memoryStats = chatbot_service_1.chatbotService.getStats();
-        // Combinar estadísticas
+        if (!supabase_1.supabaseAdmin) {
+            throw new Error('Servicio de base de datos no disponible');
+        }
+        // Obtener estadísticas de usuarios
+        const users = yield auth_service_1.AuthService.getAllUsers();
+        // Obtener estadísticas de conversaciones desde Supabase
+        const { data: conversations, error: convError } = yield supabase_1.supabaseAdmin
+            .from('conversations')
+            .select('*');
+        if (convError) {
+            logger_1.logger.error('Error fetching conversations:', convError);
+        }
+        // Obtener estadísticas de mensajes
+        const { data: messages, error: msgError } = yield supabase_1.supabaseAdmin
+            .from('messages')
+            .select('*');
+        if (msgError) {
+            logger_1.logger.error('Error fetching messages:', msgError);
+        }
+        // Obtener estadísticas de pedidos
+        const { data: orders, error: orderError } = yield supabase_1.supabaseAdmin
+            .from('orders')
+            .select('*');
+        if (orderError) {
+            logger_1.logger.error('Error fetching orders:', orderError);
+        }
+        // Calcular estadísticas
         const stats = {
+            users: {
+                total: users.length,
+                active: users.filter(u => u.is_active).length,
+                inactive: users.filter(u => !u.is_active).length,
+                admins: users.filter(u => u.role === 'admin').length,
+                agents: users.filter(u => u.role === 'agent').length,
+            },
             conversations: {
-                total: chatbotStats.totalConversations,
-                active: chatbotStats.activeConversations,
-                inMemory: memoryStats.activeConversations
+                total: (conversations === null || conversations === void 0 ? void 0 : conversations.length) || 0,
+                active: (conversations === null || conversations === void 0 ? void 0 : conversations.filter(c => c.status === 'active').length) || 0,
+                closed: (conversations === null || conversations === void 0 ? void 0 : conversations.filter(c => c.status === 'closed').length) || 0,
+                unread: 0, // Esto se calcularía basado en mensajes no leídos
             },
             messages: {
-                total: chatbotStats.totalMessages,
-                averagePerConversation: chatbotStats.totalConversations > 0
-                    ? Math.round(chatbotStats.totalMessages / chatbotStats.totalConversations)
-                    : 0
+                total: (messages === null || messages === void 0 ? void 0 : messages.length) || 0,
+                today: (messages === null || messages === void 0 ? void 0 : messages.filter(m => {
+                    const today = new Date();
+                    const messageDate = new Date(m.created_at);
+                    return messageDate.toDateString() === today.toDateString();
+                }).length) || 0,
+                thisWeek: (messages === null || messages === void 0 ? void 0 : messages.filter(m => {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const messageDate = new Date(m.created_at);
+                    return messageDate >= weekAgo;
+                }).length) || 0,
             },
             orders: {
-                total: chatbotStats.totalOrders,
-                pending: chatbotStats.totalOrders // Placeholder - en el futuro se puede filtrar por status
+                total: (orders === null || orders === void 0 ? void 0 : orders.length) || 0,
+                pending: (orders === null || orders === void 0 ? void 0 : orders.filter(o => o.status === 'pending').length) || 0,
+                completed: (orders === null || orders === void 0 ? void 0 : orders.filter(o => o.status === 'completed').length) || 0,
+                cancelled: (orders === null || orders === void 0 ? void 0 : orders.filter(o => o.status === 'cancelled').length) || 0,
             },
             system: {
-                supabaseEnabled: process.env.USE_SUPABASE === 'true',
                 uptime: process.uptime(),
-                timestamp: new Date().toISOString()
+                memory: process.memoryUsage(),
+                database: 'Connected',
+                lastBackup: new Date().toISOString(),
             }
         };
-        console.log('[Dashboard] Estadísticas obtenidas exitosamente');
         res.json({
             success: true,
             data: stats
         });
     }
     catch (error) {
-        console.error('[Dashboard] Error obteniendo estadísticas:', error);
+        logger_1.logger.error('Error fetching dashboard stats:', error);
         res.status(500).json({
             success: false,
-            error: 'Error interno del servidor',
-            message: error.message
+            message: 'Error al obtener estadísticas del sistema'
         });
     }
 }));
 /**
- * GET /api/dashboard/conversations
- * Obtener lista de conversaciones recientes
+ * @route GET /api/dashboard/users
+ * @desc Obtener lista detallada de usuarios
+ * @access Private (Admin)
  */
-router.get('/conversations', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/users', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const limit = parseInt(req.query.limit) || 10;
-        const offset = parseInt(req.query.offset) || 0;
-        console.log(`[Dashboard] Obteniendo conversaciones (limit: ${limit}, offset: ${offset})`);
-        // Obtener conversaciones desde la base de datos
-        const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
-        // Obtener conversaciones en memoria del chatbot (simuladas)
-        const memoryConversations = [];
+        const users = yield auth_service_1.AuthService.getAllUsers();
         res.json({
             success: true,
-            data: {
-                database: conversations,
-                memory: memoryConversations.slice(offset, offset + limit),
-                pagination: {
-                    limit,
-                    offset,
-                    total: conversations.length
-                }
-            }
+            data: users
         });
     }
     catch (error) {
-        console.error('[Dashboard] Error obteniendo conversaciones:', error);
+        logger_1.logger.error('Error fetching users:', error);
         res.status(500).json({
             success: false,
-            error: 'Error interno del servidor',
-            message: error.message
+            message: 'Error al obtener usuarios'
         });
     }
 }));
 /**
- * GET /api/dashboard/products/popular
- * Obtener productos más populares o buscados
+ * @route GET /api/dashboard/conversations
+ * @desc Obtener estadísticas de conversaciones
+ * @access Private (Admin)
  */
-router.get('/products/popular', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/conversations', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const limit = parseInt(req.query.limit) || 5;
-        console.log(`[Dashboard] Obteniendo productos populares (limit: ${limit})`);
-        const popularProducts = yield product_service_1.productService.getPopularProducts(limit);
-        res.json({
-            success: true,
-            data: {
-                products: popularProducts,
-                count: popularProducts.length
-            }
-        });
-    }
-    catch (error) {
-        console.error('[Dashboard] Error obteniendo productos populares:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error interno del servidor',
-            message: error.message
-        });
-    }
-}));
-/**
- * GET /api/dashboard/analytics/summary
- * Obtener resumen de analíticas para el período especificado
- */
-router.get('/analytics/summary', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const period = req.query.period || 'today'; // today, week, month
-        console.log(`[Dashboard] Obteniendo resumen analítico para: ${period}`);
-        // Para esta implementación inicial, retornamos datos simulados
-        // En el futuro, esto se calculará basado en datos reales y el período
-        const analytics = {
-            period,
-            metrics: {
-                totalInteractions: 47,
-                successfulQuotes: 12,
-                conversionRate: 25.5, // porcentaje
-                averageResponseTime: 2.3, // segundos
-                customerSatisfaction: 4.2 // de 5
-            },
-            trends: {
-                interactions: {
-                    current: 47,
-                    previous: 35,
-                    change: +34.3 // porcentaje de cambio
-                },
-                quotes: {
-                    current: 12,
-                    previous: 8,
-                    change: +50.0
-                }
-            },
-            topProducts: yield product_service_1.productService.getPopularProducts(3),
-            busyHours: [
-                { hour: '09:00', interactions: 8 },
-                { hour: '14:00', interactions: 12 },
-                { hour: '16:00', interactions: 15 },
-                { hour: '18:00', interactions: 9 }
-            ]
-        };
-        res.json({
-            success: true,
-            data: analytics
-        });
-    }
-    catch (error) {
-        console.error('[Dashboard] Error obteniendo resumen analítico:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error interno del servidor',
-            message: error.message
-        });
-    }
-}));
-/**
- * GET /api/dashboard/system/health
- * Obtener estado de salud del sistema
- */
-router.get('/system/health', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log('[Dashboard] Verificando salud del sistema...');
-        const health = {
-            status: 'healthy',
-            timestamp: new Date().toISOString(),
-            services: {
-                database: {
-                    status: 'connected',
-                    type: process.env.USE_SUPABASE === 'true' ? 'supabase' : 'sqlite'
-                },
-                chatbot: {
-                    status: 'active',
-                    activeConversations: chatbot_service_1.chatbotService.getStats().activeConversations,
-                    memoryUsage: process.memoryUsage()
-                },
-                productService: {
-                    status: 'active'
-                }
-            },
-            metrics: {
-                uptime: process.uptime(),
-                memoryUsage: process.memoryUsage(),
-                cpuUsage: process.cpuUsage()
-            }
-        };
-        res.json({
-            success: true,
-            data: health
-        });
-    }
-    catch (error) {
-        console.error('[Dashboard] Error verificando salud del sistema:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error interno del servidor',
-            message: error.message
-        });
-    }
-}));
-/**
- * POST /api/dashboard/test/chatbot
- * Endpoint para probar el chatbot desde el dashboard
- */
-router.post('/test/chatbot', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { phoneNumber, message } = req.body;
-        if (!phoneNumber || !message) {
-            return res.status(400).json({
-                success: false,
-                error: 'phoneNumber y message son requeridos'
-            });
+        if (!supabase_1.supabaseAdmin) {
+            throw new Error('Servicio de base de datos no disponible');
         }
-        console.log(`[Dashboard] Test del chatbot: ${phoneNumber} -> "${message}"`);
-        const result = yield chatbot_service_1.chatbotService.processWhatsAppMessage(phoneNumber, message);
+        const { data: conversations, error } = yield supabase_1.supabaseAdmin
+            .from('conversations')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) {
+            throw error;
+        }
         res.json({
             success: true,
-            data: {
-                response: result.response,
-                shouldSend: result.shouldSend,
-                conversationState: result.conversationState ? {
-                    status: result.conversationState.status,
-                    clientInfo: result.conversationState.clientInfo,
-                    messageCount: result.conversationState.messages.length
-                } : null,
-                error: result.error
-            }
+            data: conversations || []
         });
     }
     catch (error) {
-        console.error('[Dashboard] Error en test del chatbot:', error);
+        logger_1.logger.error('Error fetching conversations:', error);
         res.status(500).json({
             success: false,
-            error: 'Error interno del servidor',
-            message: error.message
+            message: 'Error al obtener conversaciones'
+        });
+    }
+}));
+/**
+ * @route GET /api/dashboard/orders
+ * @desc Obtener estadísticas de pedidos
+ * @access Private (Admin)
+ */
+router.get('/orders', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!supabase_1.supabaseAdmin) {
+            throw new Error('Servicio de base de datos no disponible');
+        }
+        const { data: orders, error } = yield supabase_1.supabaseAdmin
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) {
+            throw error;
+        }
+        res.json({
+            success: true,
+            data: orders || []
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Error fetching orders:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener pedidos'
+        });
+    }
+}));
+/**
+ * @route GET /api/dashboard/system
+ * @desc Obtener información del sistema
+ * @access Private (Admin)
+ */
+router.get('/system', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const systemInfo = {
+            uptime: process.uptime(),
+            memory: process.memoryUsage(),
+            version: process.version,
+            platform: process.platform,
+            arch: process.arch,
+            nodeEnv: process.env.NODE_ENV || 'development',
+            timestamp: new Date().toISOString(),
+        };
+        res.json({
+            success: true,
+            data: systemInfo
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Error fetching system info:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener información del sistema'
         });
     }
 }));

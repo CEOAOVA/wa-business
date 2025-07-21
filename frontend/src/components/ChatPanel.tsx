@@ -59,7 +59,11 @@ const MessageBubble: React.FC<{
 const ChatPanel: React.FC = () => {
   const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
   const { state: authState, logout } = useAuth();
-  const { sendMessage: sendWhatsAppMessage, checkConnection: checkWhatsAppConnection } = useWhatsApp();
+  const { 
+    sendMessage: sendWhatsAppMessage, 
+    checkConnection: checkWhatsAppConnection,
+    connectionStatus
+  } = useWhatsApp();
   const { isUploading } = useMediaUpload({
     apiBaseUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002',
   });
@@ -73,7 +77,6 @@ const ChatPanel: React.FC = () => {
   const [whatsappMode, setWhatsappMode] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [showMediaUpload, setShowMediaUpload] = useState(false);
-  const [connectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
 
   // NUEVOS: Estados para takeover y resúmenes
   const [aiMode, setAiMode] = useState<AIMode>({ aiMode: 'active' });

@@ -3,6 +3,8 @@
  * Mejora la búsqueda de productos con terminología local
  */
 import { normalizeForSearch } from '../utils/text-processing';
+import path from 'path';
+import fs from 'fs';
 
 interface ConceptMapping {
   pieza: string;           // Término técnico
@@ -10,20 +12,139 @@ interface ConceptMapping {
   categoria?: string;      // Categoría del producto
 }
 
+// Interfaz para el JSON externo
+interface ExternalConceptMapping {
+  pieza: string;
+  variantes: string[];
+}
+
 export class ConceptsService {
   private conceptMappings: ConceptMapping[] = [];
   private variantMap = new Map<string, string>();
   private isLoaded = false;
+  private productImageMap = new Map<string, string>();
 
   constructor() {
     this.loadConceptMappings();
   }
 
   /**
-   * Carga los mapeos de conceptos mexicanos
+   * Carga los mapeos de conceptos mexicanos desde múltiples fuentes
    */
   private loadConceptMappings(): void {
-    this.conceptMappings = [
+    // 1. Cargar conceptos hardcodeados (sistema existente)
+    const hardcodedMappings = this.getHardcodedMappings();
+    
+    // 2. Cargar conceptos desde archivo JSON externo
+    const externalMappings = this.loadExternalConceptsJSON();
+    
+    // 3. Combinar ambos sistemas
+    this.conceptMappings = [...hardcodedMappings, ...externalMappings];
+
+    // 4. Crear mapa inverso para búsqueda rápida
+    this.variantMap.clear();
+    this.conceptMappings.forEach(mapping => {
+      mapping.variantes.forEach(variante => {
+        const normalized = this.normalizeTerm(variante);
+        this.variantMap.set(normalized, mapping.pieza);
+      });
+    });
+
+    // 5. Cargar mapeo de imágenes (si existe)
+    this.loadProductImages();
+
+    this.isLoaded = true;
+    console.log(`[ConceptsService] ✅ Cargados ${this.conceptMappings.length} mapeos de conceptos`);
+    console.log(`[ConceptsService] ✅ Total de variantes: ${this.variantMap.size}`);
+    console.log(`[ConceptsService] ✅ Imágenes de productos: ${this.productImageMap.size}`);
+  }
+
+  /**
+   * Carga conceptos desde el archivo JSON externo
+   */
+  private loadExternalConceptsJSON(): ConceptMapping[] {
+    try {
+      // Ruta al archivo JSON en /public
+      const jsonPath = path.join(process.cwd(), 'public', 'embler', 'inventario', 'conceptos.json');
+      
+      if (!fs.existsSync(jsonPath)) {
+        console.warn('[ConceptsService] ⚠️ Archivo conceptos.json no encontrado, usando solo mapeos hardcodeados');
+        return [];
+      }
+
+      const jsonData = fs.readFileSync(jsonPath, 'utf8');
+      const externalConcepts: ExternalConceptMapping[] = JSON.parse(jsonData);
+      
+      // Convertir al formato interno
+      const mappings: ConceptMapping[] = externalConcepts.map(concept => ({
+        pieza: concept.pieza,
+        variantes: concept.variantes,
+        categoria: 'externo'
+      }));
+
+      console.log(`[ConceptsService] ✅ Cargados ${mappings.length} conceptos desde JSON externo`);
+      return mappings;
+
+    } catch (error) {
+      console.error('[ConceptsService] ❌ Error cargando conceptos externos:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Busca imagen de producto en el directorio público
+   */
+  private loadProductImages(): void {
+    try {
+      const imagesPath = path.join(process.cwd(), 'public', 'embler', 'inventario', 'images');
+      
+      if (!fs.existsSync(imagesPath)) {
+        console.log('[ConceptsService] ℹ️ Directorio de imágenes no encontrado');
+        return;
+      }
+
+      const imageFiles = fs.readdirSync(imagesPath);
+      
+      // Mapear archivos de imagen a productos
+      imageFiles.forEach(file => {
+        if (file.match(/\.(jpg|jpeg|png|webp)$/i)) {
+          const productName = path.parse(file).name.toLowerCase();
+          const imagePath = `/embler/inventario/images/${file}`;
+          this.productImageMap.set(productName, imagePath);
+        }
+      });
+
+    } catch (error) {
+      console.error('[ConceptsService] ❌ Error cargando imágenes:', error);
+    }
+  }
+
+  /**
+   * Obtiene la imagen asociada a un producto
+   */
+  getProductImage(productName: string): string | undefined {
+    const normalized = this.normalizeTerm(productName);
+    
+    // Buscar imagen exacta
+    if (this.productImageMap.has(normalized)) {
+      return this.productImageMap.get(normalized);
+    }
+
+    // Buscar imagen por coincidencia parcial
+    for (const [imageName, imagePath] of this.productImageMap.entries()) {
+      if (normalized.includes(imageName) || imageName.includes(normalized)) {
+        return imagePath;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Retorna los mapeos hardcodeados originales
+   */
+  private getHardcodedMappings(): ConceptMapping[] {
+    return [
       // Frenos
       {
         pieza: 'balatas',
@@ -221,26 +342,6 @@ export class ConceptsService {
         categoria: 'general'
       }
     ];
-
-    // Crear mapa inverso para búsqueda rápida
-    this.variantMap.clear();
-    this.conceptMappings.forEach(mapping => {
-      mapping.variantes.forEach(variante => {
-        const normalized = this.normalizeTerm(variante);
-        this.variantMap.set(normalized, mapping.pieza);
-      });
-    });
-
-    this.isLoaded = true;
-    console.log(`[ConceptsService] Cargados ${this.conceptMappings.length} mapeos de conceptos`);
-    console.log(`[ConceptsService] Total de variantes: ${this.variantMap.size}`);
-  }
-
-  /**
-   * Normaliza un término para búsqueda
-   */
-  private normalizeTerm(term: string): string {
-    return normalizeForSearch(term);
   }
 
   /**
@@ -406,41 +507,10 @@ export class ConceptsService {
   }
 
   /**
-   * Obtiene todas las categorías disponibles
+   * Normaliza un término para comparación
    */
-  getCategories(): string[] {
-    if (!this.isLoaded) {
-      return [];
-    }
-
-    const categories = new Set<string>();
-    this.conceptMappings.forEach(mapping => {
-      if (mapping.categoria) {
-        categories.add(mapping.categoria);
-      }
-    });
-
-    return Array.from(categories);
-  }
-
-  /**
-   * Obtiene conceptos por categoría
-   */
-  getConceptsByCategory(categoria: string): ConceptMapping[] {
-    if (!this.isLoaded) {
-      return [];
-    }
-
-    return this.conceptMappings.filter(mapping => 
-      mapping.categoria === categoria
-    );
-  }
-
-  /**
-   * Verifica si el servicio está cargado
-   */
-  isServiceLoaded(): boolean {
-    return this.isLoaded;
+  private normalizeTerm(term: string): string {
+    return normalizeForSearch(term);
   }
 
   /**
@@ -449,27 +519,19 @@ export class ConceptsService {
   getStats(): {
     totalMappings: number;
     totalVariants: number;
-    categories: number;
-    isLoaded: boolean;
+    categorías: string[];
+    hasImages: boolean;
   } {
+    const categorías = [...new Set(this.conceptMappings.map(m => m.categoria).filter(Boolean))] as string[];
+    
     return {
       totalMappings: this.conceptMappings.length,
       totalVariants: this.variantMap.size,
-      categories: this.getCategories().length,
-      isLoaded: this.isLoaded
+      categorías,
+      hasImages: this.productImageMap.size > 0
     };
-  }
-
-  /**
-   * Recarga los conceptos
-   */
-  reload(): void {
-    this.isLoaded = false;
-    this.conceptMappings = [];
-    this.variantMap.clear();
-    this.loadConceptMappings();
   }
 }
 
-// Exportar instancia singleton
+// Instancia singleton
 export const conceptsService = new ConceptsService(); 

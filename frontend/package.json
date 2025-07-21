@@ -1,7 +1,7 @@
 {
-  "name": "test-tailwind",
+  "name": "embler-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "axios": "^1.10.0",
+    "framer-motion": "^12.23.6",
+    "immer": "^10.1.1",
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

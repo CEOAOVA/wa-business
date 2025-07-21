@@ -56,8 +56,26 @@ class WhatsAppService {
      */
     sendMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e, _f;
+            var _a, _b, _c, _d, _e, _f, _g;
             try {
+                // Validar configuración de WhatsApp
+                if (!whatsapp_1.whatsappConfig.isConfigured) {
+                    console.warn('⚠️ WhatsApp no está configurado - simulando envío');
+                    return {
+                        success: false,
+                        error: 'WhatsApp no está configurado',
+                        details: 'Configura WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID y WEBHOOK_VERIFY_TOKEN'
+                    };
+                }
+                // Validar token de acceso
+                if (!whatsapp_1.whatsappConfig.accessToken || whatsapp_1.whatsappConfig.accessToken === 'not_configured') {
+                    console.error('❌ Token de acceso de WhatsApp no configurado');
+                    return {
+                        success: false,
+                        error: 'Token de acceso no configurado',
+                        details: 'Configura WHATSAPP_ACCESS_TOKEN en las variables de entorno'
+                    };
+                }
                 const url = (0, whatsapp_1.buildApiUrl)(`${whatsapp_1.whatsappConfig.phoneNumberId}/messages`);
                 const payload = {
                     messaging_product: 'whatsapp',
@@ -70,14 +88,16 @@ class WhatsAppService {
                 console.log('📤 Enviando mensaje WhatsApp:', {
                     to: data.to,
                     message: data.message.substring(0, 50) + '...',
-                    url
+                    url,
+                    tokenConfigured: !!whatsapp_1.whatsappConfig.accessToken,
+                    tokenLength: ((_a = whatsapp_1.whatsappConfig.accessToken) === null || _a === void 0 ? void 0 : _a.length) || 0
                 });
                 const response = yield axios_1.default.post(url, payload, {
                     headers: (0, whatsapp_1.getHeaders)()
                 });
                 console.log('✅ Mensaje enviado exitosamente:', response.data);
                 // Guardar mensaje enviado en la base de datos
-                const messageId = (_b = (_a = response.data.messages) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id;
+                const messageId = (_c = (_b = response.data.messages) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.id;
                 if (messageId) {
                     try {
                         const result = yield database_service_1.databaseService.processOutgoingMessage({
@@ -131,11 +151,11 @@ class WhatsAppService {
                 };
             }
             catch (error) {
-                console.error('❌ Error enviando mensaje:', ((_c = error.response) === null || _c === void 0 ? void 0 : _c.data) || error.message);
+                console.error('❌ Error enviando mensaje:', ((_d = error.response) === null || _d === void 0 ? void 0 : _d.data) || error.message);
                 return {
                     success: false,
-                    error: ((_e = (_d = error.response) === null || _d === void 0 ? void 0 : _d.data) === null || _e === void 0 ? void 0 : _e.error) || error.message,
-                    details: (_f = error.response) === null || _f === void 0 ? void 0 : _f.data
+                    error: ((_f = (_e = error.response) === null || _e === void 0 ? void 0 : _e.data) === null || _f === void 0 ? void 0 : _f.error) || error.message,
+                    details: (_g = error.response) === null || _g === void 0 ? void 0 : _g.data
                 };
             }
         });
@@ -453,21 +473,24 @@ class WhatsAppService {
                 const stats = yield database_service_1.databaseService.getStats();
                 return {
                     success: true,
-                    conversations: conversations.map((conv) => ({
-                        id: conv.id,
-                        contactId: conv.contactId,
-                        contactName: conv.contact.name || conv.contact.waId,
-                        contactWaId: conv.contact.waId,
-                        lastMessage: conv.lastMessage ? {
-                            id: conv.lastMessage.id,
-                            content: conv.lastMessage.content,
-                            timestamp: conv.lastMessage.timestamp,
-                            isFromUs: conv.lastMessage.isFromUs
-                        } : null,
-                        unreadCount: conv.unreadCount,
-                        totalMessages: conv._count.messages,
-                        updatedAt: conv.updatedAt
-                    })),
+                    conversations: conversations.map((conv) => {
+                        var _a, _b, _c, _d;
+                        return ({
+                            id: conv.id,
+                            contactId: conv.contactId,
+                            contactName: ((_a = conv.contact) === null || _a === void 0 ? void 0 : _a.name) || ((_b = conv.contact) === null || _b === void 0 ? void 0 : _b.waId) || 'Contacto Desconocido',
+                            contactWaId: ((_c = conv.contact) === null || _c === void 0 ? void 0 : _c.waId) || 'N/A',
+                            lastMessage: conv.lastMessage ? {
+                                id: conv.lastMessage.id,
+                                content: conv.lastMessage.content,
+                                timestamp: conv.lastMessage.timestamp,
+                                isFromUs: conv.lastMessage.isFromUs
+                            } : null,
+                            unreadCount: conv.unreadCount || 0,
+                            totalMessages: ((_d = conv._count) === null || _d === void 0 ? void 0 : _d.messages) || 0,
+                            updatedAt: conv.updatedAt
+                        });
+                    }),
                     total: stats.totalConversations,
                     unread: stats.unreadMessages
                 };

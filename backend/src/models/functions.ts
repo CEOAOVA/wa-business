@@ -37,7 +37,7 @@ export interface FunctionResult {
 
 export type FunctionHandler = (
   args: Record<string, any>,
-  context: { pointOfSaleId: string; userId?: string; sessionId?: string }
+  context: FunctionContext
 ) => Promise<FunctionResult>;
 
 export interface FunctionCallInfo {
@@ -325,6 +325,8 @@ export interface FunctionContext {
   clientInfo?: {
     nombre?: string;
     telefono?: string;
+    direccion?: string;
+    codigoPostal?: string;
     vehiculo?: {
       marca?: string;
       modelo?: string;

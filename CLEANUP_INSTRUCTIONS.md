@@ -71,12 +71,12 @@ curl -X DELETE "http://localhost:3001/api/chat/messages/cleanup?hours=1"
 ## 📍 **Archivos Modificados:**
 
 ### Frontend:
-- `frontend/test-tailwind/src/constants/messages.ts` (nuevo)
-- `frontend/test-tailwind/src/components/ChatPanel.tsx`
-- `frontend/test-tailwind/src/components/Sidebar.tsx`
-- `frontend/test-tailwind/src/pages/ClientChat.tsx`
-- `frontend/test-tailwind/src/hooks/useChat.ts`
-- `frontend/test-tailwind/src/chatbot/services/openrouter-client.ts`
+- `frontend/src/constants/messages.ts` (nuevo)
+- `frontend/src/components/ChatPanel.tsx`
+- `frontend/src/components/Sidebar.tsx`
+- `frontend/src/pages/ClientChat.tsx`
+- `frontend/src/hooks/useChat.ts`
+- `frontend/src/chatbot/services/openrouter-client.ts`
 
 ### Backend:
 - `backend/src/services/whatsapp.service.ts`
