@@ -1,5 +1,7 @@
 # Autenticación con Email - Implementación Completada
 
+###No compiló?
+
 ## Resumen de Cambios
 
 Se ha actualizado exitosamente el sistema de autenticación para usar **email** en lugar de username para el login.
