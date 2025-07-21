@@ -89,6 +89,18 @@ exports.generalRateLimit = (0, express_rate_limit_1.default)({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    // Configuración específica para Docker/proxy (igual que authRateLimit)
+    keyGenerator: (req) => {
+        // Usar X-Forwarded-For si está disponible, sino usar req.ip
+        const forwarded = req.headers['x-forwarded-for'];
+        const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
+        return ip || 'unknown';
+    },
+    skip: (req) => {
+        // Saltar rate limiting para IPs locales en desarrollo
+        const ip = req.ip || '';
+        return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
+    },
     handler: (req, res) => {
         console.warn(`[Security] ⚠️ Rate limit excedido para IP: ${req.ip}`);
         res.status(429).json({
@@ -137,6 +149,18 @@ exports.webhookRateLimit = (0, express_rate_limit_1.default)({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    // Configuración específica para Docker/proxy
+    keyGenerator: (req) => {
+        // Usar X-Forwarded-For si está disponible, sino usar req.ip
+        const forwarded = req.headers['x-forwarded-for'];
+        const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
+        return ip || 'unknown';
+    },
+    skip: (req) => {
+        // Saltar rate limiting para IPs locales en desarrollo
+        const ip = req.ip || '';
+        return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
+    },
     handler: (req, res) => {
         console.warn(`[Security] ⚠️ Webhook rate limit excedido para IP: ${req.ip}`);
         res.status(429).json({

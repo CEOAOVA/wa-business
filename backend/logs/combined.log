@@ -2614,3 +2614,6898 @@
   message: 'System metrics',
   timestamp: '2025-07-18 14:20:58.253'
 }
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 170, heapTotal: 175 },
+    uptime: 34,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:06:23.297'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 170, heapTotal: 176 },
+    uptime: 64,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:06:53.292'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 170, heapTotal: 176 },
+    uptime: 94,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:07:23.306'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 170, heapTotal: 176 },
+    uptime: 124,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:07:53.315'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 171, heapTotal: 176 },
+    uptime: 154,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:08:23.316'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 184,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:08:53.327'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 214,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:09:23.330'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 244,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:09:53.342'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 274,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:10:23.344'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 177 },
+    uptime: 304,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:10:53.352'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 177 },
+    uptime: 334,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:11:23.354'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 177 },
+    uptime: 364,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:11:53.369'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 177 },
+    uptime: 394,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:12:23.376'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 177 },
+    uptime: 424,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:12:53.384'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 177 },
+    uptime: 454,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:13:23.395'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 177 },
+    uptime: 484,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:13:53.410'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 514,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:14:23.414'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 544,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:14:53.430'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 574,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:15:23.430'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 177 },
+    uptime: 604,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:15:53.435'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 634,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:16:23.447'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 664,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:16:53.455'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 694,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:17:23.458'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 724,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:17:53.464'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 755,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:18:23.478'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 785,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:18:53.480'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 815,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:19:23.492'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 845,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:19:53.507'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 875,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:20:23.514'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 905,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:20:53.516'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 935,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:21:23.520'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 965,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:21:53.525'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 995,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:22:23.544'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1025,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:22:53.558'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1055,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:23:23.566'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1085,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:23:53.578'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1115,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:24:23.579'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1145,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:24:53.581'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1175,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:25:23.582'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1205,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:25:53.595'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1235,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:26:23.598'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1265,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:26:53.608'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1295,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:27:23.621'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1325,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:27:53.628'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1355,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:28:23.636'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1385,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:28:53.637'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1415,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:29:23.639'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1445,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:29:53.652'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1475,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:30:23.654'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1505,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:30:53.671'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1535,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:31:23.678'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1565,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:31:53.681'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1595,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:32:23.692'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1625,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:32:53.692'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1655,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:33:23.705'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1685,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:33:53.709'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 1715,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:34:23.716'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1745,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:34:53.724'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1775,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:35:23.735'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1805,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:35:53.736'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1835,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:36:23.742'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1865,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:36:53.749'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 1973,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:38:41.725'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 2003,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:39:11.703'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 2033,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:39:41.714'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 2063,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:40:11.720'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 229, heapUsed: 170, heapTotal: 176 },
+    uptime: 34,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:44:32.402'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 229, heapUsed: 170, heapTotal: 176 },
+    uptime: 64,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:45:02.402'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 171, heapTotal: 176 },
+    uptime: 94,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:45:32.401'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 171, heapTotal: 176 },
+    uptime: 124,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:46:02.413'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 171, heapTotal: 176 },
+    uptime: 154,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:46:32.429'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 230, heapUsed: 171, heapTotal: 176 },
+    uptime: 184,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:47:02.442'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Servicio de autenticación no disponible',
+    stack: 'Error: Servicio de autenticación no disponible\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:96:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:8:71\n' +
+      '    at new Promise (<anonymous>)\n' +
+      '    at __awaiter (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:4:12)\n' +
+      '    at Function.login (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:74:16)\n' +
+      '    at C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\routes\\auth.ts:28:38\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\routes\\auth.ts:8:71\n' +
+      '    at new Promise (<anonymous>)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 11:47:28.990'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Servicio de autenticación no disponible',
+    stack: 'Error: Servicio de autenticación no disponible\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:96:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:8:71\n' +
+      '    at new Promise (<anonymous>)\n' +
+      '    at __awaiter (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:4:12)\n' +
+      '    at Function.login (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:74:16)\n' +
+      '    at C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\routes\\auth.ts:28:38\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\routes\\auth.ts:8:71\n' +
+      '    at new Promise (<anonymous>)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 11:47:28.995'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 214,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:47:32.453'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 244,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:48:02.452'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 274,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:48:32.463'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 304,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:49:02.463'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 334,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:49:32.470'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 364,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:50:02.478'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 394,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:50:32.483'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 424,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:51:02.488'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 454,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:51:32.494'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 484,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:52:02.494'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 514,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:52:32.502'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 544,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:53:02.503'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 574,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:53:32.508'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 604,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:54:02.510'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 635,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:54:32.516'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 665,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:55:02.526'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 695,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:55:32.525'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 725,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:56:02.529'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 755,
+    requests: 0,
+    errors: 2,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:56:32.541'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 35,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:57:12.435'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 65,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:57:42.432'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 95,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:58:12.460'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 125,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:58:42.475'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 155,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:59:12.491'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 185,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 11:59:42.504'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 215,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:00:12.510'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 245,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:00:42.512'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 275,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:01:12.527'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 305,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:01:42.537'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 177 },
+    uptime: 335,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:02:12.550'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 34,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:03:12.018'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 64,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:03:42.013'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 170, heapTotal: 176 },
+    uptime: 94,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:04:12.036'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 125,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:04:42.054'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 155,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:05:12.054'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 176 },
+    uptime: 185,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:05:42.058'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 176 },
+    uptime: 215,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:06:12.058'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 33,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:07:11.125'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 63,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:07:41.118'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 93,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:08:11.134'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 123,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:08:41.149'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 153,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:09:11.148'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 183,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:09:41.156'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 231, heapUsed: 170, heapTotal: 175 },
+    uptime: 33,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:10:46.599'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 175 },
+    uptime: 63,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:11:16.600'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 175 },
+    uptime: 93,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:11:46.608'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 175 },
+    uptime: 123,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:12:16.611'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 175 },
+    uptime: 153,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:12:46.612'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 175 },
+    uptime: 183,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:13:16.619'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 175 },
+    uptime: 213,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:13:46.622'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 32,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:14:44.753'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 170, heapTotal: 176 },
+    uptime: 62,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:15:14.765'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 226, heapUsed: 170, heapTotal: 175 },
+    uptime: 32,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:17:20.759'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 226, heapUsed: 170, heapTotal: 175 },
+    uptime: 62,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:17:50.770'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 226, heapUsed: 171, heapTotal: 175 },
+    uptime: 92,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:18:20.783'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 226, heapUsed: 171, heapTotal: 175 },
+    uptime: 123,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:18:50.801'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 227, heapUsed: 171, heapTotal: 176 },
+    uptime: 153,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:19:20.806'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 227, heapUsed: 171, heapTotal: 176 },
+    uptime: 183,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:19:50.808'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 228, heapUsed: 171, heapTotal: 175 },
+    uptime: 213,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:20:20.817'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-21 12:20:50.888'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-21 12:21:11.408'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 240, heapUsed: 173, heapTotal: 179 },
+    uptime: 32,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:21:14.942'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 178 },
+    uptime: 62,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:21:44.956'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 178 },
+    uptime: 92,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:22:14.965'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 122,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:22:44.976'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 152,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:23:14.982'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 182,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:23:44.984'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 212,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:24:14.990'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 242,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:24:44.997'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 272,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:25:15.002'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 302,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:25:45.013'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 332,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:26:15.025'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 362,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:26:45.028'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 392,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:27:15.029'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 422,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:27:45.029'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 452,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:28:15.030'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 482,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:28:45.033'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 512,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:29:15.040'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 542,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:29:45.042'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 572,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:30:15.050'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 602,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:30:45.052'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 632,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:31:15.067'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 662,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:31:45.080'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 692,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:32:15.087'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 722,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:32:45.096'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 752,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:33:15.111'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 782,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:33:45.122'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 812,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:34:15.133'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 174, heapTotal: 178 },
+    uptime: 842,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:34:45.136'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 872,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:35:15.152'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 902,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:35:45.158'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 932,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:36:15.164'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 962,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:36:45.175'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 992,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:37:15.183'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1022,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:37:45.196'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1052,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:38:15.207'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1082,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:38:45.221'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1112,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:39:15.224'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 174, heapTotal: 178 },
+    uptime: 1142,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:39:45.226'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1172,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:40:15.237'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1202,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:40:45.249'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1232,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:41:15.261'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1262,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:41:45.262'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1292,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:42:15.264'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1322,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:42:45.280'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1352,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:43:15.280'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1382,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:43:45.284'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1413,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:44:15.296'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 174, heapTotal: 178 },
+    uptime: 1443,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:44:45.307'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1473,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:45:15.308'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1503,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:45:45.315'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1533,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:46:15.327'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1563,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:46:45.338'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1593,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:47:15.350'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1623,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:47:45.360'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1653,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:48:15.371'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1683,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:48:45.386'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 173, heapTotal: 178 },
+    uptime: 1713,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:49:15.397'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 235, heapUsed: 174, heapTotal: 178 },
+    uptime: 1743,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:49:45.402'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1773,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:50:15.408'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1803,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:50:45.410'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1833,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:51:15.414'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1863,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:51:45.425'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1893,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:52:15.439'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1923,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:52:45.442'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1953,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:53:15.449'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 1983,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:53:45.462'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 173, heapTotal: 178 },
+    uptime: 2013,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:54:15.475'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 207, heapUsed: 174, heapTotal: 178 },
+    uptime: 2043,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:54:45.483'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2073,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:55:15.490'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2103,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:55:45.496'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2133,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:56:15.499'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2163,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:56:45.502'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2193,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:57:15.504'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2223,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:57:45.512'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 103, heapUsed: 173, heapTotal: 178 },
+    uptime: 2253,
+    requests: 2,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 12:58:15.521'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 13:58:02.447'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 13:58:02.459'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 13:58:02.467'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 13:58:15.314'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 13:58:15.318'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 13:58:15.319'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 280, heapUsed: 188, heapTotal: 221 },
+    uptime: 36,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 13:58:25.020'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 13:58:34.815'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 13:58:34.818'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 13:58:34.820'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 172, heapTotal: 177 },
+    uptime: 66,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 13:58:55.020'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 172, heapTotal: 177 },
+    uptime: 96,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 13:59:25.032'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 236, heapUsed: 172, heapTotal: 178 },
+    uptime: 126,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 13:59:55.033'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:00:54.304'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:00:54.333'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:00:54.342'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 34,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:01:06.411'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:01:18.915'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:01:18.918'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:01:18.919'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 64,
+    requests: 0,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:01:36.410'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:02:00.345'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:02:00.347'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:02:00.348'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 94,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:02:06.413'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 124,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:02:36.415'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 154,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:03:06.415'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 184,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:03:36.415'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 214,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:04:06.414'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 244,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:04:36.415'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 274,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:05:06.415'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 304,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:05:36.418'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 334,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:06:06.417'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 364,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:06:36.415'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 394,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:07:06.416'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 424,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:07:36.414'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 454,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:08:06.414'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 484,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:08:36.412'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 514,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:09:06.412'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 544,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:09:36.409'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 574,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:10:06.410'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 604,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:10:36.416'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 634,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:11:06.429'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 664,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:11:36.430'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 694,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:12:06.445'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 173, heapTotal: 177 },
+    uptime: 724,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:12:36.455'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 754,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:13:06.455'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 784,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:13:36.466'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 814,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:14:06.474'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 844,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:14:36.484'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 874,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:15:06.499'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 173, heapTotal: 177 },
+    uptime: 904,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:15:36.507'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 173, heapTotal: 177 },
+    uptime: 934,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:16:06.520'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 173, heapTotal: 177 },
+    uptime: 964,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:16:36.525'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 173, heapTotal: 177 },
+    uptime: 994,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:17:06.528'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 173, heapTotal: 177 },
+    uptime: 1024,
+    requests: 0,
+    errors: 9,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:17:36.541'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:17:37.684'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:17:37.685'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:17:37.685'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:17:57.643'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:17:57.646'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:17:57.648'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 178 },
+    uptime: 33,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:18:18.193'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:18:21.020'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:18:21.021'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:18:21.021'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:18:22.233'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:18:22.235'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:18:22.236'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'TypeError: fetch failed',
+    details: 'TypeError: fetch failed\n' +
+      '    at node:internal/deps/undici/undici:13502:13\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    hint: '',
+    code: ''
+  },
+  level: 'error',
+  message: 'User not found:',
+  timestamp: '2025-07-21 14:19:09.632'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-21 14:19:09.635'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:108:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\cmmendez\\OneDrive - Laboratorios Silanes S.A. de C.V\\Documentos\\Reportes\\PRUEBAS PRUEBAS\\Nueva carpeta (2)\\wa-business1\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-21 14:19:09.637'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 176 },
+    uptime: 32,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:19:28.294'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 176 },
+    uptime: 62,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:19:58.300'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 92,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:20:28.308'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 122,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:20:58.323'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 152,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:21:28.324'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 182,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:21:58.333'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 212,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:22:28.346'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 242,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:22:58.353'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 178 },
+    uptime: 272,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:23:28.360'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 178 },
+    uptime: 302,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:23:58.363'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 332,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:24:28.376'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 362,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:24:58.384'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 392,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:25:28.390'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 422,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:25:58.390'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 452,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:26:28.407'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 482,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:26:58.420'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 512,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:27:28.430'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 178 },
+    uptime: 542,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:27:58.434'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 572,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:28:28.435'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 602,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:28:58.449'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 632,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:29:28.462'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 662,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:29:58.476'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 692,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:30:28.489'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 722,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:30:58.489'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 753,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:31:28.501'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 783,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:31:58.507'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 813,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:32:28.516'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 843,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:32:58.521'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 873,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:33:28.522'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 903,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:33:58.526'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 933,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:34:28.539'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 963,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:34:58.554'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 993,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:35:28.564'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 1023,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:35:58.574'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 1053,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:36:28.580'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 1083,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:36:58.595'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 1113,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:37:28.596'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 172, heapTotal: 177 },
+    uptime: 1143,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:37:58.612'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 1173,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:38:28.622'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 233, heapUsed: 171, heapTotal: 177 },
+    uptime: 1203,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:38:58.629'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1233,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:39:28.642'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1263,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:39:58.647'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1293,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:40:28.657'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1323,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:40:58.670'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1353,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:41:28.688'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1383,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:41:58.696'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1413,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:42:28.705'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1443,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:42:58.721'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 177 },
+    uptime: 1473,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:43:28.737'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 177 },
+    uptime: 1503,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:43:58.741'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1533,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:44:28.757'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1563,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:44:58.773'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1593,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:45:28.790'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1623,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:45:58.802'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1653,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:46:28.810'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1683,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:46:58.811'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1713,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:47:28.820'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1743,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:47:58.824'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 177 },
+    uptime: 1773,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:48:28.833'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1803,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:48:58.842'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1833,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:49:28.851'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1863,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:49:58.867'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1893,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:50:28.876'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1923,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:50:58.892'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1953,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:51:28.897'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 1983,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:51:58.904'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2013,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:52:28.910'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2043,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:52:58.917'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 177 },
+    uptime: 2073,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:53:28.919'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2103,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:53:58.930'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2133,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:54:28.937'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2163,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:54:58.948'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2193,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:55:28.957'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2223,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:55:58.972'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2253,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:56:28.973'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2283,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:56:58.983'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2313,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:57:29.000'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2343,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:57:59.009'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 171, heapTotal: 177 },
+    uptime: 2373,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:58:29.024'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2403,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:58:59.038'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2433,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:59:29.050'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2463,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 14:59:59.056'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2493,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:00:29.073'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2523,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:00:59.074'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2553,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:01:29.089'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2583,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:01:59.096'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2613,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:02:29.113'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 234, heapUsed: 172, heapTotal: 177 },
+    uptime: 2643,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:02:59.122'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 177 },
+    uptime: 2673,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:03:29.130'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2703,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:03:59.144'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2733,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:04:29.159'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2763,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:04:59.164'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2793,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:05:29.180'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2823,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:05:59.184'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2853,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:06:29.193'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2883,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:06:59.201'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2913,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:07:29.208'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 2943,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:07:59.217'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 171, heapTotal: 177 },
+    uptime: 2973,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:08:29.225'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 232, heapUsed: 172, heapTotal: 177 },
+    uptime: 3003,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:08:59.233'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3033,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:09:29.241'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3063,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:09:59.257'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3093,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:10:29.264'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3123,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:10:59.266'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3153,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:11:29.277'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3183,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:11:59.285'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3213,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:12:29.299'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3243,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:12:59.312'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 171, heapTotal: 177 },
+    uptime: 3273,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:13:29.322'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 213, heapUsed: 172, heapTotal: 177 },
+    uptime: 3303,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:13:59.330'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3333,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:14:29.332'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3363,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:14:59.339'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3393,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:15:29.346'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3423,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:15:59.347'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3453,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:16:29.365'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3483,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:16:59.374'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3513,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:17:29.389'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3543,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:17:59.394'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 171, heapTotal: 177 },
+    uptime: 3573,
+    requests: 0,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:18:29.400'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 172, heapTotal: 177 },
+    uptime: 3603,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:18:59.400'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3633,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:19:29.416'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3663,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:19:59.420'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3693,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:20:29.422'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3723,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:20:59.429'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3753,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:21:29.437'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3783,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:21:59.438'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3813,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:22:29.449'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3843,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:22:59.451'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 171, heapTotal: 177 },
+    uptime: 3873,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:23:29.458'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 172, heapTotal: 177 },
+    uptime: 3903,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:23:59.468'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 3933,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:24:29.481'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 3963,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:24:59.488'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 3993,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:25:29.490'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 4023,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:25:59.503'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 4053,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:26:29.510'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 4083,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:26:59.520'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 4113,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:27:29.531'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 4143,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:27:59.540'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 171, heapTotal: 177 },
+    uptime: 4174,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:28:29.556'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 54, heapUsed: 172, heapTotal: 177 },
+    uptime: 4204,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:28:59.568'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4234,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:29:29.581'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4264,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:29:59.584'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4294,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:30:29.586'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4324,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:30:59.590'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4354,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:31:29.596'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4384,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:31:59.608'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4414,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:32:29.618'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4444,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:32:59.634'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 171, heapTotal: 177 },
+    uptime: 4474,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:33:29.648'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4504,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:33:59.649'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4534,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:34:29.660'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4564,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:34:59.673'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4594,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:35:29.693'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4624,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:35:59.708'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4654,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:36:29.710'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4684,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:36:59.719'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4714,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:37:29.721'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4744,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:37:59.732'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 171, heapTotal: 177 },
+    uptime: 4774,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:38:29.748'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4804,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:38:59.750'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4834,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:39:29.762'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4864,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:39:59.772'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 4894,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:40:29.776'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4924,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:40:59.778'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4954,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:41:29.779'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 4984,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:41:59.793'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 5014,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:42:29.800'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 5044,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:42:59.814'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 171, heapTotal: 177 },
+    uptime: 5074,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:43:29.826'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 53, heapUsed: 172, heapTotal: 177 },
+    uptime: 5104,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:43:59.837'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5134,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:44:29.847'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5164,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:44:59.848'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5194,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:45:29.857'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5224,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:45:59.861'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5254,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:46:29.876'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5284,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:46:59.891'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5314,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:47:29.900'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5344,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:47:59.910'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 171, heapTotal: 177 },
+    uptime: 5374,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:48:29.925'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5404,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:48:59.940'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5434,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:49:29.954'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5464,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:49:59.959'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5494,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:50:29.975'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5524,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:50:59.980'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5554,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:51:29.989'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5584,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:52:00.001'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5614,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:52:30.010'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5644,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:53:00.019'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5674,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:53:30.029'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5704,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:54:00.034'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5734,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:54:30.044'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5764,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:55:00.057'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5794,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:55:30.074'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5824,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:56:00.078'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5854,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:56:30.092'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5884,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:57:00.104'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5914,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:57:30.117'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5944,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:58:00.123'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 5974,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:58:30.132'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6004,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:59:00.136'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6034,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 15:59:30.143'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6064,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:00:00.156'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6094,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:00:30.165'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6124,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:01:00.175'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6154,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:01:30.180'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6184,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:02:00.191'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6214,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:02:30.202'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6244,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:03:00.203'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6274,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:03:30.207'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6304,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:04:00.222'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6334,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:04:30.225'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6364,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:05:00.229'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6394,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:05:30.245'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6424,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:06:00.253'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6454,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:06:30.267'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6484,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:07:00.268'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6514,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:07:30.276'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6544,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:08:00.288'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6574,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:08:30.296'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6604,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:09:00.298'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6634,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:09:30.312'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6664,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:10:00.319'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6694,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:10:30.325'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6724,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:11:00.331'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 51, heapUsed: 172, heapTotal: 177 },
+    uptime: 6754,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:11:30.337'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6784,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:12:00.350'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6814,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:12:30.353'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6844,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:13:00.364'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6874,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:13:30.377'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6904,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:14:00.387'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6934,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:14:30.402'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6964,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:15:00.409'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 6994,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:15:30.424'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7024,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:16:00.430'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7054,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:16:30.442'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7084,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:17:00.444'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7114,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:17:30.453'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7144,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:18:00.466'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7174,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:18:30.476'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7204,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:19:00.492'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7234,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:19:30.506'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7264,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:20:00.512'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7294,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:20:30.522'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 52, heapUsed: 172, heapTotal: 177 },
+    uptime: 7324,
+    requests: 0,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-21 16:21:00.522'
+}
