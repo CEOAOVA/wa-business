@@ -45,21 +45,9 @@ RATE_LIMIT_MAX_REQUESTS=100
 ENABLE_DETAILED_LOGS=false
 
 # BASE DE DATOS (Si usas Supabase)
+USE_SUPABASE=true
 DATABASE_URL=postgresql://user:password@host:port/database
 SUPABASE_URL=https://tu-proyecto.supabase.co
 SUPABASE_ANON_KEY=tu_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=tu_supabase_service_role_key
 ```
-
-## Notas Importantes:
-
-1. **Cambia TODOS los valores de ejemplo**
-2. **JWT_SECRET** debe ser de 256 bits mínimo
-3. **CORS_ORIGINS** debe incluir solo el dominio del frontend
-4. **WEBHOOK_URL** debe apuntar al backend
-5. **NUNCA subas este archivo a git**
-
-## URLs de Despliegue:
-- **Frontend:** https://dev-waprueba.aova.mx
-- **Backend:** https://dev-apiwaprueba.aova.mx
-- **Webhook:** https://dev-apiwaprueba.aova.mx/api/chat/webhook 

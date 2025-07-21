@@ -55,6 +55,11 @@ API_NINJAS_KEY=your_api_ninjas_key_for_vin_decoding
 ### **🗄️ DATABASE (EXISTENTE)**
 ```env
 DATABASE_URL="file:./dev.db"
+
+# Supabase Configuration (REQUERIDO PARA PRODUCCIÓN)
+USE_SUPABASE=true
+SUPABASE_URL=https://tu-proyecto.supabase.co
+SUPABASE_ANON_KEY=tu_supabase_anon_key_aqui
 ```
 
 ### **⚙️ SYSTEM CONFIGURATION (NUEVAS)**
