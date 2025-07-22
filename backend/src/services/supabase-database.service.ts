@@ -56,11 +56,13 @@ export class SupabaseDatabaseService {
   private isEnabled: boolean;
 
   constructor() {
-    this.isEnabled = !!supabase && process.env.USE_SUPABASE === 'true';
+    // FORZAR Supabase como única opción - NO más fallbacks
+    this.isEnabled = !!supabase;
     if (this.isEnabled) {
-      console.log('🚀 Supabase Database Service activado');
+      console.log('🚀 Supabase Database Service activado (OBLIGATORIO)');
     } else {
-      console.log('⚠️ Supabase Database Service deshabilitado - usando simulación');
+      console.error('❌ CRÍTICO: Supabase no configurado. Sistema NO puede funcionar.');
+      throw new Error('Supabase es requerido. Verificar SUPABASE_URL y SUPABASE_ANON_KEY');
     }
   }
 
@@ -78,17 +80,7 @@ export class SupabaseDatabaseService {
    */
   async getOrCreateConversation(contactPhone: string): Promise<SupabaseConversation | null> {
     if (!this.isEnabled || !supabase) {
-      console.log('📋 Simulación: getOrCreateConversation para', contactPhone);
-      // Retornar conversación simulada para desarrollo
-      return {
-        id: `sim-conv-${contactPhone.replace(/\D/g, '').slice(-10)}`,
-        contact_phone: contactPhone,
-        status: 'active',
-        ai_mode: 'active',
-        assigned_agent_id: undefined,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+      throw new Error('❌ Supabase no disponible - configurar SUPABASE_URL y SUPABASE_ANON_KEY');
     }
 
     try {
@@ -230,18 +222,7 @@ export class SupabaseDatabaseService {
     metadata?: any;
   }): Promise<SupabaseMessage | null> {
     if (!this.isEnabled || !supabase) {
-      console.log('📋 Simulación: createMessage para conversación', data.conversationId);
-      // Retornar mensaje simulado para desarrollo
-      return {
-        id: parseInt(`${Date.now()}${Math.floor(Math.random() * 1000)}`),
-        conversation_id: data.conversationId,
-        sender_type: data.senderType,
-        content: data.content,
-        message_type: data.messageType || 'text',
-        whatsapp_message_id: data.whatsappMessageId,
-        metadata: data.metadata,
-        created_at: new Date().toISOString()
-      };
+      throw new Error('❌ Supabase no disponible - configurar SUPABASE_URL y SUPABASE_ANON_KEY');
     }
 
     try {

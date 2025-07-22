@@ -1,12 +1,14 @@
 import { supabaseDatabaseService, SupabaseConversation, SupabaseMessage } from './supabase-database.service';
+import { productCatalogService } from './product-catalog.service';
 
 /**
  * Servicio principal de base de datos - SOLO SUPABASE
- * COMPLETAMENTE LIBRE DE PRISMA
+ * COMPLETAMENTE LIBRE DE PRISMA Y SQLITE
  */
 export class DatabaseService {
   constructor() {
-    console.log('🗄️ DatabaseService inicializado (Supabase ONLY - SIN PRISMA)');
+    console.log('🗄️ DatabaseService inicializado (Supabase ONLY - SIN SQLITE)');
+    console.log('📦 ProductCatalogService integrado');
   }
 
   // ===== CONVERSACIONES =====
