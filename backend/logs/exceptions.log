@@ -113,3 +113,2446 @@
   ],
   timestamp: '2025-07-18 12:07:29.292'
 }
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:28:39 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 15284,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 285265920,
+      heapTotal: 228179968,
+      heapUsed: 195929952,
+      external: 9014812,
+      arrayBuffers: 4969653
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 838661.468 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:28:39.423'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:29:29 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 48628,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 277475328,
+      heapTotal: 226607104,
+      heapUsed: 193581792,
+      external: 8994967,
+      arrayBuffers: 4949808
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 838711.921 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:29:29.876'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:32:47 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 31488,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 280150016,
+      heapTotal: 227917824,
+      heapUsed: 196836656,
+      external: 9014540,
+      arrayBuffers: 4969381
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 838909.921 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:32:47.872'
+}
+{
+  error: [96msrc/middleware/auth.ts[0m:[93m78[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  
+  [7m78[0m     req.user = userProfile;
+  [7m  [0m [91m    ~~~~~~~~[0m
+  [96msrc/middleware/auth.ts[0m:[93m186[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  
+  [7m186[0m         req.user = userProfile;
+  [7m   [0m [91m        ~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:36:58 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 51088,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 279703552,
+      heapTotal: 224440320,
+      heapUsed: 190217232,
+      external: 8988957,
+      arrayBuffers: 4918420
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839160.859 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:36:58.805'
+}
+{
+  error: src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:36:59 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 35752,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 274518016,
+      heapTotal: 224509952,
+      heapUsed: 189961320,
+      external: 8989077,
+      arrayBuffers: 4918540
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839161.156 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:36:59.104'
+}
+{
+  error: [96msrc/middleware/auth.ts[0m:[93m78[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  
+  [7m78[0m     req.user = userProfile;
+  [7m  [0m [91m    ~~~~~~~~[0m
+  [96msrc/middleware/auth.ts[0m:[93m186[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  
+  [7m186[0m         req.user = userProfile;
+  [7m   [0m [91m        ~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:37:19 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 15064,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 275427328,
+      heapTotal: 224509952,
+      heapUsed: 190589632,
+      external: 8989085,
+      arrayBuffers: 4918548
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839181.687 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:37:19.637'
+}
+{
+  error: src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:37:19 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 39924,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 278822912,
+      heapTotal: 224178176,
+      heapUsed: 190356152,
+      external: 8989165,
+      arrayBuffers: 4918628
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839181.703 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:37:19.661'
+}
+{
+  error: src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:37:33 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 27076,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 279302144,
+      heapTotal: 223203328,
+      heapUsed: 201030984,
+      external: 8969405,
+      arrayBuffers: 4943377
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839196 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:37:33.953'
+}
+{
+  error: [96msrc/middleware/auth.ts[0m:[93m78[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  
+  [7m78[0m     req.user = userProfile;
+  [7m  [0m [91m    ~~~~~~~~[0m
+  [96msrc/middleware/auth.ts[0m:[93m186[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  
+  [7m186[0m         req.user = userProfile;
+  [7m   [0m [91m        ~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m78\x1B[0m:\x1B[93m5\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m78\x1B[0m     req.user = userProfile;\r\n' +
+    '\x1B[7m  \x1B[0m \x1B[91m    ~~~~~~~~\x1B[0m\r\n' +
+    `\x1B[96msrc/middleware/auth.ts\x1B[0m:\x1B[93m186\x1B[0m:\x1B[93m9\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS2322: \x1B[0mType 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\r\n' +
+    '\x1B[7m186\x1B[0m         req.user = userProfile;\r\n' +
+    '\x1B[7m   \x1B[0m \x1B[91m        ~~~~~~~~\x1B[0m\r\n' +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:37:33 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 47972,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 273588224,
+      heapTotal: 223727616,
+      heapUsed: 190138144,
+      external: 8989069,
+      arrayBuffers: 4918532
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839196 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:37:33.955'
+}
+{
+  error: src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:38:10 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 42224,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 278581248,
+      heapTotal: 223465472,
+      heapUsed: 191038368,
+      external: 8989013,
+      arrayBuffers: 4918476
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839232.375 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:38:10.323'
+}
+{
+  error: src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.
+    Types of property 'role' are incompatible.
+      Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+        Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    `src/middleware/auth.ts(78,5): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `src/middleware/auth.ts(186,9): error TS2322: Type 'UserProfile' is not assignable to type '{ id: string; username: string; full_name: string; email: string; role: "user" | "agent" | "admin"; whatsapp_id?: string | undefined; is_active: boolean; }'.\r\n` +
+    "  Types of property 'role' are incompatible.\r\n" +
+    `    Type '"agent" | "admin" | "supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    `      Type '"supervisor"' is not assignable to type '"user" | "agent" | "admin"'.\r\n` +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:38:50 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 47552,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 274481152,
+      heapTotal: 224182272,
+      heapUsed: 190741776,
+      external: 8989085,
+      arrayBuffers: 4918548
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839272.265 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:38:50.223'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:39:18 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 26492,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 279269376,
+      heapTotal: 227397632,
+      heapUsed: 196959504,
+      external: 9014668,
+      arrayBuffers: 4969509
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839300.562 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:39:18.507'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:39:27 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 17196,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 278732800,
+      heapTotal: 228970496,
+      heapUsed: 195534480,
+      external: 8975138,
+      arrayBuffers: 4929979
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839309.328 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:39:27.273'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 12:40:30 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 45016,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 283340800,
+      heapTotal: 227659776,
+      heapUsed: 196847904,
+      external: 9014732,
+      arrayBuffers: 4969573
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 839372.562 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 12:40:30.519'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 14:09:55 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 39404,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 284397568,
+      heapTotal: 228188160,
+      heapUsed: 206740816,
+      external: 9014692,
+      arrayBuffers: 4969533
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 844738.015 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 14:09:55.971'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:166:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:5:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:166:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:5:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 15:14:45 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 40592,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 275865600,
+      heapTotal: 225562624,
+      heapUsed: 203948696,
+      external: 9014724,
+      arrayBuffers: 4969565
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 848627.578 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 166,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 15:14:45.527'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\dist\app.js:161:24
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\dist\app.js:5:58)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js:161:24\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js:5:58)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js:161:24\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js:5:58)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Wed Jul 23 2025 15:35:11 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 43864,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Program Files\\nodejs\\node.exe',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js'
+    ],
+    memoryUsage: {
+      rss: 69042176,
+      heapTotal: 36237312,
+      heapUsed: 22052312,
+      external: 3409946,
+      arrayBuffers: 67892
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 849853.312 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 24,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\dist\\app.js',
+      function: 'fulfilled',
+      line: 5,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'process.processTicksAndRejections',
+      line: 105,
+      method: 'processTicksAndRejections',
+      native: false
+    }
+  ],
+  timestamp: '2025-07-23 15:35:11.263'
+}

@@ -156,19 +156,75 @@ app.get('/api', (_req, res) => {
   });
 });
 
+// Función para limpiar sesiones al inicio
+async function cleanupSessionsOnStartup() {
+  try {
+    console.log('🧹 Iniciando limpieza de sesiones al arranque...');
+    
+    // Importar servicios que necesitan limpieza
+    const { rateLimiter } = await import('./services/rate-limiter/rate-limiter');
+    const { cacheService } = await import('./services/cache/cache-service');
+    
+    // Limpiar rate limiter
+    if (rateLimiter) {
+      rateLimiter.destroy();
+      console.log('✅ Rate limiter limpiado');
+    }
+    
+    // Limpiar caché
+    if (cacheService) {
+      cacheService.destroy();
+      console.log('✅ Cache service limpiado');
+    }
+    
+    // Limpiar conversaciones del chatbot
+    const { ChatbotService } = await import('./services/chatbot.service');
+    const chatbotService = new ChatbotService();
+    if (chatbotService && typeof chatbotService['cleanupExpiredSessions'] === 'function') {
+      chatbotService['cleanupExpiredSessions']();
+      console.log('✅ Chatbot sessions limpiadas');
+    }
+    
+    // Limpiar conversaciones generales
+    const { ConversationService } = await import('./services/conversation/conversation-service');
+    const conversationService = new ConversationService();
+    if (conversationService && typeof conversationService['cleanupInactiveSessions'] === 'function') {
+      const removedCount = conversationService['cleanupInactiveSessions'](0); // Limpiar todas las sesiones
+      console.log(`✅ ${removedCount} conversaciones inactivas limpiadas`);
+    }
+    
+    // Limpiar caché de inventario
+    const { InventoryCache } = await import('./services/soap/inventory-cache');
+    const inventoryCache = new InventoryCache();
+    if (inventoryCache && typeof inventoryCache.clear === 'function') {
+      inventoryCache.clear();
+      console.log('✅ Inventory cache limpiado');
+    }
+    
+    console.log('🎉 Limpieza de sesiones completada al arranque');
+  } catch (error) {
+    console.error('⚠️ Error durante la limpieza de sesiones:', error);
+    // No fallar el arranque por errores de limpieza
+  }
+}
+
 // Función para inicializar la aplicación
 async function startServer() {
   try {
+    // Limpiar sesiones al inicio
+    await cleanupSessionsOnStartup();
+    
     // Inicializar servicios con Socket.IO
     await whatsappService.initialize(io);
     
     // Iniciar servidor
     httpServer.listen(PORT, () => {
-  console.log(`🚀 Backend running on http://localhost:${PORT}`);
-  console.log(`📱 WhatsApp API ready at http://localhost:${PORT}/api/chat`);
+      console.log(`🚀 Backend running on http://localhost:${PORT}`);
+      console.log(`📱 WhatsApp API ready at http://localhost:${PORT}/api/chat`);
       console.log(`💾 Base de datos SQLite conectada`);
       console.log(`🔧 Variables de entorno cargadas desde .env`);
       console.log(`🌐 WebSocket server ready for real-time messaging`);
+      console.log(`🧹 Sesiones limpiadas automáticamente al arranque`);
     });
   } catch (error) {
     console.error('❌ Error iniciando el servidor:', error);

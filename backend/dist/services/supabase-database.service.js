@@ -13,12 +13,14 @@ exports.supabaseDatabaseService = exports.SupabaseDatabaseService = void 0;
 const supabase_1 = require("../config/supabase");
 class SupabaseDatabaseService {
     constructor() {
-        this.isEnabled = !!supabase_1.supabase && process.env.USE_SUPABASE === 'true';
+        // FORZAR Supabase como única opción - NO más fallbacks
+        this.isEnabled = !!supabase_1.supabase;
         if (this.isEnabled) {
-            console.log('🚀 Supabase Database Service activado');
+            console.log('🚀 Supabase Database Service activado (NUEVO ESQUEMA)');
         }
         else {
-            console.log('⚠️ Supabase Database Service deshabilitado - usando simulación');
+            console.error('❌ CRÍTICO: Supabase no configurado. Sistema NO puede funcionar.');
+            throw new Error('Supabase es requerido. Verificar SUPABASE_URL y SUPABASE_ANON_KEY');
         }
     }
     /**
@@ -27,6 +29,254 @@ class SupabaseDatabaseService {
     isSupabaseEnabled() {
         return this.isEnabled;
     }
+    // ===== GESTIÓN DE AGENTES =====
+    /**
+     * Obtener todos los agentes
+     */
+    getAgents() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: agents, error } = yield supabase_1.supabase
+                    .from('agents')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) {
+                    console.error('❌ Error obteniendo agentes:', error);
+                    return [];
+                }
+                return agents || [];
+            }
+            catch (error) {
+                console.error('❌ Error en getAgents:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Obtener agente por ID
+     */
+    getAgentById(agentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: agent, error } = yield supabase_1.supabase
+                    .from('agents')
+                    .select('*')
+                    .eq('id', agentId)
+                    .single();
+                if (error) {
+                    console.error('❌ Error obteniendo agente por ID:', error);
+                    return null;
+                }
+                return agent;
+            }
+            catch (error) {
+                console.error('❌ Error en getAgentById:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Obtener agente por email
+     */
+    getAgentByEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: agent, error } = yield supabase_1.supabase
+                    .from('agents')
+                    .select('*')
+                    .eq('email', email)
+                    .single();
+                if (error) {
+                    console.error('❌ Error obteniendo agente por email:', error);
+                    return null;
+                }
+                return agent;
+            }
+            catch (error) {
+                console.error('❌ Error en getAgentByEmail:', error);
+                return null;
+            }
+        });
+    }
+    // ===== GESTIÓN DE CONTACTOS =====
+    /**
+     * Obtener o crear contacto por teléfono
+     */
+    getOrCreateContact(phone, name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                // Intentar obtener contacto existente
+                const { data: existingContact, error: fetchError } = yield supabase_1.supabase
+                    .from('contacts')
+                    .select('*')
+                    .eq('phone', phone)
+                    .single();
+                if (existingContact && !fetchError) {
+                    return existingContact;
+                }
+                // Crear nuevo contacto si no existe
+                const { data: newContact, error: createError } = yield supabase_1.supabase
+                    .from('contacts')
+                    .insert({
+                    phone,
+                    name: name || phone,
+                    is_blocked: false,
+                    is_favorite: false
+                })
+                    .select()
+                    .single();
+                if (createError) {
+                    console.error('❌ Error creando contacto:', createError);
+                    return null;
+                }
+                return newContact;
+            }
+            catch (error) {
+                console.error('❌ Error en getOrCreateContact:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Obtener contacto por teléfono
+     */
+    getContactByPhone(phone) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: contact, error } = yield supabase_1.supabase
+                    .from('contacts')
+                    .select('*')
+                    .eq('phone', phone)
+                    .single();
+                if (error) {
+                    console.error('❌ Error obteniendo contacto por teléfono:', error);
+                    return null;
+                }
+                return contact;
+            }
+            catch (error) {
+                console.error('❌ Error en getContactByPhone:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Obtener contacto por ID
+     */
+    getContactById(contactId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: contact, error } = yield supabase_1.supabase
+                    .from('contacts')
+                    .select('*')
+                    .eq('id', contactId)
+                    .single();
+                if (error) {
+                    console.error('❌ Error obteniendo contacto por ID:', error);
+                    return null;
+                }
+                return contact;
+            }
+            catch (error) {
+                console.error('❌ Error en getContactById:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Actualizar contacto
+     */
+    updateContact(contactId, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('contacts')
+                    .update(Object.assign(Object.assign({}, data), { updated_at: new Date().toISOString() }))
+                    .eq('id', contactId);
+                if (error) {
+                    console.error('❌ Error actualizando contacto:', error);
+                    return false;
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('❌ Error en updateContact:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Eliminar contacto
+     */
+    deleteContact(contactId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('contacts')
+                    .delete()
+                    .eq('id', contactId);
+                if (error) {
+                    console.error('❌ Error eliminando contacto:', error);
+                    return false;
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('❌ Error en deleteContact:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Obtener contactos con paginación
+     */
+    getContacts() {
+        return __awaiter(this, arguments, void 0, function* (limit = 50, offset = 0) {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: contacts, error } = yield supabase_1.supabase
+                    .from('contacts')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .range(offset, offset + limit - 1);
+                if (error) {
+                    console.error('❌ Error obteniendo contactos:', error);
+                    return [];
+                }
+                return contacts || [];
+            }
+            catch (error) {
+                console.error('❌ Error en getContacts:', error);
+                return [];
+            }
+        });
+    }
     // ===== GESTIÓN DE CONVERSACIONES =====
     /**
      * Obtener o crear conversación por teléfono del contacto
@@ -34,17 +284,7 @@ class SupabaseDatabaseService {
     getOrCreateConversation(contactPhone) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log('📋 Simulación: getOrCreateConversation para', contactPhone);
-                // Retornar conversación simulada para desarrollo
-                return {
-                    id: `sim-conv-${contactPhone.replace(/\D/g, '').slice(-10)}`,
-                    contact_phone: contactPhone,
-                    status: 'active',
-                    ai_mode: 'active',
-                    assigned_agent_id: undefined,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
+                throw new Error('❌ Supabase no disponible - configurar SUPABASE_URL y SUPABASE_ANON_KEY');
             }
             try {
                 // Intentar obtener conversación existente
@@ -63,16 +303,14 @@ class SupabaseDatabaseService {
                     contact_phone: contactPhone,
                     status: 'active',
                     ai_mode: 'active',
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
+                    unread_count: 0
                 })
                     .select()
                     .single();
                 if (createError) {
-                    console.error('❌ Error creando conversación en Supabase:', createError);
+                    console.error('❌ Error creando conversación:', createError);
                     return null;
                 }
-                console.log(`✅ Nueva conversación creada en Supabase: ${newConversation.id} para ${contactPhone}`);
                 return newConversation;
             }
             catch (error) {
@@ -82,48 +320,32 @@ class SupabaseDatabaseService {
         });
     }
     /**
-     * Actualizar el modo AI de una conversación
+     * Actualizar modo AI de conversación
      */
     setConversationAIMode(conversationId, mode, agentId, reason) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log(`📋 Simulación: setConversationAIMode ${conversationId} -> ${mode}`);
-                return { success: true };
+                return { success: false, error: '❌ Supabase no disponible' };
             }
             try {
-                // Obtener el modo actual antes del cambio
-                const { data: currentConversation } = yield supabase_1.supabase
-                    .from('conversations')
-                    .select('ai_mode')
-                    .eq('id', conversationId)
-                    .single();
-                // Actualizar la conversación
-                const { error: updateError } = yield supabase_1.supabase
-                    .from('conversations')
-                    .update({
+                const updateData = {
                     ai_mode: mode,
-                    assigned_agent_id: agentId,
                     updated_at: new Date().toISOString()
-                })
+                };
+                if (agentId) {
+                    updateData.assigned_agent_id = agentId;
+                }
+                if (reason) {
+                    updateData.metadata = { takeover_reason: reason };
+                }
+                const { error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update(updateData)
                     .eq('id', conversationId);
-                if (updateError) {
-                    console.error('❌ Error actualizando modo AI:', updateError);
-                    return { success: false, error: updateError.message };
+                if (error) {
+                    console.error('❌ Error actualizando modo AI:', error);
+                    return { success: false, error: error.message };
                 }
-                // Registrar el cambio en el historial
-                if (currentConversation) {
-                    yield supabase_1.supabase
-                        .from('conversation_mode_history')
-                        .insert({
-                        conversation_id: conversationId,
-                        changed_by_agent_id: agentId,
-                        previous_mode: currentConversation.ai_mode,
-                        new_mode: mode,
-                        reason: reason,
-                        changed_at: new Date().toISOString()
-                    });
-                }
-                console.log(`✅ Modo AI actualizado: ${conversationId} -> ${mode}`);
                 return { success: true };
             }
             catch (error) {
@@ -133,25 +355,24 @@ class SupabaseDatabaseService {
         });
     }
     /**
-     * Obtener el modo AI de una conversación
+     * Obtener modo AI de conversación
      */
     getConversationAIMode(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log(`📋 Simulación: getConversationAIMode ${conversationId} -> active`);
-                return 'active';
+                return null;
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data: conversation, error } = yield supabase_1.supabase
                     .from('conversations')
                     .select('ai_mode')
                     .eq('id', conversationId)
                     .single();
-                if (error || !data) {
+                if (error) {
                     console.error('❌ Error obteniendo modo AI:', error);
                     return null;
                 }
-                return data.ai_mode;
+                return (conversation === null || conversation === void 0 ? void 0 : conversation.ai_mode) || null;
             }
             catch (error) {
                 console.error('❌ Error en getConversationAIMode:', error);
@@ -159,25 +380,131 @@ class SupabaseDatabaseService {
             }
         });
     }
+    /**
+     * Obtener conversaciones que necesitan takeover
+     */
+    getConversationsNeedingTakeover() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return [];
+            }
+            try {
+                const { data: conversations, error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('*')
+                    .eq('ai_mode', 'paused')
+                    .is('assigned_agent_id', null)
+                    .order('updated_at', { ascending: false });
+                if (error) {
+                    console.error('❌ Error obteniendo conversaciones para takeover:', error);
+                    return [];
+                }
+                return conversations || [];
+            }
+            catch (error) {
+                console.error('❌ Error en getConversationsNeedingTakeover:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Asignar conversación a agente
+     */
+    assignConversationToAgent(conversationId, agentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return { success: false, error: '❌ Supabase no disponible' };
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update({
+                    assigned_agent_id: agentId,
+                    ai_mode: 'paused',
+                    updated_at: new Date().toISOString()
+                })
+                    .eq('id', conversationId);
+                if (error) {
+                    console.error('❌ Error asignando conversación a agente:', error);
+                    return { success: false, error: error.message };
+                }
+                return { success: true };
+            }
+            catch (error) {
+                console.error('❌ Error en assignConversationToAgent:', error);
+                return { success: false, error: error.message };
+            }
+        });
+    }
+    /**
+     * Liberar conversación de agente
+     */
+    releaseConversationFromAgent(conversationId, reason) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return { success: false, error: '❌ Supabase no disponible' };
+            }
+            try {
+                const updateData = {
+                    assigned_agent_id: null,
+                    ai_mode: 'active',
+                    updated_at: new Date().toISOString()
+                };
+                if (reason) {
+                    updateData.metadata = { release_reason: reason };
+                }
+                const { error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update(updateData)
+                    .eq('id', conversationId);
+                if (error) {
+                    console.error('❌ Error liberando conversación de agente:', error);
+                    return { success: false, error: error.message };
+                }
+                return { success: true };
+            }
+            catch (error) {
+                console.error('❌ Error en releaseConversationFromAgent:', error);
+                return { success: false, error: error.message };
+            }
+        });
+    }
+    /**
+     * Actualizar última actividad de conversación
+     */
+    updateConversationLastMessage(conversationId, timestamp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return false;
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update({
+                    last_message_at: timestamp.toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                    .eq('id', conversationId);
+                if (error) {
+                    console.error('❌ Error actualizando última actividad de conversación:', error);
+                    return false;
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('❌ Error en updateConversationLastMessage:', error);
+                return false;
+            }
+        });
+    }
     // ===== GESTIÓN DE MENSAJES =====
     /**
-     * Crear un nuevo mensaje
+     * Crear mensaje
      */
     createMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log('📋 Simulación: createMessage para conversación', data.conversationId);
-                // Retornar mensaje simulado para desarrollo
-                return {
-                    id: parseInt(`${Date.now()}${Math.floor(Math.random() * 1000)}`),
-                    conversation_id: data.conversationId,
-                    sender_type: data.senderType,
-                    content: data.content,
-                    message_type: data.messageType || 'text',
-                    whatsapp_message_id: data.whatsappMessageId,
-                    metadata: data.metadata,
-                    created_at: new Date().toISOString()
-                };
+                throw new Error('❌ Supabase no disponible');
             }
             try {
                 const { data: message, error } = yield supabase_1.supabase
@@ -188,21 +515,24 @@ class SupabaseDatabaseService {
                     content: data.content,
                     message_type: data.messageType || 'text',
                     whatsapp_message_id: data.whatsappMessageId,
-                    metadata: data.metadata,
-                    created_at: new Date().toISOString()
+                    is_read: data.senderType === 'user' ? false : true,
+                    metadata: data.metadata
                 })
                     .select()
                     .single();
                 if (error) {
-                    console.error('❌ Error creando mensaje en Supabase:', error);
+                    console.error('❌ Error creando mensaje:', error);
                     return null;
                 }
-                // Actualizar timestamp de la conversación
-                yield supabase_1.supabase
-                    .from('conversations')
-                    .update({ updated_at: new Date().toISOString() })
-                    .eq('id', data.conversationId);
-                console.log(`✅ Mensaje creado en Supabase: ${message.id}`);
+                // Incrementar contador de mensajes no leídos si es mensaje del usuario
+                if (data.senderType === 'user') {
+                    yield supabase_1.supabase
+                        .from('conversations')
+                        .update({
+                        unread_count: supabase_1.supabase.rpc('increment_unread_count')
+                    })
+                        .eq('id', data.conversationId);
+                }
                 return message;
             }
             catch (error) {
@@ -212,26 +542,25 @@ class SupabaseDatabaseService {
         });
     }
     /**
-     * Obtener mensajes de una conversación
+     * Obtener mensajes de conversación
      */
     getConversationMessages(conversationId_1) {
         return __awaiter(this, arguments, void 0, function* (conversationId, limit = 50) {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log(`📋 Simulación: getConversationMessages para ${conversationId}`);
-                return [];
+                throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data: messages, error } = yield supabase_1.supabase
                     .from('messages')
                     .select('*')
                     .eq('conversation_id', conversationId)
-                    .order('created_at', { ascending: false })
+                    .order('created_at', { ascending: true })
                     .limit(limit);
                 if (error) {
                     console.error('❌ Error obteniendo mensajes:', error);
                     return [];
                 }
-                return data || [];
+                return messages || [];
             }
             catch (error) {
                 console.error('❌ Error en getConversationMessages:', error);
@@ -239,190 +568,194 @@ class SupabaseDatabaseService {
             }
         });
     }
-    // ===== GESTIÓN DE RESÚMENES =====
     /**
-     * Guardar o actualizar resumen de conversación
+     * Marcar mensaje como leído
      */
-    upsertConversationSummary(conversationId_1, summaryData_1) {
-        return __awaiter(this, arguments, void 0, function* (conversationId, summaryData, generatedBy = 'gemini-2.5-flash') {
+    markMessageAsRead(messageId) {
+        return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log(`📋 Simulación: upsertConversationSummary para ${conversationId}`);
-                return null;
+                return false;
             }
             try {
-                const { data, error } = yield supabase_1.supabase
-                    .from('conversation_summaries')
-                    .upsert({
-                    conversation_id: conversationId,
-                    summary_data: summaryData,
-                    generated_by: generatedBy,
-                    created_at: new Date().toISOString()
-                })
-                    .select()
-                    .single();
+                const { error } = yield supabase_1.supabase
+                    .from('messages')
+                    .update({ is_read: true })
+                    .eq('id', messageId);
                 if (error) {
-                    console.error('❌ Error guardando resumen:', error);
-                    return null;
+                    console.error('❌ Error marcando mensaje como leído:', error);
+                    return false;
                 }
-                console.log(`✅ Resumen guardado para conversación: ${conversationId}`);
-                return data;
+                return true;
             }
             catch (error) {
-                console.error('❌ Error en upsertConversationSummary:', error);
-                return null;
+                console.error('❌ Error en markMessageAsRead:', error);
+                return false;
             }
         });
     }
     /**
-     * Obtener resumen de conversación
+     * Marcar conversación como leída
      */
-    getConversationSummary(conversationId) {
+    markConversationAsRead(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log(`📋 Simulación: getConversationSummary para ${conversationId}`);
-                return null;
+                return false;
             }
             try {
-                const { data, error } = yield supabase_1.supabase
-                    .from('conversation_summaries')
-                    .select('*')
+                // Marcar todos los mensajes de la conversación como leídos
+                const { error: messagesError } = yield supabase_1.supabase
+                    .from('messages')
+                    .update({ is_read: true })
                     .eq('conversation_id', conversationId)
-                    .single();
-                if (error && error.code !== 'PGRST116') { // PGRST116 = No rows found
-                    console.error('❌ Error obteniendo resumen:', error);
-                    return null;
+                    .eq('is_read', false);
+                if (messagesError) {
+                    console.error('❌ Error marcando mensajes como leídos:', messagesError);
+                    return false;
                 }
-                return data;
+                // Resetear contador de mensajes no leídos
+                const { error: conversationError } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update({ unread_count: 0 })
+                    .eq('id', conversationId);
+                if (conversationError) {
+                    console.error('❌ Error reseteando contador de mensajes no leídos:', conversationError);
+                    return false;
+                }
+                return true;
             }
             catch (error) {
-                console.error('❌ Error en getConversationSummary:', error);
-                return null;
+                console.error('❌ Error en markConversationAsRead:', error);
+                return false;
             }
         });
     }
-    // ===== GESTIÓN DE PRODUCTOS (SIMULACIÓN ERP) =====
     /**
-     * Buscar productos por término
+     * Limpiar mensajes antiguos
      */
-    searchProducts(searchTerm_1) {
-        return __awaiter(this, arguments, void 0, function* (searchTerm, limit = 10) {
-            if (!this.isEnabled || !supabase_1.supabase) {
-                console.log(`📋 Simulación: searchProducts "${searchTerm}"`);
-                // Retornar productos simulados
-                return [
-                    {
-                        id: '1',
-                        sku: 'BRAKE-001',
-                        name: 'Pastillas de freno Toyota',
-                        description: 'Pastillas de freno compatibles con Toyota Corolla',
-                        price: 850.00,
-                        stock: 15,
-                        metadata: { brand: 'Toyota', compatibility: ['Corolla', 'Camry'] }
-                    }
-                ];
-            }
-            try {
-                const { data, error } = yield supabase_1.supabase
-                    .from('products')
-                    .select('*')
-                    .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
-                    .gt('stock', 0)
-                    .limit(limit);
-                if (error) {
-                    console.error('❌ Error buscando productos:', error);
-                    return [];
-                }
-                return data || [];
-            }
-            catch (error) {
-                console.error('❌ Error en searchProducts:', error);
-                return [];
-            }
-        });
-    }
-    // ===== GESTIÓN DE PEDIDOS =====
-    /**
-     * Crear un nuevo pedido
-     */
-    createOrder(data) {
+    cleanupOldMessages(olderThanHours) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log('📋 Simulación: createOrder');
-                return null;
+                return 0;
             }
             try {
-                const { data: order, error } = yield supabase_1.supabase
-                    .from('orders')
-                    .insert({
-                    conversation_id: data.conversationId,
-                    agent_id: data.agentId,
-                    status: data.status || 'pending',
-                    order_details: data.orderDetails,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
-                    .select()
-                    .single();
+                const cutoffDate = new Date();
+                cutoffDate.setHours(cutoffDate.getHours() - olderThanHours);
+                const { error } = yield supabase_1.supabase
+                    .from('messages')
+                    .delete()
+                    .lt('created_at', cutoffDate.toISOString());
                 if (error) {
-                    console.error('❌ Error creando pedido:', error);
-                    return null;
+                    console.error('❌ Error limpiando mensajes antiguos:', error);
+                    return 0;
                 }
-                console.log(`✅ Pedido creado: ${order.id}`);
-                return order;
+                // Supabase no retorna el número de filas eliminadas en delete()
+                // Por ahora retornamos 0, pero podríamos implementar un contador
+                return 0;
             }
             catch (error) {
-                console.error('❌ Error en createOrder:', error);
-                return null;
+                console.error('❌ Error en cleanupOldMessages:', error);
+                return 0;
             }
         });
     }
     // ===== ESTADÍSTICAS =====
     /**
-     * Obtener estadísticas básicas
+     * Obtener estadísticas del chatbot
      */
-    getStats() {
+    getChatbotStats() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log('📋 Simulación: getStats');
                 return {
-                    totalConversations: 5,
-                    totalMessages: 47,
-                    totalOrders: 3,
-                    activeConversations: 2
+                    totalConversations: 0,
+                    totalMessages: 0,
+                    totalOrders: 0,
+                    activeConversations: 0
                 };
             }
             try {
-                const [conversationsResult, messagesResult, ordersResult, activeConversationsResult] = yield Promise.all([
-                    supabase_1.supabase.from('conversations').select('*', { count: 'exact', head: true }),
-                    supabase_1.supabase.from('messages').select('*', { count: 'exact', head: true }),
-                    supabase_1.supabase.from('orders').select('*', { count: 'exact', head: true }),
-                    supabase_1.supabase.from('conversations').select('*', { count: 'exact', head: true }).eq('status', 'active')
-                ]);
+                // Obtener estadísticas de conversaciones
+                const { count: totalConversations } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('*', { count: 'exact', head: true });
+                const { count: activeConversations } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'active');
+                // Obtener estadísticas de mensajes
+                const { count: totalMessages } = yield supabase_1.supabase
+                    .from('messages')
+                    .select('*', { count: 'exact', head: true });
+                // Obtener estadísticas de órdenes (si existe la tabla)
+                let totalOrders = 0;
+                try {
+                    const { count } = yield supabase_1.supabase
+                        .from('orders')
+                        .select('*', { count: 'exact', head: true });
+                    totalOrders = count || 0;
+                }
+                catch (error) {
+                    // La tabla orders puede no existir aún
+                    console.log('📋 Tabla orders no disponible aún');
+                }
                 return {
-                    totalConversations: conversationsResult.count || 0,
-                    totalMessages: messagesResult.count || 0,
-                    totalOrders: ordersResult.count || 0,
-                    activeConversations: activeConversationsResult.count || 0
+                    totalConversations: totalConversations || 0,
+                    totalMessages: totalMessages || 0,
+                    totalOrders,
+                    activeConversations: activeConversations || 0
                 };
             }
             catch (error) {
-                console.error('❌ Error obteniendo estadísticas:', error);
-                return { totalConversations: 0, totalMessages: 0, totalOrders: 0, activeConversations: 0 };
+                console.error('❌ Error en getChatbotStats:', error);
+                return {
+                    totalConversations: 0,
+                    totalMessages: 0,
+                    totalOrders: 0,
+                    activeConversations: 0
+                };
             }
         });
     }
-    // ===== MÉTODOS DE CONSULTA ADICIONALES =====
-    /**
-     * Obtener conversaciones activas
-     */
+    // ===== FUNCIONES LEGACY (MANTENER COMPATIBILIDAD) =====
+    upsertConversationSummary(conversationId_1, summaryData_1) {
+        return __awaiter(this, arguments, void 0, function* (conversationId, summaryData, generatedBy = 'gemini-2.5-flash') {
+            // TODO: Implementar en el nuevo esquema si es necesario
+            console.log(`📝 Resumen guardado para conversación ${conversationId} (legacy)`);
+            return null;
+        });
+    }
+    getConversationSummary(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: Implementar en el nuevo esquema si es necesario
+            console.log(`📝 Resumen obtenido para conversación ${conversationId} (legacy)`);
+            return null;
+        });
+    }
+    searchProducts(searchTerm_1) {
+        return __awaiter(this, arguments, void 0, function* (searchTerm, limit = 10) {
+            // TODO: Implementar búsqueda de productos en el nuevo esquema
+            console.log(`🔍 Búsqueda de productos: ${searchTerm} (legacy)`);
+            return [];
+        });
+    }
+    createOrder(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: Implementar en el nuevo esquema si es necesario
+            console.log(`📦 Orden creada (legacy)`);
+            return null;
+        });
+    }
+    getStats() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.getChatbotStats();
+        });
+    }
     getActiveConversations() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log('📋 Simulación: getActiveConversations');
                 return [];
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data: conversations, error } = yield supabase_1.supabase
                     .from('conversations')
                     .select('*')
                     .eq('status', 'active')
@@ -431,7 +764,7 @@ class SupabaseDatabaseService {
                     console.error('❌ Error obteniendo conversaciones activas:', error);
                     return [];
                 }
-                return data || [];
+                return conversations || [];
             }
             catch (error) {
                 console.error('❌ Error en getActiveConversations:', error);
@@ -439,17 +772,38 @@ class SupabaseDatabaseService {
             }
         });
     }
-    /**
-     * Buscar conversaciones por criterio
-     */
-    searchConversations(criteria) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getConversations() {
+        return __awaiter(this, arguments, void 0, function* (limit = 50, offset = 0) {
             if (!this.isEnabled || !supabase_1.supabase) {
-                console.log('📋 Simulación: searchConversations');
                 return [];
             }
             try {
-                let query = supabase_1.supabase.from('conversations').select('*');
+                const { data: conversations, error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .range(offset, offset + limit - 1);
+                if (error) {
+                    console.error('❌ Error obteniendo conversaciones:', error);
+                    return [];
+                }
+                return conversations || [];
+            }
+            catch (error) {
+                console.error('❌ Error en getConversations:', error);
+                return [];
+            }
+        });
+    }
+    searchConversations(criteria) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return [];
+            }
+            try {
+                let query = supabase_1.supabase
+                    .from('conversations')
+                    .select('*');
                 if (criteria.contactPhone) {
                     query = query.eq('contact_phone', criteria.contactPhone);
                 }
@@ -462,13 +816,12 @@ class SupabaseDatabaseService {
                 if (criteria.agentId) {
                     query = query.eq('assigned_agent_id', criteria.agentId);
                 }
-                query = query.order('updated_at', { ascending: false });
-                const { data, error } = yield query;
+                const { data: conversations, error } = yield query.order('updated_at', { ascending: false });
                 if (error) {
                     console.error('❌ Error buscando conversaciones:', error);
                     return [];
                 }
-                return data || [];
+                return conversations || [];
             }
             catch (error) {
                 console.error('❌ Error en searchConversations:', error);

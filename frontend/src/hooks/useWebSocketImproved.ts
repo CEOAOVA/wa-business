@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAppStore } from '../stores/appStore';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002';
+// Use relative path to leverage Vite proxy in development
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002');
 
 export interface WebSocketMessage {
   message: {
@@ -55,9 +56,9 @@ export function useWebSocketImproved(config: Partial<WebSocketConfig> = {}) {
   const [lastHeartbeat, setLastHeartbeat] = useState<Date | null>(null);
   
   const socketRef = useRef<Socket | null>(null);
-  const retryTimeoutRef = useRef<number | null>(null);
-  const heartbeatIntervalRef = useRef<number | null>(null);
-  const heartbeatTimeoutRef = useRef<number | null>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const heartbeatTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isConnectingRef = useRef(false);
   
   const { setConnectionState, incrementRetryCount, resetRetryCount, addNotification } = useAppStore();
@@ -139,13 +140,29 @@ export function useWebSocketImproved(config: Partial<WebSocketConfig> = {}) {
       connectionError: undefined,
     });
 
+    // Limpiar cualquier socket anterior antes de crear uno nuevo
+    if (socketRef.current) {
+      try {
+        socketRef.current.removeAllListeners();
+        socketRef.current.disconnect();
+      } catch (error) {
+        console.warn('⚠️ Error limpiando socket anterior:', error);
+      }
+      socketRef.current = null;
+    }
+
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
       timeout: 20000,
       forceNew: true,
       reconnection: false, // Manejar reconexión manualmente
+      autoConnect: true,
+      // Configuraciones adicionales para evitar problemas de doClose
+      closeOnBeforeunload: false,
+      rememberUpgrade: false,
     });
 
+    // Configurar listeners ANTES de asignar el socket
     socket.on('connect', () => {
       console.log('✅ WebSocket conectado:', socket.id);
       setIsConnected(true);
@@ -219,6 +236,7 @@ export function useWebSocketImproved(config: Partial<WebSocketConfig> = {}) {
       // El store se encargará de procesar la actualización
     });
 
+    // Asignar el socket DESPUÉS de configurar todos los listeners
     socketRef.current = socket;
   }, [retryCount, finalConfig.maxRetries, setConnectionState, resetRetryCount, setupHeartbeat, addNotification, clearTimeouts, handlePong]);
 
@@ -255,8 +273,19 @@ export function useWebSocketImproved(config: Partial<WebSocketConfig> = {}) {
     clearTimeouts();
     
     if (socketRef.current) {
-      socketRef.current.disconnect();
-      socketRef.current = null;
+      try {
+        // Verificar el estado del socket antes de desconectar
+        if (socketRef.current.connected) {
+          console.log('🔌 Socket activo, desconectando...');
+          socketRef.current.disconnect();
+        } else {
+          console.log('🔌 Socket no está conectado, solo limpiando referencia');
+        }
+      } catch (error) {
+        console.warn('⚠️ Error durante desconexión:', error);
+      } finally {
+        socketRef.current = null;
+      }
     }
     
     setIsConnected(false);
@@ -264,12 +293,12 @@ export function useWebSocketImproved(config: Partial<WebSocketConfig> = {}) {
     setRetryCount(0);
     isConnectingRef.current = false;
     
-          setConnectionState({
-        isConnected: false,
-        isConnecting: false,
-        connectionError: undefined,
-        retryCount: 0,
-      });
+    setConnectionState({
+      isConnected: false,
+      isConnecting: false,
+      connectionError: undefined,
+      retryCount: 0,
+    });
   }, [clearTimeouts, setConnectionState]);
 
   // Reconectar manualmente
@@ -316,13 +345,18 @@ export function useWebSocketImproved(config: Partial<WebSocketConfig> = {}) {
 
   // Efecto para conectar automáticamente
   useEffect(() => {
-    connect();
+    const isMountedRef = { current: true };
+    
+    if (isMountedRef.current) {
+      connect();
+    }
 
     // Cleanup al desmontar
     return () => {
+      isMountedRef.current = false;
       disconnect();
     };
-  }, []);
+  }, []); // Solo ejecutar una vez al montar
 
   // Efecto para manejar cambios en el estado de conexión
   useEffect(() => {

@@ -43,14 +43,18 @@ const MessageBubble: React.FC<{
         <div className="whitespace-pre-wrap">{message.content}</div>
       ) : (
         <MediaMessage message={{
-          ...message, 
-          isOwn,
-          type: message.type.toUpperCase() as 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER'
+          id: message.id.toString(),
+          type: (message.type || message.message_type || 'text').toUpperCase() as 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER',
+          mediaUrl: message.metadata?.mediaUrl,
+          mediaCaption: message.metadata?.caption,
+          content: message.content,
+          timestamp: message.timestamp || new Date(message.created_at || Date.now()),
+          isOwn
         }} />
       )}
       
       <div className="text-xs opacity-70 mt-1 text-right">
-        {getRelativeTime(message.timestamp)}
+        {getRelativeTime(message.timestamp || new Date(message.created_at || Date.now()))}
       </div>
     </div>
   );
@@ -65,7 +69,7 @@ const ChatPanel: React.FC = () => {
     connectionStatus
   } = useWhatsApp();
   const { isUploading } = useMediaUpload({
-    apiBaseUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002',
+            apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
   });
 
   // States existentes

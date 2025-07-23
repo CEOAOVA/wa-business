@@ -68,5 +68,5 @@ src/
 docker build -t embler-frontend .
 
 # Ejecutar contenedor
-docker run -p 3000:3000 embler-frontend
+docker run -p 80:80 embler-frontend
 ```

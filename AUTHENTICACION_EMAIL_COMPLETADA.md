@@ -1,6 +1,5 @@
 # Autenticación con Email - Implementación Completada
 
-###No compiló? frontend
 
 ## Resumen de Cambios
 

@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { logger } from '../../utils/logger';
-import { databaseService } from '../../config/database';
+import { databaseService } from '../database.service';
 import { soapService } from '../soap/soap-service';
 
 export interface HealthCheckResult {

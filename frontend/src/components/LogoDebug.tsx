@@ -12,7 +12,6 @@ const LogoDebug: React.FC<LogoProps> = ({
   className = "",
   animate = true
 }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   const sizeClasses = {
@@ -22,20 +21,13 @@ const LogoDebug: React.FC<LogoProps> = ({
     xl: 'h-14 w-14'
   };
 
-  // Probar diferentes rutas
-  const imagePaths = [
-    '/logembler.jpg',
-    './logembler.jpg',
-    '../public/logembler.jpg',
-    'logembler.jpg'
-  ];
+
 
   useEffect(() => {
     // Debug: verificar si la imagen existe
     const testImage = new Image();
     testImage.onload = () => {
       console.log('✅ Logo image loaded successfully');
-      setImageLoaded(true);
     };
     testImage.onerror = () => {
       console.log('❌ Logo image failed to load');
@@ -64,7 +56,6 @@ const LogoDebug: React.FC<LogoProps> = ({
         transition={{ duration: 0.3 }}
         onLoad={() => {
           console.log('✅ Logo image loaded in component');
-          setImageLoaded(true);
         }}
         onError={(e) => {
           console.error('❌ Error loading logo image:', e);

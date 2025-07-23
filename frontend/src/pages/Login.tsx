@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { MessageCircle, Shield, Zap, Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { MessageCircle, Shield, Zap, Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 import Logo from "../components/LogoDebug";
+import { forceLogout } from "../utils/auth-cleanup";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -43,6 +44,10 @@ const Login: React.FC = () => {
       // El error se maneja en el contexto
       console.error('Error en login:', error);
     }
+  };
+
+  const handleClearSession = () => {
+    forceLogout();
   };
 
   // Credenciales demo disponibles
@@ -381,6 +386,18 @@ const Login: React.FC = () => {
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
+            </motion.button>
+
+            {/* Botón para limpiar sesión */}
+            <motion.button
+              type="button"
+              onClick={handleClearSession}
+              className="w-full py-3 px-6 bg-transparent border border-gray-600 text-gray-300 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-transparent hover:bg-gray-800 hover:border-gray-500 flex items-center justify-center gap-3 text-sm"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Limpiar Sesión</span>
             </motion.button>
           </motion.form>
         </div>

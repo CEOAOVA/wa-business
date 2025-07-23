@@ -11,12 +11,61 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productService = exports.ProductService = void 0;
 const database_service_1 = require("./database.service");
+const unified_catalog_service_1 = require("./unified-catalog.service");
 class ProductService {
     constructor() {
-        console.log('🛍️ ProductService inicializado');
+        console.log('🛍️ ProductService inicializado - INTEGRADO con catálogo unificado');
     }
     /**
-     * Buscar productos por término de búsqueda
+     * Buscar productos usando el catálogo unificado de Supabase
+     */
+    searchProductsUnified(searchTerm_1) {
+        return __awaiter(this, arguments, void 0, function* (searchTerm, options = {}) {
+            const startTime = Date.now();
+            const { limit = 10, includeImages = true, includeBasic = true, includeConcepts = true, category } = options;
+            try {
+                console.log(`[ProductService] Búsqueda unificada: "${searchTerm}"`);
+                // Buscar en el catálogo unificado
+                const unifiedResults = yield unified_catalog_service_1.unifiedCatalogService.searchUnified(searchTerm, {
+                    limit,
+                    searchInImages: includeImages,
+                    searchInBasic: includeBasic,
+                    searchInConcepts: includeConcepts,
+                    category
+                });
+                // Convertir resultados a formato Product estándar
+                const products = this.convertUnifiedToProducts(unifiedResults, limit);
+                const executionTime = Date.now() - startTime;
+                console.log(`[ProductService] Búsqueda unificada completada: ${products.length} productos en ${executionTime}ms`);
+                return {
+                    unifiedResults,
+                    products,
+                    totalFound: unifiedResults.totalResults,
+                    searchTerm,
+                    executionTime
+                };
+            }
+            catch (error) {
+                console.error('[ProductService] Error en búsqueda unificada:', error);
+                return {
+                    unifiedResults: {
+                        basicProducts: [],
+                        conceptMappings: [],
+                        productsWithImages: [],
+                        totalResults: 0,
+                        searchTime: 0,
+                        query: searchTerm
+                    },
+                    products: [],
+                    totalFound: 0,
+                    searchTerm,
+                    executionTime: Date.now() - startTime
+                };
+            }
+        });
+    }
+    /**
+     * Buscar productos por término de búsqueda (método principal)
      */
     searchProducts(searchTerm_1) {
         return __awaiter(this, arguments, void 0, function* (searchTerm, options = {}) {
@@ -24,8 +73,11 @@ class ProductService {
             const { limit = 10, filters = {} } = options;
             try {
                 console.log(`[ProductService] Buscando productos: "${searchTerm}"`);
-                // Usar el servicio híbrido de base de datos
-                let products = yield database_service_1.databaseService.searchChatbotProducts(searchTerm, limit);
+                // PRIORIZAR búsqueda unificada en Supabase
+                const unifiedSearch = yield this.searchProductsUnified(searchTerm, {
+                    limit: limit * 2 // Buscar más para filtrar después
+                });
+                let products = unifiedSearch.products;
                 // Aplicar filtros adicionales si se especifican
                 if (filters.brand) {
                     products = products.filter((p) => { var _a, _b; return (_b = (_a = p.metadata) === null || _a === void 0 ? void 0 : _a.brand) === null || _b === void 0 ? void 0 : _b.toLowerCase().includes(filters.brand.toLowerCase()); });
@@ -39,11 +91,16 @@ class ProductService {
                 if (filters.inStock) {
                     products = products.filter((p) => p.stock > 0);
                 }
+                // Si no hay resultados en Supabase, usar fallback
+                if (products.length === 0) {
+                    console.log('[ProductService] Sin resultados en Supabase, usando fallback...');
+                    products = yield database_service_1.databaseService.searchChatbotProducts(searchTerm, limit);
+                }
                 const executionTime = Date.now() - startTime;
                 console.log(`[ProductService] Encontrados ${products.length} productos en ${executionTime}ms`);
                 return {
                     products: products.slice(0, limit),
-                    totalFound: products.length,
+                    totalFound: Math.max(products.length, unifiedSearch.totalFound),
                     searchTerm,
                     executionTime
                 };
@@ -215,6 +272,77 @@ class ProductService {
                 return [];
             }
         });
+    }
+    /**
+     * Convertir resultados del catálogo unificado al formato Product estándar
+     */
+    convertUnifiedToProducts(unifiedResults, limit) {
+        const products = [];
+        // Convertir productos con imágenes
+        unifiedResults.productsWithImages.forEach((item, index) => {
+            if (products.length >= limit)
+                return;
+            products.push({
+                id: item.id,
+                sku: `IMG-${item.id.slice(-8)}`,
+                name: item.titulo,
+                description: `Categoría: ${item.categoria || 'Sin categoría'}`,
+                price: 0, // Precio por cotizar
+                stock: 1, // Asumir disponible
+                metadata: {
+                    brand: this.extractBrandFromTitle(item.titulo),
+                    type: item.categoria || 'Autopartes',
+                    images: this.extractImages(item),
+                    imageCount: item.total_images,
+                    mainImage: item.main_image_url
+                }
+            });
+        });
+        // Convertir productos básicos
+        unifiedResults.basicProducts.forEach((item, index) => {
+            if (products.length >= limit)
+                return;
+            products.push({
+                id: item.id,
+                sku: item.clave || `BASIC-${item.id.slice(-8)}`,
+                name: item.nombre,
+                description: 'Producto del catálogo básico',
+                price: 0, // Precio por cotizar
+                stock: 1, // Asumir disponible
+                metadata: {
+                    brand: this.extractBrandFromTitle(item.nombre),
+                    type: 'Autopartes',
+                    source: 'basic_catalog'
+                }
+            });
+        });
+        return products;
+    }
+    /**
+     * Extraer marca del título del producto
+     */
+    extractBrandFromTitle(title) {
+        const commonBrands = [
+            'BMW', 'MERCEDES', 'AUDI', 'VOLKSWAGEN', 'PORSCHE', 'FORD', 'NISSAN',
+            'TOYOTA', 'HONDA', 'MAZDA', 'HYUNDAI', 'KIA', 'CHRYSLER', 'JEEP',
+            'MAHLE', 'BOSCH', 'FREY', 'EMBLER', 'VIKA'
+        ];
+        const upperTitle = title.toUpperCase();
+        const foundBrand = commonBrands.find(brand => upperTitle.includes(brand));
+        return foundBrand;
+    }
+    /**
+     * Extraer URLs de imágenes del producto
+     */
+    extractImages(item) {
+        const images = [];
+        for (let i = 1; i <= 10; i++) {
+            const imageKey = `imagen_${i}`;
+            if (item[imageKey] && item[imageKey].trim()) {
+                images.push(item[imageKey]);
+            }
+        }
+        return images;
     }
     /**
      * Simular procesamiento de pedido (integración ERP futura)

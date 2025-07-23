@@ -39,7 +39,6 @@ const DEFAULT_CONFIG: ErrorHandlerConfig = {
 class ErrorHandler {
   private config: ErrorHandlerConfig;
   private errorLog: ErrorInfo[] = [];
-  private retryQueue: Map<string, { fn: () => Promise<any>; retryCount: number }> = new Map();
   private notificationCallback?: (error: ErrorInfo) => void;
 
   constructor(config: Partial<ErrorHandlerConfig> = {}) {

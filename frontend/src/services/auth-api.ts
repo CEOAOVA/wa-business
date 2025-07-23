@@ -1,4 +1,4 @@
-import type { LoginCredentials, User } from '../types';
+import type { User } from '../types';
 
 // Definición local de ApiResponse para evitar problemas de importación
 interface ApiResponse<T> {
@@ -8,7 +8,8 @@ interface ApiResponse<T> {
   error?: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+// Use relative path to leverage Vite proxy in development
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002');
 
 export interface LoginRequest {
   email: string;
@@ -21,7 +22,7 @@ export interface LoginResponse {
     username: string;
     full_name: string;
     email: string;
-    role: 'admin' | 'agent' | 'user';
+    role: 'admin' | 'agent' | 'supervisor';
     whatsapp_id?: string;
     is_active: boolean;
     last_login?: string;
@@ -36,7 +37,7 @@ export interface UserProfile {
   username: string;
   full_name: string;
   email: string;
-  role: 'admin' | 'agent' | 'user';
+  role: 'admin' | 'agent' | 'supervisor';
   whatsapp_id?: string;
   is_active: boolean;
   last_login?: string;
@@ -146,7 +147,7 @@ class AuthApiService {
     full_name: string;
     email: string;
     password: string;
-    role?: 'admin' | 'agent' | 'user';
+    role?: 'admin' | 'agent' | 'supervisor';
     whatsapp_id?: string;
   }): Promise<UserProfile> {
     const response = await this.request<UserProfile>('/register', {
@@ -162,6 +163,13 @@ class AuthApiService {
     });
   }
 
+  async clearSessions(): Promise<{ cleanedServices: string[]; timestamp: string }> {
+    const response = await this.request<{ cleanedServices: string[]; timestamp: string }>('/clear-sessions', {
+      method: 'POST',
+    });
+    return response.data;
+  }
+
   // Convertir UserProfile del backend a User del frontend
   convertToUser(profile: UserProfile): User {
     return {
@@ -169,7 +177,7 @@ class AuthApiService {
       name: profile.full_name,
       email: profile.email,
       whatsappNumber: profile.whatsapp_id || '',
-      role: profile.role === 'user' ? 'agent' : profile.role, // Mapear 'user' a 'agent'
+      role: profile.role === 'supervisor' ? 'agent' : profile.role, // Mapear 'supervisor' a 'agent'
       isOnline: profile.is_active,
       lastSeen: profile.last_login ? new Date(profile.last_login) : new Date(),
       status: profile.is_active ? 'active' : 'inactive',

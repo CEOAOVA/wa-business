@@ -42,7 +42,6 @@ export interface ChatCache {
 class CacheService {
   private readonly VERSION = '1.0.0';
   private readonly STORAGE_PREFIX = 'whatsapp_cache_';
-  private readonly MAX_STORAGE_SIZE = 50 * 1024 * 1024; // 50MB
   private readonly DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 horas
 
   constructor() {

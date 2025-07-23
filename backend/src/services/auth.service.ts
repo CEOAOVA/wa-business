@@ -6,7 +6,7 @@ export interface UserProfile {
   username: string;
   full_name: string;
   email: string;
-  role: 'admin' | 'agent' | 'user';
+  role: 'admin' | 'agent' | 'supervisor';
   whatsapp_id?: string;
   is_active: boolean;
   last_login?: string;
@@ -19,7 +19,7 @@ export interface CreateUserData {
   full_name: string;
   email: string;
   password: string;
-  role?: 'admin' | 'agent' | 'user';
+  role?: 'admin' | 'agent' | 'supervisor';
   whatsapp_id?: string;
 }
 
@@ -45,7 +45,7 @@ export class AuthService {
         user_metadata: {
           username: userData.username,
           full_name: userData.full_name,
-          role: userData.role || 'user'
+          role: userData.role || 'agent'
         },
         email_confirm: true // Confirmar email automáticamente
       });
@@ -59,16 +59,15 @@ export class AuthService {
         throw new Error('No user data returned from auth creation');
       }
 
-      // Crear perfil de usuario en la tabla user_profiles usando el cliente administrativo
+      // Crear perfil de usuario en la tabla agents usando el cliente administrativo
       const { data: profileData, error: profileError } = await supabaseAdmin
-        .from('user_profiles')
+        .from('agents')
         .insert({
           id: authData.user.id,
           username: userData.username,
           full_name: userData.full_name,
           email: userData.email,
-          role: userData.role || 'user',
-          whatsapp_id: userData.whatsapp_id,
+          role: userData.role || 'agent',
           is_active: true
         })
         .select()
@@ -98,43 +97,47 @@ export class AuthService {
 
       // Buscar el usuario por email usando el cliente administrativo
       const { data: profileData, error: profileError } = await supabaseAdmin
-        .from('user_profiles')
+        .from('agents')
         .select('*')
         .eq('email', loginData.email)
+        .eq('is_active', true)
         .single();
 
-      if (profileError || !profileData) {
-        logger.error('User not found:', profileError);
-        throw new Error('Usuario o contraseña incorrectos');
+      if (profileError) {
+        logger.error('Error fetching user profile:', profileError);
+        throw new Error('Usuario no encontrado o inactivo');
       }
 
-      if (!profileData.is_active) {
-        throw new Error('Cuenta de usuario desactivada');
+      if (!profileData) {
+        throw new Error('Usuario no encontrado');
       }
 
-      // Autenticar con Supabase usando el email directamente
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Autenticar con Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password
       });
 
-      if (error) {
-        logger.error('Login error:', error);
-        throw new Error(`Error de autenticación: ${error.message}`);
+      if (authError) {
+        logger.error('Error authenticating user:', authError);
+        throw new Error(`Error de autenticación: ${authError.message}`);
       }
 
-      if (!data.user) {
-        throw new Error('No se obtuvo información del usuario');
+      if (!authData.user || !authData.session) {
+        throw new Error('No se pudo autenticar al usuario');
       }
 
-      // Actualizar último login usando el cliente administrativo
+      // Actualizar último login
       await supabaseAdmin
-        .from('user_profiles')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', data.user.id);
+        .from('agents')
+        .update({ 
+          last_login: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', profileData.id);
 
       logger.info(`User logged in successfully: ${loginData.email}`);
-      return { user: profileData, session: data.session };
+      return { user: profileData, session: authData.session };
     } catch (error) {
       logger.error('Error in login:', error);
       throw error;
@@ -146,25 +149,29 @@ export class AuthService {
    */
   static async getUserById(userId: string): Promise<UserProfile | null> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
+      if (!supabaseAdmin) {
+        throw new Error('Servicio de autenticación administrativa no disponible');
       }
 
-      const { data, error } = await supabase
-        .from('user_profiles')
+      const { data, error } = await supabaseAdmin
+        .from('agents')
         .select('*')
         .eq('id', userId)
+        .eq('is_active', true)
         .single();
 
       if (error) {
+        if (error.code === 'PGRST116') {
+          return null; // No encontrado
+        }
         logger.error('Error fetching user by ID:', error);
-        return null;
+        throw error;
       }
 
       return data;
     } catch (error) {
       logger.error('Error in getUserById:', error);
-      return null;
+      throw error;
     }
   }
 
@@ -173,30 +180,34 @@ export class AuthService {
    */
   static async getUserByEmail(email: string): Promise<UserProfile | null> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
+      if (!supabaseAdmin) {
+        throw new Error('Servicio de autenticación administrativa no disponible');
       }
 
-      const { data, error } = await supabase
-        .from('user_profiles')
+      const { data, error } = await supabaseAdmin
+        .from('agents')
         .select('*')
         .eq('email', email)
+        .eq('is_active', true)
         .single();
 
       if (error) {
+        if (error.code === 'PGRST116') {
+          return null; // No encontrado
+        }
         logger.error('Error fetching user by email:', error);
-        return null;
+        throw error;
       }
 
       return data;
     } catch (error) {
       logger.error('Error in getUserByEmail:', error);
-      return null;
+      throw error;
     }
   }
 
   /**
-   * Obtener todos los usuarios (solo para admins)
+   * Obtener todos los usuarios
    */
   static async getAllUsers(): Promise<UserProfile[]> {
     try {
@@ -205,13 +216,14 @@ export class AuthService {
       }
 
       const { data, error } = await supabaseAdmin
-        .from('user_profiles')
+        .from('agents')
         .select('*')
+        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) {
         logger.error('Error fetching all users:', error);
-        throw new Error(`Error fetching users: ${error.message}`);
+        throw error;
       }
 
       return data || [];
@@ -226,12 +238,12 @@ export class AuthService {
    */
   static async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
+      if (!supabaseAdmin) {
+        throw new Error('Servicio de autenticación administrativa no disponible');
       }
 
-      const { data, error } = await supabase
-        .from('user_profiles')
+      const { data, error } = await supabaseAdmin
+        .from('agents')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
@@ -242,7 +254,7 @@ export class AuthService {
 
       if (error) {
         logger.error('Error updating user profile:', error);
-        throw new Error(`Error updating user profile: ${error.message}`);
+        throw error;
       }
 
       logger.info(`User profile updated: ${userId}`);
@@ -258,13 +270,13 @@ export class AuthService {
    */
   static async deactivateUser(userId: string): Promise<void> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
+      if (!supabaseAdmin) {
+        throw new Error('Servicio de autenticación administrativa no disponible');
       }
 
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ 
+      const { error } = await supabaseAdmin
+        .from('agents')
+        .update({
           is_active: false,
           updated_at: new Date().toISOString()
         })
@@ -272,7 +284,7 @@ export class AuthService {
 
       if (error) {
         logger.error('Error deactivating user:', error);
-        throw new Error(`Error deactivating user: ${error.message}`);
+        throw error;
       }
 
       logger.info(`User deactivated: ${userId}`);
@@ -283,28 +295,28 @@ export class AuthService {
   }
 
   /**
-   * Verificar si un usuario tiene un permiso específico
+   * Verificar permisos de usuario
    */
   static async hasPermission(userId: string, resource: string, action: string): Promise<boolean> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
-      }
-
-      const { data, error } = await supabase
-        .rpc('has_permission', {
-          p_resource: resource,
-          p_action: action
-        });
-
-      if (error) {
-        logger.error('Error checking permission:', error);
+      const user = await this.getUserById(userId);
+      if (!user) {
         return false;
       }
 
-      return data || false;
+      // Lógica de permisos basada en roles
+      switch (user.role) {
+        case 'admin':
+          return true; // Admin tiene todos los permisos
+        case 'supervisor':
+          return ['conversations', 'messages', 'contacts', 'agents'].includes(resource);
+        case 'agent':
+          return ['conversations', 'messages'].includes(resource) && action !== 'delete';
+        default:
+          return false;
+      }
     } catch (error) {
-      logger.error('Error in hasPermission:', error);
+      logger.error('Error checking permissions:', error);
       return false;
     }
   }
@@ -314,43 +326,26 @@ export class AuthService {
    */
   static async getCurrentUserRole(userId: string): Promise<string> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
-      }
-
-      const { data, error } = await supabase
-        .rpc('get_current_user_role');
-
-      if (error) {
-        logger.error('Error getting user role:', error);
-        return 'user';
-      }
-
-      return data || 'user';
+      const user = await this.getUserById(userId);
+      return user?.role || 'agent';
     } catch (error) {
-      logger.error('Error in getCurrentUserRole:', error);
-      return 'user';
+      logger.error('Error getting user role:', error);
+      return 'agent';
     }
   }
 
   /**
-   * Crear usuario admin inicial
+   * Crear administrador inicial (si no existe)
    */
   static async createInitialAdmin(): Promise<UserProfile> {
     try {
-      if (!supabase) {
-        throw new Error('Servicio de autenticación no disponible');
-      }
+      const adminEmail = process.env.INITIAL_ADMIN_EMAIL || 'admin@example.com';
+      const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'admin123';
 
       // Verificar si ya existe un admin
-      const { data: existingAdmin } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('role', 'admin')
-        .single();
-
+      const existingAdmin = await this.getUserByEmail(adminEmail);
       if (existingAdmin) {
-        logger.info('Admin user already exists');
+        logger.info('Initial admin already exists');
         return existingAdmin;
       }
 
@@ -358,14 +353,13 @@ export class AuthService {
       const adminData: CreateUserData = {
         username: 'admin',
         full_name: 'Administrador del Sistema',
-        email: 'admin@embler.mx',
-        password: 'Admin2024!', // Cambiar en producción
-        role: 'admin',
-        whatsapp_id: 'WHATSAPP_ADMIN_ID' // Se actualizará con el ID real
+        email: adminEmail,
+        password: adminPassword,
+        role: 'admin'
       };
 
       const admin = await this.createUser(adminData);
-      logger.info('Initial admin user created successfully');
+      logger.info('Initial admin created successfully');
       return admin;
     } catch (error) {
       logger.error('Error creating initial admin:', error);

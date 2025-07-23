@@ -16,7 +16,7 @@ declare global {
         username: string;
         full_name: string;
         email: string;
-        role: 'admin' | 'agent' | 'user';
+        role: 'admin' | 'agent' | 'supervisor';
         whatsapp_id?: string;
         is_active: boolean;
       };
@@ -141,7 +141,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
 };
 
 /**
- * Middleware para verificar rol de agente o admin
+ * Middleware para verificar rol de agente, supervisor o admin
  */
 export const requireAgentOrAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -151,10 +151,10 @@ export const requireAgentOrAdmin = (req: Request, res: Response, next: NextFunct
     });
   }
 
-  if (req.user.role !== 'admin' && req.user.role !== 'agent') {
+  if (req.user.role !== 'admin' && req.user.role !== 'agent' && req.user.role !== 'supervisor') {
     return res.status(403).json({
       success: false,
-      message: 'Se requieren permisos de agente o administrador'
+      message: 'Se requieren permisos de agente, supervisor o administrador'
     });
   }
 

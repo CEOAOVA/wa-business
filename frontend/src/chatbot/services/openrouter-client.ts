@@ -82,7 +82,7 @@ export class OpenRouterClient {
           headers: {
             'Authorization': `Bearer ${this.config.apiKey}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://localhost:3000', // Para OpenRouter
+            'HTTP-Referer': 'https://localhost:3002', // Para OpenRouter
             'X-Title': 'Autoparts Chatbot', // Para OpenRouter
           },
           timeout: this.config.timeoutMs,

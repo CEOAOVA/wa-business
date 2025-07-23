@@ -160,6 +160,10 @@ export class UnifiedCatalogService {
   ): Promise<BasicProduct[]> {
     const { limit = 50, includeInactive = false } = options;
 
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+
     try {
       let query = supabase
         .from('product_basic_catalog')
@@ -196,6 +200,10 @@ export class UnifiedCatalogService {
     options: { limit?: number; includeInactive?: boolean } = {}
   ): Promise<ConceptMapping[]> {
     const { limit = 20, includeInactive = false } = options;
+
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
 
     try {
       let query = supabase
@@ -239,6 +247,10 @@ export class UnifiedCatalogService {
     options: { limit?: number; includeInactive?: boolean; category?: string } = {}
   ): Promise<ProductWithImages[]> {
     const { limit = 50, includeInactive = false, category } = options;
+
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
 
     try {
       let query = supabase
@@ -343,6 +355,10 @@ export class UnifiedCatalogService {
     productsWithImages: { total: number; active: number; withImages: number };
     totalRecords: number;
   }> {
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+
     try {
       const [basicStats, conceptStats, imageStats] = await Promise.all([
         supabase.from('product_basic_catalog').select('is_active'),
@@ -380,6 +396,10 @@ export class UnifiedCatalogService {
    * Obtener todas las categorías disponibles
    */
   async getAllCategories(): Promise<string[]> {
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+
     const cacheKey = 'all_categories';
     
     const cached = this.cache.get(cacheKey);
@@ -437,11 +457,16 @@ export class UnifiedCatalogService {
    * Incrementar contador de uso de conceptos
    */
   private async incrementUsageCount(conceptIds: string[]): Promise<void> {
+    if (!supabase) {
+      return; // Silenciosamente fallar si supabase no está disponible
+    }
+
     try {
       // Incrementar en background, no bloquear búsqueda
+      const supabaseClient = supabase; // Capturar referencia local
       Promise.resolve().then(async () => {
         for (const id of conceptIds) {
-          await supabase.rpc('increment_concept_usage', { concept_id: id });
+          await supabaseClient.rpc('increment_concept_usage', { concept_id: id });
         }
       }).catch(error => {
         console.error('[UnifiedCatalogService] Error incrementando contador:', error);
@@ -462,6 +487,11 @@ export class UnifiedCatalogService {
 
 // Crear función SQL para incrementar contador de uso
 export async function createIncrementUsageFunction(): Promise<void> {
+  if (!supabase) {
+    console.warn('[UnifiedCatalogService] Supabase client is not initialized, skipping function creation');
+    return;
+  }
+
   try {
     await supabase.rpc('exec_sql', {
       sql: `

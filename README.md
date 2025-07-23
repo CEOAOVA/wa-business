@@ -84,8 +84,6 @@ La integración del chatbot con IA está completamente funcional y disponible en
 - `GET /api/chatbot/conversation/:phone` - Ver conversación
 - `GET /api/chatbot/stats` - Estadísticas del chatbot
 
-Ver documentación completa en [`CHATBOT_IA_SETUP.md`](./CHATBOT_IA_SETUP.md)
-
 ## 🏗️ Arquitectura del Sistema
 
 ### Frontend
@@ -105,198 +103,58 @@ Ver documentación completa en [`CHATBOT_IA_SETUP.md`](./CHATBOT_IA_SETUP.md)
 - Lógica de re-asignación automática
 
 ### Base de Datos
-- **SQLite** (desarrollo) / **PostgreSQL** (producción)
+- **Supabase** (PostgreSQL en la nube)
 - **Redis** para caching y sesiones
 
-## 📁 Estructura del Proyecto
+## 🔐 Sistema de Autenticación
 
-```
-whtsppbsnss/
-├── frontend/                 # Aplicación React
-├── backend/                  # Servidor Node.js
-├── shared/                   # Tipos y utilidades compartidas
-├── docs/                     # Documentación
-├── scripts/                  # Scripts de automatización
-├── docker/                   # Configuración Docker
-├── INITIAL.md               # ⚠️ DOCUMENTO DE REFERENCIA
-└── README.md                # Este archivo
-```
+### Credenciales de Acceso
 
-### Estructura Detallada
+| Usuario | Email | Contraseña | Rol | Vista Destino |
+|---------|-------|------------|-----|---------------|
+| **Admin** | `moises.s@aova.mx` | `Admin2024!` | Admin | `/admin/dashboard` |
+| **Agente 1** | `k.alvarado@aova.mx` | `Agente2024!` | Agent | `/chats` |
+| **Agente 2** | `elisa.n@synaracare.com` | `Agente2024!` | Agent | `/chats` |
 
-#### Frontend (`/frontend`)
-```
-frontend/
-├── src/
-│   ├── components/
-│   │   ├── common/           # Componentes reutilizables
-│   │   ├── layout/           # Componentes de layout
-│   │   ├── auth/             # Componentes de autenticación
-│   │   ├── chat/             # Componentes de chat
-│   │   ├── dashboard/        # Componentes del dashboard
-│   │   ├── user/             # Componentes de usuario
-│   │   └── microsip/         # Componentes de integración ERP
-│   ├── pages/                # Páginas de la aplicación
-│   ├── hooks/                # Custom hooks
-│   ├── services/             # Servicios de API
-│   ├── stores/               # Estado global (Zustand)
-│   ├── types/                # Tipos TypeScript
-│   ├── utils/                # Utilidades
-│   └── styles/               # Estilos CSS
-├── .env                      # Variables de entorno
-└── package.json
-```
-
-#### Backend (`/backend`)
-```
-backend/
-├── src/
-│   ├── routes/               # Rutas de la API
-│   ├── controllers/          # Controladores
-│   ├── services/             # Lógica de negocio
-│   ├── models/               # Modelos de datos
-│   ├── middleware/           # Middleware personalizado
-│   ├── utils/                # Utilidades
-│   ├── types/                # Tipos TypeScript
-│   ├── config/               # Configuraciones
-│   └── app.ts                # Aplicación principal
-├── tests/                    # Tests unitarios e integración
-├── database/                 # Migraciones y seeds
-├── .env                      # Variables de entorno
-└── package.json
-```
-
-## 🚀 Plan de Trabajo
-
-### Fase 1: Configuración Inicial y Estructura Base
-- [ ] Configurar proyecto React 18 + TypeScript + Vite
-- [ ] Configurar proyecto Node.js + TypeScript
-- [ ] Implementar sistema de autenticación simple
-- [ ] Crear estructura de carpetas completa
-- [ ] Configurar base de datos SQLite
-
-### Fase 2: Sistema de Usuarios y Gestión
-- [ ] CRUD completo de usuarios
-- [ ] Perfiles de usuario básicos
-- [ ] Sistema de roles (agente, admin)
-- [ ] Panel de usuario
-
-### Fase 3: Sistema de Chat Simulado
-- [ ] Estructura de conversaciones
-- [ ] Interfaz de chat tipo WhatsApp Web
-- [ ] Lista de conversaciones
-- [ ] Chat individual simulado
-
-### Fase 4: Sistema de Notificaciones Básico
-- [ ] Notificaciones de nuevas conversaciones
-- [ ] Badges de notificaciones
-- [ ] Centro de notificaciones
-
-### Fase 5: Integración WhatsApp Cloud API
-- [ ] Configuración de WhatsApp Business Cloud API
-- [ ] Manejo de webhooks
-- [ ] Enví de mensajes
-- [ ] Recepción de mensajes
-
-### Fase 6: Sistema de Chatbot
-- [ ] Integración con OpenRouter API
-- [ ] Lógica de chatbot inteligente
-- [ ] Recopilación de datos de cotización
-- [ ] Gestión de contexto de conversación
-
-### Fase 7: Sistema de Re-asignación
-- [ ] Monitoreo de actividad de agentes
-- [ ] Lógica de re-asignación por inactividad
-- [ ] Sistema de transferencias temporales
-- [ ] Notificaciones de transferencia
-
-### Fase 8: Integración Microsip ERP
-- [ ] Configuración de métodos SOAP
-- [ ] Servicios de integración ERP
-- [ ] Sincronización de datos
-- [ ] Componentes de integración
-
-### Fase 9: Testing y Documentación
-- [ ] Tests unitarios
-- [ ] Tests de integración
-- [ ] Tests E2E
-- [ ] Documentación completa
-
-### Fase 10: Optimización y Seguridad
-- [ ] Optimización de rendimiento
-- [ ] Implementación de seguridad
-- [ ] Configuración de producción
-- [ ] Monitoreo y logs
-
-## 🔧 Tecnologías Utilizadas
-
-### Frontend
-- **React 18** - Biblioteca de UI
-- **TypeScript** - Tipado estático
-- **Vite** - Build tool
-- **Tailwind CSS** - Framework CSS
-- **React Router v6** - Enrutamiento
-- **Zustand** - Estado global
-- **Axios** - Cliente HTTP
-- **Socket.io-client** - WebSockets
-
-### Backend
-- **Node.js** - Runtime
-- **TypeScript** - Tipado estático
-- **Express.js** - Framework web
-- **Socket.io** - WebSockets
-- **Prisma** - ORM
-- **bcrypt** - Encriptación
-- **jsonwebtoken** - JWT
-- **cors** - CORS
-- **helmet** - Seguridad
-
-### Base de Datos
-- **SQLite** - Desarrollo
-- **PostgreSQL** - Producción
-- **Redis** - Caching
-
-### DevOps
-- **Docker** - Containerización
-- **GitHub Actions** - CI/CD
-- **PM2** - Gestión de procesos
+### Características
+- ✅ **Login con email** (no username)
+- ✅ **Redirección automática** según el rol del usuario
+- ✅ **Panel de administración** para gestionar usuarios
+- ✅ **Protección de rutas** basada en roles
+- ✅ **Integración completa** con Supabase
 
 ## 🔑 Variables de Entorno
 
 ### Backend (.env)
 ```env
-# Base de datos
-DATABASE_URL="sqlite:./dev.db"
-REDIS_URL="redis://localhost:6379"
+# Base de datos Supabase
+SUPABASE_URL=https://tu-proyecto.supabase.co
+SUPABASE_ANON_KEY=tu_anon_key
+SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 
 # JWT
-JWT_SECRET="your-jwt-secret"
-JWT_EXPIRES_IN="24h"
+JWT_SECRET=tu_jwt_secret_super_seguro
+JWT_EXPIRES_IN=8h
 
 # WhatsApp Cloud API
-WHATSAPP_TOKEN="your-whatsapp-token"
-WHATSAPP_PHONE_NUMBER_ID="your-phone-number-id"
-WHATSAPP_VERIFY_TOKEN="your-verify-token"
+WHATSAPP_ACCESS_TOKEN=tu_whatsapp_token
+WHATSAPP_PHONE_NUMBER_ID=tu_phone_number_id
+WEBHOOK_VERIFY_TOKEN=tu_verify_token
 
 # OpenRouter API
-OPENROUTER_API_KEY="your-openrouter-key"
-OPENROUTER_MODEL="google/gemini-2.5-flash-lite-preview-06-17"
-
-# Microsip ERP
-MICROSIP_SOAP_URL="your-soap-url"
-MICROSIP_USERNAME="your-username"
-MICROSIP_PASSWORD="your-password"
+OPENROUTER_API_KEY=tu_openrouter_key
+OPENROUTER_MODEL=google/gemini-2.5-flash-lite-preview-06-17
 
 # Servidor
-PORT=3001
-NODE_ENV="development"
+PORT=3002
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
 ```
 
-### Frontend (.env)
+### Frontend (.env.local)
 ```env
-VITE_API_URL="http://localhost:3001"
-VITE_WS_URL="ws://localhost:3001"
-VITE_APP_NAME="WhatsApp Business Platform"
+VITE_BACKEND_URL=http://localhost:3002
+VITE_APP_NAME=WhatsApp Business Platform
 ```
 
 ## 🚀 Instalación y Configuración
@@ -329,13 +187,13 @@ npm install
 ```bash
 # Backend
 cd backend
-cp .env.example .env
+cp env.example .env
 # Editar .env con tus credenciales
 
 # Frontend
 cd ../frontend
-cp .env.example .env
-# Editar .env con tus configuraciones
+cp env.example .env.local
+# Editar .env.local con tus configuraciones
 ```
 
 4. **Ejecutar en desarrollo**
@@ -349,12 +207,28 @@ cd frontend
 npm run dev
 ```
 
+## 🐳 Docker (Opcional)
+
+### Desarrollo
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+### Producción
+```bash
+docker-compose up --build -d
+```
+
 ## 📚 Documentación Adicional
 
+- [`DOCUMENTATION.md`](./DOCUMENTATION.md) - **📚 Documentación consolidada completa**
 - [`INITIAL.md`](./INITIAL.md) - Especificaciones detalladas del proyecto
-- [`docs/api.md`](./docs/api.md) - Documentación de la API
-- [`docs/setup.md`](./docs/setup.md) - Guía de instalación detallada
-- [`docs/architecture.md`](./docs/architecture.md) - Arquitectura técnica
+- [`QUICK_START.md`](./QUICK_START.md) - Guía de inicio rápido
+- [`DEPLOY_GUIDE.md`](./DEPLOY_GUIDE.md) - Guía de despliegue
+- [`DOCKER_COMPOSE_README.md`](./DOCKER_COMPOSE_README.md) - Docker con Coolify
+- [`PRODUCTION_ENV_TEMPLATE.md`](./PRODUCTION_ENV_TEMPLATE.md) - Variables de producción
+- [`AUTHENTICACION_EMAIL_COMPLETADA.md`](./AUTHENTICACION_EMAIL_COMPLETADA.md) - Autenticación
+- [`LOGIN_MULTIPLE_CREDENTIALS_COMPLETADO.md`](./LOGIN_MULTIPLE_CREDENTIALS_COMPLETADO.md) - Credenciales múltiples
 
 ## 🤝 Contribución
 

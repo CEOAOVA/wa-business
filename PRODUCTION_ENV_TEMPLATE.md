@@ -20,7 +20,7 @@ SERVER_NAME=whatsapp-business-prod
 # ============================================
 WHATSAPP_ACCESS_TOKEN=your_access_token_here
 WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id_here
-WHATSAPP_WEBHOOK_VERIFY_TOKEN=your_webhook_verify_token_here
+WEBHOOK_VERIFY_TOKEN=your_webhook_verify_token_here
 WHATSAPP_APP_SECRET=your_app_secret_here
 WHATSAPP_API_VERSION=v22.0
 WHATSAPP_BASE_URL=https://graph.facebook.com
@@ -36,7 +36,7 @@ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 # AUTENTICACIÓN RESTRINGIDA (CRÍTICO)
 # ============================================
 # Lista de emails autorizados separados por comas
-AUTHORIZED_USERS=admin@aova.mx,agente1@aova.mx,agente2@aova.mx
+AUTHORIZED_USERS=moises.s@aova.mx,k.alvarado@aova.mx,elisa.n@synaracare.com
 
 # JWT Configuration
 JWT_SECRET=your_super_secure_jwt_secret_256_bits_minimum
@@ -55,8 +55,8 @@ CORS_CREDENTIALS=true
 # ============================================
 # WEBHOOK SECURITY
 # ============================================
-WEBHOOK_URL=https://dev-waprueba.aova.mx/api/whatsapp/webhook
-WEBHOOK_PATH=/api/whatsapp/webhook
+WEBHOOK_URL=https://dev-apiwaprueba.aova.mx/api/chat/webhook
+WEBHOOK_PATH=/api/chat/webhook
 ENABLE_WEBHOOK_SIGNATURE=true
 ENABLE_DETAILED_LOGS=false
 

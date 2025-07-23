@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import whatsappApi from '../services/whatsapp-api';
 import chatbotApi from '../services/chatbot-api';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { MESSAGES } from '../constants/messages';
 
 // Estilos específicos para ocultar elementos decorativos en WhatsAppTest
@@ -37,6 +38,7 @@ interface TestResult {
 }
 
 const WhatsAppTest: React.FC = () => {
+  const { logout } = useAuth();
   const { injectTestWhatsAppMessage, injectTestOutgoingMessage, addSentWhatsAppMessage } = useApp();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
@@ -46,6 +48,7 @@ const WhatsAppTest: React.FC = () => {
   const [results, setResults] = useState<TestResult[]>([]);
   const [status, setStatus] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   
   // Estados para el chatbot
   const [chatbotStats, setChatbotStats] = useState<any>(null);
@@ -240,7 +243,7 @@ const WhatsAppTest: React.FC = () => {
       
       console.log('🧪 [WhatsAppTest] Enviando solicitud de simulación:', simulateBody);
       
-      const response = await fetch('http://localhost:3002/api/chat/simulate-message', {
+      const response = await fetch('/api/chat/simulate-message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -475,6 +478,18 @@ const WhatsAppTest: React.FC = () => {
     return phone.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '$1 $2 $3 $4');
   };
 
+  const handleLogout = async () => {
+    try {
+      setLogoutLoading(true);
+      await logout();
+      // El logout redirigirá automáticamente al login
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
   return (
     <div 
       className="min-h-screen bg-white whatsapp-test-page" 
@@ -504,12 +519,27 @@ const WhatsAppTest: React.FC = () => {
       >
         {/* Header simple */}
         <div className="mb-6 border-b border-gray-200 pb-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            WhatsApp Business API - Pruebas
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Interfaz de pruebas para la integración de WhatsApp Business API
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                WhatsApp Business API - Pruebas
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Interfaz de pruebas para la integración de WhatsApp Business API
+              </p>
+            </div>
+            
+            <button
+              onClick={handleLogout}
+              disabled={logoutLoading}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              {logoutLoading ? 'Cerrando...' : 'Cerrar Sesión'}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

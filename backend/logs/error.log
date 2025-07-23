@@ -1424,3 +1424,289 @@
   message: 'Login error:',
   timestamp: '2025-07-21 14:19:09.637'
 }
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-22 17:37:39.226'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-22 17:39:16.043'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-22 17:39:16.439'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-23 12:35:53.320'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST116',
+    details: 'The result contains 0 rows',
+    hint: null,
+    message: 'JSON object requested, multiple (or no) rows returned'
+  },
+  level: 'error',
+  message: 'Error fetching user by ID:',
+  timestamp: '2025-07-23 12:35:53.642'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:09:07.585'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:09:22.672'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:09:29.562'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:10:00.631'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:10:30.642'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:11:00.730'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:11:33.808'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:12:33.714'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:13:33.744'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:40:12.378'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:40:13.976'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:40:14.286'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 14:40:14.880'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 15:13:48.329'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST200',
+    details: "Searched for a foreign key relationship between 'conversations' and 'contacts' in the schema 'public', but no matches were found.",
+    hint: null,
+    message: "Could not find a relationship between 'conversations' and 'contacts' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error fetching public conversations:',
+  timestamp: '2025-07-23 15:14:18.700'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-07-23 15:15:20.636'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:123:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-07-23 15:15:20.642'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:123:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-07-23 15:15:20.643'
+}

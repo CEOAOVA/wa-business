@@ -29,7 +29,7 @@ class AuthService {
                     user_metadata: {
                         username: userData.username,
                         full_name: userData.full_name,
-                        role: userData.role || 'user'
+                        role: userData.role || 'agent'
                     },
                     email_confirm: true // Confirmar email automáticamente
                 });
@@ -40,16 +40,15 @@ class AuthService {
                 if (!authData.user) {
                     throw new Error('No user data returned from auth creation');
                 }
-                // Crear perfil de usuario en la tabla user_profiles usando el cliente administrativo
+                // Crear perfil de usuario en la tabla agents usando el cliente administrativo
                 const { data: profileData, error: profileError } = yield supabase_1.supabaseAdmin
-                    .from('user_profiles')
+                    .from('agents')
                     .insert({
                     id: authData.user.id,
                     username: userData.username,
                     full_name: userData.full_name,
                     email: userData.email,
-                    role: userData.role || 'user',
-                    whatsapp_id: userData.whatsapp_id,
+                    role: userData.role || 'agent',
                     is_active: true
                 })
                     .select()
@@ -78,36 +77,40 @@ class AuthService {
                 }
                 // Buscar el usuario por email usando el cliente administrativo
                 const { data: profileData, error: profileError } = yield supabase_1.supabaseAdmin
-                    .from('user_profiles')
+                    .from('agents')
                     .select('*')
                     .eq('email', loginData.email)
+                    .eq('is_active', true)
                     .single();
-                if (profileError || !profileData) {
-                    logger_1.logger.error('User not found:', profileError);
-                    throw new Error('Usuario o contraseña incorrectos');
+                if (profileError) {
+                    logger_1.logger.error('Error fetching user profile:', profileError);
+                    throw new Error('Usuario no encontrado o inactivo');
                 }
-                if (!profileData.is_active) {
-                    throw new Error('Cuenta de usuario desactivada');
+                if (!profileData) {
+                    throw new Error('Usuario no encontrado');
                 }
-                // Autenticar con Supabase usando el email directamente
-                const { data, error } = yield supabase_1.supabase.auth.signInWithPassword({
+                // Autenticar con Supabase Auth
+                const { data: authData, error: authError } = yield supabase_1.supabase.auth.signInWithPassword({
                     email: loginData.email,
                     password: loginData.password
                 });
-                if (error) {
-                    logger_1.logger.error('Login error:', error);
-                    throw new Error(`Error de autenticación: ${error.message}`);
+                if (authError) {
+                    logger_1.logger.error('Error authenticating user:', authError);
+                    throw new Error(`Error de autenticación: ${authError.message}`);
                 }
-                if (!data.user) {
-                    throw new Error('No se obtuvo información del usuario');
+                if (!authData.user || !authData.session) {
+                    throw new Error('No se pudo autenticar al usuario');
                 }
-                // Actualizar último login usando el cliente administrativo
+                // Actualizar último login
                 yield supabase_1.supabaseAdmin
-                    .from('user_profiles')
-                    .update({ last_login: new Date().toISOString() })
-                    .eq('id', data.user.id);
+                    .from('agents')
+                    .update({
+                    last_login: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                    .eq('id', profileData.id);
                 logger_1.logger.info(`User logged in successfully: ${loginData.email}`);
-                return { user: profileData, session: data.session };
+                return { user: profileData, session: authData.session };
             }
             catch (error) {
                 logger_1.logger.error('Error in login:', error);
@@ -121,23 +124,27 @@ class AuthService {
     static getUserById(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
+                if (!supabase_1.supabaseAdmin) {
+                    throw new Error('Servicio de autenticación administrativa no disponible');
                 }
-                const { data, error } = yield supabase_1.supabase
-                    .from('user_profiles')
+                const { data, error } = yield supabase_1.supabaseAdmin
+                    .from('agents')
                     .select('*')
                     .eq('id', userId)
+                    .eq('is_active', true)
                     .single();
                 if (error) {
+                    if (error.code === 'PGRST116') {
+                        return null; // No encontrado
+                    }
                     logger_1.logger.error('Error fetching user by ID:', error);
-                    return null;
+                    throw error;
                 }
                 return data;
             }
             catch (error) {
                 logger_1.logger.error('Error in getUserById:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -147,28 +154,32 @@ class AuthService {
     static getUserByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
+                if (!supabase_1.supabaseAdmin) {
+                    throw new Error('Servicio de autenticación administrativa no disponible');
                 }
-                const { data, error } = yield supabase_1.supabase
-                    .from('user_profiles')
+                const { data, error } = yield supabase_1.supabaseAdmin
+                    .from('agents')
                     .select('*')
                     .eq('email', email)
+                    .eq('is_active', true)
                     .single();
                 if (error) {
+                    if (error.code === 'PGRST116') {
+                        return null; // No encontrado
+                    }
                     logger_1.logger.error('Error fetching user by email:', error);
-                    return null;
+                    throw error;
                 }
                 return data;
             }
             catch (error) {
                 logger_1.logger.error('Error in getUserByEmail:', error);
-                return null;
+                throw error;
             }
         });
     }
     /**
-     * Obtener todos los usuarios (solo para admins)
+     * Obtener todos los usuarios
      */
     static getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -177,12 +188,13 @@ class AuthService {
                     throw new Error('Servicio de autenticación administrativa no disponible');
                 }
                 const { data, error } = yield supabase_1.supabaseAdmin
-                    .from('user_profiles')
+                    .from('agents')
                     .select('*')
+                    .eq('is_active', true)
                     .order('created_at', { ascending: false });
                 if (error) {
                     logger_1.logger.error('Error fetching all users:', error);
-                    throw new Error(`Error fetching users: ${error.message}`);
+                    throw error;
                 }
                 return data || [];
             }
@@ -198,18 +210,18 @@ class AuthService {
     static updateUserProfile(userId, updates) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
+                if (!supabase_1.supabaseAdmin) {
+                    throw new Error('Servicio de autenticación administrativa no disponible');
                 }
-                const { data, error } = yield supabase_1.supabase
-                    .from('user_profiles')
+                const { data, error } = yield supabase_1.supabaseAdmin
+                    .from('agents')
                     .update(Object.assign(Object.assign({}, updates), { updated_at: new Date().toISOString() }))
                     .eq('id', userId)
                     .select()
                     .single();
                 if (error) {
                     logger_1.logger.error('Error updating user profile:', error);
-                    throw new Error(`Error updating user profile: ${error.message}`);
+                    throw error;
                 }
                 logger_1.logger.info(`User profile updated: ${userId}`);
                 return data;
@@ -226,11 +238,11 @@ class AuthService {
     static deactivateUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
+                if (!supabase_1.supabaseAdmin) {
+                    throw new Error('Servicio de autenticación administrativa no disponible');
                 }
-                const { error } = yield supabase_1.supabase
-                    .from('user_profiles')
+                const { error } = yield supabase_1.supabaseAdmin
+                    .from('agents')
                     .update({
                     is_active: false,
                     updated_at: new Date().toISOString()
@@ -238,7 +250,7 @@ class AuthService {
                     .eq('id', userId);
                 if (error) {
                     logger_1.logger.error('Error deactivating user:', error);
-                    throw new Error(`Error deactivating user: ${error.message}`);
+                    throw error;
                 }
                 logger_1.logger.info(`User deactivated: ${userId}`);
             }
@@ -249,27 +261,29 @@ class AuthService {
         });
     }
     /**
-     * Verificar si un usuario tiene un permiso específico
+     * Verificar permisos de usuario
      */
     static hasPermission(userId, resource, action) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
-                }
-                const { data, error } = yield supabase_1.supabase
-                    .rpc('has_permission', {
-                    p_resource: resource,
-                    p_action: action
-                });
-                if (error) {
-                    logger_1.logger.error('Error checking permission:', error);
+                const user = yield this.getUserById(userId);
+                if (!user) {
                     return false;
                 }
-                return data || false;
+                // Lógica de permisos basada en roles
+                switch (user.role) {
+                    case 'admin':
+                        return true; // Admin tiene todos los permisos
+                    case 'supervisor':
+                        return ['conversations', 'messages', 'contacts', 'agents'].includes(resource);
+                    case 'agent':
+                        return ['conversations', 'messages'].includes(resource) && action !== 'delete';
+                    default:
+                        return false;
+                }
             }
             catch (error) {
-                logger_1.logger.error('Error in hasPermission:', error);
+                logger_1.logger.error('Error checking permissions:', error);
                 return false;
             }
         });
@@ -280,53 +294,39 @@ class AuthService {
     static getCurrentUserRole(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
-                }
-                const { data, error } = yield supabase_1.supabase
-                    .rpc('get_current_user_role');
-                if (error) {
-                    logger_1.logger.error('Error getting user role:', error);
-                    return 'user';
-                }
-                return data || 'user';
+                const user = yield this.getUserById(userId);
+                return (user === null || user === void 0 ? void 0 : user.role) || 'agent';
             }
             catch (error) {
-                logger_1.logger.error('Error in getCurrentUserRole:', error);
-                return 'user';
+                logger_1.logger.error('Error getting user role:', error);
+                return 'agent';
             }
         });
     }
     /**
-     * Crear usuario admin inicial
+     * Crear administrador inicial (si no existe)
      */
     static createInitialAdmin() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!supabase_1.supabase) {
-                    throw new Error('Servicio de autenticación no disponible');
-                }
+                const adminEmail = process.env.INITIAL_ADMIN_EMAIL || 'admin@example.com';
+                const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'admin123';
                 // Verificar si ya existe un admin
-                const { data: existingAdmin } = yield supabase_1.supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('role', 'admin')
-                    .single();
+                const existingAdmin = yield this.getUserByEmail(adminEmail);
                 if (existingAdmin) {
-                    logger_1.logger.info('Admin user already exists');
+                    logger_1.logger.info('Initial admin already exists');
                     return existingAdmin;
                 }
                 // Crear admin inicial
                 const adminData = {
                     username: 'admin',
                     full_name: 'Administrador del Sistema',
-                    email: 'admin@embler.mx',
-                    password: 'Admin2024!', // Cambiar en producción
-                    role: 'admin',
-                    whatsapp_id: 'WHATSAPP_ADMIN_ID' // Se actualizará con el ID real
+                    email: adminEmail,
+                    password: adminPassword,
+                    role: 'admin'
                 };
                 const admin = yield this.createUser(adminData);
-                logger_1.logger.info('Initial admin user created successfully');
+                logger_1.logger.info('Initial admin created successfully');
                 return admin;
             }
             catch (error) {

@@ -57,6 +57,10 @@ export class ProductCatalogService {
     
     try {
       // Construir query
+      if (!supabase) {
+        throw new Error('Supabase no está configurado');
+      }
+      
       let query = supabase
         .from('product_catalog')
         .select('*', { count: 'exact' });
@@ -111,6 +115,10 @@ export class ProductCatalogService {
    */
   async getProductById(id: string): Promise<ProductCatalogItem | null> {
     try {
+      if (!supabase) {
+        throw new Error('Supabase no está configurado');
+      }
+      
       const { data, error } = await supabase
         .from('product_catalog')
         .select('*')
@@ -149,6 +157,10 @@ export class ProductCatalogService {
     }
     
     try {
+      if (!supabase) {
+        throw new Error('Supabase no está configurado');
+      }
+      
       const { data, error } = await supabase
         .from('product_catalog')
         .select('*')
@@ -185,10 +197,14 @@ export class ProductCatalogService {
     // Verificar cache
     const cached = this.cache.get(cacheKey);
     if (cached && cached.expiry > Date.now()) {
-      return cached.data.map(item => item.categoria).filter(Boolean);
+      return cached.data.map(item => item.categoria).filter((cat): cat is string => Boolean(cat));
     }
     
     try {
+      if (!supabase) {
+        throw new Error('Supabase no está configurado');
+      }
+      
       const { data, error } = await supabase
         .from('product_catalog')
         .select('categoria')
@@ -284,6 +300,9 @@ export class ProductCatalogService {
     totalCategories: number;
     productsWithImages: number;
   }> {
+    if (!supabase) {
+      throw new Error('Supabase no está configurado');
+    }
     try {
       const { data, error } = await supabase
         .from('product_catalog')

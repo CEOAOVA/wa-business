@@ -118,7 +118,7 @@ const requireAdmin = (req, res, next) => {
 };
 exports.requireAdmin = requireAdmin;
 /**
- * Middleware para verificar rol de agente o admin
+ * Middleware para verificar rol de agente, supervisor o admin
  */
 const requireAgentOrAdmin = (req, res, next) => {
     if (!req.user) {
@@ -127,10 +127,10 @@ const requireAgentOrAdmin = (req, res, next) => {
             message: 'Usuario no autenticado'
         });
     }
-    if (req.user.role !== 'admin' && req.user.role !== 'agent') {
+    if (req.user.role !== 'admin' && req.user.role !== 'agent' && req.user.role !== 'supervisor') {
         return res.status(403).json({
             success: false,
-            message: 'Se requieren permisos de agente o administrador'
+            message: 'Se requieren permisos de agente, supervisor o administrador'
         });
     }
     next();

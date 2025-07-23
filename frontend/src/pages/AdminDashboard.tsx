@@ -18,10 +18,12 @@ import {
   Settings,
   ChevronDown,
   Wifi,
-  WifiOff
+  WifiOff,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { dashboardApiService, type SystemStats as ApiSystemStats } from '../services/dashboard-api';
+import { dashboardApiService } from '../services/dashboard-api';
+import { authApiService } from '../services/auth-api';
 import Logo from '../components/LogoDebug';
 
 // Interfaz local para el dashboard con datos formateados
@@ -62,6 +64,7 @@ const AdminDashboard: React.FC = () => {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [clearSessionsLoading, setClearSessionsLoading] = useState(false);
 
   // Verificar que el usuario sea admin
   useEffect(() => {
@@ -144,6 +147,25 @@ const AdminDashboard: React.FC = () => {
       setError('Error al cerrar sesión');
     } finally {
       setLogoutLoading(false);
+    }
+  };
+
+  const handleClearSessions = async () => {
+    if (!confirm('¿Estás seguro de que quieres limpiar todas las sesiones del servidor? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      setClearSessionsLoading(true);
+      const result = await authApiService.clearSessions();
+      alert(`✅ Sesiones limpiadas exitosamente\nServicios limpiados: ${result.cleanedServices.join(', ')}`);
+      // Recargar estadísticas después de limpiar
+      await fetchStats();
+    } catch (error) {
+      console.error('Error clearing sessions:', error);
+      alert('❌ Error al limpiar sesiones: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+    } finally {
+      setClearSessionsLoading(false);
     }
   };
 
@@ -565,7 +587,7 @@ const AdminDashboard: React.FC = () => {
                 <Activity className="w-5 h-5 mr-2 text-embler-yellow" />
                 Navegación Rápida
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <motion.button
                   onClick={() => window.location.href = '/client-chat'}
                   className="bg-glass-dark backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/5 transition-all group"
@@ -598,6 +620,24 @@ const AdminDashboard: React.FC = () => {
                     <div className="text-left">
                       <h3 className="text-white font-semibold text-lg">WhatsApp Test</h3>
                       <p className="text-gray-400 text-sm">Probar funcionalidades de WhatsApp</p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  onClick={handleClearSessions}
+                  disabled={clearSessionsLoading}
+                  className="bg-glass-dark backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/5 transition-all group disabled:opacity-50"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
+                      <Trash2 className={`w-6 h-6 text-red-500 ${clearSessionsLoading ? 'animate-spin' : ''}`} />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-white font-semibold text-lg">Limpiar Sesiones</h3>
+                      <p className="text-gray-400 text-sm">Limpiar todas las sesiones del servidor</p>
                     </div>
                   </div>
                 </motion.button>

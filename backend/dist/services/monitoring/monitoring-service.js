@@ -16,7 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.monitoringService = exports.MonitoringService = void 0;
 const events_1 = require("events");
 const logger_1 = require("../../utils/logger");
-const database_1 = require("../../config/database");
+const database_service_1 = require("../database.service");
 const soap_service_1 = require("../soap/soap-service");
 class MonitoringService extends events_1.EventEmitter {
     constructor(config) {
@@ -81,13 +81,13 @@ class MonitoringService extends events_1.EventEmitter {
         this.healthChecks.set('database', () => __awaiter(this, void 0, void 0, function* () {
             const start = Date.now();
             try {
-                const isHealthy = yield database_1.databaseService.isHealthy();
+                const isHealthy = yield database_service_1.databaseService.isHealthy();
                 const responseTime = Date.now() - start;
                 return {
                     service: 'database',
                     status: isHealthy ? 'healthy' : 'unhealthy',
                     responseTime,
-                    metadata: yield database_1.databaseService.getStats()
+                    metadata: yield database_service_1.databaseService.getStats()
                 };
             }
             catch (error) {

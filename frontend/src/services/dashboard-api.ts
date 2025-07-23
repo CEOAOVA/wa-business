@@ -53,7 +53,7 @@ export interface UserProfile {
   username: string;
   full_name: string;
   email: string;
-  role: 'admin' | 'agent' | 'user';
+  role: 'admin' | 'agent' | 'supervisor';
   whatsapp_id?: string;
   is_active: boolean;
   last_login?: string;
@@ -63,10 +63,17 @@ export interface UserProfile {
 
 export interface Conversation {
   id: string;
-  phone_number: string;
+  contact_id: string;
   status: 'active' | 'closed';
+  priority?: 'low' | 'medium' | 'high';
   created_at: string;
   updated_at: string;
+  contact?: {
+    id: string;
+    name: string;
+    phone_number: string;
+    email: string;
+  };
 }
 
 export interface Order {
@@ -94,7 +101,7 @@ export interface SystemInfo {
 }
 
 class DashboardApiService {
-  private baseUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3002'}/api/dashboard`;
+  private baseUrl = `${import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002')}/api/dashboard`;
 
   /**
    * Método privado para hacer peticiones HTTP
@@ -165,6 +172,19 @@ class DashboardApiService {
    */
   async getConversations(): Promise<Conversation[]> {
     const response = await this.request<Conversation[]>('/conversations');
+
+    if (!response.success) {
+      throw new Error(response.message || 'Error al obtener conversaciones');
+    }
+
+    return response.data as Conversation[];
+  }
+
+  /**
+   * Obtener conversaciones públicas (para agentes)
+   */
+  async getPublicConversations(): Promise<Conversation[]> {
+    const response = await this.request<Conversation[]>('/conversations/public');
 
     if (!response.success) {
       throw new Error(response.message || 'Error al obtener conversaciones');

@@ -8,7 +8,6 @@ import {
   BarChart3, 
   Settings, 
   Bell, 
-  Search,
   ArrowRight,
   Star,
   TrendingUp,
@@ -20,7 +19,6 @@ import ModernButton from '../components/ModernButton';
 import Logo from '../components/LogoAlt';
 
 const Demo: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
 
   const features = [
@@ -183,8 +181,8 @@ const Demo: React.FC = () => {
 
           <SearchBar
             placeholder="Buscar características, funcionalidades, configuraciones..."
-            onSearch={setSearchQuery}
-            onClear={() => setSearchQuery('')}
+            onSearch={() => {}}
+            onClear={() => {}}
             showFilters={true}
             filters={[
               { id: 'all', label: 'Todo', active: selectedFilter === 'all' },

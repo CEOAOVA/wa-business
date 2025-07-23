@@ -23,9 +23,9 @@ WEBHOOK_URL=https://your-domain.com/api/chat/webhook
 
 ### **🤖 LLM CONFIGURATION (NUEVAS)**
 ```env
-OPEN_ROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-OPEN_ROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPEN_ROUTER_DEFAULT_MODEL=google/gemini-flash-1.5
+OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_DEFAULT_MODEL=google/gemini-flash-1.5
 DEFAULT_TEMPERATURE=0.7      # Creatividad del modelo (0.0 - 2.0)
 DEFAULT_MAX_TOKENS=1000      # Límite de tokens por respuesta
 LLM_TIMEOUT_MS=60000         # Timeout en milisegundos
@@ -60,6 +60,7 @@ DATABASE_URL="file:./dev.db"
 USE_SUPABASE=true
 SUPABASE_URL=https://tu-proyecto.supabase.co
 SUPABASE_ANON_KEY=tu_supabase_anon_key_aqui
+SUPABASE_SERVICE_ROLE_KEY=tu_supabase_service_role_key_aqui
 ```
 
 ### **⚙️ SYSTEM CONFIGURATION (NUEVAS)**

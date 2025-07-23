@@ -272,6 +272,100 @@ router.post('/init-admin', async (req, res) => {
 });
 
 /**
+ * @route POST /api/auth/clear-sessions
+ * @desc Limpiar todas las sesiones del servidor (solo admins)
+ * @access Private (Admin)
+ */
+router.post('/clear-sessions', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const currentUser = req.user;
+    
+    if (!currentUser || currentUser.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Acceso denegado. Se requieren permisos de administrador'
+      });
+    }
+
+    console.log('🧹 Limpieza manual de sesiones iniciada por admin:', currentUser.email);
+    
+    // Importar y limpiar servicios
+    const { rateLimiter } = await import('../services/rate-limiter/rate-limiter');
+    const { cacheService } = await import('../services/cache/cache-service');
+    
+    let cleanedServices = [];
+    
+    // Limpiar rate limiter
+    if (rateLimiter) {
+      rateLimiter.destroy();
+      cleanedServices.push('rate-limiter');
+    }
+    
+    // Limpiar caché
+    if (cacheService) {
+      cacheService.destroy();
+      cleanedServices.push('cache-service');
+    }
+    
+    // Limpiar conversaciones del chatbot
+    try {
+      const { ChatbotService } = await import('../services/chatbot.service');
+      const chatbotService = new ChatbotService();
+      if (chatbotService && typeof chatbotService['cleanupExpiredSessions'] === 'function') {
+        chatbotService['cleanupExpiredSessions']();
+        cleanedServices.push('chatbot-sessions');
+      }
+    } catch (error) {
+      logger.warn('Error limpiando chatbot sessions', { error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+    
+    // Limpiar conversaciones generales
+    try {
+      const { ConversationService } = await import('../services/conversation/conversation-service');
+      const conversationService = new ConversationService();
+      if (conversationService && typeof conversationService['cleanupInactiveSessions'] === 'function') {
+        const removedCount = conversationService['cleanupInactiveSessions'](0);
+        cleanedServices.push(`conversation-sessions (${removedCount} removidas)`);
+      }
+    } catch (error) {
+      logger.warn('Error limpiando conversation sessions', { error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+    
+    // Limpiar caché de inventario
+    try {
+      const { InventoryCache } = await import('../services/soap/inventory-cache');
+      const inventoryCache = new InventoryCache();
+      if (inventoryCache && typeof inventoryCache.clear === 'function') {
+        inventoryCache.clear();
+        cleanedServices.push('inventory-cache');
+      }
+    } catch (error) {
+      logger.warn('Error limpiando inventory cache', { error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+    
+    logger.info('Sesiones limpiadas manualmente', {
+      userId: currentUser.id,
+      metadata: { cleanedServices }
+    });
+    
+    res.json({
+      success: true,
+      message: 'Sesiones limpiadas exitosamente',
+      data: {
+        cleanedServices,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    logger.error('Clear sessions error:', error);
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Error al limpiar sesiones'
+    });
+  }
+});
+
+/**
  * @route DELETE /api/auth/users/:userId
  * @desc Desactivar usuario (solo admins)
  * @access Private (Admin)

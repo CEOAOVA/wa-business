@@ -1,4 +1,62 @@
-// Tipos de usuario y autenticación
+// Tipos de agente (nuevo esquema)
+export interface Agent {
+  id: string;
+  username: string;
+  full_name: string;
+  email: string;
+  role: 'admin' | 'agent' | 'supervisor';
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Tipos de contacto (nuevo esquema)
+export interface Contact {
+  id: string;
+  phone: string;
+  name?: string;
+  email?: string;
+  is_blocked: boolean;
+  is_favorite: boolean;
+  metadata?: any;
+  created_at: string;
+  updated_at: string;
+}
+
+// Tipos de conversación (nuevo esquema)
+export interface Conversation {
+  id: string;
+  contact_phone: string;
+  status: 'active' | 'waiting' | 'closed';
+  ai_mode: 'active' | 'inactive' | 'paused';
+  assigned_agent_id?: string;
+  unread_count: number;
+  last_message_at?: string;
+  created_at: string;
+  updated_at: string;
+  metadata?: any;
+}
+
+// Tipos de mensaje (nuevo esquema)
+export interface Message {
+  id: number | string;
+  conversation_id?: string;
+  sender_type?: 'user' | 'agent' | 'bot';
+  content: string;
+  message_type?: 'text' | 'image' | 'quote' | 'document';
+  whatsapp_message_id?: string;
+  is_read?: boolean;
+  metadata?: any;
+  created_at?: string;
+  // Propiedades adicionales para compatibilidad con el frontend
+  chatId?: string;
+  senderId?: string;
+  timestamp?: Date;
+  type?: 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker';
+  isFromBot?: boolean;
+}
+
+// Tipos de usuario y autenticación (compatibilidad)
 export interface User {
   id: string;
   name: string;
@@ -18,26 +76,7 @@ export interface AuthState {
   error: string | null;
 }
 
-// Tipos de mensajes y chats
-export interface Message {
-  id: string;
-  chatId: string;
-  senderId: string;
-  content: string;
-  type: 'text' | 'image' | 'document' | 'audio' | 'video' | 'sticker' | 'system';
-  timestamp: Date;
-  isRead: boolean;
-  isDelivered: boolean;
-  isFromBot?: boolean;
-  metadata?: Record<string, any>;
-  // Media fields
-  mediaUrl?: string;
-  mediaCaption?: string;
-  mediaType?: 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER';
-  mediaSize?: number;
-  mediaFileName?: string;
-}
-
+// Tipos de chat (compatibilidad con frontend existente)
 export interface Chat {
   id: string;
   clientId: string;
@@ -114,7 +153,7 @@ export interface LoginCredentials {
 export interface SendMessageRequest {
   chatId: string;
   content: string;
-  type: Message['type'];
+  type: Message['message_type'];
 }
 
 // Tipos de componentes

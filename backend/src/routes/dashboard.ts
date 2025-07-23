@@ -163,6 +163,66 @@ router.get('/conversations', authMiddleware, requireAdmin, async (req, res) => {
 });
 
 /**
+ * @route GET /api/dashboard/conversations/public
+ * @desc Obtener conversaciones para agentes (sin restricción de admin)
+ * @access Private (Agentes y Admin)
+ */
+router.get('/conversations/public', authMiddleware, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      throw new Error('Servicio de base de datos no disponible');
+    }
+
+    // Obtener conversaciones
+    const { data: conversations, error: convError } = await supabaseAdmin
+      .from('conversations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (convError) {
+      throw convError;
+    }
+
+    // Obtener contactos
+    const { data: contacts, error: contactsError } = await supabaseAdmin
+      .from('contacts')
+      .select('*');
+
+    if (contactsError) {
+      throw contactsError;
+    }
+
+    // Crear un mapa de contactos para acceso rápido
+    const contactsMap = new Map();
+    (contacts || []).forEach(contact => {
+      contactsMap.set(contact.id, contact);
+    });
+
+    // Transformar los datos para que sean compatibles con el frontend
+    const transformedConversations = (conversations || []).map(conv => ({
+      id: conv.id,
+      contact_id: conv.contact_id,
+      status: conv.status,
+      priority: conv.priority,
+      created_at: conv.created_at,
+      updated_at: conv.updated_at,
+      contact: contactsMap.get(conv.contact_id) || null
+    }));
+
+    res.json({
+      success: true,
+      data: transformedConversations
+    });
+  } catch (error) {
+    logger.error('Error fetching public conversations:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener conversaciones'
+    });
+  }
+});
+
+/**
  * @route GET /api/dashboard/orders
  * @desc Obtener estadísticas de pedidos
  * @access Private (Admin)

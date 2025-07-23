@@ -2,7 +2,8 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback } 
 import type { ReactNode } from 'react';
 import type { AppState, Chat, Message, Notification, AppAction } from '../types';
 import { whatsappApi, type IncomingMessage } from '../services/whatsapp-api';
-import { useWebSocket, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocket';
+import { dashboardApiService } from '../services/dashboard-api';
+import { useWebSocketSimple, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocketSimple';
 
 // Estado inicial
 const initialState: AppState = {
@@ -29,8 +30,9 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       const message = action.payload;
       
       // Verificar si el mensaje ya existe para evitar duplicados
-      const existingMessages = state.messages[message.chatId] || [];
-      const messageExists = existingMessages.some(existing => existing.id === message.id);
+      const chatId = message.chatId || message.conversation_id || '';
+      const existingMessages = state.messages[chatId] || [];
+      const messageExists = existingMessages.some((existing: Message) => existing.id === message.id);
       
       if (messageExists) {
         console.log(`🔍 [Reducer] Mensaje ${message.id} ya existe, omitiendo`);
@@ -41,20 +43,20 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state,
         messages: {
           ...state.messages,
-          [message.chatId]: [
+          [chatId]: [
             ...existingMessages,
             message,
           ],
         },
         chats: state.chats.map(chat =>
-          chat.id === message.chatId
+          chat.id === chatId
             ? {
                 ...chat,
                 lastMessage: message,
                 unreadCount: message.senderId !== state.currentChat?.assignedAgentId
                   ? chat.unreadCount + 1
                   : chat.unreadCount,
-                updatedAt: message.timestamp,
+                updatedAt: message.timestamp || new Date(message.created_at || Date.now()),
               }
             : chat
         ),
@@ -142,6 +144,7 @@ interface AppContextType {
   toggleTheme: () => void;
   // Nuevas funciones para WhatsApp
   loadWhatsAppMessages: () => Promise<void>;
+  loadNewSchemaConversations: () => Promise<void>;
   addSentWhatsAppMessage: (to: string, message: string, messageId?: string) => void;
   // Funciones de testing manual
   injectTestWhatsAppMessage: (from: string, message: string, name?: string) => void;
@@ -159,7 +162,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Integración WebSocket para mensajería en tiempo real
-  const webSocket = useWebSocket();
+  const webSocket = useWebSocketSimple();
 
   // Configurar manejadores de eventos WebSocket
   useEffect(() => {
@@ -178,14 +181,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           clientAvatar: undefined,
           assignedAgentId: data.message.from === 'us' ? 'agent-1' : null,
           lastMessage: {
-            id: data.message.id,
+            id: typeof data.message.id === 'string' ? parseInt(data.message.id) || Date.now() : data.message.id,
             chatId: chatId,
             senderId: data.message.from === 'us' ? 'agent-1' : data.message.from,
             content: data.message.message,
             type: 'text',
             timestamp: new Date(data.message.timestamp),
-            isRead: data.message.read,
-            isDelivered: true,
+            is_read: data.message.read,
             metadata: { source: 'whatsapp', waMessageId: data.message.waMessageId }
           },
           unreadCount: data.conversation.unreadCount,
@@ -207,8 +209,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         content: data.message.message,
         type: 'text',
         timestamp: new Date(data.message.timestamp),
-        isRead: data.message.read,
-        isDelivered: true,
+        is_read: data.message.read,
         metadata: { source: 'whatsapp', waMessageId: data.message.waMessageId }
       };
       
@@ -251,8 +252,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         content: whatsappMsg.message,
         type: 'text',
         timestamp: whatsappMsg.timestamp,
-        isRead: whatsappMsg.read,
-        isDelivered: true,
+        is_read: whatsappMsg.read,
         metadata: { source: 'whatsapp' }
       },
       unreadCount: whatsappMsg.read ? 0 : 1,
@@ -347,8 +347,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
               content: msg.message,
               type: 'text',
               timestamp: msg.timestamp,
-              isRead: msg.read,
-              isDelivered: true,
+              is_read: msg.read,
               metadata: { source: 'whatsapp' }
             };
             
@@ -363,12 +362,73 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [state.messages]);
 
+  // Cargar conversaciones del nuevo esquema
+  const loadNewSchemaConversations = useCallback(async () => {
+    console.log('🔍 [AppContext] Iniciando carga de conversaciones del nuevo esquema...');
+    
+    try {
+      console.log('🔍 [AppContext] Llamando a dashboardApiService.getPublicConversations...');
+      const conversations = await dashboardApiService.getPublicConversations();
+      
+      console.log('🔍 [AppContext] Conversaciones recibidas:', conversations);
+      
+      if (conversations.length > 0) {
+        console.log(`🔍 [AppContext] ${conversations.length} conversaciones encontradas`);
+        
+        // Convertir conversaciones del nuevo esquema a chats del frontend
+        conversations.forEach(conv => {
+          const chatId = `conv-${conv.id}`;
+          
+          console.log(`🔍 [AppContext] Procesando conversación ${chatId}`);
+          
+          // Verificar si el chat ya existe en el estado actual
+          const existingChat = state.chats.find(c => c.id === chatId);
+          
+          if (!existingChat) {
+            console.log(`🔍 [AppContext] Creando nuevo chat para conversación ${conv.id}`);
+            
+            // Crear nuevo chat
+            const newChat: Chat = {
+              id: chatId,
+              clientId: conv.contact_id,
+              clientName: conv.contact?.name || 'Cliente sin nombre',
+              clientPhone: conv.contact?.phone_number || 'Sin teléfono',
+              clientAvatar: undefined,
+              assignedAgentId: null,
+              lastMessage: null, // Se cargará cuando se carguen los mensajes
+              unreadCount: 0, // Se calculará cuando se carguen los mensajes
+              isActive: conv.status === 'active',
+              createdAt: new Date(conv.created_at),
+              updatedAt: new Date(conv.updated_at),
+              tags: ['conversation'],
+              priority: conv.priority || 'medium',
+              status: conv.status === 'active' ? 'open' : conv.status
+            };
+            
+            console.log('🔍 [AppContext] Nuevo chat creado:', newChat);
+            dispatch({ type: 'ADD_CHAT', payload: newChat });
+          } else {
+            console.log(`🔍 [AppContext] Chat ${chatId} ya existe`);
+          }
+        });
+      } else {
+        console.log('🔍 [AppContext] No hay conversaciones en el nuevo esquema');
+      }
+    } catch (error) {
+      console.error('❌ [AppContext] Error cargando conversaciones del nuevo esquema:', error);
+    }
+  }, [state.chats]);
+
   // Polling para nuevos mensajes cada 30 segundos
   useEffect(() => {
     loadWhatsAppMessages();
-    const interval = setInterval(loadWhatsAppMessages, 30000);
+    loadNewSchemaConversations();
+    const interval = setInterval(() => {
+      loadWhatsAppMessages();
+      loadNewSchemaConversations();
+    }, 30000);
     return () => clearInterval(interval);
-  }, [loadWhatsAppMessages]);
+  }, [loadWhatsAppMessages, loadNewSchemaConversations]);
 
   // Funciones de conveniencia
   const selectChat = (chat: Chat) => {
@@ -447,8 +507,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         content,
         type,
         timestamp: new Date(),
-        isRead: true,
-        isDelivered: true,
+        is_read: true,
       };
 
       dispatch({ type: 'ADD_MESSAGE', payload: message });
@@ -533,8 +592,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       content: message,
       type: 'text',
       timestamp: timestamp,
-      isRead: false,
-      isDelivered: true,
+      is_read: false,
       metadata: { source: 'whatsapp', isTest: true }
     };
     
@@ -583,8 +641,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       content: message,
       type: 'text',
       timestamp: timestamp,
-      isRead: true, // Los mensajes que enviamos nosotros están leídos por defecto
-      isDelivered: true,
+      is_read: true, // Los mensajes que enviamos nosotros están leídos por defecto
       metadata: { source: 'whatsapp', isTest: true, direction: 'outgoing' }
     };
     
@@ -633,8 +690,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       content: message,
       type: 'text',
       timestamp: timestamp,
-      isRead: true,
-      isDelivered: true,
+      is_read: true,
       metadata: { source: 'whatsapp', direction: 'outgoing' }
     };
     
@@ -656,6 +712,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     addNotification,
     toggleTheme,
     loadWhatsAppMessages,
+    loadNewSchemaConversations,
     addSentWhatsAppMessage,
     injectTestWhatsAppMessage,
     injectTestOutgoingMessage,

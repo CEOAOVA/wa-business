@@ -21,7 +21,7 @@ VITE_BACKEND_URL=http://localhost:3002
 
 En `backend/.env`:
 ```bash
-OPEN_ROUTER_API_KEY=tu_openrouter_api_key_aqui
+OPENROUTER_API_KEY=tu_openrouter_api_key_aqui
 JWT_SECRET=mi_jwt_secret_super_seguro_2024
 ```
 
@@ -47,7 +47,7 @@ docker-compose up --build -d
 
 - **Frontend:** http://localhost:5173 (dev) o http://localhost:80 (prod)
 - **Backend:** http://localhost:3002
-- **Login:** `admin@embler.com` / `admin123`
+- **Login:** `moises.s@aova.mx` / `Admin2024!`
 
 ## 🚨 Problemas Comunes
 
@@ -61,7 +61,7 @@ docker-compose logs backend
 ### Error: "OpenRouter API key not found"
 ```bash
 # Verificar que la API key esté configurada EN EL BACKEND
-grep OPEN_ROUTER_API_KEY backend/.env
+grep OPENROUTER_API_KEY backend/.env
 
 # ✅ CORRECTO: API key en backend/.env
 # ❌ INCORRECTO: API key en frontend (riesgo de seguridad)

@@ -142,7 +142,7 @@ const Sidebar: React.FC = () => {
   
   const { unreadCount } = useNotifications();
   const { state: authState, logout } = useAuth();
-  const { loadWhatsAppMessages } = useApp();
+  const { loadWhatsAppMessages, loadNewSchemaConversations } = useApp();
 
   // Filtrar chats según la búsqueda y filtros
   const filteredChats = useMemo(() => {
@@ -196,6 +196,7 @@ const Sidebar: React.FC = () => {
     setIsLoadingMessages(true);
     try {
       await loadWhatsAppMessages();
+      await loadNewSchemaConversations();
       console.log('🔄 Conversaciones cargadas manualmente');
     } catch (error) {
       console.error('❌ Error cargando conversaciones:', error);

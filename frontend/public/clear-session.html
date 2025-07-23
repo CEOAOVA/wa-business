@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Sesión - WhatsApp Business Platform</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .title {
+            color: #fbbf24;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #fbbf24;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        .info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .warning {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🔧 Limpiar Sesión</h1>
+        <p>Esta herramienta te permite limpiar completamente los datos de autenticación almacenados en tu navegador.</p>
+        
+        <div id="status" class="status info">
+            Estado: Esperando acción...
+        </div>
+        
+        <button class="button" onclick="clearSession()">
+            🗑️ Limpiar Sesión
+        </button>
+        
+        <button class="button" onclick="checkStatus()">
+            🔍 Verificar Estado
+        </button>
+        
+        <button class="button" onclick="goToLogin()">
+            🚀 Ir al Login
+        </button>
+    </div>
+
+    <script>
+        function clearSession() {
+            try {
+                // Limpiar localStorage
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('rememberAuth');
+                
+                // Limpiar sessionStorage
+                sessionStorage.clear();
+                
+                // Limpiar cookies
+                document.cookie.split(";").forEach((c) => {
+                    document.cookie = c
+                        .replace(/^ +/, "")
+                        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+                
+                updateStatus('✅ Sesión limpiada exitosamente', 'success');
+                
+                // Verificar que se limpió
+                setTimeout(checkStatus, 1000);
+                
+            } catch (error) {
+                updateStatus('❌ Error al limpiar sesión: ' + error.message, 'warning');
+            }
+        }
+        
+        function checkStatus() {
+            const token = localStorage.getItem('authToken');
+            const rememberAuth = localStorage.getItem('rememberAuth');
+            const sessionData = sessionStorage.length;
+            
+            if (!token && !rememberAuth && sessionData === 0) {
+                updateStatus('✅ No hay datos de sesión almacenados', 'success');
+            } else {
+                let status = '⚠️ Datos de sesión encontrados:\n';
+                if (token) status += '• Token de autenticación\n';
+                if (rememberAuth) status += '• Recordar autenticación\n';
+                if (sessionData > 0) status += `• ${sessionData} elementos en sessionStorage\n`;
+                
+                updateStatus(status, 'warning');
+            }
+        }
+        
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function goToLogin() {
+            window.location.href = '/login';
+        }
+        
+        // Verificar estado al cargar la página
+        window.onload = function() {
+            checkStatus();
+        };
+    </script>
+</body>
+</html> 

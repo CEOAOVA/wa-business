@@ -518,15 +518,15 @@ class WhatsAppService {
                     success: true,
                     messages: messages.map((msg) => ({
                         id: msg.id,
-                        waMessageId: msg.waMessageId,
+                        waMessageId: msg.whatsapp_message_id,
                         content: msg.content,
-                        messageType: msg.messageType,
-                        timestamp: msg.timestamp,
-                        isFromUs: msg.isFromUs,
-                        isRead: msg.isRead,
-                        isDelivered: msg.isDelivered,
-                        senderId: msg.senderId,
-                        receiverId: msg.receiverId
+                        messageType: msg.message_type,
+                        timestamp: msg.created_at,
+                        isFromUs: msg.sender_type === 'agent' || msg.sender_type === 'bot',
+                        isRead: msg.is_read,
+                        isDelivered: true, // Por defecto en el nuevo esquema
+                        senderId: msg.sender_type,
+                        receiverId: conversationId
                     })).reverse() // Mostrar más antiguos primero
                 };
             }

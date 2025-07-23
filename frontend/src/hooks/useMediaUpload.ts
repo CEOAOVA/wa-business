@@ -18,7 +18,7 @@ export const useMediaUpload = (options: UseMediaUploadOptions = {}) => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<UploadResult | null>(null);
 
-  const { onSuccess, onError, apiBaseUrl = 'http://localhost:3002' } = options;
+      const { onSuccess, onError, apiBaseUrl = 'http://localhost:3002' } = options;
 
   const uploadFile = useCallback(async (file: File): Promise<UploadResult> => {
     setIsUploading(true);

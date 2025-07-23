@@ -3,7 +3,8 @@
  */
 
 // Configuración del backend - Usando variables de entorno
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002';
+// Use relative path to leverage Vite proxy in development
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002');
 
 export interface SendMessageRequest {
   to: string;
@@ -359,11 +360,15 @@ class WhatsAppApiService {
    */
   async getConversationMessages(conversationId: string, limit?: number, offset?: number): Promise<ApiResponse<{
     messages: Array<{
-      id: string;
-      role: 'user' | 'assistant' | 'system';
+      id: number;
+      conversation_id: string;
+      sender_type: 'user' | 'agent' | 'bot';
       content: string;
-      timestamp: string;
-      metadata: any;
+      message_type: 'text' | 'image' | 'quote' | 'document';
+      whatsapp_message_id?: string;
+      is_read: boolean;
+      metadata?: any;
+      created_at: string;
     }>;
     total: number;
     conversationId: string;

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
 import { authApiService } from '../services/auth-api';
+import { cleanupInvalidAuth, clearAllAuthData, forceLogout } from '../utils/auth-cleanup';
 
 // Estado inicial
 const initialState: AuthState = {
@@ -93,6 +94,72 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Hacer funciones de debug disponibles globalmente
+  useEffect(() => {
+    // @ts-ignore - Hacer funciones disponibles globalmente para debug
+    window.authDebug = {
+      checkAuthStatus: () => {
+        const token = localStorage.getItem('authToken');
+        const rememberAuth = localStorage.getItem('rememberAuth');
+        const sessionData = sessionStorage.length;
+        
+        console.log('🔍 Estado de autenticación:');
+        console.log('  • Token:', token ? '✅ Presente' : '❌ No encontrado');
+        console.log('  • Remember Auth:', rememberAuth ? '✅ Activado' : '❌ No activado');
+        console.log('  • Session Storage:', sessionData > 0 ? `⚠️ ${sessionData} elementos` : '✅ Vacío');
+        
+        if (token) {
+          try {
+            const parts = token.split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(atob(parts[1]));
+              const currentTime = Math.floor(Date.now() / 1000);
+              const isExpired = payload.exp && payload.exp < currentTime;
+              console.log('  • Token expirado:', isExpired ? '❌ Sí' : '✅ No');
+            }
+          } catch (error) {
+            console.log('  • Error al decodificar token:', error);
+          }
+        }
+        
+        return { hasToken: !!token, hasRememberAuth: !!rememberAuth, sessionDataCount: sessionData };
+      },
+      clearAuthSession: () => {
+        console.log('🗑️ Limpiando sesión...');
+        clearAllAuthData();
+        dispatch({ type: 'LOGOUT' });
+        console.log('✅ Sesión limpiada');
+      },
+      forceLogout: () => {
+        console.log('🚪 Forzando logout...');
+        clearAllAuthData();
+        dispatch({ type: 'LOGOUT' });
+        window.location.href = '/login';
+      },
+      reloadPage: () => {
+        console.log('🔄 Recargando página...');
+        window.location.reload();
+      },
+      goToLogin: () => {
+        console.log('🚀 Navegando al login...');
+        window.location.href = '/login';
+      },
+      getAuthState: () => {
+        console.log('📊 Estado del contexto:', state);
+        return state;
+      }
+    };
+    
+    console.log('🔧 Debug de autenticación disponible. Usa: window.authDebug.functionName()');
+    console.log('📋 Funciones disponibles:');
+    console.log('  • window.authDebug.checkAuthStatus()');
+    console.log('  • window.authDebug.clearAuthSession()');
+    console.log('  • window.authDebug.forceLogout()');
+    console.log('  • window.authDebug.reloadPage()');
+    console.log('  • window.authDebug.goToLogin()');
+    console.log('  • window.authDebug.getAuthState()');
+  }, [state]);
+
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
@@ -117,12 +184,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await authApiService.logout();
-      localStorage.removeItem('rememberAuth');
-      localStorage.removeItem('authToken');
-      dispatch({ type: 'LOGOUT' });
     } catch (error) {
       console.error('Error durante logout:', error);
-      // Logout forzado aunque falle la API
+    } finally {
+      // Limpiar todos los datos de autenticación
+      clearAllAuthData();
       dispatch({ type: 'LOGOUT' });
     }
   };
@@ -137,16 +203,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuth = async () => {
     try {
+      // Limpiar datos de autenticación inválidos antes de verificar
+      cleanupInvalidAuth();
+      
       const token = localStorage.getItem('authToken');
-      if (!token) return;
+      if (!token) {
+        // Limpiar estado si no hay token
+        dispatch({ type: 'LOGOUT' });
+        return;
+      }
 
       dispatch({ type: 'AUTH_START' });
       const profile = await authApiService.getProfile();
       const user = authApiService.convertToUser(profile);
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
     } catch (error) {
-      localStorage.removeItem('authToken');
-      dispatch({ type: 'AUTH_FAILURE', payload: 'Sesión expirada' });
+      console.error('Error checking auth:', error);
+      // Limpiar token inválido y estado
+      clearAllAuthData();
+      dispatch({ type: 'LOGOUT' });
     }
   };
 

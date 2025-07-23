@@ -24,7 +24,7 @@ const configureCORS = () => {
             // Obtener orígenes permitidos desde variables de entorno
             const allowedOrigins = ((_a = process.env.CORS_ORIGINS) === null || _a === void 0 ? void 0 : _a.split(',').map(o => o.trim())) || [
                 'http://localhost:5173',
-                'http://localhost:3000',
+                'http://localhost:3002',
                 'https://dev-waprueba.aova.mx' // Frontend en dominio separado
             ];
             if (allowedOrigins.includes(origin)) {

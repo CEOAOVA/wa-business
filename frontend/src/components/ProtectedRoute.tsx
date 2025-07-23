@@ -16,6 +16,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { state } = useAuth();
   const location = useLocation();
 
+  // Mostrar loading mientras se verifica la autenticación
+  if (state.isLoading) {
+    return (
+      <div className="min-h-screen bg-embler-dark flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-embler-yellow border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg">Verificando acceso...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Si no está autenticado, redirigir al login
   if (!state.isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;

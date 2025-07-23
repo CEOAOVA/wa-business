@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { useChatbot } from "../chatbot/hooks/useChatbot";
 import { MESSAGES } from "../constants/messages";
 import type { ChatbotMessage } from "../chatbot/types/chatbot";
@@ -13,7 +13,6 @@ interface ChatMessage {
 }
 
 const ClientChat: React.FC = () => {
-  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
