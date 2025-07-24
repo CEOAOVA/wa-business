@@ -12,7 +12,13 @@ export function useChat() {
   // Obtener mensajes del chat actual
   const currentMessages = useMemo(() => {
     if (!state.currentChat) return [];
-    return state.messages[state.currentChat.id] || [];
+    const messages = state.messages[state.currentChat.id] || [];
+    // Asegurar orden cronológico (más antiguo primero)
+    return messages.sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.created_at || 0).getTime();
+      const timeB = new Date(b.timestamp || b.created_at || 0).getTime();
+      return timeA - timeB;
+    });
   }, [state.currentChat, state.messages]);
 
   // Enviar mensaje con notificación
@@ -110,7 +116,8 @@ export function useChat() {
 
   // Verificar si el usuario actual es el remitente
   const isOwnMessage = useCallback((message: Message): boolean => {
-    return message.senderId === 'agent-1'; // ID del agente actual
+    // Los mensajes del agente o bot son los que envía la aplicación
+    return message.senderId === 'agent' || message.senderId === 'bot';
   }, []);
 
   return {

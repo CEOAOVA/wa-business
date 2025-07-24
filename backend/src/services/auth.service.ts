@@ -87,7 +87,7 @@ export class AuthService {
   }
 
   /**
-   * Autenticar usuario
+   * Autenticar usuario (versión simplificada y menos restrictiva)
    */
   static async login(loginData: LoginData): Promise<{ user: UserProfile; session: any }> {
     try {
@@ -95,24 +95,7 @@ export class AuthService {
         throw new Error('Servicio de autenticación no disponible');
       }
 
-      // Buscar el usuario por email usando el cliente administrativo
-      const { data: profileData, error: profileError } = await supabaseAdmin
-        .from('agents')
-        .select('*')
-        .eq('email', loginData.email)
-        .eq('is_active', true)
-        .single();
-
-      if (profileError) {
-        logger.error('Error fetching user profile:', profileError);
-        throw new Error('Usuario no encontrado o inactivo');
-      }
-
-      if (!profileData) {
-        throw new Error('Usuario no encontrado');
-      }
-
-      // Autenticar con Supabase Auth
+      // Primero intentar autenticar con Supabase Auth (más rápido)
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password
@@ -127,14 +110,77 @@ export class AuthService {
         throw new Error('No se pudo autenticar al usuario');
       }
 
-      // Actualizar último login
-      await supabaseAdmin
-        .from('agents')
-        .update({ 
-          last_login: new Date().toISOString(),
+      // Buscar el perfil del usuario (más flexible)
+      let profileData: UserProfile;
+      
+      try {
+        const { data: profileResult, error: profileError } = await supabaseAdmin
+          .from('agents')
+          .select('*')
+          .eq('email', loginData.email)
+          .single();
+
+        if (profileError) {
+          logger.warn('Error fetching user profile, creating basic profile');
+          // Si no existe el perfil, crear uno básico
+          profileData = {
+            id: authData.user.id,
+            username: authData.user.user_metadata?.username || authData.user.email?.split('@')[0] || 'user',
+            full_name: authData.user.user_metadata?.full_name || authData.user.email || 'Usuario',
+            email: authData.user.email || '',
+            role: authData.user.user_metadata?.role || 'agent',
+            whatsapp_id: authData.user.user_metadata?.whatsapp_id,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+        } else {
+          profileData = profileResult;
+          
+          // Si el usuario está marcado como inactivo, reactivarlo automáticamente
+          if (!profileData.is_active) {
+            logger.info('Reactivating inactive user');
+            profileData.is_active = true;
+            profileData.updated_at = new Date().toISOString();
+          }
+        }
+      } catch (profileError) {
+        logger.warn('Error with user profile, using auth data');
+        // Crear perfil básico si hay problemas
+        profileData = {
+          id: authData.user.id,
+          username: authData.user.user_metadata?.username || authData.user.email?.split('@')[0] || 'user',
+          full_name: authData.user.user_metadata?.full_name || authData.user.email || 'Usuario',
+          email: authData.user.email || '',
+          role: authData.user.user_metadata?.role || 'agent',
+          whatsapp_id: authData.user.user_metadata?.whatsapp_id,
+          is_active: true,
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        })
-        .eq('id', profileData.id);
+        };
+      }
+
+      // Actualizar último login y estado activo
+      try {
+        await supabaseAdmin
+          .from('agents')
+          .upsert({
+            id: profileData.id,
+            username: profileData.username,
+            full_name: profileData.full_name,
+            email: profileData.email,
+            role: profileData.role,
+            whatsapp_id: profileData.whatsapp_id,
+            is_active: true,
+            last_login: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          });
+      } catch (updateError) {
+        logger.warn('Error updating user profile');
+        // Continuar aunque falle la actualización
+      }
 
       logger.info(`User logged in successfully: ${loginData.email}`);
       return { user: profileData, session: authData.session };

@@ -640,14 +640,26 @@ export class SupabaseDatabaseService {
         return null;
       }
 
+      // Actualizar la conversación con el último mensaje y timestamp
+      const updateData: any = {
+        last_message_at: message.created_at,
+        updated_at: message.created_at
+      };
+
       // Incrementar contador de mensajes no leídos si es mensaje del usuario
       if (data.senderType === 'user') {
-        await supabase
-          .from('conversations')
-          .update({
-            unread_count: supabase.rpc('increment_unread_count')
-          })
-          .eq('id', data.conversationId);
+        updateData.unread_count = supabase.rpc('increment_unread_count');
+      }
+
+      const { error: updateError } = await supabase
+        .from('conversations')
+        .update(updateData)
+        .eq('id', data.conversationId);
+
+      if (updateError) {
+        console.error('❌ Error actualizando conversación después de crear mensaje:', updateError);
+      } else {
+        console.log(`✅ Conversación ${data.conversationId} actualizada con último mensaje: ${message.created_at}`);
       }
 
       return message;
@@ -670,7 +682,7 @@ export class SupabaseDatabaseService {
         .from('messages')
         .select('*')
         .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: true }) // Ordenar por timestamp ascendente (más antiguo primero)
         .limit(limit);
 
       if (error) {
@@ -682,6 +694,38 @@ export class SupabaseDatabaseService {
     } catch (error) {
       console.error('❌ Error en getConversationMessages:', error);
       return [];
+    }
+  }
+
+  /**
+   * Obtener el último mensaje de una conversación
+   */
+  async getLastMessage(conversationId: string): Promise<SupabaseMessage | null> {
+    if (!this.isEnabled || !supabase) {
+      throw new Error('❌ Supabase no disponible');
+    }
+
+    try {
+      const { data: message, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: false }) // Ordenar por timestamp descendente (más reciente primero)
+        .limit(1)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null; // No hay mensajes
+        }
+        console.error('❌ Error obteniendo último mensaje:', error);
+        return null;
+      }
+
+      return message;
+    } catch (error) {
+      console.error('❌ Error en getLastMessage:', error);
+      return null;
     }
   }
 
@@ -920,9 +964,11 @@ export class SupabaseDatabaseService {
     }
 
     try {
+      // Ordenar por last_message_at si existe, sino por updated_at
       const { data: conversations, error } = await supabase
         .from('conversations')
         .select('*')
+        .order('last_message_at', { ascending: false })
         .order('updated_at', { ascending: false })
         .range(offset, offset + limit - 1);
 

@@ -2556,3 +2556,118 @@
   ],
   timestamp: '2025-07-23 15:35:11.263'
 }
+{
+  error: Error: listen EADDRINUSE: address already in use :::3002
+      at Server.setupListenHandle [as _listen2] (node:net:1939:16)
+      at listenInCluster (node:net:1996:12)
+      at Server.listen (node:net:2101:7)
+      at C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:221:16
+      at Generator.next (<anonymous>)
+      at fulfilled (C:\Users\karal\Documents\whtsppbsnss - copia\backend\src\app.ts:38:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3002
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3002\n' +
+    'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:221:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:38:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3002\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n' +
+    '    at listenInCluster (node:net:1996:12)\n' +
+    '    at Server.listen (node:net:2101:7)\n' +
+    '    at C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:221:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts:38:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Thu Jul 24 2025 11:28:59 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 9172,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 316735488,
+      heapTotal: 261644288,
+      heapUsed: 226465144,
+      external: 9026272,
+      arrayBuffers: 4968521
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 921481.828 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1939,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1996,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2101,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: null,
+      line: 221,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 38,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-07-24 11:28:59.780'
+}

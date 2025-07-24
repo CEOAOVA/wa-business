@@ -163,8 +163,8 @@ export const useAppStore = create<AppStore>()(
           // Actualizar chat existente
           state.chats[existingIndex] = { ...state.chats[existingIndex], ...chat };
         } else {
-          // Agregar nuevo chat al inicio
-          state.chats.unshift(chat);
+          // Agregar nuevo chat al final (el ordenamiento se maneja en el componente)
+          state.chats.push(chat);
         }
       }),
 

@@ -17,6 +17,9 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--embler-gradient-dark);
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 /* Gradientes de fondo modernos */
@@ -261,7 +264,7 @@ header img {
 
 /* Asegurar que el contenido principal no se superponga con el header */
 .min-h-screen {
-  padding-top: 80px; /* Espacio para el header fijo */
+  /* Removido padding-top innecesario */
 }
 
 /* Responsive design mejorado */

@@ -23,15 +23,19 @@ const MessageBubble: React.FC<{
 }> = ({ message, isOwn, getRelativeTime }) => {
   const bubbleClass = isOwn 
     ? "self-end bg-embler-yellow text-embler-dark" 
-    : message.isFromBot 
+    : message.senderId === 'bot'
       ? "self-start bg-blue-600 text-white"
       : "self-start bg-gray-700 text-white";
 
   const senderName = isOwn 
     ? "Tú" 
-    : message.isFromBot 
+    : message.senderId === 'bot'
       ? "🤖 IA Asistente"
       : "Cliente";
+
+  // Determinar si es un mensaje de texto o media
+  const isTextMessage = message.type === 'text' || message.message_type === 'text' || !message.type;
+  const hasMedia = message.metadata?.mediaUrl || message.metadata?.media_url;
 
   return (
     <div className={`flex flex-col ${bubbleClass} rounded-lg px-4 py-2 max-w-[70%] break-words`}>
@@ -39,18 +43,21 @@ const MessageBubble: React.FC<{
         {senderName}
       </div>
       
-      {message.type === 'text' ? (
+      {isTextMessage && !hasMedia ? (
         <div className="whitespace-pre-wrap">{message.content}</div>
       ) : (
-        <MediaMessage message={{
-          id: message.id.toString(),
-          type: (message.type || message.message_type || 'text').toUpperCase() as 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER',
-          mediaUrl: message.metadata?.mediaUrl,
-          mediaCaption: message.metadata?.caption,
-          content: message.content,
-          timestamp: message.timestamp || new Date(message.created_at || Date.now()),
-          isOwn
-        }} />
+        <MediaMessage 
+          message={{
+            id: message.id.toString(),
+            type: (message.type || message.message_type || 'text').toUpperCase() as 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER',
+            mediaUrl: message.metadata?.mediaUrl || message.metadata?.media_url,
+            mediaCaption: message.metadata?.caption || message.metadata?.media_caption,
+            content: message.content,
+            timestamp: message.timestamp || new Date(message.created_at || Date.now()),
+            isOwn
+          }}
+          standalone={false} // Usar modo integrado para evitar burbujas dentro de burbujas
+        />
       )}
       
       <div className="text-xs opacity-70 mt-1 text-right">
@@ -88,6 +95,37 @@ const ChatPanel: React.FC = () => {
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [conversationSummary, setConversationSummary] = useState<any>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+
+  // Auto-scroll a mensajes más recientes
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // Auto-scroll inmediato cuando se carga un nuevo chat
+  useEffect(() => {
+    if (currentChat && messagesEndRef.current) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      }, 100);
+    }
+  }, [currentChat?.id]);
+
+  // Función para scroll manual al final
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  // Función para scroll manual al inicio
+  const scrollToTop = useCallback(() => {
+    const messagesContainer = document.querySelector('.messages-container');
+    if (messagesContainer) {
+      messagesContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
 
   // Funciones utilitarias
   const validatePhone = (phone: string) => {
@@ -136,11 +174,6 @@ const ChatPanel: React.FC = () => {
       loadAIMode();
     }
   }, [currentChat?.id]);
-
-  // Auto-scroll al final cuando llegan nuevos mensajes
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   // WhatsApp number effect
   useEffect(() => {
@@ -384,7 +417,7 @@ const ChatPanel: React.FC = () => {
       </div>
 
       {/* Mensajes */}
-      <div className="flex-1 px-6 py-4 flex flex-col gap-1 overflow-y-auto scrollbar-thin scrollbar-thumb-embler-accent scrollbar-track-embler-dark">
+      <div className="flex-1 px-6 py-4 flex flex-col gap-1 overflow-y-auto scrollbar-thin scrollbar-thumb-embler-accent scrollbar-track-embler-dark messages-container relative">
         {!whatsappMode && messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center text-gray-400">
@@ -408,6 +441,30 @@ const ChatPanel: React.FC = () => {
           ))
         )}
         <div ref={messagesEndRef} />
+        
+        {/* Botones de navegación de scroll */}
+        {messages.length > 5 && (
+          <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+            <button
+              onClick={scrollToTop}
+              className="p-2 bg-embler-dark/80 text-embler-yellow rounded-full hover:bg-embler-dark transition-colors shadow-lg"
+              title="Ir al inicio"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+              </svg>
+            </button>
+            <button
+              onClick={scrollToBottom}
+              className="p-2 bg-embler-dark/80 text-embler-yellow rounded-full hover:bg-embler-dark transition-colors shadow-lg"
+              title="Ir al final"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Input de WhatsApp Number */}

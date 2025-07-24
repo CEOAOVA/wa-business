@@ -270,7 +270,36 @@ export class DatabaseService {
     try {
       const conversations = await supabaseDatabaseService.getConversations(limit, offset);
       console.log(`✅ Conversaciones obtenidas: ${conversations.length}`);
-      return conversations;
+      
+      // Enriquecer conversaciones con información adicional
+      const enrichedConversations = await Promise.all(
+        conversations.map(async (conv) => {
+          // Obtener el último mensaje de la conversación de manera eficiente
+          const lastMessage = await this.getLastMessage(conv.id);
+          
+          // Obtener información del contacto
+          let contact = null;
+          if (conv.contact_phone) {
+            contact = await this.getContactByPhone(conv.contact_phone);
+          }
+          
+          return {
+            ...conv,
+            lastMessage: lastMessage ? {
+              id: lastMessage.id,
+              content: lastMessage.content,
+              timestamp: lastMessage.created_at,
+              isFromUs: lastMessage.sender_type === 'agent' || lastMessage.sender_type === 'bot'
+            } : null,
+            contact: contact,
+            _count: {
+              messages: 1 // Por ahora, podríamos implementar un contador real si es necesario
+            }
+          };
+        })
+      );
+      
+      return enrichedConversations;
     } catch (error) {
       console.error('❌ Error obteniendo conversaciones:', error);
       return [];
@@ -325,6 +354,20 @@ export class DatabaseService {
     } catch (error) {
       console.error('❌ Error en getChatbotConversationMessages:', error);
       return [];
+    }
+  }
+
+  /**
+   * Obtener el último mensaje de una conversación
+   */
+  async getLastMessage(conversationId: string): Promise<SupabaseMessage | null> {
+    try {
+      const message = await supabaseDatabaseService.getLastMessage(conversationId);
+      console.log(`✅ Último mensaje obtenido para conversación ${conversationId}: ${message ? message.id : 'sin mensajes'}`);
+      return message;
+    } catch (error) {
+      console.error('❌ Error en getLastMessage:', error);
+      return null;
     }
   }
 

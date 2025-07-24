@@ -63,16 +63,19 @@ export interface UserProfile {
 
 export interface Conversation {
   id: string;
-  contact_id: string;
-  status: 'active' | 'closed';
-  priority?: 'low' | 'medium' | 'high';
+  contact_phone: string;
+  status: 'active' | 'waiting' | 'closed';
+  ai_mode: 'active' | 'inactive' | 'paused';
+  assigned_agent_id?: string;
+  unread_count: number;
+  last_message_at?: string;
   created_at: string;
   updated_at: string;
   contact?: {
     id: string;
     name: string;
-    phone_number: string;
-    email: string;
+    phone: string;
+    email?: string;
   };
 }
 

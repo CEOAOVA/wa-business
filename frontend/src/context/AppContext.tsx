@@ -39,14 +39,18 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         return state;
       }
       
+      // Agregar el nuevo mensaje y ordenar cronológicamente
+      const updatedMessages = [...existingMessages, message].sort((a, b) => {
+        const timeA = new Date(a.timestamp || a.created_at || 0).getTime();
+        const timeB = new Date(b.timestamp || b.created_at || 0).getTime();
+        return timeA - timeB; // Orden ascendente: más antiguo primero
+      });
+      
       return {
         ...state,
         messages: {
           ...state.messages,
-          [chatId]: [
-            ...existingMessages,
-            message,
-          ],
+          [chatId]: updatedMessages,
         },
         chats: state.chats.map(chat =>
           chat.id === chatId
@@ -70,15 +74,15 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       }
       return {
         ...state,
-        chats: [action.payload, ...state.chats],
+        chats: [...state.chats, action.payload], // Agregar al final, no al principio
       };
     case 'UPDATE_CHAT':
       const existingChatIndex = state.chats.findIndex(c => c.id === action.payload.id);
       if (existingChatIndex === -1) {
-        // Si no existe, agregarlo
+        // Si no existe, agregarlo al final
         return {
           ...state,
-          chats: [action.payload, ...state.chats],
+          chats: [...state.chats, action.payload],
         };
       }
       return {
@@ -145,6 +149,7 @@ interface AppContextType {
   // Nuevas funciones para WhatsApp
   loadWhatsAppMessages: () => Promise<void>;
   loadNewSchemaConversations: () => Promise<void>;
+  loadConversationMessages: (conversationId: string) => Promise<void>;
   addSentWhatsAppMessage: (to: string, message: string, messageId?: string) => void;
   // Funciones de testing manual
   injectTestWhatsAppMessage: (from: string, message: string, name?: string) => void;
@@ -183,7 +188,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           lastMessage: {
             id: typeof data.message.id === 'string' ? parseInt(data.message.id) || Date.now() : data.message.id,
             chatId: chatId,
-            senderId: data.message.from === 'us' ? 'agent-1' : data.message.from,
+            senderId: data.message.from === 'us' ? 'agent' : 'user',
             content: data.message.message,
             type: 'text',
             timestamp: new Date(data.message.timestamp),
@@ -205,7 +210,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const newMessage: Message = {
         id: data.message.id,
         chatId: chatId,
-        senderId: data.message.from === 'us' ? 'agent-1' : data.message.from,
+        senderId: data.message.from === 'us' ? 'agent' : 'user',
         content: data.message.message,
         type: 'text',
         timestamp: new Date(data.message.timestamp),
@@ -248,7 +253,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       lastMessage: {
         id: whatsappMsg.id,
         chatId: chatId,
-        senderId: whatsappMsg.from,
+        senderId: 'user',
         content: whatsappMsg.message,
         type: 'text',
         timestamp: whatsappMsg.timestamp,
@@ -273,96 +278,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return `+${phone}`;
   };
 
-  // Cargar mensajes de WhatsApp
-  const loadWhatsAppMessages = useCallback(async () => {
-    console.log('🔍 [AppContext] Iniciando carga de mensajes de WhatsApp...');
-    
-    try {
-      console.log('🔍 [AppContext] Llamando a whatsappApi.getIncomingMessages...');
-      const response = await whatsappApi.getIncomingMessages(50, 0);
-      
-      console.log('🔍 [AppContext] Respuesta recibida:', response);
-      
-      if (response.success && response.messages.length > 0) {
-        console.log(`🔍 [AppContext] ${response.messages.length} mensajes encontrados`);
-        
-        // Agrupar mensajes por número de teléfono
-        const messagesByPhone = response.messages.reduce((acc, msg) => {
-          if (!acc[msg.from]) {
-            acc[msg.from] = [];
-          }
-          acc[msg.from].push(msg);
-          return acc;
-        }, {} as Record<string, IncomingMessage[]>);
-
-        console.log('🔍 [AppContext] Mensajes agrupados por teléfono:', Object.keys(messagesByPhone));
-
-        // Crear chats y mensajes
-        Object.entries(messagesByPhone).forEach(([phone, msgs]) => {
-          const chatId = `whatsapp-${phone}`;
-          
-          console.log(`🔍 [AppContext] Procesando chat ${chatId} con ${msgs.length} mensajes`);
-          
-          // Verificar si el chat ya existe en el estado actual
-          let currentChats = state.chats;
-          const existingChat = currentChats.find(c => c.id === chatId);
-          
-          if (!existingChat) {
-            console.log(`🔍 [AppContext] Creando nuevo chat para ${phone}`);
-            // Crear nuevo chat con el mensaje más reciente
-            const latestMsg = msgs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
-            const newChat = convertWhatsAppToChat(latestMsg);
-            
-            console.log('🔍 [AppContext] Nuevo chat creado:', newChat);
-            dispatch({ type: 'ADD_CHAT', payload: newChat });
-            
-            // Actualizar la referencia local para evitar duplicados en el mismo ciclo
-            currentChats = [newChat, ...currentChats];
-          } else {
-            console.log(`🔍 [AppContext] Chat ${chatId} ya existe`);
-          }
-
-          // Agregar mensajes nuevos - verificar en el estado actual
-          const existingMessages = state.messages[chatId] || [];
-          console.log(`🔍 [AppContext] Mensajes existentes en ${chatId}: ${existingMessages.length}`);
-          
-          // Filtrar solo mensajes que realmente son nuevos
-          const newMessages = msgs.filter(msg => {
-            const messageExists = existingMessages.some(existing => existing.id === msg.id);
-            if (messageExists) {
-              console.log(`🔍 [AppContext] Mensaje ${msg.id} ya existe en ${chatId}, omitiendo`);
-            }
-            return !messageExists;
-          });
-          
-          console.log(`🔍 [AppContext] ${newMessages.length} mensajes nuevos para agregar a ${chatId}`);
-          
-          // Agregar solo los mensajes nuevos
-          newMessages.forEach(msg => {
-            console.log(`🔍 [AppContext] Agregando mensaje ${msg.id} al chat ${chatId}`);
-            const chatMessage: Message = {
-              id: msg.id,
-              chatId: chatId,
-              senderId: msg.from,
-              content: msg.message,
-              type: 'text',
-              timestamp: msg.timestamp,
-              is_read: msg.read,
-              metadata: { source: 'whatsapp' }
-            };
-            
-            dispatch({ type: 'ADD_MESSAGE', payload: chatMessage });
-          });
-        });
-      } else {
-        console.log('🔍 [AppContext] No hay mensajes o respuesta fallida:', response);
-      }
-    } catch (error) {
-      console.error('❌ [AppContext] Error cargando mensajes de WhatsApp:', error);
-    }
-  }, [state.messages]);
-
-  // Cargar conversaciones del nuevo esquema
+  // Cargar conversaciones del nuevo esquema (FUNCIÓN PRINCIPAL)
   const loadNewSchemaConversations = useCallback(async () => {
     console.log('🔍 [AppContext] Iniciando carga de conversaciones del nuevo esquema...');
     
@@ -375,7 +291,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       if (conversations.length > 0) {
         console.log(`🔍 [AppContext] ${conversations.length} conversaciones encontradas`);
         
-        // Convertir conversaciones del nuevo esquema a chats del frontend
+        // Convertir conversaciones a chats del frontend
         conversations.forEach(conv => {
           const chatId = `conv-${conv.id}`;
           
@@ -390,18 +306,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             // Crear nuevo chat
             const newChat: Chat = {
               id: chatId,
-              clientId: conv.contact_id,
-              clientName: conv.contact?.name || 'Cliente sin nombre',
-              clientPhone: conv.contact?.phone_number || 'Sin teléfono',
+              clientId: conv.contact_phone,
+              clientName: conv.contact_phone, // Usar el número como nombre
+              clientPhone: conv.contact_phone,
               clientAvatar: undefined,
-              assignedAgentId: null,
+              assignedAgentId: conv.assigned_agent_id || null,
               lastMessage: null, // Se cargará cuando se carguen los mensajes
-              unreadCount: 0, // Se calculará cuando se carguen los mensajes
+              unreadCount: conv.unread_count || 0,
               isActive: conv.status === 'active',
               createdAt: new Date(conv.created_at),
               updatedAt: new Date(conv.updated_at),
               tags: ['conversation'],
-              priority: conv.priority || 'medium',
+              priority: 'medium',
               status: conv.status === 'active' ? 'open' : conv.status
             };
             
@@ -409,6 +325,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             dispatch({ type: 'ADD_CHAT', payload: newChat });
           } else {
             console.log(`🔍 [AppContext] Chat ${chatId} ya existe`);
+            // Actualizar datos del chat existente si es necesario
+            if (existingChat.unreadCount !== conv.unread_count || 
+                existingChat.updatedAt.getTime() !== new Date(conv.updated_at).getTime()) {
+              const updatedChat = {
+                ...existingChat,
+                unreadCount: conv.unread_count || 0,
+                updatedAt: new Date(conv.updated_at),
+                status: conv.status === 'active' ? 'open' : (conv.status === 'closed' ? 'closed' : 'waiting') as 'open' | 'assigned' | 'waiting' | 'closed'
+              };
+              dispatch({ type: 'UPDATE_CHAT', payload: updatedChat });
+            }
           }
         });
       } else {
@@ -419,16 +346,72 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [state.chats]);
 
+  // Cargar mensajes de WhatsApp (FUNCIÓN LEGACY - DEPRECATED)
+  const loadWhatsAppMessages = useCallback(async () => {
+    console.log('🔍 [AppContext] Función loadWhatsAppMessages DEPRECATED - usando loadNewSchemaConversations');
+    // Esta función ya no se usa, redirigir a la función principal
+    await loadNewSchemaConversations();
+  }, [loadNewSchemaConversations]);
+
+  // Cargar mensajes de una conversación específica
+  const loadConversationMessages = useCallback(async (conversationId: string) => {
+    console.log(`📨 [AppContext] Cargando mensajes para conversación: ${conversationId}`);
+    
+    try {
+      // Determinar el tipo de conversación basado en el ID
+      if (conversationId.startsWith('conv-')) {
+        // Conversación del nuevo esquema
+        const actualConversationId = conversationId.replace('conv-', '');
+        console.log(`📨 [AppContext] Cargando mensajes del nuevo esquema para: ${actualConversationId}`);
+        
+        const response = await whatsappApi.getConversationMessages(actualConversationId);
+        
+        if (response.success && response.data?.messages) {
+          console.log(`📨 [AppContext] ${response.data.messages.length} mensajes cargados`);
+          
+          // Convertir mensajes al formato del frontend
+          const frontendMessages: Message[] = response.data.messages.map((msg: any) => ({
+            id: msg.id.toString(),
+            chatId: conversationId,
+            senderId: msg.sender_type, // Mantener el tipo original del backend
+            content: msg.content,
+            type: msg.message_type || 'text',
+            timestamp: new Date(msg.created_at),
+            is_read: msg.is_read,
+            metadata: {
+              whatsapp_message_id: msg.whatsapp_message_id,
+              source: 'new_schema'
+            }
+          }));
+          
+          // Agregar mensajes al estado
+          frontendMessages.forEach(msg => {
+            dispatch({ type: 'ADD_MESSAGE', payload: msg });
+          });
+          
+          console.log(`📨 [AppContext] Mensajes agregados al estado para ${conversationId}`);
+        } else {
+          console.log('📨 [AppContext] No hay mensajes o respuesta fallida:', response);
+        }
+      } else if (conversationId.startsWith('whatsapp-')) {
+        // Conversación de WhatsApp legacy - los mensajes ya se cargan en loadNewSchemaConversations
+        console.log(`📨 [AppContext] Conversación WhatsApp ${conversationId} - mensajes ya cargados`);
+      } else {
+        console.log(`📨 [AppContext] Tipo de conversación no reconocido: ${conversationId}`);
+      }
+    } catch (error) {
+      console.error(`❌ [AppContext] Error cargando mensajes para ${conversationId}:`, error);
+    }
+  }, []);
+
   // Polling para nuevos mensajes cada 30 segundos
   useEffect(() => {
-    loadWhatsAppMessages();
     loadNewSchemaConversations();
     const interval = setInterval(() => {
-      loadWhatsAppMessages();
       loadNewSchemaConversations();
     }, 30000);
     return () => clearInterval(interval);
-  }, [loadWhatsAppMessages, loadNewSchemaConversations]);
+  }, [loadNewSchemaConversations]);
 
   // Funciones de conveniencia
   const selectChat = (chat: Chat) => {
@@ -448,27 +431,85 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (conversationId) {
       webSocket.joinConversation(conversationId);
     }
+
+    // Cargar mensajes de la conversación seleccionada
+    loadConversationMessages(chat.id);
   };
 
-  // Función auxiliar para extraer ID de conversación (asumiendo que viene del backend)
+  // Función auxiliar para extraer ID de conversación
   const extractConversationId = (chatId: string): string | null => {
-    // Por ahora usamos el chatId directamente, pero en producción esto vendría de la API
-    // cuando carguemos las conversaciones desde el backend
-    return chatId.replace('whatsapp-', ''); // Simplificado por ahora
+    if (chatId.startsWith('conv-')) {
+      return chatId.replace('conv-', '');
+    } else if (chatId.startsWith('whatsapp-')) {
+      return chatId.replace('whatsapp-', '');
+    }
+    return null;
   };
 
   const sendMessage = async (content: string, type: Message['type'] = 'text') => {
     if (!state.currentChat) return;
 
-    // Extract phone number from chat ID for WhatsApp messages
+    // Determinar el tipo de chat basado en el ID
     const isWhatsAppChat = state.currentChat.id.startsWith('whatsapp-');
+    const isNewSchemaChat = state.currentChat.id.startsWith('conv-');
     
-    if (isWhatsAppChat) {
-      // WhatsApp chat - enviar via API real
+    if (isNewSchemaChat) {
+      // Conversación del nuevo esquema - usar la API correcta
+      const conversationId = state.currentChat.id.replace('conv-', '');
       const phoneNumber = state.currentChat.clientPhone;
       
       try {
-        console.log(`📤 [AppContext] Enviando mensaje WhatsApp a ${phoneNumber}: ${content}`);
+        console.log(`📤 [AppContext] Enviando mensaje a conversación ${conversationId} (${phoneNumber}): ${content}`);
+        
+        // Usar el endpoint correcto para el nuevo esquema
+        const result = await whatsappApi.sendMessage({
+          to: phoneNumber,
+          message: content
+        });
+
+        if (result.success) {
+          // Agregar mensaje al historial local
+          const sentMessage: Message = {
+            id: result.data?.messageId || `sent-${Date.now()}`,
+            chatId: state.currentChat.id,
+            senderId: 'agent', // Usar el tipo correcto del backend
+            content: content,
+            type: type,
+            timestamp: new Date(),
+            is_read: true,
+            metadata: { 
+              source: 'new_schema', 
+              direction: 'outgoing',
+              conversationId: conversationId
+            }
+          };
+          
+          dispatch({ type: 'ADD_MESSAGE', payload: sentMessage });
+          console.log(`✅ [AppContext] Mensaje enviado exitosamente a conversación ${conversationId}`);
+        } else {
+          console.error(`❌ [AppContext] Error enviando mensaje:`, result.error);
+          addNotification({
+            type: 'warning',
+            title: 'Error al enviar mensaje',
+            message: result.error || 'No se pudo enviar el mensaje',
+            isRead: false
+          });
+        }
+      } catch (error: any) {
+        console.error(`❌ [AppContext] Error enviando mensaje:`, error);
+        addNotification({
+          type: 'warning',
+          title: 'Error de conexión',
+          message: 'No se pudo conectar con el servicio',
+          isRead: false
+        });
+      }
+    } else if (isWhatsAppChat) {
+      // WhatsApp chat legacy - mantener compatibilidad temporal
+      const phoneNumber = state.currentChat.clientPhone;
+      
+      try {
+        console.log(`📤 [AppContext] Enviando mensaje WhatsApp legacy a ${phoneNumber}: ${content}`);
         
         const result = await whatsappApi.sendMessage({
           to: phoneNumber,
@@ -476,12 +517,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         });
 
         if (result.success) {
-          // Solo agregar al historial si el envío fue exitoso
           addSentWhatsAppMessage(phoneNumber, content, result.data?.messageId);
-          console.log(`✅ [AppContext] Mensaje WhatsApp enviado exitosamente`);
+          console.log(`✅ [AppContext] Mensaje WhatsApp legacy enviado exitosamente`);
         } else {
-          console.error(`❌ [AppContext] Error enviando mensaje WhatsApp:`, result.error);
-          // Agregar notificación de error
+          console.error(`❌ [AppContext] Error enviando mensaje WhatsApp legacy:`, result.error);
           addNotification({
             type: 'warning',
             title: 'Error al enviar mensaje',
@@ -490,7 +529,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           });
         }
       } catch (error: any) {
-        console.error(`❌ [AppContext] Error enviando mensaje WhatsApp:`, error);
+        console.error(`❌ [AppContext] Error enviando mensaje WhatsApp legacy:`, error);
         addNotification({
           type: 'warning',
           title: 'Error de conexión',
@@ -503,7 +542,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const message: Message = {
         id: `msg-${Date.now()}`,
         chatId: state.currentChat.id,
-        senderId: 'agent-1', // ID del agente actual
+        senderId: 'agent', // ID del agente actual
         content,
         type,
         timestamp: new Date(),
@@ -588,7 +627,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const newMessage: Message = {
       id: `test-msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       chatId: chatId,
-      senderId: from,
+      senderId: 'user',
       content: message,
       type: 'text',
       timestamp: timestamp,
@@ -637,7 +676,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const newMessage: Message = {
       id: `test-sent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       chatId: chatId,
-      senderId: 'agent-1', // ID del agente (nosotros)
+      senderId: 'agent', // ID del agente (nosotros)
       content: message,
       type: 'text',
       timestamp: timestamp,
@@ -686,7 +725,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const sentMessage: Message = {
       id: messageId || `sent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       chatId: chatId,
-      senderId: 'agent-1', // ID del agente (nosotros)
+      senderId: 'agent', // Usar el tipo correcto del backend
       content: message,
       type: 'text',
       timestamp: timestamp,
@@ -713,6 +752,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     toggleTheme,
     loadWhatsAppMessages,
     loadNewSchemaConversations,
+    loadConversationMessages,
     addSentWhatsAppMessage,
     injectTestWhatsAppMessage,
     injectTestOutgoingMessage,

@@ -142,7 +142,7 @@ const Sidebar: React.FC = () => {
   
   const { unreadCount } = useNotifications();
   const { state: authState, logout } = useAuth();
-  const { loadWhatsAppMessages, loadNewSchemaConversations } = useApp();
+  const { loadNewSchemaConversations } = useApp();
 
   // Filtrar chats según la búsqueda y filtros
   const filteredChats = useMemo(() => {
@@ -171,11 +171,12 @@ const Sidebar: React.FC = () => {
     
     // Aplicar búsqueda
     if (!debouncedSearchQuery.trim()) {
-      // Ordenar por: chats con mensajes no leídos primero, luego por última actualización
+      // Ordenar por último mensaje más reciente (sin priorizar no leídos)
       return filtered.sort((a, b) => {
-        if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
-        if (b.unreadCount > 0 && a.unreadCount === 0) return 1;
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        // Usar el timestamp del último mensaje si existe, sino usar updatedAt
+        const aTime = a.lastMessage?.timestamp ? new Date(a.lastMessage.timestamp).getTime() : new Date(a.updatedAt).getTime();
+        const bTime = b.lastMessage?.timestamp ? new Date(b.lastMessage.timestamp).getTime() : new Date(b.updatedAt).getTime();
+        return bTime - aTime; // Más reciente primero
       });
     }
     return performSearch(debouncedSearchQuery).filter(chat => 
@@ -195,7 +196,6 @@ const Sidebar: React.FC = () => {
   const handleLoadMessages = async () => {
     setIsLoadingMessages(true);
     try {
-      await loadWhatsAppMessages();
       await loadNewSchemaConversations();
       console.log('🔄 Conversaciones cargadas manualmente');
     } catch (error) {

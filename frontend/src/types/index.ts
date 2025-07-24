@@ -50,7 +50,7 @@ export interface Message {
   created_at?: string;
   // Propiedades adicionales para compatibilidad con el frontend
   chatId?: string;
-  senderId?: string;
+  senderId?: 'user' | 'agent' | 'bot'; // Estandarizado con el backend
   timestamp?: Date;
   type?: 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker';
   isFromBot?: boolean;

@@ -12,6 +12,7 @@ import { whatsappConfig } from './config/whatsapp';
 import { whatsappService } from './services/whatsapp.service';
 import { applySecurity } from './middleware/security';
 import { authRateLimit } from './middleware/security';
+import { sessionCleanupService } from './services/session-cleanup.service';
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -216,6 +217,21 @@ async function startServer() {
     
     // Inicializar servicios con Socket.IO
     await whatsappService.initialize(io);
+
+    // Inicializar servicios al arrancar la aplicación
+    console.log('🚀 Inicializando servicios...');
+
+    // Inicializar servicio de limpieza de sesiones
+    try {
+      const stats = sessionCleanupService.getServiceStats();
+      console.log('✅ Servicio de limpieza de sesiones inicializado:', {
+        isRunning: stats.isRunning,
+        intervalMinutes: stats.interval / 1000 / 60,
+        timeoutHours: stats.timeout / 1000 / 60 / 60
+      });
+    } catch (error) {
+      console.error('❌ Error inicializando servicio de limpieza de sesiones:', error);
+    }
     
     // Iniciar servidor
     httpServer.listen(PORT, () => {

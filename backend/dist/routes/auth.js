@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,6 +50,7 @@ const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
 const logger_1 = require("../utils/logger");
 const auth_1 = require("../middleware/auth");
+const session_cleanup_service_1 = require("../services/session-cleanup.service");
 const router = (0, express_1.Router)();
 /**
  * @route POST /api/auth/login
@@ -259,6 +293,92 @@ router.post('/init-admin', (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 }));
 /**
+ * @route POST /api/auth/clear-sessions
+ * @desc Limpiar todas las sesiones del servidor (solo admins)
+ * @access Private (Admin)
+ */
+router.post('/clear-sessions', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const currentUser = req.user;
+        if (!currentUser || currentUser.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Acceso denegado. Se requieren permisos de administrador'
+            });
+        }
+        console.log('🧹 Limpieza manual de sesiones iniciada por admin:', currentUser.email);
+        // Importar y limpiar servicios
+        const { rateLimiter } = yield Promise.resolve().then(() => __importStar(require('../services/rate-limiter/rate-limiter')));
+        const { cacheService } = yield Promise.resolve().then(() => __importStar(require('../services/cache/cache-service')));
+        let cleanedServices = [];
+        // Limpiar rate limiter
+        if (rateLimiter) {
+            rateLimiter.destroy();
+            cleanedServices.push('rate-limiter');
+        }
+        // Limpiar caché
+        if (cacheService) {
+            cacheService.destroy();
+            cleanedServices.push('cache-service');
+        }
+        // Limpiar conversaciones del chatbot
+        try {
+            const { ChatbotService } = yield Promise.resolve().then(() => __importStar(require('../services/chatbot.service')));
+            const chatbotService = new ChatbotService();
+            if (chatbotService && typeof chatbotService['cleanupExpiredSessions'] === 'function') {
+                chatbotService['cleanupExpiredSessions']();
+                cleanedServices.push('chatbot-sessions');
+            }
+        }
+        catch (error) {
+            logger_1.logger.warn('Error limpiando chatbot sessions', { error: error instanceof Error ? error.message : 'Unknown error' });
+        }
+        // Limpiar conversaciones generales
+        try {
+            const { ConversationService } = yield Promise.resolve().then(() => __importStar(require('../services/conversation/conversation-service')));
+            const conversationService = new ConversationService();
+            if (conversationService && typeof conversationService['cleanupInactiveSessions'] === 'function') {
+                const removedCount = conversationService['cleanupInactiveSessions'](0);
+                cleanedServices.push(`conversation-sessions (${removedCount} removidas)`);
+            }
+        }
+        catch (error) {
+            logger_1.logger.warn('Error limpiando conversation sessions', { error: error instanceof Error ? error.message : 'Unknown error' });
+        }
+        // Limpiar caché de inventario
+        try {
+            const { InventoryCache } = yield Promise.resolve().then(() => __importStar(require('../services/soap/inventory-cache')));
+            const inventoryCache = new InventoryCache();
+            if (inventoryCache && typeof inventoryCache.clear === 'function') {
+                inventoryCache.clear();
+                cleanedServices.push('inventory-cache');
+            }
+        }
+        catch (error) {
+            logger_1.logger.warn('Error limpiando inventory cache', { error: error instanceof Error ? error.message : 'Unknown error' });
+        }
+        logger_1.logger.info('Sesiones limpiadas manualmente', {
+            userId: currentUser.id,
+            metadata: { cleanedServices }
+        });
+        res.json({
+            success: true,
+            message: 'Sesiones limpiadas exitosamente',
+            data: {
+                cleanedServices,
+                timestamp: new Date().toISOString()
+            }
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Clear sessions error:', error);
+        res.status(500).json({
+            success: false,
+            message: error instanceof Error ? error.message : 'Error al limpiar sesiones'
+        });
+    }
+}));
+/**
  * @route DELETE /api/auth/users/:userId
  * @desc Desactivar usuario (solo admins)
  * @access Private (Admin)
@@ -291,6 +411,169 @@ router.delete('/users/:userId', auth_1.authMiddleware, auth_1.requireAdmin, (req
         res.status(500).json({
             success: false,
             message: error instanceof Error ? error.message : 'Error al desactivar usuario'
+        });
+    }
+}));
+/**
+ * @route GET /api/auth/sessions
+ * @desc Obtener información de sesiones activas (solo admins)
+ * @access Private (Admin)
+ */
+router.get('/sessions', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sessions = yield session_cleanup_service_1.sessionCleanupService.getActiveSessions();
+        res.json({
+            success: true,
+            data: {
+                sessions,
+                stats: session_cleanup_service_1.sessionCleanupService.getServiceStats()
+            }
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Get sessions error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener sesiones'
+        });
+    }
+}));
+/**
+ * @route POST /api/auth/sessions/cleanup
+ * @desc Limpiar sesiones expiradas (solo admins)
+ * @access Private (Admin)
+ */
+router.post('/sessions/cleanup', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield session_cleanup_service_1.sessionCleanupService.cleanupExpiredSessions();
+        res.json({
+            success: true,
+            message: 'Limpieza de sesiones completada',
+            data: result
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Cleanup sessions error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al limpiar sesiones'
+        });
+    }
+}));
+/**
+ * @route POST /api/auth/sessions/force-cleanup
+ * @desc Forzar limpieza de todas las sesiones (solo admins)
+ * @access Private (Admin)
+ */
+router.post('/sessions/force-cleanup', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield session_cleanup_service_1.sessionCleanupService.forceCleanupAllSessions();
+        res.json({
+            success: true,
+            message: 'Limpieza forzada de sesiones completada',
+            data: result
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Force cleanup sessions error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al forzar limpieza de sesiones'
+        });
+    }
+}));
+/**
+ * @route DELETE /api/auth/sessions/:userId
+ * @desc Limpiar sesión de un usuario específico (solo admins)
+ * @access Private (Admin)
+ */
+router.delete('/sessions/:userId', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const success = yield session_cleanup_service_1.sessionCleanupService.cleanupUserSessions(userId);
+        if (success) {
+            res.json({
+                success: true,
+                message: 'Sesión de usuario limpiada exitosamente'
+            });
+        }
+        else {
+            res.status(400).json({
+                success: false,
+                message: 'Error al limpiar sesión de usuario'
+            });
+        }
+    }
+    catch (error) {
+        logger_1.logger.error('Cleanup user session error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al limpiar sesión de usuario'
+        });
+    }
+}));
+/**
+ * @route POST /api/auth/refresh
+ * @desc Refrescar token de autenticación
+ * @access Private
+ */
+router.post('/refresh', auth_1.tempAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Usuario no autenticado'
+            });
+        }
+        // Obtener perfil completo del usuario
+        const userProfile = yield auth_service_1.AuthService.getUserById(req.user.id);
+        if (!userProfile || !userProfile.is_active) {
+            return res.status(401).json({
+                success: false,
+                message: 'Usuario no encontrado o inactivo'
+            });
+        }
+        // Actualizar último login
+        yield auth_service_1.AuthService.updateUserProfile(req.user.id, {
+            last_login: new Date().toISOString()
+        });
+        res.json({
+            success: true,
+            message: 'Token refrescado exitosamente',
+            data: {
+                user: userProfile
+            }
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Refresh token error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al refrescar token'
+        });
+    }
+}));
+/**
+ * @route GET /api/auth/status
+ * @desc Verificar estado de autenticación (opcional)
+ * @access Public
+ */
+router.get('/status', auth_1.optionalAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.json({
+            success: true,
+            data: {
+                isAuthenticated: req.isAuthenticated || false,
+                user: req.user || null,
+                sessionStats: session_cleanup_service_1.sessionCleanupService.getServiceStats()
+            }
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Auth status error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al verificar estado de autenticación'
         });
     }
 }));

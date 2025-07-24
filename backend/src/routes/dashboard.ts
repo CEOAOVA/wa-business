@@ -173,40 +173,33 @@ router.get('/conversations/public', authMiddleware, async (req, res) => {
       throw new Error('Servicio de base de datos no disponible');
     }
 
-    // Obtener conversaciones
+    // Obtener conversaciones únicas por número de teléfono
     const { data: conversations, error: convError } = await supabaseAdmin
       .from('conversations')
       .select('*')
+      .order('last_message_at', { ascending: false })
       .order('created_at', { ascending: false });
 
     if (convError) {
       throw convError;
     }
 
-    // Obtener contactos
-    const { data: contacts, error: contactsError } = await supabaseAdmin
-      .from('contacts')
-      .select('*');
-
-    if (contactsError) {
-      throw contactsError;
-    }
-
-    // Crear un mapa de contactos para acceso rápido
-    const contactsMap = new Map();
-    (contacts || []).forEach(contact => {
-      contactsMap.set(contact.id, contact);
-    });
-
     // Transformar los datos para que sean compatibles con el frontend
     const transformedConversations = (conversations || []).map(conv => ({
       id: conv.id,
-      contact_id: conv.contact_id,
+      contact_phone: conv.contact_phone,
       status: conv.status,
-      priority: conv.priority,
+      ai_mode: conv.ai_mode,
+      assigned_agent_id: conv.assigned_agent_id,
+      unread_count: conv.unread_count,
+      last_message_at: conv.last_message_at,
       created_at: conv.created_at,
       updated_at: conv.updated_at,
-      contact: contactsMap.get(conv.contact_id) || null
+      contact: {
+        id: conv.contact_phone, // Usar el número como ID
+        name: conv.contact_phone, // Usar el número como nombre
+        phone: conv.contact_phone
+      }
     }));
 
     res.json({

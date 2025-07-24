@@ -35,7 +35,7 @@ export const hasAuthData = (): boolean => {
   return !!(token || rememberAuth);
 };
 
-// Función para limpiar datos de autenticación inválidos
+// Función para limpiar datos de autenticación inválidos (versión mejorada)
 export const cleanupInvalidAuth = (): void => {
   const token = localStorage.getItem('authToken');
   
@@ -53,7 +53,10 @@ export const cleanupInvalidAuth = (): void => {
       const payload = JSON.parse(atob(parts[1]));
       const currentTime = Math.floor(Date.now() / 1000);
       
-      if (payload.exp && payload.exp < currentTime) {
+      // Agregar margen de tolerancia de 5 minutos para evitar problemas de sincronización
+      const tolerance = 5 * 60; // 5 minutos en segundos
+      
+      if (payload.exp && payload.exp < (currentTime - tolerance)) {
         console.warn('Token expirado detectado, limpiando...');
         clearAllAuthData();
         return;
@@ -63,5 +66,54 @@ export const cleanupInvalidAuth = (): void => {
       console.warn('Error al verificar token, limpiando datos de autenticación...');
       clearAllAuthData();
     }
+  }
+};
+
+// Función para verificar si el token está próximo a expirar
+export const isTokenExpiringSoon = (): boolean => {
+  const token = localStorage.getItem('authToken');
+  
+  if (!token) return false;
+  
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    // Considerar que expira pronto si queda menos de 1 hora
+    const oneHour = 60 * 60;
+    
+    return payload.exp && payload.exp < (currentTime + oneHour);
+  } catch (error) {
+    return true;
+  }
+};
+
+// Función para refrescar el token automáticamente
+export const refreshTokenIfNeeded = async (): Promise<boolean> => {
+  if (!isTokenExpiringSoon()) return true;
+  
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      console.log('Token refrescado automáticamente');
+      return true;
+    } else {
+      console.warn('Error al refrescar token, limpiando sesión...');
+      clearAllAuthData();
+      return false;
+    }
+  } catch (error) {
+    console.error('Error al refrescar token:', error);
+    return false;
   }
 }; 

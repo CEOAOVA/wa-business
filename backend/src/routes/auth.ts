@@ -5,7 +5,8 @@
 import { Router } from 'express';
 import { AuthService, CreateUserData, LoginData } from '../services/auth.service';
 import { logger } from '../utils/logger';
-import { authMiddleware, requireAdmin } from '../middleware/auth';
+import { authMiddleware, requireAdmin, optionalAuth, tempAuth } from '../middleware/auth';
+import { sessionCleanupService } from '../services/session-cleanup.service';
 
 const router = Router();
 
@@ -402,6 +403,176 @@ router.delete('/users/:userId', authMiddleware, requireAdmin, async (req, res) =
     res.status(500).json({
       success: false,
       message: error instanceof Error ? error.message : 'Error al desactivar usuario'
+    });
+  }
+});
+
+/**
+ * @route GET /api/auth/sessions
+ * @desc Obtener información de sesiones activas (solo admins)
+ * @access Private (Admin)
+ */
+router.get('/sessions', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const sessions = await sessionCleanupService.getActiveSessions();
+    
+    res.json({
+      success: true,
+      data: {
+        sessions,
+        stats: sessionCleanupService.getServiceStats()
+      }
+    });
+  } catch (error) {
+    logger.error('Get sessions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener sesiones'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/sessions/cleanup
+ * @desc Limpiar sesiones expiradas (solo admins)
+ * @access Private (Admin)
+ */
+router.post('/sessions/cleanup', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const result = await sessionCleanupService.cleanupExpiredSessions();
+    
+    res.json({
+      success: true,
+      message: 'Limpieza de sesiones completada',
+      data: result
+    });
+  } catch (error) {
+    logger.error('Cleanup sessions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al limpiar sesiones'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/sessions/force-cleanup
+ * @desc Forzar limpieza de todas las sesiones (solo admins)
+ * @access Private (Admin)
+ */
+router.post('/sessions/force-cleanup', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const result = await sessionCleanupService.forceCleanupAllSessions();
+    
+    res.json({
+      success: true,
+      message: 'Limpieza forzada de sesiones completada',
+      data: result
+    });
+  } catch (error) {
+    logger.error('Force cleanup sessions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al forzar limpieza de sesiones'
+    });
+  }
+});
+
+/**
+ * @route DELETE /api/auth/sessions/:userId
+ * @desc Limpiar sesión de un usuario específico (solo admins)
+ * @access Private (Admin)
+ */
+router.delete('/sessions/:userId', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const success = await sessionCleanupService.cleanupUserSessions(userId);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: 'Sesión de usuario limpiada exitosamente'
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Error al limpiar sesión de usuario'
+      });
+    }
+  } catch (error) {
+    logger.error('Cleanup user session error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al limpiar sesión de usuario'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/refresh
+ * @desc Refrescar token de autenticación
+ * @access Private
+ */
+router.post('/refresh', tempAuth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Usuario no autenticado'
+      });
+    }
+
+    // Obtener perfil completo del usuario
+    const userProfile = await AuthService.getUserById(req.user.id);
+    
+    if (!userProfile || !userProfile.is_active) {
+      return res.status(401).json({
+        success: false,
+        message: 'Usuario no encontrado o inactivo'
+      });
+    }
+
+    // Actualizar último login
+    await AuthService.updateUserProfile(req.user.id, {
+      last_login: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: 'Token refrescado exitosamente',
+      data: {
+        user: userProfile
+      }
+    });
+  } catch (error) {
+    logger.error('Refresh token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al refrescar token'
+    });
+  }
+});
+
+/**
+ * @route GET /api/auth/status
+ * @desc Verificar estado de autenticación (opcional)
+ * @access Public
+ */
+router.get('/status', optionalAuth, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: {
+        isAuthenticated: req.isAuthenticated || false,
+        user: req.user || null,
+        sessionStats: sessionCleanupService.getServiceStats()
+      }
+    });
+  } catch (error) {
+    logger.error('Auth status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al verificar estado de autenticación'
     });
   }
 });

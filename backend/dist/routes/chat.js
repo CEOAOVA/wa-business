@@ -448,59 +448,24 @@ router.get('/conversations/:id/messages', (req, res) => __awaiter(void 0, void 0
         const { id: conversationId } = req.params;
         const { limit, offset } = req.query;
         console.log(`📨 [Messages] Obteniendo historial para: ${conversationId}`);
-        // TODO: IMPLEMENTAR CON SUPABASE
-        // const messages = await databaseService.getConversationHistory(conversationId);
-        // IMPLEMENTACIÓN TEMPORAL
-        const messages = [
-            {
-                id: '1',
-                role: 'user',
-                content: 'Necesito pastillas de freno para mi Toyota Corolla 2018',
-                timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-                metadata: {}
-            },
-            {
-                id: '2',
-                role: 'assistant',
-                content: 'Te ayudo a encontrar pastillas de freno. Para tu Toyota Corolla 2018, ¿qué tipo de motor tiene?',
-                timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
-                metadata: { function_called: 'buscarYConsultarInventario' }
-            },
-            {
-                id: '3',
-                role: 'user',
-                content: 'Es 1.8L',
-                timestamp: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
-                metadata: {}
-            },
-            {
-                id: '4',
-                role: 'assistant',
-                content: 'Perfecto. Tenemos pastillas de freno para Toyota Corolla 2018 1.8L. Mi nombre es María, ¿cuál es tu nombre?',
-                timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-                metadata: { function_called: 'recopilarDatosUsuario' }
-            },
-            {
-                id: '5',
-                role: 'user',
-                content: 'Me llamo Carlos y vivo en 06100',
-                timestamp: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
-                metadata: {}
-            }
-        ];
-        // Aplicar paginación si se especifica
-        let paginatedMessages = messages;
-        if (limit) {
-            const limitNum = parseInt(limit);
-            const offsetNum = parseInt(offset) || 0;
-            paginatedMessages = messages.slice(offsetNum, offsetNum + limitNum);
+        // Usar el servicio de WhatsApp que ya implementa Supabase
+        const result = yield whatsapp_service_1.whatsappService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
+        if (result.success) {
+            res.json({
+                success: true,
+                data: {
+                    messages: result.messages,
+                    total: result.messages.length,
+                    conversationId
+                }
+            });
         }
-        res.json({
-            success: true,
-            messages: paginatedMessages,
-            total: messages.length,
-            conversationId
-        });
+        else {
+            res.status(500).json({
+                success: false,
+                error: result.error || 'Error obteniendo mensajes'
+            });
+        }
     }
     catch (error) {
         console.error('[Messages] Error obteniendo historial:', error);
@@ -526,23 +491,7 @@ router.get('/conversations', (req, res) => __awaiter(void 0, void 0, void 0, fun
         });
     }
 }));
-// GET /api/chat/conversations/:id/messages - Obtener mensajes de una conversación
-router.get('/conversations/:id/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const conversationId = req.params.id;
-        const limit = parseInt(req.query.limit) || 50;
-        const offset = parseInt(req.query.offset) || 0;
-        const result = yield whatsapp_service_1.whatsappService.getConversationMessages(conversationId, limit, offset);
-        res.json(result);
-    }
-    catch (error) {
-        res.status(500).json({
-            success: false,
-            error: 'Error obteniendo mensajes de conversación',
-            details: error.message
-        });
-    }
-}));
+// Esta ruta fue eliminada porque estaba duplicada con la anterior
 // GET /api/chat/messages - Mantener compatibilidad (deprecado)
 router.get('/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;

@@ -4,7 +4,7 @@ import { Download, Play, Pause, Volume2, File, FileText, Image, Video, Music, Ey
 interface MediaMessageProps {
   message: {
     id: string;
-    type: 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER';
+    type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'STICKER';
     mediaUrl?: string;
     mediaCaption?: string;
     content: string;
@@ -12,9 +12,10 @@ interface MediaMessageProps {
     isOwn: boolean;
   };
   onDownload?: (mediaUrl: string, filename: string) => void;
+  standalone?: boolean; // Nueva prop para controlar si renderiza su propia burbuja
 }
 
-const MediaMessage: React.FC<MediaMessageProps> = ({ message, onDownload }) => {
+const MediaMessage: React.FC<MediaMessageProps> = ({ message, onDownload, standalone = true }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
@@ -186,8 +187,16 @@ const MediaMessage: React.FC<MediaMessageProps> = ({ message, onDownload }) => {
     </div>
   );
 
+  const renderTextMessage = () => (
+    <div className="whitespace-pre-wrap">
+      {message.content}
+    </div>
+  );
+
   const renderMediaContent = () => {
     switch (message.type) {
+      case 'TEXT':
+        return renderTextMessage();
       case 'IMAGE':
         return renderImageMessage();
       case 'VIDEO':
@@ -199,30 +208,38 @@ const MediaMessage: React.FC<MediaMessageProps> = ({ message, onDownload }) => {
       case 'STICKER':
         return renderStickerMessage();
       default:
-        return <div className="text-gray-500">Tipo de media no soportado</div>;
+        console.warn('🔍 [MediaMessage] Tipo no reconocido:', message.type);
+        return <div className="text-gray-500">Tipo de media no soportado: {message.type}</div>;
     }
   };
 
   return (
     <>
-      <div className={`flex mb-4 ${message.isOwn ? 'justify-end' : 'justify-start'}`}>
-        <div className={`
-          max-w-xs lg:max-w-md px-4 py-2 rounded-lg
-          ${message.isOwn 
-            ? 'bg-blue-500 text-white' 
-            : 'bg-white text-gray-900 border border-gray-200'
-          }
-        `}>
-          {renderMediaContent()}
-          
+      {standalone ? (
+        <div className={`flex mb-4 ${message.isOwn ? 'justify-end' : 'justify-start'}`}>
           <div className={`
-            text-xs mt-2 
-            ${message.isOwn ? 'text-blue-100' : 'text-gray-500'}
+            max-w-xs lg:max-w-md px-4 py-2 rounded-lg
+            ${message.isOwn 
+              ? 'bg-blue-500 text-white' 
+              : 'bg-white text-gray-900 border border-gray-200'
+            }
           `}>
-            {formatTimestamp(message.timestamp)}
+            {renderMediaContent()}
+            
+            <div className={`
+              text-xs mt-2 
+              ${message.isOwn ? 'text-blue-100' : 'text-gray-500'}
+            `}>
+              {formatTimestamp(message.timestamp)}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        // Modo integrado: solo renderiza el contenido sin burbuja
+        <div className="w-full">
+          {renderMediaContent()}
+        </div>
+      )}
 
       {/* Modal de pantalla completa para imágenes */}
       {showFullScreen && message.type === 'IMAGE' && (

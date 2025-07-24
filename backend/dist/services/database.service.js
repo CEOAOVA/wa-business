@@ -304,7 +304,25 @@ class DatabaseService {
             try {
                 const conversations = yield supabase_database_service_1.supabaseDatabaseService.getConversations(limit, offset);
                 console.log(`✅ Conversaciones obtenidas: ${conversations.length}`);
-                return conversations;
+                // Enriquecer conversaciones con información adicional
+                const enrichedConversations = yield Promise.all(conversations.map((conv) => __awaiter(this, void 0, void 0, function* () {
+                    // Obtener el último mensaje de la conversación de manera eficiente
+                    const lastMessage = yield this.getLastMessage(conv.id);
+                    // Obtener información del contacto
+                    let contact = null;
+                    if (conv.contact_phone) {
+                        contact = yield this.getContactByPhone(conv.contact_phone);
+                    }
+                    return Object.assign(Object.assign({}, conv), { lastMessage: lastMessage ? {
+                            id: lastMessage.id,
+                            content: lastMessage.content,
+                            timestamp: lastMessage.created_at,
+                            isFromUs: lastMessage.sender_type === 'agent' || lastMessage.sender_type === 'bot'
+                        } : null, contact: contact, _count: {
+                            messages: 1 // Por ahora, podríamos implementar un contador real si es necesario
+                        } });
+                })));
+                return enrichedConversations;
             }
             catch (error) {
                 console.error('❌ Error obteniendo conversaciones:', error);
@@ -355,6 +373,22 @@ class DatabaseService {
             catch (error) {
                 console.error('❌ Error en getChatbotConversationMessages:', error);
                 return [];
+            }
+        });
+    }
+    /**
+     * Obtener el último mensaje de una conversación
+     */
+    getLastMessage(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const message = yield supabase_database_service_1.supabaseDatabaseService.getLastMessage(conversationId);
+                console.log(`✅ Último mensaje obtenido para conversación ${conversationId}: ${message ? message.id : 'sin mensajes'}`);
+                return message;
+            }
+            catch (error) {
+                console.error('❌ Error en getLastMessage:', error);
+                return null;
             }
         });
     }

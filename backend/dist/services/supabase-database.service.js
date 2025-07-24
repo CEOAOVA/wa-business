@@ -524,14 +524,24 @@ class SupabaseDatabaseService {
                     console.error('❌ Error creando mensaje:', error);
                     return null;
                 }
+                // Actualizar la conversación con el último mensaje y timestamp
+                const updateData = {
+                    last_message_at: message.created_at,
+                    updated_at: message.created_at
+                };
                 // Incrementar contador de mensajes no leídos si es mensaje del usuario
                 if (data.senderType === 'user') {
-                    yield supabase_1.supabase
-                        .from('conversations')
-                        .update({
-                        unread_count: supabase_1.supabase.rpc('increment_unread_count')
-                    })
-                        .eq('id', data.conversationId);
+                    updateData.unread_count = supabase_1.supabase.rpc('increment_unread_count');
+                }
+                const { error: updateError } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update(updateData)
+                    .eq('id', data.conversationId);
+                if (updateError) {
+                    console.error('❌ Error actualizando conversación después de crear mensaje:', updateError);
+                }
+                else {
+                    console.log(`✅ Conversación ${data.conversationId} actualizada con último mensaje: ${message.created_at}`);
                 }
                 return message;
             }
@@ -554,7 +564,7 @@ class SupabaseDatabaseService {
                     .from('messages')
                     .select('*')
                     .eq('conversation_id', conversationId)
-                    .order('created_at', { ascending: true })
+                    .order('created_at', { ascending: true }) // Ordenar por timestamp ascendente (más antiguo primero)
                     .limit(limit);
                 if (error) {
                     console.error('❌ Error obteniendo mensajes:', error);
@@ -565,6 +575,37 @@ class SupabaseDatabaseService {
             catch (error) {
                 console.error('❌ Error en getConversationMessages:', error);
                 return [];
+            }
+        });
+    }
+    /**
+     * Obtener el último mensaje de una conversación
+     */
+    getLastMessage(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: message, error } = yield supabase_1.supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('conversation_id', conversationId)
+                    .order('created_at', { ascending: false }) // Ordenar por timestamp descendente (más reciente primero)
+                    .limit(1)
+                    .single();
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        return null; // No hay mensajes
+                    }
+                    console.error('❌ Error obteniendo último mensaje:', error);
+                    return null;
+                }
+                return message;
+            }
+            catch (error) {
+                console.error('❌ Error en getLastMessage:', error);
+                return null;
             }
         });
     }
@@ -778,9 +819,11 @@ class SupabaseDatabaseService {
                 return [];
             }
             try {
+                // Ordenar por last_message_at si existe, sino por updated_at
                 const { data: conversations, error } = yield supabase_1.supabase
                     .from('conversations')
                     .select('*')
+                    .order('last_message_at', { ascending: false })
                     .order('updated_at', { ascending: false })
                     .range(offset, offset + limit - 1);
                 if (error) {

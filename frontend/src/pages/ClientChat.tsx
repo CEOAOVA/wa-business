@@ -44,6 +44,14 @@ const ClientChat: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Función para scroll manual al inicio
+  const scrollToTop = () => {
+    const messagesContainer = document.querySelector('.client-messages-container');
+    if (messagesContainer) {
+      messagesContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Manejar envío de mensajes con chatbot real
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +82,7 @@ const ClientChat: React.FC = () => {
       <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full bg-embler-gray shadow-lg border border-embler-accent">
         
         {/* Messages Area - Solo esta parte hace scroll */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: 'calc(100vh - 160px)' }}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 client-messages-container relative" style={{ height: 'calc(100vh - 160px)' }}>
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.sender === 'client' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
@@ -112,6 +120,30 @@ const ClientChat: React.FC = () => {
           )}
           
           <div ref={messagesEndRef} />
+          
+          {/* Botones de navegación de scroll */}
+          {messages.length > 5 && (
+            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+              <button
+                onClick={scrollToTop}
+                className="p-2 bg-embler-dark/80 text-embler-yellow rounded-full hover:bg-embler-dark transition-colors shadow-lg"
+                title="Ir al inicio"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+              <button
+                onClick={scrollToBottom}
+                className="p-2 bg-embler-dark/80 text-embler-yellow rounded-full hover:bg-embler-dark transition-colors shadow-lg"
+                title="Ir al final"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

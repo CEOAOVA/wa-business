@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -27,6 +60,7 @@ const whatsapp_1 = require("./config/whatsapp");
 const whatsapp_service_1 = require("./services/whatsapp.service");
 const security_1 = require("./middleware/security");
 const security_2 = require("./middleware/security");
+const session_cleanup_service_1 = require("./services/session-cleanup.service");
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 // Debug de variables de entorno
@@ -151,12 +185,75 @@ app.get('/api', (_req, res) => {
         }
     });
 });
+// Función para limpiar sesiones al inicio
+function cleanupSessionsOnStartup() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log('🧹 Iniciando limpieza de sesiones al arranque...');
+            // Importar servicios que necesitan limpieza
+            const { rateLimiter } = yield Promise.resolve().then(() => __importStar(require('./services/rate-limiter/rate-limiter')));
+            const { cacheService } = yield Promise.resolve().then(() => __importStar(require('./services/cache/cache-service')));
+            // Limpiar rate limiter
+            if (rateLimiter) {
+                rateLimiter.destroy();
+                console.log('✅ Rate limiter limpiado');
+            }
+            // Limpiar caché
+            if (cacheService) {
+                cacheService.destroy();
+                console.log('✅ Cache service limpiado');
+            }
+            // Limpiar conversaciones del chatbot
+            const { ChatbotService } = yield Promise.resolve().then(() => __importStar(require('./services/chatbot.service')));
+            const chatbotService = new ChatbotService();
+            if (chatbotService && typeof chatbotService['cleanupExpiredSessions'] === 'function') {
+                chatbotService['cleanupExpiredSessions']();
+                console.log('✅ Chatbot sessions limpiadas');
+            }
+            // Limpiar conversaciones generales
+            const { ConversationService } = yield Promise.resolve().then(() => __importStar(require('./services/conversation/conversation-service')));
+            const conversationService = new ConversationService();
+            if (conversationService && typeof conversationService['cleanupInactiveSessions'] === 'function') {
+                const removedCount = conversationService['cleanupInactiveSessions'](0); // Limpiar todas las sesiones
+                console.log(`✅ ${removedCount} conversaciones inactivas limpiadas`);
+            }
+            // Limpiar caché de inventario
+            const { InventoryCache } = yield Promise.resolve().then(() => __importStar(require('./services/soap/inventory-cache')));
+            const inventoryCache = new InventoryCache();
+            if (inventoryCache && typeof inventoryCache.clear === 'function') {
+                inventoryCache.clear();
+                console.log('✅ Inventory cache limpiado');
+            }
+            console.log('🎉 Limpieza de sesiones completada al arranque');
+        }
+        catch (error) {
+            console.error('⚠️ Error durante la limpieza de sesiones:', error);
+            // No fallar el arranque por errores de limpieza
+        }
+    });
+}
 // Función para inicializar la aplicación
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Limpiar sesiones al inicio
+            yield cleanupSessionsOnStartup();
             // Inicializar servicios con Socket.IO
             yield whatsapp_service_1.whatsappService.initialize(io);
+            // Inicializar servicios al arrancar la aplicación
+            console.log('🚀 Inicializando servicios...');
+            // Inicializar servicio de limpieza de sesiones
+            try {
+                const stats = session_cleanup_service_1.sessionCleanupService.getServiceStats();
+                console.log('✅ Servicio de limpieza de sesiones inicializado:', {
+                    isRunning: stats.isRunning,
+                    intervalMinutes: stats.interval / 1000 / 60,
+                    timeoutHours: stats.timeout / 1000 / 60 / 60
+                });
+            }
+            catch (error) {
+                console.error('❌ Error inicializando servicio de limpieza de sesiones:', error);
+            }
             // Iniciar servidor
             httpServer.listen(PORT, () => {
                 console.log(`🚀 Backend running on http://localhost:${PORT}`);
@@ -164,6 +261,7 @@ function startServer() {
                 console.log(`💾 Base de datos SQLite conectada`);
                 console.log(`🔧 Variables de entorno cargadas desde .env`);
                 console.log(`🌐 WebSocket server ready for real-time messaging`);
+                console.log(`🧹 Sesiones limpiadas automáticamente al arranque`);
             });
         }
         catch (error) {

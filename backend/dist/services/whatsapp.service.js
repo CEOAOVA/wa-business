@@ -471,26 +471,35 @@ class WhatsAppService {
             try {
                 const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
                 const stats = yield database_service_1.databaseService.getStats();
+                // Obtener información de contactos para cada conversación
+                const conversationsWithContacts = yield Promise.all(conversations.map((conv) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    let contact = null;
+                    if (conv.contact_id) {
+                        contact = yield database_service_1.databaseService.getContactById(conv.contact_id);
+                    }
+                    return {
+                        id: conv.id,
+                        contactId: conv.contact_id,
+                        contactName: (contact === null || contact === void 0 ? void 0 : contact.name) || 'Contacto Desconocido',
+                        contactWaId: (contact === null || contact === void 0 ? void 0 : contact.phone_number) || conv.contact_phone || 'N/A',
+                        contact: contact,
+                        lastMessage: conv.lastMessage ? {
+                            id: conv.lastMessage.id,
+                            content: conv.lastMessage.content,
+                            timestamp: conv.lastMessage.timestamp,
+                            isFromUs: conv.lastMessage.isFromUs
+                        } : null,
+                        unreadCount: conv.unread_count || 0,
+                        totalMessages: ((_a = conv._count) === null || _a === void 0 ? void 0 : _a.messages) || 0,
+                        updatedAt: conv.updated_at,
+                        status: conv.status,
+                        ai_mode: conv.ai_mode
+                    };
+                })));
                 return {
                     success: true,
-                    conversations: conversations.map((conv) => {
-                        var _a, _b, _c, _d;
-                        return ({
-                            id: conv.id,
-                            contactId: conv.contactId,
-                            contactName: ((_a = conv.contact) === null || _a === void 0 ? void 0 : _a.name) || ((_b = conv.contact) === null || _b === void 0 ? void 0 : _b.waId) || 'Contacto Desconocido',
-                            contactWaId: ((_c = conv.contact) === null || _c === void 0 ? void 0 : _c.waId) || 'N/A',
-                            lastMessage: conv.lastMessage ? {
-                                id: conv.lastMessage.id,
-                                content: conv.lastMessage.content,
-                                timestamp: conv.lastMessage.timestamp,
-                                isFromUs: conv.lastMessage.isFromUs
-                            } : null,
-                            unreadCount: conv.unreadCount || 0,
-                            totalMessages: ((_d = conv._count) === null || _d === void 0 ? void 0 : _d.messages) || 0,
-                            updatedAt: conv.updatedAt
-                        });
-                    }),
+                    conversations: conversationsWithContacts,
                     total: stats.totalConversations,
                     unread: stats.unreadMessages
                 };
@@ -518,16 +527,23 @@ class WhatsAppService {
                     success: true,
                     messages: messages.map((msg) => ({
                         id: msg.id,
-                        waMessageId: msg.whatsapp_message_id,
+                        conversation_id: conversationId,
+                        sender_type: msg.sender_type, // Mantener el tipo original del backend
                         content: msg.content,
-                        messageType: msg.message_type,
-                        timestamp: msg.created_at,
+                        message_type: msg.message_type || 'text',
+                        whatsapp_message_id: msg.whatsapp_message_id,
+                        is_read: msg.is_read || false,
+                        metadata: msg.metadata || {},
+                        created_at: msg.created_at || msg.timestamp,
+                        // Propiedades adicionales para compatibilidad
+                        waMessageId: msg.whatsapp_message_id,
+                        messageType: msg.message_type || 'text',
+                        timestamp: msg.created_at || msg.timestamp,
                         isFromUs: msg.sender_type === 'agent' || msg.sender_type === 'bot',
-                        isRead: msg.is_read,
-                        isDelivered: true, // Por defecto en el nuevo esquema
+                        isDelivered: true,
                         senderId: msg.sender_type,
                         receiverId: conversationId
-                    })).reverse() // Mostrar más antiguos primero
+                    })).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) // Ordenar por timestamp ascendente (más antiguo primero)
                 };
             }
             catch (error) {

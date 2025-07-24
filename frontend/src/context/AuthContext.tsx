@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
 import { authApiService } from '../services/auth-api';
-import { cleanupInvalidAuth, clearAllAuthData, forceLogout } from '../utils/auth-cleanup';
+import { cleanupInvalidAuth, clearAllAuthData, forceLogout, refreshTokenIfNeeded } from '../utils/auth-cleanup';
 
 // Estado inicial
 const initialState: AuthState = {
@@ -213,10 +213,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
+      // Intentar refrescar el token si es necesario
+      const tokenRefreshed = await refreshTokenIfNeeded();
+      if (!tokenRefreshed) {
+        dispatch({ type: 'LOGOUT' });
+        return;
+      }
+
       dispatch({ type: 'AUTH_START' });
-      const profile = await authApiService.getProfile();
-      const user = authApiService.convertToUser(profile);
-      dispatch({ type: 'AUTH_SUCCESS', payload: user });
+      
+      try {
+        const profile = await authApiService.getProfile();
+        const user = authApiService.convertToUser(profile);
+        dispatch({ type: 'AUTH_SUCCESS', payload: user });
+      } catch (profileError) {
+        console.warn('Error obteniendo perfil, intentando verificar estado de autenticación...');
+        
+        // Intentar verificar estado de autenticación de forma más simple
+        const statusResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/status`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          if (statusData.data?.isAuthenticated && statusData.data?.user) {
+            const user = authApiService.convertToUser(statusData.data.user);
+            dispatch({ type: 'AUTH_SUCCESS', payload: user });
+            return;
+          }
+        }
+        
+        // Si todo falla, limpiar sesión
+        throw profileError;
+      }
     } catch (error) {
       console.error('Error checking auth:', error);
       // Limpiar token inválido y estado
