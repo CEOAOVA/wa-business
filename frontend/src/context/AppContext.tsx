@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { AppState, Chat, Message, Notification, AppAction } from '../types';
-import { whatsappApi, type IncomingMessage } from '../services/whatsapp-api';
+import { whatsappApi } from '../services/whatsapp-api';
 import { dashboardApiService } from '../services/dashboard-api';
 import { useWebSocketSimple, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocketSimple';
 
@@ -173,53 +173,100 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   useEffect(() => {
     // Manejar nuevos mensajes en tiempo real
     webSocket.onNewMessage((data: WebSocketMessage) => {
-      const chatId = `whatsapp-${data.message.from === 'us' ? data.message.to : data.message.from}`;
+      console.log('📨 [WebSocket] Nuevo mensaje recibido:', data);
+      
+      // Determinar el tipo de conversación basado en el conversationId
+      let chatId: string;
+      let isNewSchema = false;
+      
+      if (data.conversation.id && !data.conversation.id.startsWith('temp-')) {
+        // Conversación del nuevo esquema
+        chatId = `conv-${data.conversation.id}`;
+        isNewSchema = true;
+        console.log(`📨 [WebSocket] Conversación del nuevo esquema: ${chatId}`);
+      } else {
+        // Conversación legacy (fallback)
+        chatId = `whatsapp-${data.message.from === 'us' ? data.message.to : data.message.from}`;
+        console.log(`📨 [WebSocket] Conversación legacy: ${chatId}`);
+      }
       
       // Crear o actualizar chat
       const existingChat = state.chats.find(c => c.id === chatId);
       if (!existingChat) {
         const newChat: Chat = {
           id: chatId,
-          clientId: data.conversation.contactId,
-          clientName: data.conversation.contactName,
+          clientId: data.conversation.contactId || data.message.from,
+          clientName: data.conversation.contactName || formatPhoneForDisplay(data.message.from === 'us' ? data.message.to : data.message.from),
           clientPhone: data.message.from === 'us' ? data.message.to : data.message.from,
           clientAvatar: undefined,
           assignedAgentId: data.message.from === 'us' ? 'agent-1' : null,
           lastMessage: {
             id: typeof data.message.id === 'string' ? parseInt(data.message.id) || Date.now() : data.message.id,
             chatId: chatId,
-            senderId: data.message.from === 'us' ? 'agent' : 'user',
+            senderId: (data.message.from === 'us' ? 'agent' : 'user') as 'user' | 'agent' | 'bot',
             content: data.message.message,
-            type: 'text',
+            type: 'text' as 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker',
             timestamp: new Date(data.message.timestamp),
             is_read: data.message.read,
-            metadata: { source: 'whatsapp', waMessageId: data.message.waMessageId }
+            metadata: { 
+              source: isNewSchema ? 'new_schema' : 'whatsapp', 
+              waMessageId: data.message.waMessageId,
+              conversationId: data.conversation.id
+            }
           },
-          unreadCount: data.conversation.unreadCount,
+          unreadCount: data.conversation.unreadCount || 0,
           isActive: true,
           createdAt: new Date(data.message.timestamp),
           updatedAt: new Date(data.message.timestamp),
-          tags: ['whatsapp'],
+          tags: isNewSchema ? ['conversation'] : ['whatsapp'],
           priority: 'medium',
           status: 'open'
         };
         dispatch({ type: 'ADD_CHAT', payload: newChat });
+        console.log(`📨 [WebSocket] Nuevo chat creado: ${chatId}`);
+      } else {
+                 // Actualizar chat existente
+         const updatedChat = {
+           ...existingChat,
+           lastMessage: {
+             id: typeof data.message.id === 'string' ? parseInt(data.message.id) || Date.now() : data.message.id,
+             chatId: chatId,
+             senderId: (data.message.from === 'us' ? 'agent' : 'user') as 'user' | 'agent' | 'bot',
+             content: data.message.message,
+             type: 'text' as 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker',
+             timestamp: new Date(data.message.timestamp),
+             is_read: data.message.read,
+             metadata: { 
+               source: isNewSchema ? 'new_schema' : 'whatsapp', 
+               waMessageId: data.message.waMessageId,
+               conversationId: data.conversation.id
+             }
+           },
+           unreadCount: data.conversation.unreadCount || existingChat.unreadCount,
+           updatedAt: new Date(data.message.timestamp)
+         };
+        dispatch({ type: 'UPDATE_CHAT', payload: updatedChat });
+        console.log(`📨 [WebSocket] Chat actualizado: ${chatId}`);
       }
 
       // Agregar mensaje
       const newMessage: Message = {
         id: data.message.id,
         chatId: chatId,
-        senderId: data.message.from === 'us' ? 'agent' : 'user',
+        senderId: (data.message.from === 'us' ? 'agent' : 'user') as 'user' | 'agent' | 'bot',
         content: data.message.message,
-        type: 'text',
+        type: 'text' as 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker',
         timestamp: new Date(data.message.timestamp),
         is_read: data.message.read,
-        metadata: { source: 'whatsapp', waMessageId: data.message.waMessageId }
+        metadata: { 
+          source: isNewSchema ? 'new_schema' : 'whatsapp', 
+          waMessageId: data.message.waMessageId,
+          conversationId: data.conversation.id
+        }
       };
       
       dispatch({ type: 'ADD_MESSAGE', payload: newMessage });
-      console.log('📨 Mensaje WebSocket agregado al estado:', newMessage);
+      console.log(`📨 [WebSocket] Mensaje agregado al estado: ${chatId}`, newMessage);
     });
 
     // Manejar actualizaciones de conversación
@@ -239,36 +286,36 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     });
   }, [webSocket, state.chats]);
 
-  // Convertir mensaje de WhatsApp a Chat
-  const convertWhatsAppToChat = (whatsappMsg: IncomingMessage): Chat => {
-    const chatId = `whatsapp-${whatsappMsg.from}`;
-    
-    return {
-      id: chatId,
-      clientId: whatsappMsg.from,
-      clientName: whatsappMsg.contact?.name || formatPhoneForDisplay(whatsappMsg.from),
-      clientPhone: whatsappMsg.from,
-      clientAvatar: undefined,
-      assignedAgentId: null,
-      lastMessage: {
-        id: whatsappMsg.id,
-        chatId: chatId,
-        senderId: 'user',
-        content: whatsappMsg.message,
-        type: 'text',
-        timestamp: whatsappMsg.timestamp,
-        is_read: whatsappMsg.read,
-        metadata: { source: 'whatsapp' }
-      },
-      unreadCount: whatsappMsg.read ? 0 : 1,
-      isActive: true,
-      createdAt: whatsappMsg.timestamp,
-      updatedAt: whatsappMsg.timestamp,
-      tags: ['whatsapp'],
-      priority: 'medium',
-      status: 'open'
-    };
-  };
+  // Convertir mensaje de WhatsApp a Chat (comentado por no uso actual)
+  // const convertWhatsAppToChat = (whatsappMsg: IncomingMessage): Chat => {
+  //   const chatId = `whatsapp-${whatsappMsg.from}`;
+  //   
+  //   return {
+  //     id: chatId,
+  //     clientId: whatsappMsg.from,
+  //     clientName: whatsappMsg.contact?.name || formatPhoneForDisplay(whatsappMsg.from),
+  //     clientPhone: whatsappMsg.from,
+  //     clientAvatar: undefined,
+  //     assignedAgentId: null,
+  //     lastMessage: {
+  //       id: whatsappMsg.id,
+  //       chatId: chatId,
+  //       senderId: 'user',
+  //       content: whatsappMsg.message,
+  //       type: 'text',
+  //       timestamp: whatsappMsg.timestamp,
+  //       is_read: whatsappMsg.read,
+  //       metadata: { source: 'whatsapp' }
+  //     },
+  //     unreadCount: whatsappMsg.read ? 0 : 1,
+  //     isActive: true,
+  //     createdAt: whatsappMsg.timestamp,
+  //     updatedAt: whatsappMsg.timestamp,
+  //     tags: ['whatsapp'],
+  //     priority: 'medium',
+  //     status: 'open'
+  //   };
+  // };
 
   // Formatear número de teléfono para mostrar
   const formatPhoneForDisplay = (phone: string) => {

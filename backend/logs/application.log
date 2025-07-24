@@ -24109,3 +24109,829 @@
   message: 'System metrics',
   timestamp: '2025-07-24 15:10:50.942'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-24 17:19:50.343'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-24 17:19:50.675'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-24 17:19:50.676'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-24 17:19:50.710'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-24 17:19:50.710'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-24 17:19:50.711'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753399198922-2mdgzx4rq',
+    type: 'critical',
+    service: 'soap'
+  },
+  level: 'warn',
+  message: 'Alert created: Service soap is unhealthy: Unknown error',
+  timestamp: '2025-07-24 17:19:58.923'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753399198923-jlgmfwscr',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-24 17:19:58.923'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1950,
+        metadata: {
+          totalConversations: 1,
+          totalMessages: 2,
+          totalOrders: 0,
+          activeConversations: 1
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4990 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 89,
+          heapUsed: 223,
+          heapTotal: 252,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 12 }
+    ],
+    timestamp: 2025-07-24T23:19:58.924Z,
+    uptime: 11.3872225
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:19:58.924'
+}
+{
+  service: 'whatsapp-llm',
+  error: 'invalid JWT: unable to parse or verify signature, token has invalid claims: token is expired',
+  level: 'warn',
+  message: 'Token inválido o expirado',
+  timestamp: '2025-07-24 17:19:59.758'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-24 17:20:03.029'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 263, heapUsed: 201, heapTotal: 207 },
+    uptime: 33,
+    requests: 7,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-24 17:20:20.296'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1060,
+        metadata: {
+          totalConversations: 1,
+          totalMessages: 2,
+          totalOrders: 0,
+          activeConversations: 1
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4964 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 203,
+          heapTotal: 208,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 57 }
+    ],
+    timestamp: 2025-07-24T23:20:27.702Z,
+    uptime: 40.1661269
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:20:27.704'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-24 17:20:40.170'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-24 17:20:40.170'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-24 17:20:40.171'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-24 17:20:40.322'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-24 17:20:40.322'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-24 17:20:40.322'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-24 17:20:54.799'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-24 17:20:55.109'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-24 17:20:55.111'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-24 17:20:55.145'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-24 17:20:55.146'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-24 17:20:55.146'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-24 17:20:59.316'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753399262535-tdiuohynh',
+    type: 'critical',
+    service: 'soap'
+  },
+  level: 'warn',
+  message: 'Alert created: Service soap is unhealthy: Unknown error',
+  timestamp: '2025-07-24 17:21:02.536'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753399262536-e7ydv7t92',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-24 17:21:02.537'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1510,
+        metadata: {
+          totalConversations: 1,
+          totalMessages: 3,
+          totalOrders: 0,
+          activeConversations: 1
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4960 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 90,
+          heapUsed: 227,
+          heapTotal: 253,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 94 }
+    ],
+    timestamp: 2025-07-24T23:21:02.537Z,
+    uptime: 10.7007745
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:21:02.538'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: moises.s@aova.mx',
+  timestamp: '2025-07-24 17:21:17.710'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-24 17:21:22.769'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-24 17:21:22.769'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-24 17:21:22.770'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-24 17:21:22.814'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-24 17:21:22.814'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-24 17:21:22.814'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 203, heapTotal: 211 },
+    uptime: 33,
+    requests: 8,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-24 17:21:24.745'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 906,
+        metadata: {
+          totalConversations: 1,
+          totalMessages: 3,
+          totalOrders: 0,
+          activeConversations: 1
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4947 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 203,
+          heapTotal: 210,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 53 }
+    ],
+    timestamp: 2025-07-24T23:21:31.995Z,
+    uptime: 40.1588504
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:21:31.996'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 268, heapUsed: 204, heapTotal: 210 },
+    uptime: 63,
+    requests: 8,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-24 17:21:54.750'
+}
+{
+  service: 'monitoring',
+  metrics: { requests: 0, averageResponseTime: 0, memoryUsage: 204 },
+  level: 'debug',
+  message: 'Metrics updated',
+  timestamp: '2025-07-24 17:21:55.122'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 811,
+        metadata: {
+          totalConversations: 2,
+          totalMessages: 4,
+          totalOrders: 0,
+          activeConversations: 2
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4962 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 205,
+          heapTotal: 211,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 30 }
+    ],
+    timestamp: 2025-07-24T23:22:01.875Z,
+    uptime: 70.0380221
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:22:01.876'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 205, heapTotal: 211 },
+    uptime: 93,
+    requests: 8,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-24 17:22:24.759'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 858,
+        metadata: {
+          totalConversations: 2,
+          totalMessages: 5,
+          totalOrders: 0,
+          activeConversations: 2
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4951 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 206,
+          heapTotal: 213,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 0 }
+    ],
+    timestamp: 2025-07-24T23:22:31.965Z,
+    uptime: 100.1284123
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:22:31.966'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-24 17:22:33.892'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 270, heapUsed: 208, heapTotal: 213 },
+    uptime: 123,
+    requests: 9,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-24 17:22:54.771'
+}
+{
+  service: 'monitoring',
+  metrics: { requests: 0, averageResponseTime: 0, memoryUsage: 208 },
+  level: 'debug',
+  message: 'Metrics updated',
+  timestamp: '2025-07-24 17:22:55.127'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1085,
+        metadata: {
+          totalConversations: 2,
+          totalMessages: 5,
+          totalOrders: 0,
+          activeConversations: 2
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4952 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 98,
+          heapUsed: 209,
+          heapTotal: 215,
+          external: 10
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 35 }
+    ],
+    timestamp: 2025-07-24T23:23:02.229Z,
+    uptime: 130.3920983
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:23:02.230'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-24 17:23:29.545'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-24 17:23:29.851'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-24 17:23:29.852'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-24 17:23:29.885'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-24 17:23:29.886'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-24 17:23:29.886'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-24 17:23:30.899'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-24 17:23:30.899'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-24 17:23:30.899'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-24 17:23:30.925'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-24 17:23:30.925'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-24 17:23:30.925'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-07-24 17:23:32.296'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753399416869-yx11nl876',
+    type: 'critical',
+    service: 'soap'
+  },
+  level: 'warn',
+  message: 'Alert created: Service soap is unhealthy: Unknown error',
+  timestamp: '2025-07-24 17:23:36.870'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753399416870-lb6tfe2cw',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-24 17:23:36.870'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1252,
+        metadata: {
+          totalConversations: 2,
+          totalMessages: 6,
+          totalOrders: 0,
+          activeConversations: 2
+        }
+      },
+      { service: 'soap', status: 'unhealthy', responseTime: 4958 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 89,
+          heapUsed: 228,
+          heapTotal: 258,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 9 }
+    ],
+    timestamp: 2025-07-24T23:23:36.871Z,
+    uptime: 10.1288934
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-24 17:23:36.871'
+}

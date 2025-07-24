@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
 import { authApiService } from '../services/auth-api';
-import { cleanupInvalidAuth, clearAllAuthData, forceLogout, refreshTokenIfNeeded } from '../utils/auth-cleanup';
+import { cleanupInvalidAuth, clearAllAuthData, refreshTokenIfNeeded } from '../utils/auth-cleanup';
 
 // Estado inicial
 const initialState: AuthState = {
