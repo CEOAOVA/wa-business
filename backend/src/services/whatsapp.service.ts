@@ -9,6 +9,7 @@ export interface SendMessageRequest {
   to: string;
   message: string;
   type?: 'text';
+  isChatbotResponse?: boolean; // NUEVO: Para evitar duplicados del chatbot
 }
 
 export interface SendTemplateRequest {
@@ -130,9 +131,9 @@ export class WhatsAppService {
 
       console.log('✅ Mensaje enviado exitosamente:', response.data);
 
-      // Guardar mensaje enviado en la base de datos
+      // Guardar mensaje enviado en la base de datos (SOLO si NO es respuesta del chatbot)
       const messageId = response.data.messages?.[0]?.id;
-      if (messageId) {
+      if (messageId && !data.isChatbotResponse) {
         try {
           const result = await databaseService.processOutgoingMessage({
             waMessageId: messageId,
@@ -180,6 +181,8 @@ export class WhatsAppService {
           console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
           // No fallar el envío por error de BD
         }
+      } else if (data.isChatbotResponse) {
+        console.log('🤖 Mensaje del chatbot enviado - NO guardando en BD (lo hará el chatbot después)');
       }
 
       return {
@@ -394,7 +397,8 @@ export class WhatsAppService {
                             try {
                               const sendResult = await this.sendMessage({
                                 to: message.from,
-                                message: chatbotResponse.response
+                                message: chatbotResponse.response,
+                                isChatbotResponse: true // Indicar que es una respuesta del chatbot
                               });
                               
                               if (sendResult.success && sendResult.messageId) {
