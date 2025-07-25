@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import logemblerImage from '/logembler.jpg';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -22,7 +21,7 @@ const LogoAlt: React.FC<LogoProps> = ({
 
   const LogoImage = () => (
     <motion.img 
-      src={logemblerImage}
+      src="/logembler.jpg"
       alt="Logo" 
       className={`${sizeClasses[size]} rounded-xl shadow-soft border border-white/10 ${className}`}
       whileHover={{ 
@@ -60,7 +59,7 @@ const LogoAlt: React.FC<LogoProps> = ({
   return (
     <div className="flex items-center">
       <img 
-        src={logemblerImage}
+        src="/logembler.jpg"
         alt="Logo" 
         className={`${sizeClasses[size]} rounded-xl shadow-soft border border-white/10 ${className}`}
         onError={(e) => {
