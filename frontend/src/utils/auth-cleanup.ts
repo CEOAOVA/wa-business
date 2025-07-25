@@ -96,7 +96,7 @@ export const refreshTokenIfNeeded = async (): Promise<boolean> => {
   if (!isTokenExpiringSoon()) return true;
   
   try {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/refresh`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'https://dev-apiwaprueba.aova.mx'}/api/auth/refresh`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

@@ -94,6 +94,48 @@ if (fs.existsSync(dockerPath)) {
   console.log('⚠️  No se encontró archivo docker-compose.coolify.yml');
 }
 
+console.log('\n🔍 Verificando archivos del frontend...\n');
+
+// Verificar archivos del frontend que podrían tener localhost
+const frontendFiles = [
+  '../frontend/src/services/auth-api.ts',
+  '../frontend/src/services/whatsapp-api.ts',
+  '../frontend/src/services/chatbot-api.ts',
+  '../frontend/src/services/dashboard-api.ts',
+  '../frontend/src/hooks/useWebSocket.ts',
+  '../frontend/src/hooks/useWebSocketImproved.ts',
+  '../frontend/src/hooks/useWebSocketSimple.ts',
+  '../frontend/src/utils/auth-cleanup.ts'
+];
+
+let frontendIssues = 0;
+
+for (const filePath of frontendFiles) {
+  const fullPath = path.join(__dirname, filePath);
+  if (fs.existsSync(fullPath)) {
+    const content = fs.readFileSync(fullPath, 'utf8');
+    
+    // Buscar localhost:3002
+    if (content.includes('localhost:3002')) {
+      console.log(`❌ ${filePath}: Contiene localhost:3002`);
+      frontendIssues++;
+    } else if (content.includes('https://dev-apiwaprueba.aova.mx')) {
+      console.log(`✅ ${filePath}: Configurado correctamente`);
+    } else {
+      console.log(`⚠️  ${filePath}: No se detectó configuración específica`);
+    }
+  } else {
+    console.log(`⚠️  ${filePath}: Archivo no encontrado`);
+  }
+}
+
+if (frontendIssues > 0) {
+  console.log(`\n❌ Se encontraron ${frontendIssues} archivos con localhost:3002`);
+  allGood = false;
+} else {
+  console.log('\n✅ Todos los archivos del frontend están configurados correctamente');
+}
+
 console.log('\n📊 Resumen de verificación:');
 if (allGood) {
   console.log('✅ Configuración correcta para producción');
@@ -108,9 +150,11 @@ if (allGood) {
   console.log('2. Asegurar que VITE_BACKEND_URL use HTTPS');
   console.log('3. Verificar configuración de CSP');
   console.log('4. Revisar logs de la aplicación');
+  console.log('5. Ejecutar: git add . && git commit -m "Fix CSP localhost URLs" && git push');
 }
 
 console.log('\n📝 Para más información, consulta:');
 console.log('- DEPLOY_GUIDE.md');
 console.log('- PRODUCTION_ENV_TEMPLATE.md');
-console.log('- DOCUMENTATION.md'); 
+console.log('- DOCUMENTATION.md');
+console.log('- CSP_FIX_GUIDE.md'); 

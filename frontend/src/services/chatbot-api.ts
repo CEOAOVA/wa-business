@@ -4,7 +4,7 @@
 
 // Configuración del backend
 // Use relative path to leverage Vite proxy in development
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002');
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'https://dev-apiwaprueba.aova.mx');
 
 export interface ChatbotSendMessageRequest {
   phoneNumber: string;

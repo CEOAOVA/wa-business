@@ -4,7 +4,7 @@
 
 // Configuración del backend - Usando variables de entorno
 // Use relative path to leverage Vite proxy in development
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002');
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'https://dev-apiwaprueba.aova.mx');
 
 export interface SendMessageRequest {
   to: string;
@@ -414,4 +414,4 @@ class WhatsAppApiService {
 export const whatsappApi = new WhatsAppApiService();
 
 // Exports adicionales
-export default whatsappApi; 
+export default whatsappApi;

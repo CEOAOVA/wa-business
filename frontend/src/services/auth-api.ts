@@ -9,7 +9,7 @@ interface ApiResponse<T> {
 }
 
 // Use relative path to leverage Vite proxy in development
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002');
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'https://dev-apiwaprueba.aova.mx');
 
 export interface LoginRequest {
   email: string;
