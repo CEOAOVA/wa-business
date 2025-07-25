@@ -196,7 +196,7 @@ services:
       - "traefik.http.middlewares.frontend-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
       
       # CSP middleware
-      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss:; font-src 'self' https:; object-src 'none';"
+      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss: https://dev-apiwaprueba.aova.mx; font-src 'self' https:; object-src 'none';"
       
       # Apply middlewares to HTTPS router
       - "traefik.http.routers.wa-business-frontend.middlewares=frontend-headers,frontend-csp"

@@ -56,7 +56,7 @@ export const configureSecurityHeaders = () => {
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https://api.openrouter.ai", "https://graph.facebook.com"],
+        connectSrc: ["'self'", "https://api.openrouter.ai", "https://graph.facebook.com", "https://dev-waprueba.aova.mx"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
