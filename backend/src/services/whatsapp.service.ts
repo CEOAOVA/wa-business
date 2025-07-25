@@ -391,11 +391,38 @@ export class WhatsAppService {
                           
                           // Enviar respuesta automática con delay natural
                           setTimeout(async () => {
-                            await this.sendMessage({
-                              to: message.from,
-                              message: chatbotResponse.response
-                            });
-                            console.log('✅ Respuesta IA enviada exitosamente');
+                            try {
+                              const sendResult = await this.sendMessage({
+                                to: message.from,
+                                message: chatbotResponse.response
+                              });
+                              
+                              if (sendResult.success && sendResult.messageId) {
+                                console.log('✅ Respuesta IA enviada exitosamente');
+                                
+                                // Guardar mensaje del chatbot en la base de datos DESPUÉS de enviarlo
+                                if (chatbotResponse.conversationState) {
+                                  // Buscar el último mensaje del asistente en la conversación
+                                  const assistantMessages = chatbotResponse.conversationState.messages.filter(
+                                    msg => msg.role === 'assistant'
+                                  );
+                                  const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
+                                  
+                                  if (lastAssistantMessage) {
+                                    await chatbotService.saveChatbotMessageToDatabase(
+                                      message.from,
+                                      lastAssistantMessage,
+                                      sendResult.messageId
+                                    );
+                                    console.log('💾 Mensaje del chatbot guardado en BD con WhatsApp ID');
+                                  }
+                                }
+                              } else {
+                                console.error('❌ Error enviando respuesta IA:', sendResult.error);
+                              }
+                            } catch (sendError) {
+                              console.error('❌ Error enviando respuesta IA:', sendError);
+                            }
                           }, 2000);
                         } else {
                           console.log(`⚠️ [Takeover] IA decidió no responder para: ${message.from}`);

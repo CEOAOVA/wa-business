@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "webhook:check": "node src/scripts/webhook-setup.js",
-    "security:test": "node src/scripts/test-webhook-security.js"
+    "security:test": "node src/scripts/test-webhook-security.js",
+    "cleanup:duplicates": "node cleanup-duplicate-messages.js"
   },
   "keywords": [],
   "author": "",

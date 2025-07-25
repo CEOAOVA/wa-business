@@ -129,7 +129,7 @@ export class ChatbotService {
       // Actualizar actividad
       conversation.lastActivity = new Date();
 
-      // Agregar mensaje del usuario
+      // Agregar mensaje del usuario (SOLO EN MEMORIA, NO EN BD)
       const userMsg: ChatbotMessage = {
         id: `msg-${Date.now()}-user`,
         role: 'user',
@@ -139,13 +139,13 @@ export class ChatbotService {
       
       conversation.messages.push(userMsg);
 
-      // Guardar mensaje del usuario en la base de datos
-      await this.saveMessageToDatabase(conversation.phoneNumber, userMsg);
+      // NO guardar mensaje del usuario en la base de datos aquí
+      // await this.saveMessageToDatabase(conversation.phoneNumber, userMsg);
 
       // Generar respuesta con IA
       const aiResponse = await this.generateAIResponse(conversation);
       
-      // Agregar respuesta del asistente
+      // Agregar respuesta del asistente (SOLO EN MEMORIA, NO EN BD)
       const assistantMsg: ChatbotMessage = {
         id: `msg-${Date.now()}-assistant`,
         role: 'assistant',
@@ -157,19 +157,19 @@ export class ChatbotService {
 
       conversation.messages.push(assistantMsg);
 
-      // Guardar respuesta del asistente en la base de datos
-      await this.saveMessageToDatabase(conversation.phoneNumber, assistantMsg);
+      // NO guardar respuesta del asistente en la base de datos aquí
+      // await this.saveMessageToDatabase(conversation.phoneNumber, assistantMsg);
 
       // Actualizar estado de la conversación si se procesó datos
       if (aiResponse.updatedClientInfo) {
         conversation.clientInfo = { ...conversation.clientInfo, ...aiResponse.updatedClientInfo };
         conversation.status = this.determineNextStatus(conversation.clientInfo);
         
-        // Guardar resumen actualizado en la base de datos
+        // Guardar resumen actualizado en la base de datos (esto sí es necesario)
         await this.saveConversationSummary(conversation);
       }
 
-      // Guardar conversación actualizada
+      // Guardar conversación actualizada en memoria
       this.conversations.set(conversationId, conversation);
 
       console.log(`[ChatbotService] Respuesta generada: ${aiResponse.content.substring(0, 100)}...`);
@@ -762,9 +762,14 @@ EJEMPLO:
   }
 
   /**
-   * Guardar mensaje en la base de datos
+   * Guardar mensaje del chatbot en la base de datos cuando se envía efectivamente
+   * Este método se llama DESPUÉS de que el mensaje se envía por WhatsApp
    */
-  private async saveMessageToDatabase(phoneNumber: string, message: ChatbotMessage): Promise<void> {
+  async saveChatbotMessageToDatabase(
+    phoneNumber: string, 
+    message: ChatbotMessage, 
+    whatsappMessageId: string
+  ): Promise<void> {
     try {
       // Obtener conversación de la base de datos
       const dbResult = await databaseService.getOrCreateConversationByPhone(phoneNumber);
@@ -781,29 +786,40 @@ EJEMPLO:
         return;
       }
 
-      // Guardar mensaje usando el servicio híbrido
+      // Guardar mensaje usando el servicio híbrido con WhatsApp Message ID
       const result = await databaseService.createChatbotMessage({
         conversationId,
         contactPhone: phoneNumber,
         senderType: message.role === 'user' ? 'user' : 'bot',
         content: message.content,
         messageType: 'text',
+        whatsappMessageId: whatsappMessageId, // IMPORTANTE: Incluir el WhatsApp Message ID
         metadata: {
           chatbotId: message.id,
           functionCalled: message.functionCalled,
-          clientData: message.clientData
+          clientData: message.clientData,
+          timestamp: message.timestamp.toISOString() // Agregar timestamp real
         }
       });
 
       if (result.success) {
-        console.log(`[ChatbotService] Mensaje guardado en DB: ${result.messageId}`);
+        console.log(`[ChatbotService] Mensaje del chatbot guardado en DB: ${result.messageId} con WhatsApp ID: ${whatsappMessageId}`);
       } else {
-        console.warn(`[ChatbotService] No se pudo guardar mensaje en DB para ${phoneNumber}`);
+        console.warn(`[ChatbotService] No se pudo guardar mensaje del chatbot en DB para ${phoneNumber}`);
       }
-         } catch (error) {
-       console.error('[ChatbotService] Error guardando mensaje en DB:', error);
-     }
-   }
+    } catch (error) {
+      console.error('[ChatbotService] Error guardando mensaje del chatbot en DB:', error);
+    }
+  }
+
+  /**
+   * Guardar mensaje en la base de datos (MÉTODO DEPRECADO - Solo para compatibilidad)
+   * @deprecated Usar saveChatbotMessageToDatabase en su lugar
+   */
+  private async saveMessageToDatabase(phoneNumber: string, message: ChatbotMessage): Promise<void> {
+    console.warn('[ChatbotService] saveMessageToDatabase está deprecado. Usar saveChatbotMessageToDatabase en su lugar.');
+    // Este método ya no se usa, pero lo mantenemos por compatibilidad
+  }
 
    /**
     * Guardar resumen de conversación en la base de datos
