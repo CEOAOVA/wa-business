@@ -96,9 +96,9 @@ class WhatsAppService {
                     headers: (0, whatsapp_1.getHeaders)()
                 });
                 console.log('✅ Mensaje enviado exitosamente:', response.data);
-                // Guardar mensaje enviado en la base de datos
+                // Guardar mensaje enviado en la base de datos (SOLO si NO es respuesta del chatbot)
                 const messageId = (_c = (_b = response.data.messages) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.id;
-                if (messageId) {
+                if (messageId && !data.isChatbotResponse) {
                     try {
                         const result = yield database_service_1.databaseService.processOutgoingMessage({
                             waMessageId: messageId,
@@ -143,6 +143,9 @@ class WhatsAppService {
                         console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
                         // No fallar el envío por error de BD
                     }
+                }
+                else if (data.isChatbotResponse) {
+                    console.log('🤖 Mensaje del chatbot enviado - NO guardando en BD (lo hará el chatbot después)');
                 }
                 return {
                     success: true,
@@ -331,11 +334,32 @@ class WhatsAppService {
                                                         console.log(`🤖 [Takeover] Enviando respuesta automática de IA: ${chatbotResponse.response.substring(0, 100)}...`);
                                                         // Enviar respuesta automática con delay natural
                                                         setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                                                            yield this.sendMessage({
-                                                                to: message.from,
-                                                                message: chatbotResponse.response
-                                                            });
-                                                            console.log('✅ Respuesta IA enviada exitosamente');
+                                                            try {
+                                                                const sendResult = yield this.sendMessage({
+                                                                    to: message.from,
+                                                                    message: chatbotResponse.response,
+                                                                    isChatbotResponse: true // Indicar que es una respuesta del chatbot
+                                                                });
+                                                                if (sendResult.success && sendResult.messageId) {
+                                                                    console.log('✅ Respuesta IA enviada exitosamente');
+                                                                    // Guardar mensaje del chatbot en la base de datos DESPUÉS de enviarlo
+                                                                    if (chatbotResponse.conversationState) {
+                                                                        // Buscar el último mensaje del asistente en la conversación
+                                                                        const assistantMessages = chatbotResponse.conversationState.messages.filter(msg => msg.role === 'assistant');
+                                                                        const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
+                                                                        if (lastAssistantMessage) {
+                                                                            yield chatbot_service_1.chatbotService.saveChatbotMessageToDatabase(message.from, lastAssistantMessage, sendResult.messageId);
+                                                                            console.log('💾 Mensaje del chatbot guardado en BD con WhatsApp ID');
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.error('❌ Error enviando respuesta IA:', sendResult.error);
+                                                                }
+                                                            }
+                                                            catch (sendError) {
+                                                                console.error('❌ Error enviando respuesta IA:', sendError);
+                                                            }
                                                         }), 2000);
                                                     }
                                                     else {

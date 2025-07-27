@@ -81,7 +81,7 @@ exports.configureSecurityHeaders = configureSecurityHeaders;
  */
 exports.generalRateLimit = (0, express_rate_limit_1.default)({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'), // 1 minuto
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // 100 requests por minuto
+    max: process.env.NODE_ENV === 'production' ? 300 : 100, // Más permisivo en producción
     message: {
         success: false,
         error: 'Demasiadas peticiones. Intenta de nuevo en un minuto.',
@@ -94,6 +94,11 @@ exports.generalRateLimit = (0, express_rate_limit_1.default)({
         // Usar X-Forwarded-For si está disponible, sino usar req.ip
         const forwarded = req.headers['x-forwarded-for'];
         const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
+        // En producción, usar una clave más específica que incluya User-Agent
+        if (process.env.NODE_ENV === 'production') {
+            const userAgent = req.headers['user-agent'] || 'unknown';
+            return `${ip}-${userAgent.substring(0, 20)}`;
+        }
         return ip || 'unknown';
     },
     skip: (req) => {
@@ -115,7 +120,7 @@ exports.generalRateLimit = (0, express_rate_limit_1.default)({
  */
 exports.authRateLimit = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // 5 intentos por IP
+    max: process.env.NODE_ENV === 'production' ? 20 : 5, // Más permisivo en producción
     message: {
         success: false,
         error: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
@@ -128,12 +133,25 @@ exports.authRateLimit = (0, express_rate_limit_1.default)({
         // Usar X-Forwarded-For si está disponible, sino usar req.ip
         const forwarded = req.headers['x-forwarded-for'];
         const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
+        // En producción, usar una clave más específica que incluya User-Agent
+        if (process.env.NODE_ENV === 'production') {
+            const userAgent = req.headers['user-agent'] || 'unknown';
+            return `${ip}-${userAgent.substring(0, 20)}`;
+        }
         return ip || 'unknown';
     },
     skip: (req) => {
         // Saltar rate limiting para IPs locales en desarrollo
         const ip = req.ip || '';
         return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
+    },
+    handler: (req, res) => {
+        console.warn(`[Security] ⚠️ Auth rate limit excedido para IP: ${req.ip}`);
+        res.status(429).json({
+            success: false,
+            error: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
+            code: 'RATE_LIMIT_EXCEEDED'
+        });
     }
 });
 /**

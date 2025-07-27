@@ -7,10 +7,6 @@ import { ToastNotifications } from "./components/NotificationCenter";
 import Login from "./pages/Login";
 import Chats from "./pages/Chats";
 import ClientChat from "./pages/ClientChat";
-import WhatsAppTest from "./pages/WhatsAppTest";
-import WebSocketTest from "./pages/WebSocketTest";
-import Demo from "./pages/Demo";
-import ImageTest from "./pages/ImageTest";
 import AdminDashboard from "./pages/AdminDashboard";
 import './App.css';
 
@@ -28,11 +24,7 @@ function App() {
           
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/image-test" element={<ImageTest />} />
             <Route path="/client-chat" element={<ClientChat />} />
-            <Route path="/whatsapp-test" element={<WhatsAppTest />} />
-            <Route path="/websocket-test" element={<WebSocketTest />} />
             
             {/* Ruta raíz con redirección automática según rol */}
             <Route 
