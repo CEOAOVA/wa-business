@@ -366,7 +366,7 @@ class WhatsAppService {
      */
     processTextMessage(from, messageId, content, timestamp, contactName) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d;
+            var _a, _b;
             try {
                 console.log(`📝 Procesando texto de ${from}: ${content.substring(0, 50)}...`);
                 // Obtener o crear conversación
@@ -401,15 +401,15 @@ class WhatsAppService {
                             message: chatbotResponse.response,
                             isChatbotResponse: true
                         });
-                        // GUARDAR RESPUESTA DEL CHATBOT EN LA BASE DE DATOS DESPUÉS DE ENVIARLA
+                        // GUARDAR MENSAJE DEL CHATBOT DESPUÉS DE ENVIARLO
                         if (sendResult.success && sendResult.messageId) {
                             yield chatbot_service_1.chatbotService.saveChatbotMessageToDatabase(from, {
                                 id: `msg-${Date.now()}-assistant`,
                                 role: 'assistant',
                                 content: chatbotResponse.response,
                                 timestamp: new Date(),
-                                functionCalled: (_c = (_b = (_a = chatbotResponse.conversationState) === null || _a === void 0 ? void 0 : _a.messages) === null || _b === void 0 ? void 0 : _b.find(m => m.role === 'assistant')) === null || _c === void 0 ? void 0 : _c.functionCalled,
-                                clientData: (_d = chatbotResponse.conversationState) === null || _d === void 0 ? void 0 : _d.clientInfo
+                                functionCalled: (_a = chatbotResponse.conversationState) === null || _a === void 0 ? void 0 : _a.status,
+                                clientData: (_b = chatbotResponse.conversationState) === null || _b === void 0 ? void 0 : _b.clientInfo
                             }, sendResult.messageId);
                         }
                     }

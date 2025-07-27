@@ -427,16 +427,42 @@ export class WhatsAppService {
       if (canChatbotProcess) {
         console.log(`🤖 Chatbot procesará mensaje de ${from} (modo: ${conversation.takeover_mode || 'spectator'})`);
         
+        // GUARDAR MENSAJE DEL USUARIO EN LA BASE DE DATOS ANTES DE PROCESAR CON CHATBOT
+        await databaseService.createChatbotMessage({
+          conversationId: conversation.id,
+          contactPhone: from,
+          senderType: 'user',
+          content: content,
+          messageType: 'text',
+          whatsappMessageId: messageId,
+          metadata: {
+            contactName: contactName,
+            timestamp: timestamp.toISOString()
+          }
+        });
+        
         // Procesar con chatbot
         const chatbotResponse = await chatbotService.processWhatsAppMessage(from, content);
         
         if (chatbotResponse.shouldSend && chatbotResponse.response) {
           // Enviar respuesta del chatbot
-          await this.sendMessage({
+          const sendResult = await this.sendMessage({
             to: from,
             message: chatbotResponse.response,
             isChatbotResponse: true
           });
+
+          // GUARDAR MENSAJE DEL CHATBOT DESPUÉS DE ENVIARLO
+          if (sendResult.success && sendResult.messageId) {
+            await chatbotService.saveChatbotMessageToDatabase(from, {
+              id: `msg-${Date.now()}-assistant`,
+              role: 'assistant',
+              content: chatbotResponse.response,
+              timestamp: new Date(),
+              functionCalled: chatbotResponse.conversationState?.status,
+              clientData: chatbotResponse.conversationState?.clientInfo
+            }, sendResult.messageId);
+          }
         }
       } else {
         console.log(`👤 Agente debe procesar mensaje de ${from} (modo: ${conversation.takeover_mode})`);
