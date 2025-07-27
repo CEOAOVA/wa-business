@@ -447,28 +447,6 @@ export class WhatsAppService {
                     }
                   }
 
-                  // Emitir evento de Socket.IO para nuevo mensaje
-                  if (this.io) {
-                    this.io.to(`conversation_${processedMessage.conversationId}`).emit('new_message', {
-                      message: processedMessage,
-                      conversation: {
-                        id: processedMessage.conversationId,
-                        contactId: processedMessage.contactId,
-                        contactName: (result?.contact?.name || contact?.profile?.name || result?.contact?.waId || message.from),
-                        unreadCount: result?.conversation?.unreadCount || 1
-                      }
-                    });
-                    
-                    // También emitir a todos los clientes para actualizar lista de conversaciones
-                    this.io.emit('conversation_updated', {
-                      conversationId: processedMessage.conversationId,
-                      lastMessage: processedMessage,
-                      unreadCount: result?.conversation?.unreadCount || 1
-                    });
-                    
-                    console.log('🌐 Evento Socket.IO emitido para nuevo mensaje');
-                  }
-
                   // El procesamiento con IA ya se realiza arriba
                 } catch (dbError) {
                   console.error('❌ Error guardando mensaje en BD:', dbError);
@@ -478,6 +456,31 @@ export class WhatsAppService {
             }
           }
         }
+      }
+
+      // Emitir eventos de Socket.IO SOLO UNA VEZ al final del procesamiento
+      if (this.io && processedMessages.length > 0) {
+        // Emitir para cada mensaje procesado
+        for (const processedMessage of processedMessages) {
+          this.io.to(`conversation_${processedMessage.conversationId}`).emit('new_message', {
+            message: processedMessage,
+            conversation: {
+              id: processedMessage.conversationId,
+              contactId: processedMessage.contactId,
+              contactName: processedMessage.contact?.name || processedMessage.from,
+              unreadCount: 1 // Valor por defecto
+            }
+          });
+          
+          // También emitir para actualizar lista de conversaciones
+          this.io.emit('conversation_updated', {
+            conversationId: processedMessage.conversationId,
+            lastMessage: processedMessage,
+            unreadCount: 1 // Valor por defecto
+          });
+        }
+        
+        console.log(`🌐 Eventos Socket.IO emitidos para ${processedMessages.length} mensajes`);
       }
 
       return {
