@@ -749,6 +749,91 @@ class DatabaseService {
             return [];
         });
     }
+    /**
+     * Obtener modo takeover de conversación
+     */
+    getConversationTakeoverMode(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const mode = yield supabase_database_service_1.supabaseDatabaseService.getConversationTakeoverMode(conversationId);
+                console.log(`🔍 Takeover mode obtenido: ${conversationId} -> ${mode}`);
+                return mode;
+            }
+            catch (error) {
+                console.error('❌ Error en getConversationTakeoverMode:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Establecer modo takeover de conversación
+     */
+    setConversationTakeoverMode(conversationId, mode, agentId, reason) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield supabase_database_service_1.supabaseDatabaseService.setConversationTakeoverMode(conversationId, mode, agentId, reason);
+                if (result.success) {
+                    console.log(`✅ Takeover mode actualizado: ${conversationId} -> ${mode} ${agentId ? `(agente: ${agentId})` : ''}`);
+                }
+                else {
+                    console.error(`❌ Error actualizando takeover mode: ${result.error}`);
+                }
+                return result;
+            }
+            catch (error) {
+                console.error('❌ Error en setConversationTakeoverMode:', error);
+                return { success: false, error: error.message };
+            }
+        });
+    }
+    /**
+     * Obtener conversaciones en modo espectador
+     */
+    getSpectatorConversations() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const conversations = yield supabase_database_service_1.supabaseDatabaseService.getSpectatorConversations();
+                console.log(`🔍 Conversaciones en espectador: ${conversations.length}`);
+                return conversations;
+            }
+            catch (error) {
+                console.error('❌ Error obteniendo conversaciones en espectador:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Obtener conversaciones en takeover
+     */
+    getTakeoverConversations() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const conversations = yield supabase_database_service_1.supabaseDatabaseService.getTakeoverConversations();
+                console.log(`🔍 Conversaciones en takeover: ${conversations.length}`);
+                return conversations;
+            }
+            catch (error) {
+                console.error('❌ Error obteniendo conversaciones en takeover:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Verificar si el chatbot puede procesar un mensaje
+     */
+    canChatbotProcessMessage(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const canProcess = yield supabase_database_service_1.supabaseDatabaseService.canChatbotProcessMessage(conversationId);
+                console.log(`🔍 Chatbot puede procesar ${conversationId}: ${canProcess}`);
+                return canProcess;
+            }
+            catch (error) {
+                console.error('❌ Error verificando si chatbot puede procesar:', error);
+                return false;
+            }
+        });
+    }
 }
 exports.DatabaseService = DatabaseService;
 // Instancia singleton

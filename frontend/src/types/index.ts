@@ -29,6 +29,7 @@ export interface Conversation {
   contact_phone: string;
   status: 'active' | 'waiting' | 'closed';
   ai_mode: 'active' | 'inactive' | 'paused';
+  takeover_mode: 'spectator' | 'takeover' | 'ai_only'; // NUEVO
   assigned_agent_id?: string;
   unread_count: number;
   last_message_at?: string;
@@ -232,3 +233,17 @@ export type AppAction =
   | { type: 'ADD_NOTIFICATION'; payload: Notification }
   | { type: 'MARK_NOTIFICATION_READ'; payload: string }
   | { type: 'SET_THEME'; payload: 'dark' | 'light' }; 
+
+// Tipos de takeover
+export interface TakeoverMode {
+  mode: 'spectator' | 'takeover' | 'ai_only';
+  assignedAgentId?: string;
+  reason?: string;
+}
+
+export interface TakeoverRequest {
+  conversationId: string;
+  mode: 'spectator' | 'takeover' | 'ai_only';
+  agentId?: string;
+  reason?: string;
+} 

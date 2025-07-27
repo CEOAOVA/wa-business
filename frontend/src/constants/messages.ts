@@ -57,6 +57,18 @@ export const MESSAGES = {
     MESSAGES_COUNT: "💬 Mensajes"
   },
 
+  // Takeover y control de conversaciones
+  TAKEOVER: {
+    SPECTATOR_MODE: "👁️ Modo espectador: Solo puedes observar la conversación. Haz clic en \"Tomar Control\" para intervenir.",
+    TAKEOVER_MODE: "👨‍💼 Modo control: Puedes responder directamente al cliente.",
+    TAKING_CONTROL: "Tomando control...",
+    RELEASING_CONTROL: "Liberando control...",
+    CONTROL_ACTIVE: "Control activo",
+    AI_ACTIVE: "IA activa",
+    TOGGLE_TO_TAKEOVER: "Tomar Control",
+    TOGGLE_TO_AI: "Activar IA"
+  },
+
   // Chat del cliente
   CLIENT_CHAT: {
     QUICK_RESPONSES_LABEL: "Respuestas rápidas:",

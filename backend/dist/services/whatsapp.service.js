@@ -257,522 +257,203 @@ class WhatsAppService {
      */
     processWebhook(body) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
-            console.log('📨 Procesando webhook de WhatsApp:', JSON.stringify(body, null, 2));
-            const processedMessages = [];
             try {
-                if (body.object === 'whatsapp_business_account') {
-                    for (const entry of body.entry || []) {
-                        for (const change of entry.changes || []) {
-                            if (change.field === 'messages') {
-                                const value = change.value;
-                                // Procesar mensajes entrantes
-                                for (const message of value.messages || []) {
-                                    const contact = (_a = value.contacts) === null || _a === void 0 ? void 0 : _a.find(c => c.wa_id === message.from);
-                                    try {
-                                        // Determinar tipo de mensaje
-                                        let messageType = database_1.MessageType.TEXT;
-                                        let content = '';
-                                        if (message.type === 'text' && ((_b = message.text) === null || _b === void 0 ? void 0 : _b.body)) {
-                                            content = message.text.body;
-                                        }
-                                        else if (message.type === 'image') {
-                                            content = '[Imagen]'; // Simplificado por ahora
-                                            // TODO: Implementar soporte para imágenes
-                                        }
-                                        else {
-                                            content = `[${message.type.toUpperCase()}]`;
-                                        }
-                                        // Guardar en la base de datos
-                                        const result = yield database_service_1.databaseService.processIncomingMessage({
-                                            waMessageId: message.id,
-                                            fromWaId: message.from,
-                                            toWaId: value.metadata.phone_number_id,
-                                            content,
-                                            messageType,
-                                            timestamp: new Date(parseInt(message.timestamp) * 1000),
-                                            contactName: (_c = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _c === void 0 ? void 0 : _c.name
-                                        });
-                                        // Generar estructura temporal si el método es un stub
-                                        const processedMessage = {
-                                            id: ((_d = result === null || result === void 0 ? void 0 : result.message) === null || _d === void 0 ? void 0 : _d.id) || `temp-msg-${Date.now()}`,
-                                            waMessageId: message.id,
-                                            from: message.from,
-                                            to: value.metadata.phone_number_id,
-                                            message: content,
-                                            timestamp: ((_e = result === null || result === void 0 ? void 0 : result.message) === null || _e === void 0 ? void 0 : _e.timestamp) || new Date(),
-                                            type: message.type,
-                                            contact: contact ? {
-                                                name: contact.profile.name,
-                                                wa_id: contact.wa_id
-                                            } : undefined,
-                                            read: false,
-                                            conversationId: ((_f = result === null || result === void 0 ? void 0 : result.conversation) === null || _f === void 0 ? void 0 : _f.id) || `temp-conv-${message.from}`,
-                                            contactId: ((_g = result === null || result === void 0 ? void 0 : result.contact) === null || _g === void 0 ? void 0 : _g.id) || `temp-contact-${message.from}`
-                                        };
-                                        processedMessages.push(processedMessage);
-                                        console.log('📩 Mensaje guardado en BD:', processedMessage);
-                                        // ============================================
-                                        // NUEVA LÓGICA DE TAKEOVER - VERIFICAR MODO AI
-                                        // ============================================
-                                        // Solo procesar con IA si es un mensaje de texto del usuario
-                                        if (message.type === 'text' && ((_h = message.text) === null || _h === void 0 ? void 0 : _h.body)) {
-                                            // Almacenar el último mensaje para referencia futura
-                                            this.lastMessages.set(message.from, content);
-                                            try {
-                                                // TODO: VERIFICAR MODO AI CON SUPABASE
-                                                // const aiModeInfo = await databaseService.getConversationAIMode(result.conversation.id);
-                                                // const isAIActive = aiModeInfo?.aiMode === 'active';
-                                                // IMPLEMENTACIÓN TEMPORAL - Asumir IA activa por defecto
-                                                const isAIActive = true; // Cambiar a false para probar modo manual
-                                                if (isAIActive) {
-                                                    console.log(`🤖 [Takeover] IA está ACTIVA para conversación: ${result.conversation.id}`);
-                                                    // Procesar mensaje con IA
-                                                    const chatbotResponse = yield chatbot_service_1.chatbotService.processWhatsAppMessage(message.from, content);
-                                                    // Si el chatbot quiere enviar una respuesta
-                                                    if (chatbotResponse.shouldSend && chatbotResponse.response) {
-                                                        console.log(`🤖 [Takeover] Enviando respuesta automática de IA: ${chatbotResponse.response.substring(0, 100)}...`);
-                                                        // Enviar respuesta automática con delay natural
-                                                        setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                                                            try {
-                                                                const sendResult = yield this.sendMessage({
-                                                                    to: message.from,
-                                                                    message: chatbotResponse.response,
-                                                                    isChatbotResponse: true // Indicar que es una respuesta del chatbot
-                                                                });
-                                                                if (sendResult.success && sendResult.messageId) {
-                                                                    console.log('✅ Respuesta IA enviada exitosamente');
-                                                                    // Guardar mensaje del chatbot en la base de datos DESPUÉS de enviarlo
-                                                                    if (chatbotResponse.conversationState) {
-                                                                        // Buscar el último mensaje del asistente en la conversación
-                                                                        const assistantMessages = chatbotResponse.conversationState.messages.filter(msg => msg.role === 'assistant');
-                                                                        const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
-                                                                        if (lastAssistantMessage) {
-                                                                            yield chatbot_service_1.chatbotService.saveChatbotMessageToDatabase(message.from, lastAssistantMessage, sendResult.messageId);
-                                                                            console.log('💾 Mensaje del chatbot guardado en BD con WhatsApp ID');
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    console.error('❌ Error enviando respuesta IA:', sendResult.error);
-                                                                }
-                                                            }
-                                                            catch (sendError) {
-                                                                console.error('❌ Error enviando respuesta IA:', sendError);
-                                                            }
-                                                        }), 2000);
-                                                    }
-                                                    else {
-                                                        console.log(`⚠️ [Takeover] IA decidió no responder para: ${message.from}`);
-                                                    }
-                                                }
-                                                else {
-                                                    console.log(`👤 [Takeover] IA está INACTIVA, mensaje disponible para agente humano`);
-                                                }
-                                            }
-                                            catch (aiError) {
-                                                console.error('❌ Error procesando con IA:', aiError);
-                                                // En caso de error, enviar respuesta de fallback
-                                                const fallbackMessage = `¡Hola! 👋 Hemos recibido tu mensaje. Un agente te responderá pronto.\n\n*Embler - Siempre conectados* 🚀`;
-                                                setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                                                    yield this.sendMessage({
-                                                        to: message.from,
-                                                        message: fallbackMessage
-                                                    });
-                                                }), 2000);
-                                            }
-                                        }
-                                        // Emitir evento de Socket.IO para nuevo mensaje
-                                        if (this.io) {
-                                            this.io.to(`conversation_${processedMessage.conversationId}`).emit('new_message', {
-                                                message: processedMessage,
-                                                conversation: {
-                                                    id: processedMessage.conversationId,
-                                                    contactId: processedMessage.contactId,
-                                                    contactName: (((_j = result === null || result === void 0 ? void 0 : result.contact) === null || _j === void 0 ? void 0 : _j.name) || ((_k = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _k === void 0 ? void 0 : _k.name) || ((_l = result === null || result === void 0 ? void 0 : result.contact) === null || _l === void 0 ? void 0 : _l.waId) || message.from),
-                                                    unreadCount: ((_m = result === null || result === void 0 ? void 0 : result.conversation) === null || _m === void 0 ? void 0 : _m.unreadCount) || 1
-                                                }
-                                            });
-                                            // También emitir a todos los clientes para actualizar lista de conversaciones
-                                            this.io.emit('conversation_updated', {
-                                                conversationId: processedMessage.conversationId,
-                                                lastMessage: processedMessage,
-                                                unreadCount: ((_o = result === null || result === void 0 ? void 0 : result.conversation) === null || _o === void 0 ? void 0 : _o.unreadCount) || 1
-                                            });
-                                            console.log('🌐 Evento Socket.IO emitido para nuevo mensaje');
-                                        }
-                                        // El procesamiento con IA ya se realiza arriba
-                                    }
-                                    catch (dbError) {
-                                        console.error('❌ Error guardando mensaje en BD:', dbError);
-                                        // Continuar procesando otros mensajes
-                                    }
-                                }
-                            }
+                console.log('📨 Procesando webhook de WhatsApp...');
+                if (!body.entry || body.entry.length === 0) {
+                    console.log('⚠️ Webhook sin entradas');
+                    return;
+                }
+                for (const entry of body.entry) {
+                    if (!entry.changes || entry.changes.length === 0)
+                        continue;
+                    for (const change of entry.changes) {
+                        if (change.field !== 'messages')
+                            continue;
+                        const value = change.value;
+                        if (!value.messages || value.messages.length === 0)
+                            continue;
+                        for (const message of value.messages) {
+                            yield this.processIncomingMessage(message, value.contacts);
                         }
                     }
                 }
-                return {
-                    success: true,
-                    messages: processedMessages,
-                    processed: processedMessages.length
-                };
             }
             catch (error) {
                 console.error('❌ Error procesando webhook:', error);
-                return {
-                    success: false,
-                    error: error.message,
-                    messages: []
-                };
             }
         });
     }
     /**
-     * Procesar mensaje con IA y enviar respuesta inteligente
+     * Procesar mensaje entrante individual
      */
-    sendAutoReply(to, clientName) {
+    processIncomingMessage(message, contacts) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
-                console.log('🤖 Procesando mensaje con IA para:', to);
-                // Obtener el último mensaje del usuario para enviarlo al chatbot
-                const lastUserMessage = yield this.getLastUserMessage(to);
-                if (!lastUserMessage) {
-                    console.warn('⚠️ No se encontró mensaje del usuario para procesar');
-                    return;
+                const from = message.from;
+                const messageId = message.id;
+                const timestamp = new Date(parseInt(message.timestamp) * 1000);
+                const messageType = message.type;
+                console.log(`📨 Mensaje entrante de ${from}: ${messageType}`);
+                // Obtener información del contacto
+                const contact = contacts === null || contacts === void 0 ? void 0 : contacts.find(c => c.wa_id === from);
+                const contactName = ((_a = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _a === void 0 ? void 0 : _a.name) || 'Cliente';
+                // Procesar según el tipo de mensaje
+                if (messageType === 'text' && message.text) {
+                    yield this.processTextMessage(from, messageId, message.text.body, timestamp, contactName);
                 }
-                // Procesar mensaje con el servicio de chatbot
-                const chatbotResult = yield chatbot_service_1.chatbotService.processWhatsAppMessage(to, lastUserMessage);
-                if (chatbotResult.shouldSend && chatbotResult.response) {
-                    console.log(`🧠 Respuesta IA generada: ${chatbotResult.response.substring(0, 100)}...`);
-                    // Esperar 2 segundos antes de responder (más natural)
-                    setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                        yield this.sendMessage({
-                            to: to,
-                            message: chatbotResult.response
-                        });
-                        console.log('✅ Respuesta IA enviada exitosamente');
-                    }), 2000);
+                else if (messageType === 'image' && message.image) {
+                    yield this.processMediaMessage(from, messageId, 'image', message.image, timestamp, contactName);
+                }
+                else if (messageType === 'video' && message.video) {
+                    yield this.processMediaMessage(from, messageId, 'video', message.video, timestamp, contactName);
+                }
+                else if (messageType === 'audio' && message.audio) {
+                    yield this.processMediaMessage(from, messageId, 'audio', message.audio, timestamp, contactName);
+                }
+                else if (messageType === 'document' && message.document) {
+                    yield this.processMediaMessage(from, messageId, 'document', message.document, timestamp, contactName);
                 }
                 else {
-                    console.warn('⚠️ El chatbot decidió no enviar respuesta');
+                    console.log(`⚠️ Tipo de mensaje no soportado: ${messageType}`);
                 }
             }
             catch (error) {
-                console.error('❌ Error procesando mensaje con IA:', error);
-                // Fallback a respuesta básica en caso de error
-                const fallbackMessage = `¡Hola ${clientName}! 👋\n\nGracias por contactarnos. Estamos procesando tu mensaje y te responderemos pronto.\n\n*Embler - Siempre conectados* 🚀`;
-                setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                    yield this.sendMessage({
-                        to: to,
-                        message: fallbackMessage
-                    });
-                }), 2000);
+                console.error('❌ Error procesando mensaje entrante:', error);
             }
         });
     }
     /**
-     * Obtener el último mensaje del usuario para procesarlo con IA
+     * Procesar mensaje de texto
      */
-    getLastUserMessage(phoneNumber) {
+    processTextMessage(from, messageId, content, timestamp, contactName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO: En producción esto vendría de la base de datos
-                // Por ahora, como es una simulación, vamos a almacenar temporalmente los últimos mensajes
-                return this.lastMessages.get(phoneNumber) || null;
-            }
-            catch (error) {
-                console.error('❌ Error obteniendo último mensaje:', error);
-                return null;
-            }
-        });
-    }
-    /**
-     * Obtener conversaciones con mensajes
-     */
-    getConversations() {
-        return __awaiter(this, arguments, void 0, function* (limit = 50, offset = 0) {
-            try {
-                const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
-                const stats = yield database_service_1.databaseService.getStats();
-                // Obtener información de contactos para cada conversación
-                const conversationsWithContacts = yield Promise.all(conversations.map((conv) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    let contact = null;
-                    if (conv.contact_id) {
-                        contact = yield database_service_1.databaseService.getContactById(conv.contact_id);
+                console.log(`📝 Procesando texto de ${from}: ${content.substring(0, 50)}...`);
+                // Obtener o crear conversación
+                const conversation = yield database_service_1.databaseService.getOrCreateConversationByPhone(from);
+                if (!conversation) {
+                    console.error('❌ No se pudo obtener/crear conversación para', from);
+                    return;
+                }
+                // NUEVO: Verificar si el chatbot puede procesar este mensaje
+                const canChatbotProcess = yield database_service_1.databaseService.canChatbotProcessMessage(conversation.id);
+                if (canChatbotProcess) {
+                    console.log(`🤖 Chatbot procesará mensaje de ${from} (modo: ${conversation.takeover_mode || 'spectator'})`);
+                    // Procesar con chatbot
+                    const chatbotResponse = yield chatbot_service_1.chatbotService.processWhatsAppMessage(from, content);
+                    if (chatbotResponse.shouldSend && chatbotResponse.response) {
+                        // Enviar respuesta del chatbot
+                        yield this.sendMessage({
+                            to: from,
+                            message: chatbotResponse.response,
+                            isChatbotResponse: true
+                        });
                     }
-                    return {
-                        id: conv.id,
-                        contactId: conv.contact_id,
-                        contactName: (contact === null || contact === void 0 ? void 0 : contact.name) || 'Contacto Desconocido',
-                        contactWaId: (contact === null || contact === void 0 ? void 0 : contact.phone_number) || conv.contact_phone || 'N/A',
-                        contact: contact,
-                        lastMessage: conv.lastMessage ? {
-                            id: conv.lastMessage.id,
-                            content: conv.lastMessage.content,
-                            timestamp: conv.lastMessage.timestamp,
-                            isFromUs: conv.lastMessage.isFromUs
-                        } : null,
-                        unreadCount: conv.unread_count || 0,
-                        totalMessages: ((_a = conv._count) === null || _a === void 0 ? void 0 : _a.messages) || 0,
-                        updatedAt: conv.updated_at,
-                        status: conv.status,
-                        ai_mode: conv.ai_mode
-                    };
-                })));
-                return {
-                    success: true,
-                    conversations: conversationsWithContacts,
-                    total: stats.totalConversations,
-                    unread: stats.unreadMessages
-                };
-            }
-            catch (error) {
-                console.error('❌ Error obteniendo conversaciones:', error);
-                return {
-                    success: false,
-                    error: error.message,
-                    conversations: [],
-                    total: 0,
-                    unread: 0
-                };
-            }
-        });
-    }
-    /**
-     * Obtener mensajes de una conversación específica
-     */
-    getConversationMessages(conversationId_1) {
-        return __awaiter(this, arguments, void 0, function* (conversationId, limit = 50, offset = 0) {
-            try {
-                const messages = yield database_service_1.databaseService.getConversationMessages(conversationId, limit, offset);
-                return {
-                    success: true,
-                    messages: messages.map((msg) => ({
-                        id: msg.id,
-                        conversation_id: conversationId,
-                        sender_type: msg.sender_type, // Mantener el tipo original del backend
-                        content: msg.content,
-                        message_type: msg.message_type || 'text',
-                        whatsapp_message_id: msg.whatsapp_message_id,
-                        is_read: msg.is_read || false,
-                        metadata: msg.metadata || {},
-                        created_at: msg.created_at || msg.timestamp,
-                        // Propiedades adicionales para compatibilidad
-                        waMessageId: msg.whatsapp_message_id,
-                        messageType: msg.message_type || 'text',
-                        timestamp: msg.created_at || msg.timestamp,
-                        isFromUs: msg.sender_type === 'agent' || msg.sender_type === 'bot',
-                        isDelivered: true,
-                        senderId: msg.sender_type,
-                        receiverId: conversationId
-                    })).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) // Ordenar por timestamp ascendente (más antiguo primero)
-                };
-            }
-            catch (error) {
-                console.error('❌ Error obteniendo mensajes de conversación:', error);
-                return {
-                    success: false,
-                    error: error.message,
-                    messages: []
-                };
-            }
-        });
-    }
-    /**
-     * Marcar mensaje como leído
-     */
-    markMessageAsRead(messageId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const success = yield database_service_1.databaseService.markMessageAsRead(messageId);
-                if (success) {
-                    console.log(`📖 Mensaje ${messageId} marcado como leído`);
                 }
-                return success;
-            }
-            catch (error) {
-                console.error('❌ Error marcando mensaje como leído:', error);
-                return false;
-            }
-        });
-    }
-    /**
-     * Marcar conversación como leída
-     */
-    markConversationAsRead(conversationId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const success = yield database_service_1.databaseService.markConversationAsRead(conversationId);
-                if (success) {
-                    console.log(`📖 Conversación ${conversationId} marcada como leída`);
+                else {
+                    console.log(`👤 Agente debe procesar mensaje de ${from} (modo: ${conversation.takeover_mode})`);
+                    // Solo guardar el mensaje en la base de datos, sin procesar con chatbot
+                    yield database_service_1.databaseService.createChatbotMessage({
+                        conversationId: conversation.id,
+                        contactPhone: from,
+                        senderType: 'user',
+                        content: content,
+                        messageType: 'text',
+                        whatsappMessageId: messageId,
+                        metadata: {
+                            contactName: contactName,
+                            timestamp: timestamp.toISOString()
+                        }
+                    });
+                    // Notificar a agentes conectados
+                    this.emitSocketEvent('new_message', {
+                        conversationId: conversation.id,
+                        from: from,
+                        content: content,
+                        timestamp: timestamp,
+                        contactName: contactName,
+                        requiresAgentAction: true
+                    });
                 }
-                return success;
+                // Actualizar conversación
+                yield database_service_1.databaseService.markConversationAsRead(conversation.id);
             }
             catch (error) {
-                console.error('❌ Error marcando conversación como leída:', error);
-                return false;
+                console.error('❌ Error procesando mensaje de texto:', error);
             }
         });
     }
     /**
-     * Limpiar mensajes antiguos
+     * Procesar mensaje multimedia
      */
-    clearOldMessages() {
-        return __awaiter(this, arguments, void 0, function* (olderThanHours = 24) {
-            try {
-                const removedCount = yield database_service_1.databaseService.cleanupOldMessages(olderThanHours);
-                console.log(`🗑️ ${removedCount} mensajes antiguos eliminados (${olderThanHours}h)`);
-                return removedCount;
-            }
-            catch (error) {
-                console.error('❌ Error limpiando mensajes antiguos:', error);
-                return 0;
-            }
-        });
-    }
-    /**
-     * Obtener estadísticas
-     */
-    getStats() {
+    processMediaMessage(from, messageId, mediaType, mediaData, timestamp, contactName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const stats = yield database_service_1.databaseService.getStats();
-                return {
-                    success: true,
-                    data: stats
-                };
-            }
-            catch (error) {
-                console.error('❌ Error obteniendo estadísticas:', error);
-                return {
-                    success: false,
-                    error: error.message,
-                    data: null
-                };
-            }
-        });
-    }
-    /**
-     * Limpiar TODOS los mensajes (deprecado - usar clearOldMessages)
-     */
-    clearAllMessages() {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('⚠️ clearAllMessages deprecado - redirigiendo a limpiar mensajes de 1 hora');
-            return yield this.clearOldMessages(1); // Limpiar mensajes de última hora
-        });
-    }
-    /**
-     * Verificar webhook (para Facebook)
-     */
-    verifyWebhook(mode, token, challenge) {
-        console.log('🔐 Verificando webhook:', {
-            mode,
-            token: token ? `${token.substring(0, 10)}...` : 'undefined',
-            challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined',
-            expectedToken: whatsapp_1.whatsappConfig.webhook.verifyToken ? `${whatsapp_1.whatsappConfig.webhook.verifyToken.substring(0, 10)}...` : 'undefined'
-        });
-        // Debug detallado de comparación
-        console.log('🔐 Token comparison:', {
-            receivedToken: token,
-            expectedToken: whatsapp_1.whatsappConfig.webhook.verifyToken,
-            tokensMatch: token === whatsapp_1.whatsappConfig.webhook.verifyToken,
-            modeCorrect: mode === 'subscribe'
-        });
-        if (mode === 'subscribe' && token === whatsapp_1.whatsappConfig.webhook.verifyToken) {
-            console.log('✅ Webhook verificado exitosamente, devolviendo challenge:', challenge);
-            return challenge;
-        }
-        else {
-            console.error('❌ Token de verificación incorrecto o modo inválido:', {
-                modeReceived: mode,
-                modeExpected: 'subscribe',
-                tokenReceived: token,
-                tokenExpected: whatsapp_1.whatsappConfig.webhook.verifyToken,
-                modeMatch: mode === 'subscribe',
-                tokenMatch: token === whatsapp_1.whatsappConfig.webhook.verifyToken
-            });
-            return null;
-        }
-    }
-    /**
-     * Obtener información de debug del webhook
-     */
-    getWebhookDebugInfo() {
-        var _a;
-        return {
-            url: whatsapp_1.whatsappConfig.webhook.url,
-            path: whatsapp_1.whatsappConfig.webhook.path,
-            verifyTokenConfigured: !!whatsapp_1.whatsappConfig.webhook.verifyToken,
-            verifyTokenLength: ((_a = whatsapp_1.whatsappConfig.webhook.verifyToken) === null || _a === void 0 ? void 0 : _a.length) || 0,
-            appSecretConfigured: !!whatsapp_1.whatsappConfig.webhook.appSecret,
-            signatureVerificationEnabled: whatsapp_1.whatsappConfig.webhook.enableSignatureVerification,
-            accessTokenConfigured: !!whatsapp_1.whatsappConfig.accessToken,
-            phoneNumberIdConfigured: !!whatsapp_1.whatsappConfig.phoneNumberId,
-            apiVersion: whatsapp_1.whatsappConfig.apiVersion
-        };
-    }
-    /**
-     * Configurar webhook URL (programáticamente)
-     */
-    setWebhookUrl(callbackUrl) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
-            try {
-                const url = (0, whatsapp_1.buildApiUrl)(`${whatsapp_1.whatsappConfig.phoneNumberId}/subscribed_apps`);
-                const payload = {
-                    subscribed_fields: ['messages']
-                };
-                console.log('🔗 Configurando webhook:', { url, callbackUrl });
-                const response = yield axios_1.default.post(url, payload, {
-                    headers: (0, whatsapp_1.getHeaders)()
+                console.log(`📷 Procesando ${mediaType} de ${from}`);
+                // Obtener o crear conversación
+                const conversation = yield database_service_1.databaseService.getOrCreateConversationByPhone(from);
+                if (!conversation) {
+                    console.error('❌ No se pudo obtener/crear conversación para', from);
+                    return;
+                }
+                // Crear contenido descriptivo para el tipo de medio
+                let content = '';
+                let caption = '';
+                switch (mediaType) {
+                    case 'image':
+                        content = '[Imagen]';
+                        caption = mediaData.caption || '';
+                        break;
+                    case 'video':
+                        content = '[Video]';
+                        caption = mediaData.caption || '';
+                        break;
+                    case 'audio':
+                        content = '[Audio]';
+                        break;
+                    case 'document':
+                        content = `[Documento: ${mediaData.filename || 'archivo'}]`;
+                        caption = mediaData.caption || '';
+                        break;
+                    default:
+                        content = `[${mediaType.toUpperCase()}]`;
+                }
+                // Guardar mensaje multimedia en la base de datos
+                yield database_service_1.databaseService.createChatbotMessage({
+                    conversationId: conversation.id,
+                    contactPhone: from,
+                    senderType: 'user',
+                    content: content,
+                    messageType: mediaType,
+                    whatsappMessageId: messageId,
+                    metadata: {
+                        contactName: contactName,
+                        timestamp: timestamp.toISOString(),
+                        mediaId: mediaData.id,
+                        caption: caption,
+                        filename: mediaData.filename,
+                        mimeType: mediaData.mime_type
+                    }
                 });
-                return {
-                    success: true,
-                    data: response.data
-                };
+                // Notificar a agentes conectados
+                this.emitSocketEvent('new_message', {
+                    conversationId: conversation.id,
+                    from: from,
+                    content: content,
+                    timestamp: timestamp,
+                    contactName: contactName,
+                    mediaType: mediaType,
+                    mediaData: mediaData,
+                    requiresAgentAction: true
+                });
+                // Actualizar conversación
+                yield database_service_1.databaseService.markConversationAsRead(conversation.id);
             }
             catch (error) {
-                console.error('❌ Error configurando webhook:', ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message);
-                return {
-                    success: false,
-                    error: ((_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.error) || error.message
-                };
+                console.error('❌ Error procesando mensaje multimedia:', error);
             }
         });
-    }
-    /**
-     * Validar formato de número de teléfono
-     */
-    validatePhoneNumber(phoneNumber) {
-        // Limpiar el número (solo dígitos)
-        const cleaned = phoneNumber.replace(/[^\d]/g, '');
-        // Verificar longitud mínima
-        if (cleaned.length < 10) {
-            return {
-                isValid: false,
-                formatted: cleaned,
-                error: 'Número muy corto (mínimo 10 dígitos)'
-            };
-        }
-        // Verificar longitud máxima
-        if (cleaned.length > 15) {
-            return {
-                isValid: false,
-                formatted: cleaned,
-                error: 'Número muy largo (máximo 15 dígitos)'
-            };
-        }
-        // Para números mexicanos, asegurar que empiece con 52
-        let formatted = cleaned;
-        if (cleaned.length === 10 && !cleaned.startsWith('52')) {
-            formatted = '52' + cleaned;
-        }
-        return {
-            isValid: true,
-            formatted
-        };
     }
     /**
      * Procesar mensaje multimedia saliente

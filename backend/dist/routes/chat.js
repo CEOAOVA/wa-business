@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const whatsapp_service_1 = require("../services/whatsapp.service");
+const database_service_1 = require("../services/database.service");
+const whatsapp_utils_1 = require("../utils/whatsapp-utils");
 const router = express_1.default.Router();
 // POST /api/chat/send - Enviar mensaje de texto
 router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -25,7 +27,7 @@ router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 error: 'Los campos "to" y "message" son requeridos'
             });
         }
-        const phoneValidation = whatsapp_service_1.whatsappService.validatePhoneNumber(to);
+        const phoneValidation = (0, whatsapp_utils_1.validatePhoneNumber)(to);
         if (!phoneValidation.isValid) {
             return res.status(400).json({
                 success: false,
@@ -70,7 +72,7 @@ router.post('/template', (req, res) => __awaiter(void 0, void 0, void 0, functio
                 error: 'Los campos "to" y "template" son requeridos'
             });
         }
-        const phoneValidation = whatsapp_service_1.whatsappService.validatePhoneNumber(to);
+        const phoneValidation = (0, whatsapp_utils_1.validatePhoneNumber)(to);
         if (!phoneValidation.isValid) {
             return res.status(400).json({
                 success: false,
@@ -205,7 +207,7 @@ router.get('/webhook', (req, res) => {
             return res.status(403).send('Invalid mode. Expected: subscribe');
         }
         // Verificar token - esto es crítico para la seguridad
-        const result = whatsapp_service_1.whatsappService.verifyWebhook(mode, token, challenge);
+        const result = (0, whatsapp_utils_1.verifyWebhook)(mode, token, challenge);
         if (result) {
             console.log(`✅ [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
             // 🚀 IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
@@ -214,7 +216,7 @@ router.get('/webhook', (req, res) => {
         }
         else {
             console.error(`❌ [${requestId}] Webhook verification failed - token mismatch`);
-            console.error(`❌ [${requestId}] Expected token: ${whatsapp_service_1.whatsappService.getWebhookDebugInfo().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
+            console.error(`❌ [${requestId}] Expected token: ${(0, whatsapp_utils_1.getWebhookDebugInfo)().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
             res.status(403).send('Forbidden: Invalid verify token');
         }
     }
@@ -263,13 +265,11 @@ router.post('/webhook', (req, res) => __awaiter(void 0, void 0, void 0, function
         // Procesar webhook de forma asíncrona (no bloqueante)
         setImmediate(() => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                const result = yield whatsapp_service_1.whatsappService.processWebhook(req.body);
-                console.log(`✅ [${requestId}] Webhook procesado exitosamente: ${result.processed} mensajes`);
+                yield whatsapp_service_1.whatsappService.processWebhook(req.body);
+                console.log(`✅ [${requestId}] Webhook procesado exitosamente`);
                 // Opcional: Notificar via Socket.IO a clientes conectados
-                if (result.messages.length > 0) {
-                    // TODO: Implementar notificación en tiempo real si es necesario
-                    console.log(`📢 [${requestId}] ${result.messages.length} nuevos mensajes procesados`);
-                }
+                // TODO: Implementar notificación en tiempo real si es necesario
+                console.log(`📢 [${requestId}] Webhook procesado correctamente`);
             }
             catch (error) {
                 console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente:`, error);
@@ -283,189 +283,24 @@ router.post('/webhook', (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 }));
 // ============================================
-// NUEVAS RUTAS PARA TAKEOVER Y RESÚMENES
+// RUTAS PARA TAKEOVER Y RESÚMENES
 // ============================================
-// POST /api/chat/conversations/:id/set-mode - Cambiar modo de IA (takeover)
-router.post('/conversations/:id/set-mode', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id: conversationId } = req.params;
-        const { mode, agentId } = req.body;
-        // Validación
-        if (!mode || !['active', 'inactive'].includes(mode)) {
-            return res.status(400).json({
-                success: false,
-                error: 'El campo "mode" es requerido y debe ser "active" o "inactive"'
-            });
-        }
-        if (mode === 'inactive' && !agentId) {
-            return res.status(400).json({
-                success: false,
-                error: 'El campo "agentId" es requerido cuando se desactiva la IA'
-            });
-        }
-        console.log(`🤖 [Takeover] Cambiando modo IA: ${conversationId} -> ${mode}`, mode === 'inactive' ? `(Agente: ${agentId})` : '');
-        // TODO: IMPLEMENTAR CON SUPABASE
-        // const result = await databaseService.setConversationAIMode(conversationId, mode, agentId);
-        // IMPLEMENTACIÓN TEMPORAL CON PRISMA (mientras no hay Supabase)
-        // Por ahora simulamos la respuesta exitosa
-        const result = { success: true };
-        if (result.success) {
-            // Emitir evento WebSocket para notificar cambio en tiempo real
-            whatsapp_service_1.whatsappService.emitSocketEvent('conversation_ai_mode_changed', {
-                conversationId,
-                aiMode: mode,
-                assignedAgentId: mode === 'inactive' ? agentId : null,
-                timestamp: new Date().toISOString()
-            });
-            res.json({
-                success: true,
-                message: `Modo IA ${mode === 'active' ? 'activado' : 'desactivado'} exitosamente`,
-                conversationId,
-                aiMode: mode,
-                assignedAgentId: mode === 'inactive' ? agentId : null
-            });
-        }
-        else {
-            res.status(500).json({
-                success: false,
-                error: 'Error actualizando modo IA'
-            });
-        }
-    }
-    catch (error) {
-        console.error('[Takeover] Error en set-mode:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error interno del servidor'
-        });
-    }
-}));
-// GET /api/chat/conversations/:id/mode - Obtener modo actual de IA
-router.get('/conversations/:id/mode', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id: conversationId } = req.params;
-        console.log(`🔍 [Takeover] Consultando modo IA para: ${conversationId}`);
-        // TODO: IMPLEMENTAR CON SUPABASE
-        // const result = await databaseService.getConversationAIMode(conversationId);
-        // IMPLEMENTACIÓN TEMPORAL
-        const result = {
-            aiMode: 'active',
-            assignedAgentId: null
-        };
-        if (result) {
-            res.json({
-                success: true,
-                conversationId,
-                aiMode: result.aiMode,
-                assignedAgentId: result.assignedAgentId
-            });
-        }
-        else {
-            res.status(404).json({
-                success: false,
-                error: 'Conversación no encontrada'
-            });
-        }
-    }
-    catch (error) {
-        console.error('[Takeover] Error obteniendo modo IA:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error interno del servidor'
-        });
-    }
-}));
-// GET /api/chat/conversations/:id/summary - Generar resumen de conversación
-router.get('/conversations/:id/summary', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id: conversationId } = req.params;
-        const { forceRegenerate } = req.query;
-        console.log(`📝 [Summary] Generando resumen para: ${conversationId}`, forceRegenerate ? '(Forzar regeneración)' : '');
-        // 1. Verificar caché si no se fuerza regeneración
-        if (!forceRegenerate) {
-            // TODO: IMPLEMENTAR CON SUPABASE
-            // const cachedSummary = await databaseService.getConversationSummary(conversationId);
-            // if (cachedSummary) {
-            //   return res.json({
-            //     success: true,
-            //     summary: cachedSummary.summary,
-            //     keyPoints: cachedSummary.keyPoints,
-            //     isFromCache: cachedSummary.isFromCache,
-            //     conversationId
-            //   });
-            // }
-        }
-        // 2. Obtener historial de mensajes
-        // TODO: IMPLEMENTAR CON SUPABASE
-        // const messages = await databaseService.getConversationHistory(conversationId);
-        // IMPLEMENTACIÓN TEMPORAL - Simular algunos mensajes
-        const messages = [
-            { role: 'user', content: 'Necesito pastillas de freno para mi Toyota Corolla 2018', timestamp: new Date() },
-            { role: 'assistant', content: 'Te ayudo a encontrar pastillas de freno. Para tu Toyota Corolla 2018, ¿qué tipo de motor tiene?', timestamp: new Date() },
-            { role: 'user', content: 'Es 1.8L', timestamp: new Date() },
-            { role: 'assistant', content: 'Perfecto. Tenemos pastillas de freno para Toyota Corolla 2018 1.8L. Mi nombre es María, ¿cuál es tu nombre?', timestamp: new Date() },
-            { role: 'user', content: 'Me llamo Carlos y vivo en 06100', timestamp: new Date() }
-        ];
-        if (messages.length === 0) {
-            return res.status(404).json({
-                success: false,
-                error: 'No se encontraron mensajes para esta conversación'
-            });
-        }
-        // 3. Generar resumen con IA
-        const chatbotService = require('../services/chatbot.service').chatbotService;
-        const summary = yield chatbotService.generateConversationSummary(conversationId, messages);
-        // 4. Guardar en caché
-        // TODO: IMPLEMENTAR CON SUPABASE
-        // await databaseService.saveConversationSummary(
-        //   conversationId, 
-        //   summary.text, 
-        //   summary.keyPoints, 
-        //   messages.length
-        // );
-        console.log(`✅ [Summary] Resumen generado exitosamente para: ${conversationId}`);
-        res.json({
-            success: true,
-            summary: summary.text,
-            keyPoints: summary.keyPoints,
-            isFromCache: false,
-            conversationId,
-            messageCount: messages.length,
-            generatedAt: new Date().toISOString()
-        });
-    }
-    catch (error) {
-        console.error('[Summary] Error generando resumen:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message || 'Error generando resumen de conversación'
-        });
-    }
-}));
 // GET /api/chat/conversations/:id/messages - Obtener historial de mensajes
 router.get('/conversations/:id/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: conversationId } = req.params;
         const { limit, offset } = req.query;
         console.log(`📨 [Messages] Obteniendo historial para: ${conversationId}`);
-        // Usar el servicio de WhatsApp que ya implementa Supabase
-        const result = yield whatsapp_service_1.whatsappService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
-        if (result.success) {
-            res.json({
-                success: true,
-                data: {
-                    messages: result.messages,
-                    total: result.messages.length,
-                    conversationId
-                }
-            });
-        }
-        else {
-            res.status(500).json({
-                success: false,
-                error: result.error || 'Error obteniendo mensajes'
-            });
-        }
+        // Usar el servicio de base de datos
+        const messages = yield database_service_1.databaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
+        res.json({
+            success: true,
+            data: {
+                messages: messages,
+                total: messages.length,
+                conversationId
+            }
+        });
     }
     catch (error) {
         console.error('[Messages] Error obteniendo historial:', error);
@@ -480,8 +315,12 @@ router.get('/conversations', (req, res) => __awaiter(void 0, void 0, void 0, fun
     try {
         const limit = parseInt(req.query.limit) || 50;
         const offset = parseInt(req.query.offset) || 0;
-        const result = yield whatsapp_service_1.whatsappService.getConversations(limit, offset);
-        res.json(result);
+        const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
+        res.json({
+            success: true,
+            conversations: conversations,
+            total: conversations.length
+        });
     }
     catch (error) {
         res.status(500).json({
@@ -491,18 +330,16 @@ router.get('/conversations', (req, res) => __awaiter(void 0, void 0, void 0, fun
         });
     }
 }));
-// Esta ruta fue eliminada porque estaba duplicada con la anterior
 // GET /api/chat/messages - Mantener compatibilidad (deprecado)
 router.get('/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
         const limit = parseInt(req.query.limit) || 50;
         const offset = parseInt(req.query.offset) || 0;
-        const result = yield whatsapp_service_1.whatsappService.getConversations(limit, offset);
+        const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
         // Convertir a formato legacy
         const legacyFormat = {
             success: true,
-            messages: ((_a = result.conversations) === null || _a === void 0 ? void 0 : _a.map((conv) => {
+            messages: conversations.map((conv) => {
                 var _a, _b, _c;
                 return ({
                     id: ((_a = conv.lastMessage) === null || _a === void 0 ? void 0 : _a.id) || conv.id,
@@ -515,9 +352,9 @@ router.get('/messages', (req, res) => __awaiter(void 0, void 0, void 0, function
                     },
                     read: conv.unreadCount === 0
                 });
-            })) || [],
-            total: result.total || 0,
-            unread: result.unread || 0
+            }),
+            total: conversations.length,
+            unread: conversations.filter((conv) => conv.unreadCount > 0).length
         };
         res.json(legacyFormat);
     }
@@ -533,7 +370,7 @@ router.get('/messages', (req, res) => __awaiter(void 0, void 0, void 0, function
 router.put('/messages/:messageId/read', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { messageId } = req.params;
-        const result = yield whatsapp_service_1.whatsappService.markMessageAsRead(messageId);
+        const result = yield database_service_1.databaseService.markMessageAsRead(messageId);
         if (result) {
             res.json({
                 success: true,
@@ -559,7 +396,7 @@ router.put('/messages/:messageId/read', (req, res) => __awaiter(void 0, void 0, 
 router.put('/conversations/:conversationId/read', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { conversationId } = req.params;
-        const result = yield whatsapp_service_1.whatsappService.markConversationAsRead(conversationId);
+        const result = yield database_service_1.databaseService.markConversationAsRead(conversationId);
         if (result) {
             res.json({
                 success: true,
@@ -585,7 +422,7 @@ router.put('/conversations/:conversationId/read', (req, res) => __awaiter(void 0
 router.delete('/messages/cleanup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const hours = parseInt(req.query.hours) || 24;
-        const removedCount = yield whatsapp_service_1.whatsappService.clearOldMessages(hours);
+        const removedCount = yield database_service_1.databaseService.cleanupOldMessages(hours);
         res.json({
             success: true,
             message: `${removedCount} mensajes eliminados`,
@@ -603,7 +440,7 @@ router.delete('/messages/cleanup', (req, res) => __awaiter(void 0, void 0, void 
 // DELETE /api/chat/messages/clear-all - Limpiar TODOS los mensajes
 router.delete('/messages/clear-all', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const removedCount = yield whatsapp_service_1.whatsappService.clearAllMessages();
+        const removedCount = yield database_service_1.databaseService.cleanupOldMessages(0); // 0 horas = limpiar todo
         res.json({
             success: true,
             message: `LIMPIEZA TOTAL: ${removedCount} mensajes eliminados`,
@@ -621,7 +458,7 @@ router.delete('/messages/clear-all', (req, res) => __awaiter(void 0, void 0, voi
 // GET /api/chat/stats - Obtener estadísticas
 router.get('/stats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield whatsapp_service_1.whatsappService.getStats();
+        const result = (0, whatsapp_utils_1.getStats)();
         res.json(result);
     }
     catch (error) {
@@ -677,11 +514,10 @@ router.post('/simulate-message', (req, res) => __awaiter(void 0, void 0, void 0,
             ]
         };
         console.log('🧪 Simulando mensaje entrante:', simulatedWebhook);
-        const result = yield whatsapp_service_1.whatsappService.processWebhook(simulatedWebhook);
+        yield whatsapp_service_1.whatsappService.processWebhook(simulatedWebhook);
         res.json({
             success: true,
             message: 'Mensaje simulado procesado',
-            result: result,
             timestamp: new Date().toISOString()
         });
     }
@@ -697,7 +533,7 @@ router.post('/simulate-message', (req, res) => __awaiter(void 0, void 0, void 0,
 router.get('/webhook/debug', (req, res) => {
     try {
         console.log('🔍 Debug webhook configuration requested');
-        const config = whatsapp_service_1.whatsappService.getWebhookDebugInfo();
+        const config = (0, whatsapp_utils_1.getWebhookDebugInfo)();
         res.json({
             success: true,
             webhook: {
@@ -705,7 +541,6 @@ router.get('/webhook/debug', (req, res) => {
                 path: config.path,
                 verifyTokenConfigured: config.verifyTokenConfigured,
                 verifyTokenLength: config.verifyTokenLength,
-                appSecretConfigured: config.appSecretConfigured,
                 signatureVerificationEnabled: config.signatureVerificationEnabled
             },
             whatsapp: {
@@ -741,7 +576,7 @@ router.post('/webhook/config', (req, res) => __awaiter(void 0, void 0, void 0, f
                 error: 'El campo "callbackUrl" es requerido'
             });
         }
-        const result = yield whatsapp_service_1.whatsappService.setWebhookUrl(callbackUrl);
+        const result = yield (0, whatsapp_utils_1.setWebhookUrl)(callbackUrl);
         if (result.success) {
             res.json({
                 success: true,
@@ -766,7 +601,7 @@ router.post('/webhook/config', (req, res) => __awaiter(void 0, void 0, void 0, f
 // GET /api/chat/webhook/health - Verificar salud del webhook (para debugging)
 router.get('/webhook/health', (req, res) => {
     try {
-        const config = whatsapp_service_1.whatsappService.getWebhookDebugInfo();
+        const config = (0, whatsapp_utils_1.getWebhookDebugInfo)();
         const timestamp = new Date().toISOString();
         // Verificar configuración crítica
         const issues = [];

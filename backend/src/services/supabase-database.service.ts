@@ -35,6 +35,7 @@ export interface SupabaseConversation {
   created_at: string;
   updated_at: string;
   metadata?: any;
+  takeover_mode?: 'spectator' | 'takeover' | 'ai_only';
 }
 
 export interface SupabaseMessage {
@@ -1026,6 +1027,160 @@ export class SupabaseDatabaseService {
     } catch (error) {
       console.error('❌ Error en searchConversations:', error);
       return [];
+    }
+  }
+
+  /**
+   * Obtener modo takeover de conversación
+   */
+  async getConversationTakeoverMode(conversationId: string): Promise<'spectator' | 'takeover' | 'ai_only' | null> {
+    if (!this.isEnabled || !supabase) {
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('takeover_mode')
+        .eq('id', conversationId)
+        .single();
+
+      if (error) {
+        console.error('Error obteniendo takeover_mode:', error);
+        return null;
+      }
+
+      return data?.takeover_mode || 'spectator';
+    } catch (error) {
+      console.error('Error en getConversationTakeoverMode:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Establecer modo takeover de conversación
+   */
+  async setConversationTakeoverMode(
+    conversationId: string,
+    mode: 'spectator' | 'takeover' | 'ai_only',
+    agentId?: string,
+    reason?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    if (!this.isEnabled || !supabase) {
+      return { success: false, error: '❌ Supabase no disponible' };
+    }
+
+    try {
+      const updateData: any = {
+        takeover_mode: mode,
+        updated_at: new Date().toISOString()
+      };
+
+      // Si es takeover, asignar al agente
+      if (mode === 'takeover' && agentId) {
+        updateData.assigned_agent_id = agentId;
+        updateData.ai_mode = 'inactive';
+      } else if (mode === 'spectator') {
+        // En modo espectador, mantener ai_mode activo pero sin agente asignado
+        updateData.assigned_agent_id = null;
+        updateData.ai_mode = 'active';
+      } else if (mode === 'ai_only') {
+        // En modo solo AI, desasignar agente y mantener AI activo
+        updateData.assigned_agent_id = null;
+        updateData.ai_mode = 'active';
+      }
+
+      const { error } = await supabase
+        .from('conversations')
+        .update(updateData)
+        .eq('id', conversationId);
+
+      if (error) {
+        console.error('Error actualizando takeover_mode:', error);
+        return { success: false, error: error.message };
+      }
+
+      // Log del cambio
+      console.log(`✅ Takeover mode actualizado: ${conversationId} -> ${mode} ${agentId ? `(agente: ${agentId})` : ''} ${reason ? `(razón: ${reason})` : ''}`);
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error en setConversationTakeoverMode:', error);
+      return { success: false, error: (error as Error).message };
+    }
+  }
+
+  /**
+   * Obtener conversaciones en modo espectador (que pueden ser tomadas)
+   */
+  async getSpectatorConversations(): Promise<SupabaseConversation[]> {
+    if (!this.isEnabled || !supabase) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('takeover_mode', 'spectator')
+        .eq('status', 'active')
+        .order('last_message_at', { ascending: false });
+
+      if (error) {
+        console.error('Error obteniendo conversaciones en espectador:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error en getSpectatorConversations:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Obtener conversaciones en takeover (controladas por agentes)
+   */
+  async getTakeoverConversations(): Promise<SupabaseConversation[]> {
+    if (!this.isEnabled || !supabase) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('takeover_mode', 'takeover')
+        .eq('status', 'active')
+        .order('last_message_at', { ascending: false });
+
+      if (error) {
+        console.error('Error obteniendo conversaciones en takeover:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error en getTakeoverConversations:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Verificar si una conversación puede ser procesada por el chatbot
+   */
+  async canChatbotProcessMessage(conversationId: string): Promise<boolean> {
+    if (!this.isEnabled || !supabase) {
+      return false;
+    }
+
+    try {
+      const mode = await this.getConversationTakeoverMode(conversationId);
+      // El chatbot puede procesar solo si está en modo 'spectator' o 'ai_only'
+      return mode === 'spectator' || mode === 'ai_only';
+    } catch (error) {
+      console.error('Error verificando si chatbot puede procesar:', error);
+      return false;
     }
   }
 }

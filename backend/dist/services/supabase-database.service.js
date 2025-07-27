@@ -872,6 +872,151 @@ class SupabaseDatabaseService {
             }
         });
     }
+    /**
+     * Obtener modo takeover de conversación
+     */
+    getConversationTakeoverMode(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return null;
+            }
+            try {
+                const { data, error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('takeover_mode')
+                    .eq('id', conversationId)
+                    .single();
+                if (error) {
+                    console.error('Error obteniendo takeover_mode:', error);
+                    return null;
+                }
+                return (data === null || data === void 0 ? void 0 : data.takeover_mode) || 'spectator';
+            }
+            catch (error) {
+                console.error('Error en getConversationTakeoverMode:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Establecer modo takeover de conversación
+     */
+    setConversationTakeoverMode(conversationId, mode, agentId, reason) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return { success: false, error: '❌ Supabase no disponible' };
+            }
+            try {
+                const updateData = {
+                    takeover_mode: mode,
+                    updated_at: new Date().toISOString()
+                };
+                // Si es takeover, asignar al agente
+                if (mode === 'takeover' && agentId) {
+                    updateData.assigned_agent_id = agentId;
+                    updateData.ai_mode = 'inactive';
+                }
+                else if (mode === 'spectator') {
+                    // En modo espectador, mantener ai_mode activo pero sin agente asignado
+                    updateData.assigned_agent_id = null;
+                    updateData.ai_mode = 'active';
+                }
+                else if (mode === 'ai_only') {
+                    // En modo solo AI, desasignar agente y mantener AI activo
+                    updateData.assigned_agent_id = null;
+                    updateData.ai_mode = 'active';
+                }
+                const { error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .update(updateData)
+                    .eq('id', conversationId);
+                if (error) {
+                    console.error('Error actualizando takeover_mode:', error);
+                    return { success: false, error: error.message };
+                }
+                // Log del cambio
+                console.log(`✅ Takeover mode actualizado: ${conversationId} -> ${mode} ${agentId ? `(agente: ${agentId})` : ''} ${reason ? `(razón: ${reason})` : ''}`);
+                return { success: true };
+            }
+            catch (error) {
+                console.error('Error en setConversationTakeoverMode:', error);
+                return { success: false, error: error.message };
+            }
+        });
+    }
+    /**
+     * Obtener conversaciones en modo espectador (que pueden ser tomadas)
+     */
+    getSpectatorConversations() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return [];
+            }
+            try {
+                const { data, error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('*')
+                    .eq('takeover_mode', 'spectator')
+                    .eq('status', 'active')
+                    .order('last_message_at', { ascending: false });
+                if (error) {
+                    console.error('Error obteniendo conversaciones en espectador:', error);
+                    return [];
+                }
+                return data || [];
+            }
+            catch (error) {
+                console.error('Error en getSpectatorConversations:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Obtener conversaciones en takeover (controladas por agentes)
+     */
+    getTakeoverConversations() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return [];
+            }
+            try {
+                const { data, error } = yield supabase_1.supabase
+                    .from('conversations')
+                    .select('*')
+                    .eq('takeover_mode', 'takeover')
+                    .eq('status', 'active')
+                    .order('last_message_at', { ascending: false });
+                if (error) {
+                    console.error('Error obteniendo conversaciones en takeover:', error);
+                    return [];
+                }
+                return data || [];
+            }
+            catch (error) {
+                console.error('Error en getTakeoverConversations:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Verificar si una conversación puede ser procesada por el chatbot
+     */
+    canChatbotProcessMessage(conversationId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return false;
+            }
+            try {
+                const mode = yield this.getConversationTakeoverMode(conversationId);
+                // El chatbot puede procesar solo si está en modo 'spectator' o 'ai_only'
+                return mode === 'spectator' || mode === 'ai_only';
+            }
+            catch (error) {
+                console.error('Error verificando si chatbot puede procesar:', error);
+                return false;
+            }
+        });
+    }
 }
 exports.SupabaseDatabaseService = SupabaseDatabaseService;
 // Instancia singleton

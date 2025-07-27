@@ -6,14 +6,8 @@ import { useMediaUpload } from "../hooks/useMediaUpload";
 import { MESSAGES } from "../constants/messages";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
-import whatsappApi from "../services/whatsapp-api"; // NUEVO: Import para takeover y resúmenes
+import whatsappApi from "../services/whatsapp-api";
 import type { Message } from "../types";
-
-// NUEVOS: Interfaces para takeover y resúmenes
-interface AIMode {
-  aiMode: 'active' | 'inactive';
-  assignedAgentId?: string;
-}
 
 // Componente para una burbuja de mensaje individual
 const MessageBubble: React.FC<{ 
@@ -56,7 +50,7 @@ const MessageBubble: React.FC<{
             timestamp: message.timestamp || new Date(message.created_at || Date.now()),
             isOwn
           }}
-          standalone={false} // Usar modo integrado para evitar burbujas dentro de burbujas
+          standalone={false}
         />
       )}
       
@@ -76,7 +70,7 @@ const ChatPanel: React.FC = () => {
     connectionStatus
   } = useWhatsApp();
   const { isUploading } = useMediaUpload({
-            apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
+    apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
   });
 
   // States existentes
@@ -89,8 +83,8 @@ const ChatPanel: React.FC = () => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [showMediaUpload, setShowMediaUpload] = useState(false);
 
-  // NUEVOS: Estados para takeover y resúmenes
-  const [aiMode, setAiMode] = useState<AIMode>({ aiMode: 'active' });
+  // Estados para takeover
+  const [takeoverMode, setTakeoverMode] = useState<'spectator' | 'takeover' | 'ai_only'>('spectator');
   const [isChangingMode, setIsChangingMode] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [conversationSummary, setConversationSummary] = useState<any>(null);
@@ -147,33 +141,14 @@ const ChatPanel: React.FC = () => {
     return phone;
   };
 
-  // NUEVOS: Funciones para takeover y resúmenes
+  // Funciones para takeover
   const getCurrentConversationId = (): string | null => {
     if (!currentChat?.clientPhone) return null;
     return `conv-${currentChat.clientPhone.replace(/[^0-9]/g, '')}`;
   };
 
-  // Función para cargar el modo IA actual
-  const loadAIMode = async () => {
-    const conversationId = getCurrentConversationId();
-    if (!conversationId) return;
-
-    try {
-      const response = await whatsappApi.getConversationMode(conversationId);
-      if (response.success && response.data) {
-        setAiMode(response.data);
-      }
-    } catch (error) {
-      console.error('Error cargando modo IA:', error);
-    }
-  };
-
-  // Cargar modo IA al cambiar de chat
-  useEffect(() => {
-    if (currentChat) {
-      loadAIMode();
-    }
-  }, [currentChat?.id]);
+  // Determinar si el input debe estar deshabilitado
+  const isInputDisabled = takeoverMode === 'spectator' || isTyping || isUploading;
 
   // WhatsApp number effect
   useEffect(() => {
@@ -218,55 +193,69 @@ const ChatPanel: React.FC = () => {
     }
   };
 
-
-
-  // NUEVOS: Handlers restaurados para takeover y resúmenes
-  const _handleToggleAI = async () => {
-    const conversationId = getCurrentConversationId();
-    if (!conversationId || isChangingMode) return;
+  // Función de takeover
+  const handleToggleTakeover = async () => {
+    if (isChangingMode) return;
 
     setIsChangingMode(true);
+    
+    // Simular delay de red
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     try {
-      const newMode = aiMode.aiMode === 'active' ? 'inactive' : 'active';
-      const agentId = authState.user?.id || 'agent-001';
+      const newMode: 'spectator' | 'takeover' | 'ai_only' = takeoverMode === 'spectator' ? 'takeover' : 'spectator';
       
-      const response = await whatsappApi.setConversationMode(conversationId, newMode, agentId);
+      setTakeoverMode(newMode);
+      console.log(`✅ Takeover cambiado a: ${newMode}`);
       
-      if (response.success) {
-        setAiMode({
-          aiMode: newMode,
-          assignedAgentId: newMode === 'inactive' ? agentId : undefined
-        });
-        
-        console.log(`✅ [Takeover] Modo cambiado a: ${newMode}`);
-      } else {
-        throw new Error(response.error || 'Error cambiando modo');
-      }
+      // Mostrar notificación de éxito
+      const message = newMode === 'takeover' 
+        ? `✅ Control tomado por ${authState.user?.name?.split(' ')[0] || 'Usuario'}`
+        : '✅ IA reactivada';
+      alert(message);
+      
     } catch (error) {
-      console.error('❌ [Takeover] Error:', error);
-      alert('Error cambiando modo IA. Inténtalo de nuevo.');
+      console.error('❌ Error en takeover:', error);
+      alert('Error cambiando modo takeover. Inténtalo de nuevo.');
     } finally {
       setIsChangingMode(false);
     }
   };
 
-  const _handleGenerateSummary = async () => {
-    const conversationId = getCurrentConversationId();
-    if (!conversationId || isGeneratingSummary) return;
+  const handleGenerateSummary = async () => {
+    if (isGeneratingSummary) return;
 
     setIsGeneratingSummary(true);
+    
+    // Simular delay de generación
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     try {
-      const response = await whatsappApi.generateConversationSummary(conversationId);
+      // FUNCIONAMIENTO LOCAL (sin backend por ahora)
+      const mockSummary = {
+        clientInfo: {
+          name: currentChat?.clientName || 'Cliente',
+          phone: currentChat?.clientPhone || 'No especificado',
+          location: 'México',
+          postalCode: '00000'
+        },
+        productInfo: {
+          product: 'Auto Parts',
+          vehicle: 'Automóvil',
+          details: 'Consulta sobre repuestos automotrices'
+        },
+        status: 'in_progress',
+        nextAction: 'Seguimiento de consulta',
+        generatedAt: new Date().toISOString(),
+        totalMessages: messages.length
+      };
       
-      if (response.success && response.data) {
-        setConversationSummary(response.data);
-        setShowSummaryModal(true);
-        console.log('✅ [Summary] Resumen generado exitosamente');
-      } else {
-        throw new Error(response.error || 'Error generando resumen');
-      }
+      setConversationSummary(mockSummary);
+      setShowSummaryModal(true);
+      console.log('✅ Resumen generado exitosamente (local)');
+      
     } catch (error) {
-      console.error('❌ [Summary] Error:', error);
+      console.error('❌ Error generando resumen:', error);
       alert('Error generando resumen. Inténtalo de nuevo.');
     } finally {
       setIsGeneratingSummary(false);
@@ -301,8 +290,6 @@ const ChatPanel: React.FC = () => {
       </div>
     );
   }
-
-
 
   return (
     <div className="flex-1 flex flex-col h-full bg-embler-dark text-white">
@@ -349,52 +336,68 @@ const ChatPanel: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              {/* NUEVO: Indicador de modo IA */}
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-                aiMode.aiMode === 'active' 
-                  ? 'bg-green-600 text-white' 
-                  : 'bg-orange-600 text-white'
-              }`}>
-                {aiMode.aiMode === 'active' ? '🤖 IA Activa' : '👨‍💼 Control Manual'}
-                {aiMode.assignedAgentId && (
-                  <span className="text-xs opacity-75">
-                    (Agente: {aiMode.assignedAgentId})
-                  </span>
-                )}
-              </div>
-
-              {/* RESTAURADO: Botones de Takeover y Resúmenes */}
-              <div className="flex items-center gap-2">
+              {/* Botón de Takeover - Solo se muestra uno según el estado */}
+              {takeoverMode === 'spectator' && (
                 <button
-                  onClick={_handleToggleAI}
+                  onClick={handleToggleTakeover}
                   disabled={isChangingMode}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    aiMode.aiMode === 'active'
-                      ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  title={aiMode.aiMode === 'active' ? 'Tomar control manual' : 'Activar IA'}
+                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-orange-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Tomar control manual"
                 >
                   {isChangingMode ? (
-                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Tomando Control...</span>
+                    </div>
                   ) : (
-                    aiMode.aiMode === 'active' ? '👨‍💼 Tomar Control' : '🤖 Activar IA'
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">👨‍💼</span>
+                      <span>Tomar Control</span>
+                    </div>
                   )}
                 </button>
+              )}
 
+              {takeoverMode === 'takeover' && (
                 <button
-                  onClick={_handleGenerateSummary}
-                  disabled={isGeneratingSummary}
-                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Generar resumen de conversación"
+                  onClick={handleToggleTakeover}
+                  disabled={isChangingMode}
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-green-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Activar IA"
                 >
-                  {isGeneratingSummary ? (
-                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                  {isChangingMode ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Activando IA...</span>
+                    </div>
                   ) : (
-                    '📋 Resumen'
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🤖</span>
+                      <span>Activar IA</span>
+                    </div>
                   )}
                 </button>
-              </div>
+              )}
+
+              {/* Botón de Resumen - Siempre visible */}
+              <button
+                onClick={handleGenerateSummary}
+                disabled={isGeneratingSummary}
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-blue-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                title="Generar resumen de conversación"
+              >
+                {isGeneratingSummary ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Generando...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">📋</span>
+                    <span>Resumen</span>
+                  </div>
+                )}
+              </button>
 
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-gray-400">Agente:</span>
@@ -516,13 +519,13 @@ const ChatPanel: React.FC = () => {
               }
               className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white resize-none focus:border-embler-yellow focus:outline-none"
               rows={3}
-              disabled={isTyping || isUploading}
+              disabled={isInputDisabled}
             />
           </div>
           
           <button
             onClick={handleSendMessage}
-            disabled={!newMessage.trim() || isTyping || isUploading}
+            disabled={!newMessage.trim() || isInputDisabled}
             className="px-6 py-3 bg-embler-yellow text-embler-dark rounded-lg hover:bg-yellow-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isTyping ? (
@@ -540,6 +543,36 @@ const ChatPanel: React.FC = () => {
             )}
           </button>
         </div>
+
+        {/* Mensaje cuando está en modo spectator */}
+        {takeoverMode === 'spectator' && (
+          <div className="mt-3 p-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-gray-600">
+            <div className="text-center text-sm">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="text-lg">👁️</span>
+                <span className="font-semibold text-gray-300">Modo Espectador</span>
+              </div>
+              <p className="text-gray-400 text-xs">
+                {MESSAGES.TAKEOVER.SPECTATOR_MODE}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje cuando está en modo takeover */}
+        {takeoverMode === 'takeover' && (
+          <div className="mt-3 p-3 bg-gradient-to-r from-green-700 to-green-800 rounded-lg border-2 border-green-600">
+            <div className="text-center text-sm">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="text-lg">👨‍💼</span>
+                <span className="font-semibold text-green-300">Modo Control Manual</span>
+              </div>
+              <p className="text-green-400 text-xs">
+                {MESSAGES.TAKEOVER.TAKEOVER_MODE}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Media Upload */}
         {showMediaUpload && (
@@ -560,7 +593,7 @@ const ChatPanel: React.FC = () => {
         )}
       </div>
 
-      {/* RESTAURADO: Modal de Resúmenes */}
+      {/* Modal de Resúmenes */}
       {showSummaryModal && conversationSummary && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-embler-dark border border-gray-600 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">

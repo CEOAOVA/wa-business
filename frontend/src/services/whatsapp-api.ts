@@ -389,6 +389,64 @@ class WhatsAppApiService {
     }>(endpoint);
   }
 
+  /**
+   * Obtener modo takeover de una conversación
+   */
+  async getTakeoverMode(conversationId: string): Promise<ApiResponse<{
+    conversationId: string;
+    takeoverMode: 'spectator' | 'takeover' | 'ai_only';
+  }>> {
+    console.log('🔍 Obteniendo modo takeover:', conversationId);
+    
+    return this.request(`/chatbot/takeover/${conversationId}`);
+  }
+
+  /**
+   * Cambiar modo takeover de una conversación
+   */
+  async setTakeoverMode(data: {
+    conversationId: string;
+    mode: 'spectator' | 'takeover' | 'ai_only';
+    agentId?: string;
+    reason?: string;
+  }): Promise<ApiResponse<{
+    conversationId: string;
+    takeoverMode: 'spectator' | 'takeover' | 'ai_only';
+    assignedAgentId?: string;
+    reason?: string;
+  }>> {
+    console.log('🔄 Cambiando modo takeover:', data);
+    
+    return this.request('/chatbot/takeover', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Obtener conversaciones en modo espectador
+   */
+  async getSpectatorConversations(): Promise<ApiResponse<{
+    conversations: any[];
+    count: number;
+  }>> {
+    console.log('👀 Obteniendo conversaciones en espectador');
+    
+    return this.request('/chatbot/conversations/spectator');
+  }
+
+  /**
+   * Obtener conversaciones en takeover
+   */
+  async getTakeoverConversations(): Promise<ApiResponse<{
+    conversations: any[];
+    count: number;
+  }>> {
+    console.log('👤 Obteniendo conversaciones en takeover');
+    
+    return this.request('/chatbot/conversations/takeover');
+  }
+
   // ============================================
   // MÉTODOS DE UTILIDAD
   // ============================================

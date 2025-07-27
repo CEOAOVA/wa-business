@@ -5,6 +5,7 @@
 import express from 'express';
 import { chatbotService } from '../services/chatbot.service';
 import { whatsappService } from '../services/whatsapp.service';
+import { databaseService } from '../services/database.service';
 
 const router = express.Router();
 
@@ -225,6 +226,124 @@ router.post('/test-ai', async (req: any, res: any) => {
     return res.status(500).json({
       success: false,
       error: error.message || 'Error interno del servidor'
+    });
+  }
+});
+
+// POST /api/chatbot/takeover - Cambiar modo takeover
+router.post('/takeover', async (req: any, res: any) => {
+  try {
+    const { conversationId, mode, agentId, reason } = req.body;
+    
+    if (!conversationId || !mode) {
+      return res.status(400).json({
+        success: false,
+        error: 'Los campos "conversationId" y "mode" son requeridos'
+      });
+    }
+
+    if (!['spectator', 'takeover', 'ai_only'].includes(mode)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Modo inválido. Debe ser: spectator, takeover, o ai_only'
+      });
+    }
+
+    const result = await databaseService.setConversationTakeoverMode(
+      conversationId, 
+      mode, 
+      agentId, 
+      reason
+    );
+
+    if (result.success) {
+      res.json({
+        success: true,
+        message: `Modo takeover actualizado a: ${mode}`,
+        data: {
+          conversationId,
+          takeoverMode: mode,
+          assignedAgentId: agentId,
+          reason
+        }
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Error actualizando modo takeover',
+        details: result.error
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      details: error.message
+    });
+  }
+});
+
+// GET /api/chatbot/takeover/:conversationId - Obtener modo takeover
+router.get('/takeover/:conversationId', async (req: any, res: any) => {
+  try {
+    const { conversationId } = req.params;
+    
+    const mode = await databaseService.getConversationTakeoverMode(conversationId);
+    
+    res.json({
+      success: true,
+      data: {
+        conversationId,
+        takeoverMode: mode || 'spectator'
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      details: error.message
+    });
+  }
+});
+
+// GET /api/chatbot/conversations/spectator - Obtener conversaciones en espectador
+router.get('/conversations/spectator', async (req: any, res: any) => {
+  try {
+    const conversations = await databaseService.getSpectatorConversations();
+    
+    res.json({
+      success: true,
+      data: {
+        conversations,
+        count: conversations.length
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      details: error.message
+    });
+  }
+});
+
+// GET /api/chatbot/conversations/takeover - Obtener conversaciones en takeover
+router.get('/conversations/takeover', async (req: any, res: any) => {
+  try {
+    const conversations = await databaseService.getTakeoverConversations();
+    
+    res.json({
+      success: true,
+      data: {
+        conversations,
+        count: conversations.length
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      details: error.message
     });
   }
 });

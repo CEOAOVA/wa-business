@@ -19,6 +19,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const chatbot_service_1 = require("../services/chatbot.service");
 const whatsapp_service_1 = require("../services/whatsapp.service");
+const database_service_1 = require("../services/database.service");
 const router = express_1.default.Router();
 /**
  * POST /api/chatbot/send-message
@@ -203,6 +204,112 @@ router.post('/test-ai', (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(500).json({
             success: false,
             error: error.message || 'Error interno del servidor'
+        });
+    }
+}));
+// POST /api/chatbot/takeover - Cambiar modo takeover
+router.post('/takeover', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { conversationId, mode, agentId, reason } = req.body;
+        if (!conversationId || !mode) {
+            return res.status(400).json({
+                success: false,
+                error: 'Los campos "conversationId" y "mode" son requeridos'
+            });
+        }
+        if (!['spectator', 'takeover', 'ai_only'].includes(mode)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Modo inválido. Debe ser: spectator, takeover, o ai_only'
+            });
+        }
+        const result = yield database_service_1.databaseService.setConversationTakeoverMode(conversationId, mode, agentId, reason);
+        if (result.success) {
+            res.json({
+                success: true,
+                message: `Modo takeover actualizado a: ${mode}`,
+                data: {
+                    conversationId,
+                    takeoverMode: mode,
+                    assignedAgentId: agentId,
+                    reason
+                }
+            });
+        }
+        else {
+            res.status(500).json({
+                success: false,
+                error: 'Error actualizando modo takeover',
+                details: result.error
+            });
+        }
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor',
+            details: error.message
+        });
+    }
+}));
+// GET /api/chatbot/takeover/:conversationId - Obtener modo takeover
+router.get('/takeover/:conversationId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { conversationId } = req.params;
+        const mode = yield database_service_1.databaseService.getConversationTakeoverMode(conversationId);
+        res.json({
+            success: true,
+            data: {
+                conversationId,
+                takeoverMode: mode || 'spectator'
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor',
+            details: error.message
+        });
+    }
+}));
+// GET /api/chatbot/conversations/spectator - Obtener conversaciones en espectador
+router.get('/conversations/spectator', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const conversations = yield database_service_1.databaseService.getSpectatorConversations();
+        res.json({
+            success: true,
+            data: {
+                conversations,
+                count: conversations.length
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor',
+            details: error.message
+        });
+    }
+}));
+// GET /api/chatbot/conversations/takeover - Obtener conversaciones en takeover
+router.get('/conversations/takeover', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const conversations = yield database_service_1.databaseService.getTakeoverConversations();
+        res.json({
+            success: true,
+            data: {
+                conversations,
+                count: conversations.length
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor',
+            details: error.message
         });
     }
 }));

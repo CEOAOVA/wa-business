@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Takeover API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Takeover API</h1>
+    
+    <div class="test-section">
+        <h3>1. Obtener Modo Takeover</h3>
+        <input type="text" id="conversationId" placeholder="ID de conversación" value="conv-1234567890" style="width: 200px; padding: 5px;">
+        <button onclick="getTakeoverMode()">Obtener Modo</button>
+        <div id="getResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Cambiar Modo Takeover</h3>
+        <select id="newMode" style="padding: 5px;">
+            <option value="spectator">Spectator</option>
+            <option value="takeover">Takeover</option>
+            <option value="ai_only">AI Only</option>
+        </select>
+        <button onclick="setTakeoverMode()">Cambiar Modo</button>
+        <div id="setResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Obtener Conversaciones en Espectador</h3>
+        <button onclick="getSpectatorConversations()">Obtener Conversaciones</button>
+        <div id="spectatorResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+
+        async function makeRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function getTakeoverMode() {
+            const conversationId = document.getElementById('conversationId').value;
+            const resultDiv = document.getElementById('getResult');
+            
+            resultDiv.innerHTML = '🔄 Cargando...';
+            
+            const result = await makeRequest(`/chatbot/takeover/${conversationId}`);
+            
+            if (result.success) {
+                resultDiv.innerHTML = `<div class="success">✅ Éxito: ${JSON.stringify(result.data, null, 2)}</div>`;
+            } else {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${JSON.stringify(result, null, 2)}</div>`;
+            }
+        }
+
+        async function setTakeoverMode() {
+            const conversationId = document.getElementById('conversationId').value;
+            const mode = document.getElementById('newMode').value;
+            const resultDiv = document.getElementById('setResult');
+            
+            resultDiv.innerHTML = '🔄 Cambiando modo...';
+            
+            const result = await makeRequest('/chatbot/takeover', {
+                method: 'POST',
+                body: JSON.stringify({
+                    conversationId,
+                    mode,
+                    agentId: 'test-agent-001',
+                    reason: 'Prueba desde HTML'
+                })
+            });
+            
+            if (result.success) {
+                resultDiv.innerHTML = `<div class="success">✅ Éxito: ${JSON.stringify(result.data, null, 2)}</div>`;
+            } else {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${JSON.stringify(result, null, 2)}</div>`;
+            }
+        }
+
+        async function getSpectatorConversations() {
+            const resultDiv = document.getElementById('spectatorResult');
+            
+            resultDiv.innerHTML = '🔄 Cargando conversaciones...';
+            
+            const result = await makeRequest('/chatbot/conversations/spectator');
+            
+            if (result.success) {
+                resultDiv.innerHTML = `<div class="success">✅ Éxito: ${JSON.stringify(result.data, null, 2)}</div>`;
+            } else {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${JSON.stringify(result, null, 2)}</div>`;
+            }
+        }
+    </script>
+</body>
+</html> 

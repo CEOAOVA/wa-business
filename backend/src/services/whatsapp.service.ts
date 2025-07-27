@@ -301,553 +301,210 @@ export class WhatsAppService {
    * Procesar webhook de WhatsApp
    */
   async processWebhook(body: WhatsAppWebhookMessage) {
-    console.log('📨 Procesando webhook de WhatsApp:', JSON.stringify(body, null, 2));
-
-    const processedMessages: any[] = [];
-
     try {
-      if (body.object === 'whatsapp_business_account') {
-        for (const entry of body.entry || []) {
-          for (const change of entry.changes || []) {
-            if (change.field === 'messages') {
-              const value = change.value;
-              
-              // Procesar mensajes entrantes
-              for (const message of value.messages || []) {
-                const contact = value.contacts?.find(c => c.wa_id === message.from);
-                
-                try {
-                  // Determinar tipo de mensaje
-                  let messageType = MessageType.TEXT;
-                  let content = '';
-                  
-                  if (message.type === 'text' && message.text?.body) {
-                    content = message.text.body;
-                  } else if (message.type === 'image') {
-                    content = '[Imagen]'; // Simplificado por ahora
-                    // TODO: Implementar soporte para imágenes
-                  } else {
-                    content = `[${message.type.toUpperCase()}]`;
-                  }
+      console.log('📨 Procesando webhook de WhatsApp...');
 
-                  // Guardar en la base de datos
-                  const result = await databaseService.processIncomingMessage({
-                    waMessageId: message.id,
-                    fromWaId: message.from,
-                    toWaId: value.metadata.phone_number_id,
-                    content,
-                    messageType,
-                    timestamp: new Date(parseInt(message.timestamp) * 1000),
-                    contactName: contact?.profile?.name
-                  });
-                
-                  // Generar estructura temporal si el método es un stub
-                  const processedMessage = {
-                    id: result?.message?.id || `temp-msg-${Date.now()}`,
-                    waMessageId: message.id,
-                    from: message.from,
-                    to: value.metadata.phone_number_id,
-                    message: content,
-                    timestamp: result?.message?.timestamp || new Date(),
-                    type: message.type,
-                    contact: contact ? {
-                      name: contact.profile.name,
-                      wa_id: contact.wa_id
-                    } : undefined,
-                    read: false,
-                    conversationId: result?.conversation?.id || `temp-conv-${message.from}`,
-                    contactId: result?.contact?.id || `temp-contact-${message.from}`
-                  };
-
-                  processedMessages.push(processedMessage);
-                  console.log('📩 Mensaje guardado en BD:', processedMessage);
-
-                  // ============================================
-                  // NUEVA LÓGICA DE TAKEOVER - VERIFICAR MODO AI
-                  // ============================================
-                  
-                  // Solo procesar con IA si es un mensaje de texto del usuario
-                  if (message.type === 'text' && message.text?.body) {
-                    // Almacenar el último mensaje para referencia futura
-                    this.lastMessages.set(message.from, content);
-                    
-                    try {
-                      // TODO: VERIFICAR MODO AI CON SUPABASE
-                      // const aiModeInfo = await databaseService.getConversationAIMode(result.conversation.id);
-                      // const isAIActive = aiModeInfo?.aiMode === 'active';
-                      
-                      // IMPLEMENTACIÓN TEMPORAL - Asumir IA activa por defecto
-                      const isAIActive = true; // Cambiar a false para probar modo manual
-                      
-                      if (isAIActive) {
-                        console.log(`🤖 [Takeover] IA está ACTIVA para conversación: ${result.conversation.id}`);
-                        
-                        // Procesar mensaje con IA
-                        const chatbotResponse = await chatbotService.processWhatsAppMessage(
-                          message.from, 
-                          content
-                        );
-                        
-                        // Si el chatbot quiere enviar una respuesta
-                        if (chatbotResponse.shouldSend && chatbotResponse.response) {
-                          console.log(`🤖 [Takeover] Enviando respuesta automática de IA: ${chatbotResponse.response.substring(0, 100)}...`);
-                          
-                          // Enviar respuesta automática con delay natural
-                          setTimeout(async () => {
-                            try {
-                              const sendResult = await this.sendMessage({
-                                to: message.from,
-                                message: chatbotResponse.response,
-                                isChatbotResponse: true // Indicar que es una respuesta del chatbot
-                              });
-                              
-                              if (sendResult.success && sendResult.messageId) {
-                                console.log('✅ Respuesta IA enviada exitosamente');
-                                
-                                // Guardar mensaje del chatbot en la base de datos DESPUÉS de enviarlo
-                                if (chatbotResponse.conversationState) {
-                                  // Buscar el último mensaje del asistente en la conversación
-                                  const assistantMessages = chatbotResponse.conversationState.messages.filter(
-                                    msg => msg.role === 'assistant'
-                                  );
-                                  const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
-                                  
-                                  if (lastAssistantMessage) {
-                                    await chatbotService.saveChatbotMessageToDatabase(
-                                      message.from,
-                                      lastAssistantMessage,
-                                      sendResult.messageId
-                                    );
-                                    console.log('💾 Mensaje del chatbot guardado en BD con WhatsApp ID');
-                                  }
-                                }
-                              } else {
-                                console.error('❌ Error enviando respuesta IA:', sendResult.error);
-                              }
-                            } catch (sendError) {
-                              console.error('❌ Error enviando respuesta IA:', sendError);
-                            }
-                          }, 2000);
-                        } else {
-                          console.log(`⚠️ [Takeover] IA decidió no responder para: ${message.from}`);
-                        }
-                      } else {
-                        console.log(`👤 [Takeover] IA está INACTIVA, mensaje disponible para agente humano`);
-                      }
-                    } catch (aiError) {
-                      console.error('❌ Error procesando con IA:', aiError);
-                      // En caso de error, enviar respuesta de fallback
-                      const fallbackMessage = `¡Hola! 👋 Hemos recibido tu mensaje. Un agente te responderá pronto.\n\n*Embler - Siempre conectados* 🚀`;
-                      setTimeout(async () => {
-                        await this.sendMessage({
-                          to: message.from,
-                          message: fallbackMessage
-                        });
-                      }, 2000);
-                    }
-                  }
-
-                  // El procesamiento con IA ya se realiza arriba
-                } catch (dbError) {
-                  console.error('❌ Error guardando mensaje en BD:', dbError);
-                  // Continuar procesando otros mensajes
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Emitir eventos de Socket.IO SOLO UNA VEZ al final del procesamiento
-      if (this.io && processedMessages.length > 0) {
-        // Emitir para cada mensaje procesado
-        for (const processedMessage of processedMessages) {
-          this.io.to(`conversation_${processedMessage.conversationId}`).emit('new_message', {
-            message: processedMessage,
-            conversation: {
-              id: processedMessage.conversationId,
-              contactId: processedMessage.contactId,
-              contactName: processedMessage.contact?.name || processedMessage.from,
-              unreadCount: 1 // Valor por defecto
-            }
-          });
-          
-          // También emitir para actualizar lista de conversaciones
-          this.io.emit('conversation_updated', {
-            conversationId: processedMessage.conversationId,
-            lastMessage: processedMessage,
-            unreadCount: 1 // Valor por defecto
-          });
-        }
-        
-        console.log(`🌐 Eventos Socket.IO emitidos para ${processedMessages.length} mensajes`);
-      }
-
-      return {
-        success: true,
-        messages: processedMessages,
-        processed: processedMessages.length
-      };
-    } catch (error: any) {
-      console.error('❌ Error procesando webhook:', error);
-      return {
-        success: false,
-        error: error.message,
-        messages: []
-      };
-    }
-  }
-
-  /**
-   * Procesar mensaje con IA y enviar respuesta inteligente
-   */
-  private async sendAutoReply(to: string, clientName: string) {
-    try {
-      console.log('🤖 Procesando mensaje con IA para:', to);
-      
-      // Obtener el último mensaje del usuario para enviarlo al chatbot
-      const lastUserMessage = await this.getLastUserMessage(to);
-      
-      if (!lastUserMessage) {
-        console.warn('⚠️ No se encontró mensaje del usuario para procesar');
+      if (!body.entry || body.entry.length === 0) {
+        console.log('⚠️ Webhook sin entradas');
         return;
       }
-      
-      // Procesar mensaje con el servicio de chatbot
-      const chatbotResult = await chatbotService.processWhatsAppMessage(to, lastUserMessage);
-      
-      if (chatbotResult.shouldSend && chatbotResult.response) {
-        console.log(`🧠 Respuesta IA generada: ${chatbotResult.response.substring(0, 100)}...`);
-        
-        // Esperar 2 segundos antes de responder (más natural)
-        setTimeout(async () => {
-          await this.sendMessage({
-            to: to,
-            message: chatbotResult.response
-          });
-          
-          console.log('✅ Respuesta IA enviada exitosamente');
-        }, 2000);
-        
-      } else {
-        console.warn('⚠️ El chatbot decidió no enviar respuesta');
-      }
-      
-    } catch (error: any) {
-      console.error('❌ Error procesando mensaje con IA:', error);
-      
-      // Fallback a respuesta básica en caso de error
-      const fallbackMessage = `¡Hola ${clientName}! 👋\n\nGracias por contactarnos. Estamos procesando tu mensaje y te responderemos pronto.\n\n*Embler - Siempre conectados* 🚀`;
-      
-      setTimeout(async () => {
-        await this.sendMessage({
-          to: to,
-          message: fallbackMessage
-        });
-      }, 2000);
-    }
-  }
 
-  /**
-   * Obtener el último mensaje del usuario para procesarlo con IA
-   */
-  private async getLastUserMessage(phoneNumber: string): Promise<string | null> {
-    try {
-      // TODO: En producción esto vendría de la base de datos
-      // Por ahora, como es una simulación, vamos a almacenar temporalmente los últimos mensajes
-      return this.lastMessages.get(phoneNumber) || null;
-    } catch (error) {
-      console.error('❌ Error obteniendo último mensaje:', error);
-      return null;
-    }
-  }
+      for (const entry of body.entry) {
+        if (!entry.changes || entry.changes.length === 0) continue;
 
-  /**
-   * Obtener conversaciones con mensajes
-   */
-  async getConversations(limit: number = 50, offset: number = 0) {
-    try {
-      const conversations = await databaseService.getConversations(limit, offset);
-      const stats = await databaseService.getStats();
+        for (const change of entry.changes) {
+          if (change.field !== 'messages') continue;
 
-      // Obtener información de contactos para cada conversación
-      const conversationsWithContacts = await Promise.all(
-        conversations.map(async (conv: any) => {
-          let contact = null;
-          if (conv.contact_id) {
-            contact = await databaseService.getContactById(conv.contact_id);
+          const value = change.value;
+          if (!value.messages || value.messages.length === 0) continue;
+
+          for (const message of value.messages) {
+            await this.processIncomingMessage(message, value.contacts);
           }
-
-          return {
-            id: conv.id,
-            contactId: conv.contact_id,
-            contactName: contact?.name || 'Contacto Desconocido',
-            contactWaId: contact?.phone_number || conv.contact_phone || 'N/A',
-            contact: contact,
-            lastMessage: conv.lastMessage ? {
-              id: conv.lastMessage.id,
-              content: conv.lastMessage.content,
-              timestamp: conv.lastMessage.timestamp,
-              isFromUs: conv.lastMessage.isFromUs
-            } : null,
-            unreadCount: conv.unread_count || 0,
-            totalMessages: conv._count?.messages || 0,
-            updatedAt: conv.updated_at,
-            status: conv.status,
-            ai_mode: conv.ai_mode
-          };
-        })
-      );
-
-      return {
-        success: true,
-        conversations: conversationsWithContacts,
-        total: stats.totalConversations,
-        unread: stats.unreadMessages
-      };
-    } catch (error: any) {
-      console.error('❌ Error obteniendo conversaciones:', error);
-      return {
-        success: false,
-        error: error.message,
-        conversations: [],
-        total: 0,
-        unread: 0
-      };
-    }
-  }
-
-  /**
-   * Obtener mensajes de una conversación específica
-   */
-  async getConversationMessages(conversationId: string, limit: number = 50, offset: number = 0) {
-    try {
-      const messages = await databaseService.getConversationMessages(conversationId, limit, offset);
-
-      return {
-        success: true,
-        messages: messages.map((msg: any) => ({
-          id: msg.id,
-          conversation_id: conversationId,
-          sender_type: msg.sender_type, // Mantener el tipo original del backend
-          content: msg.content,
-          message_type: msg.message_type || 'text',
-          whatsapp_message_id: msg.whatsapp_message_id,
-          is_read: msg.is_read || false,
-          metadata: msg.metadata || {},
-          created_at: msg.created_at || msg.timestamp,
-          // Propiedades adicionales para compatibilidad
-          waMessageId: msg.whatsapp_message_id,
-          messageType: msg.message_type || 'text',
-          timestamp: msg.created_at || msg.timestamp,
-          isFromUs: msg.sender_type === 'agent' || msg.sender_type === 'bot',
-          isDelivered: true,
-          senderId: msg.sender_type,
-          receiverId: conversationId
-        })).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) // Ordenar por timestamp ascendente (más antiguo primero)
-      };
-    } catch (error: any) {
-      console.error('❌ Error obteniendo mensajes de conversación:', error);
-      return {
-        success: false,
-        error: error.message,
-        messages: []
-      };
-    }
-  }
-
-  /**
-   * Marcar mensaje como leído
-   */
-  async markMessageAsRead(messageId: string) {
-    try {
-      const success = await databaseService.markMessageAsRead(messageId);
-      if (success) {
-        console.log(`📖 Mensaje ${messageId} marcado como leído`);
+        }
       }
-      return success;
-    } catch (error: any) {
-      console.error('❌ Error marcando mensaje como leído:', error);
-      return false;
+    } catch (error) {
+      console.error('❌ Error procesando webhook:', error);
     }
   }
 
   /**
-   * Marcar conversación como leída
+   * Procesar mensaje entrante individual
    */
-  async markConversationAsRead(conversationId: string) {
+  private async processIncomingMessage(message: any, contacts?: any[]) {
     try {
-      const success = await databaseService.markConversationAsRead(conversationId);
-      if (success) {
-        console.log(`📖 Conversación ${conversationId} marcada como leída`);
-      }
-      return success;
-    } catch (error: any) {
-      console.error('❌ Error marcando conversación como leída:', error);
-    return false;
-    }
-  }
-
-  /**
-   * Limpiar mensajes antiguos
-   */
-  async clearOldMessages(olderThanHours: number = 24): Promise<number> {
-    try {
-      const removedCount = await databaseService.cleanupOldMessages(olderThanHours);
-      console.log(`🗑️ ${removedCount} mensajes antiguos eliminados (${olderThanHours}h)`);
-      return removedCount;
-    } catch (error: any) {
-      console.error('❌ Error limpiando mensajes antiguos:', error);
-      return 0;
-    }
-  }
-
-  /**
-   * Obtener estadísticas
-   */
-  async getStats() {
-    try {
-      const stats = await databaseService.getStats();
-      return {
-        success: true,
-        data: stats
-      };
-    } catch (error: any) {
-      console.error('❌ Error obteniendo estadísticas:', error);
-      return {
-        success: false,
-        error: error.message,
-        data: null
-      };
-         }
-  }
-
-  /**
-   * Limpiar TODOS los mensajes (deprecado - usar clearOldMessages)
-   */
-  async clearAllMessages() {
-    console.log('⚠️ clearAllMessages deprecado - redirigiendo a limpiar mensajes de 1 hora');
-    return await this.clearOldMessages(1); // Limpiar mensajes de última hora
-  }
-
-  /**
-   * Verificar webhook (para Facebook)
-   */
-  verifyWebhook(mode: string, token: string, challenge: string) {
-    console.log('🔐 Verificando webhook:', { 
-      mode, 
-      token: token ? `${token.substring(0, 10)}...` : 'undefined', 
-      challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined',
-      expectedToken: whatsappConfig.webhook.verifyToken ? `${whatsappConfig.webhook.verifyToken.substring(0, 10)}...` : 'undefined'
-    });
-
-    // Debug detallado de comparación
-    console.log('🔐 Token comparison:', {
-      receivedToken: token,
-      expectedToken: whatsappConfig.webhook.verifyToken,
-      tokensMatch: token === whatsappConfig.webhook.verifyToken,
-      modeCorrect: mode === 'subscribe'
-    });
-
-    if (mode === 'subscribe' && token === whatsappConfig.webhook.verifyToken) {
-      console.log('✅ Webhook verificado exitosamente, devolviendo challenge:', challenge);
-      return challenge;
-    } else {
-      console.error('❌ Token de verificación incorrecto o modo inválido:', {
-        modeReceived: mode,
-        modeExpected: 'subscribe',
-        tokenReceived: token,
-        tokenExpected: whatsappConfig.webhook.verifyToken,
-        modeMatch: mode === 'subscribe',
-        tokenMatch: token === whatsappConfig.webhook.verifyToken
-      });
-      return null;
-    }
-  }
-
-  /**
-   * Obtener información de debug del webhook
-   */
-  getWebhookDebugInfo() {
-    return {
-      url: whatsappConfig.webhook.url,
-      path: whatsappConfig.webhook.path,
-      verifyTokenConfigured: !!whatsappConfig.webhook.verifyToken,
-      verifyTokenLength: whatsappConfig.webhook.verifyToken?.length || 0,
-      appSecretConfigured: !!whatsappConfig.webhook.appSecret,
-      signatureVerificationEnabled: whatsappConfig.webhook.enableSignatureVerification,
-      accessTokenConfigured: !!whatsappConfig.accessToken,
-      phoneNumberIdConfigured: !!whatsappConfig.phoneNumberId,
-      apiVersion: whatsappConfig.apiVersion
-    };
-  }
-
-  /**
-   * Configurar webhook URL (programáticamente)
-   */
-  async setWebhookUrl(callbackUrl: string) {
-    try {
-      const url = buildApiUrl(`${whatsappConfig.phoneNumberId}/subscribed_apps`);
+      const from = message.from;
+      const messageId = message.id;
+      const timestamp = new Date(parseInt(message.timestamp) * 1000);
+      const messageType = message.type;
       
-      const payload = {
-        subscribed_fields: ['messages']
-      };
+      console.log(`📨 Mensaje entrante de ${from}: ${messageType}`);
 
-      console.log('🔗 Configurando webhook:', { url, callbackUrl });
+      // Obtener información del contacto
+      const contact = contacts?.find(c => c.wa_id === from);
+      const contactName = contact?.profile?.name || 'Cliente';
 
-      const response = await axios.post(url, payload, {
-        headers: getHeaders()
+      // Procesar según el tipo de mensaje
+      if (messageType === 'text' && message.text) {
+        await this.processTextMessage(from, messageId, message.text.body, timestamp, contactName);
+      } else if (messageType === 'image' && message.image) {
+        await this.processMediaMessage(from, messageId, 'image', message.image, timestamp, contactName);
+      } else if (messageType === 'video' && message.video) {
+        await this.processMediaMessage(from, messageId, 'video', message.video, timestamp, contactName);
+      } else if (messageType === 'audio' && message.audio) {
+        await this.processMediaMessage(from, messageId, 'audio', message.audio, timestamp, contactName);
+      } else if (messageType === 'document' && message.document) {
+        await this.processMediaMessage(from, messageId, 'document', message.document, timestamp, contactName);
+      } else {
+        console.log(`⚠️ Tipo de mensaje no soportado: ${messageType}`);
+      }
+
+    } catch (error) {
+      console.error('❌ Error procesando mensaje entrante:', error);
+    }
+  }
+
+  /**
+   * Procesar mensaje de texto
+   */
+  private async processTextMessage(from: string, messageId: string, content: string, timestamp: Date, contactName: string) {
+    try {
+      console.log(`📝 Procesando texto de ${from}: ${content.substring(0, 50)}...`);
+
+      // Obtener o crear conversación
+      const conversation = await databaseService.getOrCreateConversationByPhone(from);
+      if (!conversation) {
+        console.error('❌ No se pudo obtener/crear conversación para', from);
+        return;
+      }
+
+      // NUEVO: Verificar si el chatbot puede procesar este mensaje
+      const canChatbotProcess = await databaseService.canChatbotProcessMessage(conversation.id);
+      
+      if (canChatbotProcess) {
+        console.log(`🤖 Chatbot procesará mensaje de ${from} (modo: ${conversation.takeover_mode || 'spectator'})`);
+        
+        // Procesar con chatbot
+        const chatbotResponse = await chatbotService.processWhatsAppMessage(from, content);
+        
+        if (chatbotResponse.shouldSend && chatbotResponse.response) {
+          // Enviar respuesta del chatbot
+          await this.sendMessage({
+            to: from,
+            message: chatbotResponse.response,
+            isChatbotResponse: true
+          });
+        }
+      } else {
+        console.log(`👤 Agente debe procesar mensaje de ${from} (modo: ${conversation.takeover_mode})`);
+        
+        // Solo guardar el mensaje en la base de datos, sin procesar con chatbot
+        await databaseService.createChatbotMessage({
+          conversationId: conversation.id,
+          contactPhone: from,
+          senderType: 'user',
+          content: content,
+          messageType: 'text',
+          whatsappMessageId: messageId,
+          metadata: {
+            contactName: contactName,
+            timestamp: timestamp.toISOString()
+          }
+        });
+
+        // Notificar a agentes conectados
+        this.emitSocketEvent('new_message', {
+          conversationId: conversation.id,
+          from: from,
+          content: content,
+          timestamp: timestamp,
+          contactName: contactName,
+          requiresAgentAction: true
+        });
+      }
+
+      // Actualizar conversación
+      await databaseService.markConversationAsRead(conversation.id);
+
+    } catch (error) {
+      console.error('❌ Error procesando mensaje de texto:', error);
+    }
+  }
+
+  /**
+   * Procesar mensaje multimedia
+   */
+  private async processMediaMessage(from: string, messageId: string, mediaType: string, mediaData: any, timestamp: Date, contactName: string) {
+    try {
+      console.log(`📷 Procesando ${mediaType} de ${from}`);
+
+      // Obtener o crear conversación
+      const conversation = await databaseService.getOrCreateConversationByPhone(from);
+      if (!conversation) {
+        console.error('❌ No se pudo obtener/crear conversación para', from);
+        return;
+      }
+
+      // Crear contenido descriptivo para el tipo de medio
+      let content = '';
+      let caption = '';
+      
+      switch (mediaType) {
+        case 'image':
+          content = '[Imagen]';
+          caption = mediaData.caption || '';
+          break;
+        case 'video':
+          content = '[Video]';
+          caption = mediaData.caption || '';
+          break;
+        case 'audio':
+          content = '[Audio]';
+          break;
+        case 'document':
+          content = `[Documento: ${mediaData.filename || 'archivo'}]`;
+          caption = mediaData.caption || '';
+          break;
+        default:
+          content = `[${mediaType.toUpperCase()}]`;
+      }
+
+      // Guardar mensaje multimedia en la base de datos
+      await databaseService.createChatbotMessage({
+        conversationId: conversation.id,
+        contactPhone: from,
+        senderType: 'user',
+        content: content,
+        messageType: mediaType as any,
+        whatsappMessageId: messageId,
+        metadata: {
+          contactName: contactName,
+          timestamp: timestamp.toISOString(),
+          mediaId: mediaData.id,
+          caption: caption,
+          filename: mediaData.filename,
+          mimeType: mediaData.mime_type
+        }
       });
 
-      return {
-        success: true,
-        data: response.data
-      };
-    } catch (error: any) {
-      console.error('❌ Error configurando webhook:', error.response?.data || error.message);
-      
-      return {
-        success: false,
-        error: error.response?.data?.error || error.message
-      };
-    }
-  }
+      // Notificar a agentes conectados
+      this.emitSocketEvent('new_message', {
+        conversationId: conversation.id,
+        from: from,
+        content: content,
+        timestamp: timestamp,
+        contactName: contactName,
+        mediaType: mediaType,
+        mediaData: mediaData,
+        requiresAgentAction: true
+      });
 
-  /**
-   * Validar formato de número de teléfono
-   */
-  validatePhoneNumber(phoneNumber: string): { isValid: boolean; formatted: string; error?: string } {
-    // Limpiar el número (solo dígitos)
-    const cleaned = phoneNumber.replace(/[^\d]/g, '');
-    
-    // Verificar longitud mínima
-    if (cleaned.length < 10) {
-      return {
-        isValid: false,
-        formatted: cleaned,
-        error: 'Número muy corto (mínimo 10 dígitos)'
-      };
-    }
+      // Actualizar conversación
+      await databaseService.markConversationAsRead(conversation.id);
 
-    // Verificar longitud máxima
-    if (cleaned.length > 15) {
-      return {
-        isValid: false,
-        formatted: cleaned,
-        error: 'Número muy largo (máximo 15 dígitos)'
-      };
+    } catch (error) {
+      console.error('❌ Error procesando mensaje multimedia:', error);
     }
-
-    // Para números mexicanos, asegurar que empiece con 52
-    let formatted = cleaned;
-    if (cleaned.length === 10 && !cleaned.startsWith('52')) {
-      formatted = '52' + cleaned;
-    }
-
-    return {
-      isValid: true,
-      formatted
-    };
   }
 
   /**

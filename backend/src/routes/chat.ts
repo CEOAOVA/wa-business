@@ -1,5 +1,7 @@
 import express from 'express';
 import { whatsappService } from '../services/whatsapp.service';
+import { databaseService } from '../services/database.service';
+import { validatePhoneNumber, verifyWebhook, getWebhookDebugInfo, setWebhookUrl, getStats } from '../utils/whatsapp-utils';
 import { webhookSecurity, securityLogger, SecureRequest } from '../middleware/webhook-security';
 
 const router = express.Router();
@@ -15,7 +17,7 @@ router.post('/send', async (req: any, res: any) => {
       });
     }
 
-    const phoneValidation = whatsappService.validatePhoneNumber(to);
+    const phoneValidation = validatePhoneNumber(to);
     if (!phoneValidation.isValid) {
       return res.status(400).json({
         success: false,
@@ -62,7 +64,7 @@ router.post('/template', async (req: any, res: any) => {
       });
     }
 
-    const phoneValidation = whatsappService.validatePhoneNumber(to);
+    const phoneValidation = validatePhoneNumber(to);
     if (!phoneValidation.isValid) {
       return res.status(400).json({
         success: false,
@@ -209,7 +211,7 @@ router.get('/webhook', (req: any, res: any) => {
     }
 
     // Verificar token - esto es crítico para la seguridad
-    const result = whatsappService.verifyWebhook(mode, token, challenge);
+    const result = verifyWebhook(mode, token, challenge);
     if (result) {
       console.log(`✅ [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
       // 🚀 IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
@@ -217,7 +219,7 @@ router.get('/webhook', (req: any, res: any) => {
       res.status(200).send(result);
     } else {
       console.error(`❌ [${requestId}] Webhook verification failed - token mismatch`);
-      console.error(`❌ [${requestId}] Expected token: ${whatsappService.getWebhookDebugInfo().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
+      console.error(`❌ [${requestId}] Expected token: ${getWebhookDebugInfo().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
       res.status(403).send('Forbidden: Invalid verify token');
     }
   } catch (error: any) {
@@ -272,14 +274,12 @@ router.post('/webhook', async (req: any, res: any) => {
     // Procesar webhook de forma asíncrona (no bloqueante)
     setImmediate(async () => {
       try {
-        const result = await whatsappService.processWebhook(req.body);
-        console.log(`✅ [${requestId}] Webhook procesado exitosamente: ${result.processed} mensajes`);
+        await whatsappService.processWebhook(req.body);
+        console.log(`✅ [${requestId}] Webhook procesado exitosamente`);
         
         // Opcional: Notificar via Socket.IO a clientes conectados
-        if (result.messages.length > 0) {
-          // TODO: Implementar notificación en tiempo real si es necesario
-          console.log(`📢 [${requestId}] ${result.messages.length} nuevos mensajes procesados`);
-        }
+        // TODO: Implementar notificación en tiempo real si es necesario
+        console.log(`📢 [${requestId}] Webhook procesado correctamente`);
       } catch (error: any) {
         console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente:`, error);
         // No podemos responder al webhook aquí, pero loggeamos para debugging
@@ -293,186 +293,8 @@ router.post('/webhook', async (req: any, res: any) => {
 });
 
 // ============================================
-// NUEVAS RUTAS PARA TAKEOVER Y RESÚMENES
+// RUTAS PARA TAKEOVER Y RESÚMENES
 // ============================================
-
-// POST /api/chat/conversations/:id/set-mode - Cambiar modo de IA (takeover)
-router.post('/conversations/:id/set-mode', async (req: any, res: any) => {
-  try {
-    const { id: conversationId } = req.params;
-    const { mode, agentId } = req.body;
-
-    // Validación
-    if (!mode || !['active', 'inactive'].includes(mode)) {
-      return res.status(400).json({
-        success: false,
-        error: 'El campo "mode" es requerido y debe ser "active" o "inactive"'
-      });
-    }
-
-    if (mode === 'inactive' && !agentId) {
-      return res.status(400).json({
-        success: false,
-        error: 'El campo "agentId" es requerido cuando se desactiva la IA'
-      });
-    }
-
-    console.log(`🤖 [Takeover] Cambiando modo IA: ${conversationId} -> ${mode}`, 
-      mode === 'inactive' ? `(Agente: ${agentId})` : '');
-
-    // TODO: IMPLEMENTAR CON SUPABASE
-    // const result = await databaseService.setConversationAIMode(conversationId, mode, agentId);
-    
-    // IMPLEMENTACIÓN TEMPORAL CON PRISMA (mientras no hay Supabase)
-    // Por ahora simulamos la respuesta exitosa
-    const result = { success: true };
-    
-    if (result.success) {
-      // Emitir evento WebSocket para notificar cambio en tiempo real
-      whatsappService.emitSocketEvent('conversation_ai_mode_changed', {
-        conversationId,
-        aiMode: mode,
-        assignedAgentId: mode === 'inactive' ? agentId : null,
-        timestamp: new Date().toISOString()
-      });
-
-      res.json({
-        success: true,
-        message: `Modo IA ${mode === 'active' ? 'activado' : 'desactivado'} exitosamente`,
-        conversationId,
-        aiMode: mode,
-        assignedAgentId: mode === 'inactive' ? agentId : null
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: 'Error actualizando modo IA'
-      });
-    }
-  } catch (error: any) {
-    console.error('[Takeover] Error en set-mode:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error interno del servidor'
-    });
-  }
-});
-
-// GET /api/chat/conversations/:id/mode - Obtener modo actual de IA
-router.get('/conversations/:id/mode', async (req: any, res: any) => {
-  try {
-    const { id: conversationId } = req.params;
-
-    console.log(`🔍 [Takeover] Consultando modo IA para: ${conversationId}`);
-
-    // TODO: IMPLEMENTAR CON SUPABASE
-    // const result = await databaseService.getConversationAIMode(conversationId);
-    
-    // IMPLEMENTACIÓN TEMPORAL
-    const result = {
-      aiMode: 'active' as 'active' | 'inactive',
-      assignedAgentId: null
-    };
-    
-    if (result) {
-      res.json({
-        success: true,
-        conversationId,
-        aiMode: result.aiMode,
-        assignedAgentId: result.assignedAgentId
-      });
-    } else {
-      res.status(404).json({
-        success: false,
-        error: 'Conversación no encontrada'
-      });
-    }
-  } catch (error: any) {
-    console.error('[Takeover] Error obteniendo modo IA:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error interno del servidor'
-    });
-  }
-});
-
-// GET /api/chat/conversations/:id/summary - Generar resumen de conversación
-router.get('/conversations/:id/summary', async (req: any, res: any) => {
-  try {
-    const { id: conversationId } = req.params;
-    const { forceRegenerate } = req.query;
-
-    console.log(`📝 [Summary] Generando resumen para: ${conversationId}`, 
-      forceRegenerate ? '(Forzar regeneración)' : '');
-
-    // 1. Verificar caché si no se fuerza regeneración
-    if (!forceRegenerate) {
-      // TODO: IMPLEMENTAR CON SUPABASE
-      // const cachedSummary = await databaseService.getConversationSummary(conversationId);
-      // if (cachedSummary) {
-      //   return res.json({
-      //     success: true,
-      //     summary: cachedSummary.summary,
-      //     keyPoints: cachedSummary.keyPoints,
-      //     isFromCache: cachedSummary.isFromCache,
-      //     conversationId
-      //   });
-      // }
-    }
-
-    // 2. Obtener historial de mensajes
-    // TODO: IMPLEMENTAR CON SUPABASE
-    // const messages = await databaseService.getConversationHistory(conversationId);
-    
-    // IMPLEMENTACIÓN TEMPORAL - Simular algunos mensajes
-    const messages = [
-      { role: 'user', content: 'Necesito pastillas de freno para mi Toyota Corolla 2018', timestamp: new Date() },
-      { role: 'assistant', content: 'Te ayudo a encontrar pastillas de freno. Para tu Toyota Corolla 2018, ¿qué tipo de motor tiene?', timestamp: new Date() },
-      { role: 'user', content: 'Es 1.8L', timestamp: new Date() },
-      { role: 'assistant', content: 'Perfecto. Tenemos pastillas de freno para Toyota Corolla 2018 1.8L. Mi nombre es María, ¿cuál es tu nombre?', timestamp: new Date() },
-      { role: 'user', content: 'Me llamo Carlos y vivo en 06100', timestamp: new Date() }
-    ];
-
-    if (messages.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: 'No se encontraron mensajes para esta conversación'
-      });
-    }
-
-    // 3. Generar resumen con IA
-    const chatbotService = require('../services/chatbot.service').chatbotService;
-    const summary = await chatbotService.generateConversationSummary(conversationId, messages);
-
-    // 4. Guardar en caché
-    // TODO: IMPLEMENTAR CON SUPABASE
-    // await databaseService.saveConversationSummary(
-    //   conversationId, 
-    //   summary.text, 
-    //   summary.keyPoints, 
-    //   messages.length
-    // );
-
-    console.log(`✅ [Summary] Resumen generado exitosamente para: ${conversationId}`);
-
-    res.json({
-      success: true,
-      summary: summary.text,
-      keyPoints: summary.keyPoints,
-      isFromCache: false,
-      conversationId,
-      messageCount: messages.length,
-      generatedAt: new Date().toISOString()
-    });
-
-  } catch (error: any) {
-    console.error('[Summary] Error generando resumen:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Error generando resumen de conversación'
-    });
-  }
-});
 
 // GET /api/chat/conversations/:id/messages - Obtener historial de mensajes
 router.get('/conversations/:id/messages', async (req: any, res: any) => {
@@ -482,24 +304,17 @@ router.get('/conversations/:id/messages', async (req: any, res: any) => {
 
     console.log(`📨 [Messages] Obteniendo historial para: ${conversationId}`);
 
-    // Usar el servicio de WhatsApp que ya implementa Supabase
-    const result = await whatsappService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
+    // Usar el servicio de base de datos
+    const messages = await databaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
     
-    if (result.success) {
-      res.json({
-        success: true,
-        data: {
-          messages: result.messages,
-          total: result.messages.length,
-          conversationId
-        }
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: result.error || 'Error obteniendo mensajes'
-      });
-    }
+    res.json({
+      success: true,
+      data: {
+        messages: messages,
+        total: messages.length,
+        conversationId
+      }
+    });
 
   } catch (error: any) {
     console.error('[Messages] Error obteniendo historial:', error);
@@ -516,9 +331,13 @@ router.get('/conversations', async (req: any, res: any) => {
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
     
-    const result = await whatsappService.getConversations(limit, offset);
+    const conversations = await databaseService.getConversations(limit, offset);
     
-    res.json(result);
+    res.json({
+      success: true,
+      conversations: conversations,
+      total: conversations.length
+    });
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -528,20 +347,18 @@ router.get('/conversations', async (req: any, res: any) => {
   }
 });
 
-// Esta ruta fue eliminada porque estaba duplicada con la anterior
-
 // GET /api/chat/messages - Mantener compatibilidad (deprecado)
 router.get('/messages', async (req: any, res: any) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
     
-    const result = await whatsappService.getConversations(limit, offset);
+    const conversations = await databaseService.getConversations(limit, offset);
     
     // Convertir a formato legacy
     const legacyFormat = {
       success: true,
-      messages: result.conversations?.map((conv: any) => ({
+      messages: conversations.map((conv: any) => ({
         id: conv.lastMessage?.id || conv.id,
         from: conv.contactWaId,
         message: conv.lastMessage?.content || '',
@@ -551,9 +368,9 @@ router.get('/messages', async (req: any, res: any) => {
           wa_id: conv.contactWaId
         },
         read: conv.unreadCount === 0
-      })) || [],
-      total: result.total || 0,
-      unread: result.unread || 0
+      })),
+      total: conversations.length,
+      unread: conversations.filter((conv: any) => conv.unreadCount > 0).length
     };
     
     res.json(legacyFormat);
@@ -570,7 +387,7 @@ router.get('/messages', async (req: any, res: any) => {
 router.put('/messages/:messageId/read', async (req: any, res: any) => {
   try {
     const { messageId } = req.params;
-    const result = await whatsappService.markMessageAsRead(messageId);
+    const result = await databaseService.markMessageAsRead(messageId);
     
     if (result) {
       res.json({
@@ -596,7 +413,7 @@ router.put('/messages/:messageId/read', async (req: any, res: any) => {
 router.put('/conversations/:conversationId/read', async (req: any, res: any) => {
   try {
     const { conversationId } = req.params;
-    const result = await whatsappService.markConversationAsRead(conversationId);
+    const result = await databaseService.markConversationAsRead(conversationId);
     
     if (result) {
       res.json({
@@ -622,7 +439,7 @@ router.put('/conversations/:conversationId/read', async (req: any, res: any) => 
 router.delete('/messages/cleanup', async (req: any, res: any) => {
   try {
     const hours = parseInt(req.query.hours as string) || 24;
-    const removedCount = await whatsappService.clearOldMessages(hours);
+    const removedCount = await databaseService.cleanupOldMessages(hours);
     
     res.json({
       success: true,
@@ -641,7 +458,7 @@ router.delete('/messages/cleanup', async (req: any, res: any) => {
 // DELETE /api/chat/messages/clear-all - Limpiar TODOS los mensajes
 router.delete('/messages/clear-all', async (req: any, res: any) => {
   try {
-    const removedCount = await whatsappService.clearAllMessages();
+    const removedCount = await databaseService.cleanupOldMessages(0); // 0 horas = limpiar todo
     
     res.json({
       success: true,
@@ -660,7 +477,7 @@ router.delete('/messages/clear-all', async (req: any, res: any) => {
 // GET /api/chat/stats - Obtener estadísticas
 router.get('/stats', async (req: any, res: any) => {
   try {
-    const result = await whatsappService.getStats();
+    const result = getStats();
     res.json(result);
   } catch (error: any) {
     res.status(500).json({
@@ -687,10 +504,10 @@ router.post('/simulate-message', async (req: any, res: any) => {
               field: 'messages',
               value: {
                 messaging_product: 'whatsapp',
-                                 metadata: {
-                   display_phone_number: '525549679734',
-                   phone_number_id: '748017128384316'
-                 },
+                metadata: {
+                  display_phone_number: '525549679734',
+                  phone_number_id: '748017128384316'
+                },
                 contacts: [
                   {
                     profile: {
@@ -718,12 +535,11 @@ router.post('/simulate-message', async (req: any, res: any) => {
     };
 
     console.log('🧪 Simulando mensaje entrante:', simulatedWebhook);
-    const result = await whatsappService.processWebhook(simulatedWebhook);
+    await whatsappService.processWebhook(simulatedWebhook);
     
     res.json({
       success: true,
       message: 'Mensaje simulado procesado',
-      result: result,
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
@@ -740,7 +556,7 @@ router.get('/webhook/debug', (req: any, res: any) => {
   try {
     console.log('🔍 Debug webhook configuration requested');
     
-    const config = whatsappService.getWebhookDebugInfo();
+    const config = getWebhookDebugInfo();
     
     res.json({
       success: true,
@@ -749,7 +565,6 @@ router.get('/webhook/debug', (req: any, res: any) => {
         path: config.path,
         verifyTokenConfigured: config.verifyTokenConfigured,
         verifyTokenLength: config.verifyTokenLength,
-        appSecretConfigured: config.appSecretConfigured,
         signatureVerificationEnabled: config.signatureVerificationEnabled
       },
       whatsapp: {
@@ -786,7 +601,7 @@ router.post('/webhook/config', async (req: any, res: any) => {
       });
     }
 
-    const result = await whatsappService.setWebhookUrl(callbackUrl);
+    const result = await setWebhookUrl(callbackUrl);
     if (result.success) {
       res.json({
         success: true,
@@ -810,7 +625,7 @@ router.post('/webhook/config', async (req: any, res: any) => {
 // GET /api/chat/webhook/health - Verificar salud del webhook (para debugging)
 router.get('/webhook/health', (req: any, res: any) => {
   try {
-    const config = whatsappService.getWebhookDebugInfo();
+    const config = getWebhookDebugInfo();
     const timestamp = new Date().toISOString();
     
     // Verificar configuración crítica

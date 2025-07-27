@@ -771,6 +771,85 @@ export class DatabaseService {
     console.log('🔍 Contactos por tag (legacy)');
     return [];
   }
+
+  /**
+   * Obtener modo takeover de conversación
+   */
+  async getConversationTakeoverMode(conversationId: string): Promise<'spectator' | 'takeover' | 'ai_only' | null> {
+    try {
+      const mode = await supabaseDatabaseService.getConversationTakeoverMode(conversationId);
+      console.log(`🔍 Takeover mode obtenido: ${conversationId} -> ${mode}`);
+      return mode;
+    } catch (error) {
+      console.error('❌ Error en getConversationTakeoverMode:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Establecer modo takeover de conversación
+   */
+  async setConversationTakeoverMode(
+    conversationId: string,
+    mode: 'spectator' | 'takeover' | 'ai_only',
+    agentId?: string,
+    reason?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const result = await supabaseDatabaseService.setConversationTakeoverMode(conversationId, mode, agentId, reason);
+      if (result.success) {
+        console.log(`✅ Takeover mode actualizado: ${conversationId} -> ${mode} ${agentId ? `(agente: ${agentId})` : ''}`);
+      } else {
+        console.error(`❌ Error actualizando takeover mode: ${result.error}`);
+      }
+      return result;
+    } catch (error) {
+      console.error('❌ Error en setConversationTakeoverMode:', error);
+      return { success: false, error: (error as Error).message };
+    }
+  }
+
+  /**
+   * Obtener conversaciones en modo espectador
+   */
+  async getSpectatorConversations(): Promise<SupabaseConversation[]> {
+    try {
+      const conversations = await supabaseDatabaseService.getSpectatorConversations();
+      console.log(`🔍 Conversaciones en espectador: ${conversations.length}`);
+      return conversations;
+    } catch (error) {
+      console.error('❌ Error obteniendo conversaciones en espectador:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Obtener conversaciones en takeover
+   */
+  async getTakeoverConversations(): Promise<SupabaseConversation[]> {
+    try {
+      const conversations = await supabaseDatabaseService.getTakeoverConversations();
+      console.log(`🔍 Conversaciones en takeover: ${conversations.length}`);
+      return conversations;
+    } catch (error) {
+      console.error('❌ Error obteniendo conversaciones en takeover:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Verificar si el chatbot puede procesar un mensaje
+   */
+  async canChatbotProcessMessage(conversationId: string): Promise<boolean> {
+    try {
+      const canProcess = await supabaseDatabaseService.canChatbotProcessMessage(conversationId);
+      console.log(`🔍 Chatbot puede procesar ${conversationId}: ${canProcess}`);
+      return canProcess;
+    } catch (error) {
+      console.error('❌ Error verificando si chatbot puede procesar:', error);
+      return false;
+    }
+  }
 }
 
 // Instancia singleton
