@@ -17,6 +17,7 @@ export interface SupabaseContact {
   phone: string;
   name?: string;
   email?: string;
+  postal_code?: string; // NUEVO: Código postal
   is_blocked: boolean;
   is_favorite: boolean;
   metadata?: any;
@@ -1180,6 +1181,68 @@ export class SupabaseDatabaseService {
       return mode === 'spectator' || mode === 'ai_only';
     } catch (error) {
       console.error('Error verificando si chatbot puede procesar:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Ejecutar migración para agregar campo postal_code a contacts
+   */
+  async addPostalCodeToContacts(): Promise<{ success: boolean; error?: string }> {
+    if (!this.isEnabled || !supabase) {
+      return { success: false, error: '❌ Supabase no disponible' };
+    }
+
+    try {
+      console.log('🔄 Ejecutando migración: agregando postal_code a contacts...');
+
+      // Agregar columna postal_code si no existe
+      const { error: alterError } = await supabase.rpc('exec_sql', {
+        sql_query: `
+          ALTER TABLE contacts 
+          ADD COLUMN IF NOT EXISTS postal_code TEXT;
+        `
+      });
+
+      if (alterError) {
+        console.error('❌ Error agregando columna postal_code:', alterError);
+        return { success: false, error: alterError.message };
+      }
+
+      console.log('✅ Migración completada: postal_code agregado a contacts');
+      return { success: true };
+    } catch (error) {
+      console.error('❌ Error en migración postal_code:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+    }
+  }
+
+  /**
+   * Actualizar contacto con código postal
+   */
+  async updateContactWithPostalCode(contactId: string, data: Partial<SupabaseContact>): Promise<boolean> {
+    if (!this.isEnabled || !supabase) {
+      throw new Error('❌ Supabase no disponible');
+    }
+
+    try {
+      const { error } = await supabase
+        .from('contacts')
+        .update({
+          ...data,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', contactId);
+
+      if (error) {
+        console.error('❌ Error actualizando contacto:', error);
+        return false;
+      }
+
+      console.log(`✅ Contacto ${contactId} actualizado con código postal`);
+      return true;
+    } catch (error) {
+      console.error('❌ Error en updateContactWithPostalCode:', error);
       return false;
     }
   }

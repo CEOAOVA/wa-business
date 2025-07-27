@@ -7,6 +7,7 @@ import { useMediaUpload } from "../hooks/useMediaUpload";
 import { MESSAGES } from "../constants/messages";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
+import ContactInfoComponent from "./ContactInfo";
 import whatsappApi from "../services/whatsapp-api";
 import type { Message } from "../types";
 
@@ -91,6 +92,9 @@ const ChatPanel: React.FC = () => {
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [conversationSummary, setConversationSummary] = useState<any>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+
+  // NUEVO: Estado para información de contacto
+  const [showContactInfo, setShowContactInfo] = useState(false);
 
   // Auto-scroll a mensajes más recientes
   useEffect(() => {
@@ -397,6 +401,18 @@ const ChatPanel: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3">
+              {/* NUEVO: Botón de información de contacto */}
+              <button
+                onClick={() => setShowContactInfo(!showContactInfo)}
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors flex items-center gap-2"
+                title="Información del cliente"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Cliente
+              </button>
+
               {/* Botón de Takeover - Solo se muestra uno según el estado */}
               {takeoverMode === 'spectator' && (
                 <button
@@ -479,6 +495,33 @@ const ChatPanel: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* NUEVO: Panel lateral de información de contacto */}
+      {showContactInfo && currentChat && !whatsappMode && (
+        <div className="absolute top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-700 z-10 overflow-y-auto">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Información del Cliente</h3>
+              <button
+                onClick={() => setShowContactInfo(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+                              <ContactInfoComponent
+                    phoneNumber={currentChat.clientPhone || ''}
+                    onContactUpdate={(contact) => {
+                      console.log('Contacto actualizado:', contact);
+                      // Aquí podrías actualizar el estado global si es necesario
+                    }}
+                  />
+          </div>
+        </div>
+      )}
 
       {/* Mensajes */}
       <div className="flex-1 px-6 py-4 flex flex-col gap-1 overflow-y-auto scrollbar-thin scrollbar-thumb-embler-accent scrollbar-track-embler-dark messages-container relative">

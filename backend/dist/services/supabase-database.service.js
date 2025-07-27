@@ -1017,6 +1017,62 @@ class SupabaseDatabaseService {
             }
         });
     }
+    /**
+     * Ejecutar migración para agregar campo postal_code a contacts
+     */
+    addPostalCodeToContacts() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                return { success: false, error: '❌ Supabase no disponible' };
+            }
+            try {
+                console.log('🔄 Ejecutando migración: agregando postal_code a contacts...');
+                // Agregar columna postal_code si no existe
+                const { error: alterError } = yield supabase_1.supabase.rpc('exec_sql', {
+                    sql_query: `
+          ALTER TABLE contacts 
+          ADD COLUMN IF NOT EXISTS postal_code TEXT;
+        `
+                });
+                if (alterError) {
+                    console.error('❌ Error agregando columna postal_code:', alterError);
+                    return { success: false, error: alterError.message };
+                }
+                console.log('✅ Migración completada: postal_code agregado a contacts');
+                return { success: true };
+            }
+            catch (error) {
+                console.error('❌ Error en migración postal_code:', error);
+                return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+            }
+        });
+    }
+    /**
+     * Actualizar contacto con código postal
+     */
+    updateContactWithPostalCode(contactId, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('contacts')
+                    .update(Object.assign(Object.assign({}, data), { updated_at: new Date().toISOString() }))
+                    .eq('id', contactId);
+                if (error) {
+                    console.error('❌ Error actualizando contacto:', error);
+                    return false;
+                }
+                console.log(`✅ Contacto ${contactId} actualizado con código postal`);
+                return true;
+            }
+            catch (error) {
+                console.error('❌ Error en updateContactWithPostalCode:', error);
+                return false;
+            }
+        });
+    }
 }
 exports.SupabaseDatabaseService = SupabaseDatabaseService;
 // Instancia singleton
