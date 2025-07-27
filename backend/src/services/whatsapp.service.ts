@@ -70,15 +70,68 @@ export class WhatsAppService {
   }
 
   /**
-   * Emitir evento WebSocket (método público para uso externo)
+   * Emitir evento WebSocket optimizado (método público para uso externo)
    */
   emitSocketEvent(event: string, data: any) {
     if (this.io) {
-      this.io.emit(event, data);
+      // Emitir con optimizaciones para tiempo real
+      this.io.emit(event, data, {
+        compress: true, // Comprimir datos
+        volatile: false, // Asegurar entrega
+        timeout: 5000 // Timeout de 5 segundos
+      });
       console.log(`🌐 [Socket] Evento '${event}' emitido:`, data);
     } else {
       console.log(`⚠️ [Socket] No hay conexión WebSocket para emitir evento '${event}'`);
     }
+  }
+
+  /**
+   * Emitir evento a una conversación específica
+   */
+  emitToConversation(conversationId: string, event: string, data: any) {
+    if (this.io) {
+      this.io.to(conversationId).emit(event, data, {
+        compress: true,
+        volatile: false,
+        timeout: 5000
+      });
+      console.log(`🌐 [Socket] Evento '${event}' emitido a conversación ${conversationId}:`, data);
+    }
+  }
+
+  /**
+   * Emitir evento de nuevo mensaje optimizado
+   */
+  emitNewMessage(message: any, conversation: any) {
+    const eventData = {
+      message,
+      conversation,
+      timestamp: new Date().toISOString()
+    };
+
+    // Emitir a todos los clientes conectados
+    this.emitSocketEvent('new_message', eventData);
+    
+    // También emitir específicamente a la conversación
+    if (conversation?.id) {
+      this.emitToConversation(conversation.id, 'new_message', eventData);
+    }
+  }
+
+  /**
+   * Emitir evento de actualización de conversación optimizado
+   */
+  emitConversationUpdate(conversationId: string, lastMessage: any, unreadCount: number) {
+    const eventData = {
+      conversationId,
+      lastMessage,
+      unreadCount,
+      timestamp: new Date().toISOString()
+    };
+
+    this.emitSocketEvent('conversation_updated', eventData);
+    this.emitToConversation(conversationId, 'conversation_updated', eventData);
   }
 
   /**
@@ -158,21 +211,11 @@ export class WhatsAppService {
               contactId: result.contact.id
             };
 
-            this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
-              message: sentMessage,
-              conversation: {
-                id: result.conversation.id,
-                contactId: result.contact.id,
-                contactName: result.contact.name || result.contact.waId,
-                unreadCount: result.conversation.unreadCount
-              }
-            });
-
-            // También emitir para actualizar lista de conversaciones
-            this.io.emit('conversation_updated', {
-              conversationId: result.conversation.id,
-              lastMessage: sentMessage,
-              unreadCount: result.conversation.unreadCount
+            this.emitNewMessage(sentMessage, {
+              id: result.conversation.id,
+              contactId: result.contact.id,
+              contactName: result.contact.name || result.contact.waId,
+              unreadCount: result.conversation.unreadCount || 0
             });
 
             console.log('🌐 Evento Socket.IO emitido para mensaje enviado');
@@ -413,13 +456,18 @@ export class WhatsAppService {
         });
 
         // Notificar a agentes conectados
-        this.emitSocketEvent('new_message', {
+        this.emitNewMessage({
           conversationId: conversation.id,
           from: from,
           content: content,
           timestamp: timestamp,
           contactName: contactName,
           requiresAgentAction: true
+        }, {
+          id: conversation.id,
+          contactId: conversation.contact_phone,
+          contactName: contactName,
+          unreadCount: conversation.unread_count || 0
         });
       }
 
@@ -488,7 +536,7 @@ export class WhatsAppService {
       });
 
       // Notificar a agentes conectados
-      this.emitSocketEvent('new_message', {
+      this.emitNewMessage({
         conversationId: conversation.id,
         from: from,
         content: content,
@@ -497,6 +545,11 @@ export class WhatsAppService {
         mediaType: mediaType,
         mediaData: mediaData,
         requiresAgentAction: true
+      }, {
+        id: conversation.id,
+        contactId: conversation.contact_phone,
+        contactName: contactName,
+        unreadCount: conversation.unread_count || 0
       });
 
       // Actualizar conversación
@@ -554,20 +607,10 @@ export class WhatsAppService {
           filename: data.filename
         };
 
-        this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
-          message: sentMessage,
-          conversation: {
-            id: result.conversation.id,
-            contactId: result.contact.id,
-            contactName: result.contact.name || result.contact.waId,
-            unreadCount: result.conversation.unreadCount
-          }
-        });
-
-        // También emitir para actualizar lista de conversaciones
-        this.io.emit('conversation_updated', {
-          conversationId: result.conversation.id,
-          lastMessage: sentMessage,
+        this.emitNewMessage(sentMessage, {
+          id: result.conversation.id,
+          contactId: result.contact.id,
+          contactName: result.contact.name || result.contact.waId,
           unreadCount: result.conversation.unreadCount
         });
 
@@ -632,20 +675,10 @@ export class WhatsAppService {
           filename: data.filename
         };
 
-        this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
-          message: receivedMessage,
-          conversation: {
-            id: result.conversation.id,
-            contactId: result.contact.id,
-            contactName: result.contact.name || result.contact.waId,
-            unreadCount: result.conversation.unreadCount
-          }
-        });
-
-        // También emitir para actualizar lista de conversaciones
-        this.io.emit('conversation_updated', {
-          conversationId: result.conversation.id,
-          lastMessage: receivedMessage,
+        this.emitNewMessage(receivedMessage, {
+          id: result.conversation.id,
+          contactId: result.contact.id,
+          contactName: result.contact.name || result.contact.waId,
           unreadCount: result.conversation.unreadCount
         });
 

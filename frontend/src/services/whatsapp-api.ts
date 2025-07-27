@@ -100,6 +100,17 @@ class WhatsAppApiService {
   }
 
   /**
+   * Obtener mensajes
+   */
+  async getMessages(): Promise<ApiResponse<any[]>> {
+    console.log('📥 Obteniendo mensajes');
+    
+    return this.request('/messages', {
+      method: 'GET'
+    });
+  }
+
+  /**
    * Enviar template
    */
   async sendTemplate(data: SendTemplateRequest): Promise<ApiResponse<any>> {

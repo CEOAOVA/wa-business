@@ -40,16 +40,63 @@ class WhatsAppService {
         });
     }
     /**
-     * Emitir evento WebSocket (método público para uso externo)
+     * Emitir evento WebSocket optimizado (método público para uso externo)
      */
     emitSocketEvent(event, data) {
         if (this.io) {
-            this.io.emit(event, data);
+            // Emitir con optimizaciones para tiempo real
+            this.io.emit(event, data, {
+                compress: true, // Comprimir datos
+                volatile: false, // Asegurar entrega
+                timeout: 5000 // Timeout de 5 segundos
+            });
             console.log(`🌐 [Socket] Evento '${event}' emitido:`, data);
         }
         else {
             console.log(`⚠️ [Socket] No hay conexión WebSocket para emitir evento '${event}'`);
         }
+    }
+    /**
+     * Emitir evento a una conversación específica
+     */
+    emitToConversation(conversationId, event, data) {
+        if (this.io) {
+            this.io.to(conversationId).emit(event, data, {
+                compress: true,
+                volatile: false,
+                timeout: 5000
+            });
+            console.log(`🌐 [Socket] Evento '${event}' emitido a conversación ${conversationId}:`, data);
+        }
+    }
+    /**
+     * Emitir evento de nuevo mensaje optimizado
+     */
+    emitNewMessage(message, conversation) {
+        const eventData = {
+            message,
+            conversation,
+            timestamp: new Date().toISOString()
+        };
+        // Emitir a todos los clientes conectados
+        this.emitSocketEvent('new_message', eventData);
+        // También emitir específicamente a la conversación
+        if (conversation === null || conversation === void 0 ? void 0 : conversation.id) {
+            this.emitToConversation(conversation.id, 'new_message', eventData);
+        }
+    }
+    /**
+     * Emitir evento de actualización de conversación optimizado
+     */
+    emitConversationUpdate(conversationId, lastMessage, unreadCount) {
+        const eventData = {
+            conversationId,
+            lastMessage,
+            unreadCount,
+            timestamp: new Date().toISOString()
+        };
+        this.emitSocketEvent('conversation_updated', eventData);
+        this.emitToConversation(conversationId, 'conversation_updated', eventData);
     }
     /**
      * Enviar mensaje de texto
@@ -121,20 +168,11 @@ class WhatsAppService {
                                 conversationId: result.conversation.id,
                                 contactId: result.contact.id
                             };
-                            this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
-                                message: sentMessage,
-                                conversation: {
-                                    id: result.conversation.id,
-                                    contactId: result.contact.id,
-                                    contactName: result.contact.name || result.contact.waId,
-                                    unreadCount: result.conversation.unreadCount
-                                }
-                            });
-                            // También emitir para actualizar lista de conversaciones
-                            this.io.emit('conversation_updated', {
-                                conversationId: result.conversation.id,
-                                lastMessage: sentMessage,
-                                unreadCount: result.conversation.unreadCount
+                            this.emitNewMessage(sentMessage, {
+                                id: result.conversation.id,
+                                contactId: result.contact.id,
+                                contactName: result.contact.name || result.contact.waId,
+                                unreadCount: result.conversation.unreadCount || 0
                             });
                             console.log('🌐 Evento Socket.IO emitido para mensaje enviado');
                         }
@@ -328,6 +366,7 @@ class WhatsAppService {
      */
     processTextMessage(from, messageId, content, timestamp, contactName) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d;
             try {
                 console.log(`📝 Procesando texto de ${from}: ${content.substring(0, 50)}...`);
                 // Obtener o crear conversación
@@ -340,15 +379,39 @@ class WhatsAppService {
                 const canChatbotProcess = yield database_service_1.databaseService.canChatbotProcessMessage(conversation.id);
                 if (canChatbotProcess) {
                     console.log(`🤖 Chatbot procesará mensaje de ${from} (modo: ${conversation.takeover_mode || 'spectator'})`);
+                    // GUARDAR MENSAJE DEL USUARIO EN LA BASE DE DATOS ANTES DE PROCESAR CON CHATBOT
+                    yield database_service_1.databaseService.createChatbotMessage({
+                        conversationId: conversation.id,
+                        contactPhone: from,
+                        senderType: 'user',
+                        content: content,
+                        messageType: 'text',
+                        whatsappMessageId: messageId,
+                        metadata: {
+                            contactName: contactName,
+                            timestamp: timestamp.toISOString()
+                        }
+                    });
                     // Procesar con chatbot
                     const chatbotResponse = yield chatbot_service_1.chatbotService.processWhatsAppMessage(from, content);
                     if (chatbotResponse.shouldSend && chatbotResponse.response) {
                         // Enviar respuesta del chatbot
-                        yield this.sendMessage({
+                        const sendResult = yield this.sendMessage({
                             to: from,
                             message: chatbotResponse.response,
                             isChatbotResponse: true
                         });
+                        // GUARDAR RESPUESTA DEL CHATBOT EN LA BASE DE DATOS DESPUÉS DE ENVIARLA
+                        if (sendResult.success && sendResult.messageId) {
+                            yield chatbot_service_1.chatbotService.saveChatbotMessageToDatabase(from, {
+                                id: `msg-${Date.now()}-assistant`,
+                                role: 'assistant',
+                                content: chatbotResponse.response,
+                                timestamp: new Date(),
+                                functionCalled: (_c = (_b = (_a = chatbotResponse.conversationState) === null || _a === void 0 ? void 0 : _a.messages) === null || _b === void 0 ? void 0 : _b.find(m => m.role === 'assistant')) === null || _c === void 0 ? void 0 : _c.functionCalled,
+                                clientData: (_d = chatbotResponse.conversationState) === null || _d === void 0 ? void 0 : _d.clientInfo
+                            }, sendResult.messageId);
+                        }
                     }
                 }
                 else {
@@ -367,13 +430,18 @@ class WhatsAppService {
                         }
                     });
                     // Notificar a agentes conectados
-                    this.emitSocketEvent('new_message', {
+                    this.emitNewMessage({
                         conversationId: conversation.id,
                         from: from,
                         content: content,
                         timestamp: timestamp,
                         contactName: contactName,
                         requiresAgentAction: true
+                    }, {
+                        id: conversation.id,
+                        contactId: conversation.contact_phone,
+                        contactName: contactName,
+                        unreadCount: conversation.unread_count || 0
                     });
                 }
                 // Actualizar conversación
@@ -437,7 +505,7 @@ class WhatsAppService {
                     }
                 });
                 // Notificar a agentes conectados
-                this.emitSocketEvent('new_message', {
+                this.emitNewMessage({
                     conversationId: conversation.id,
                     from: from,
                     content: content,
@@ -446,6 +514,11 @@ class WhatsAppService {
                     mediaType: mediaType,
                     mediaData: mediaData,
                     requiresAgentAction: true
+                }, {
+                    id: conversation.id,
+                    contactId: conversation.contact_phone,
+                    contactName: contactName,
+                    unreadCount: conversation.unread_count || 0
                 });
                 // Actualizar conversación
                 yield database_service_1.databaseService.markConversationAsRead(conversation.id);
@@ -493,19 +566,10 @@ class WhatsAppService {
                         mediaType: data.mediaType,
                         filename: data.filename
                     };
-                    this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
-                        message: sentMessage,
-                        conversation: {
-                            id: result.conversation.id,
-                            contactId: result.contact.id,
-                            contactName: result.contact.name || result.contact.waId,
-                            unreadCount: result.conversation.unreadCount
-                        }
-                    });
-                    // También emitir para actualizar lista de conversaciones
-                    this.io.emit('conversation_updated', {
-                        conversationId: result.conversation.id,
-                        lastMessage: sentMessage,
+                    this.emitNewMessage(sentMessage, {
+                        id: result.conversation.id,
+                        contactId: result.contact.id,
+                        contactName: result.contact.name || result.contact.waId,
                         unreadCount: result.conversation.unreadCount
                     });
                     console.log('🌐 Evento Socket.IO emitido para mensaje multimedia enviado');
@@ -558,19 +622,10 @@ class WhatsAppService {
                         mediaType: data.mediaType,
                         filename: data.filename
                     };
-                    this.io.to(`conversation_${result.conversation.id}`).emit('new_message', {
-                        message: receivedMessage,
-                        conversation: {
-                            id: result.conversation.id,
-                            contactId: result.contact.id,
-                            contactName: result.contact.name || result.contact.waId,
-                            unreadCount: result.conversation.unreadCount
-                        }
-                    });
-                    // También emitir para actualizar lista de conversaciones
-                    this.io.emit('conversation_updated', {
-                        conversationId: result.conversation.id,
-                        lastMessage: receivedMessage,
+                    this.emitNewMessage(receivedMessage, {
+                        id: result.conversation.id,
+                        contactId: result.contact.id,
+                        contactName: result.contact.name || result.contact.waId,
                         unreadCount: result.conversation.unreadCount
                     });
                     console.log('🌐 Evento Socket.IO emitido para mensaje multimedia recibido');

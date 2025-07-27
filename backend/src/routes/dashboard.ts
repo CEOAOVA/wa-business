@@ -190,6 +190,7 @@ router.get('/conversations/public', authMiddleware, async (req, res) => {
       contact_phone: conv.contact_phone,
       status: conv.status,
       ai_mode: conv.ai_mode,
+      takeover_mode: conv.takeover_mode || 'spectator', // Agregar takeover_mode con valor por defecto
       assigned_agent_id: conv.assigned_agent_id,
       unread_count: conv.unread_count,
       last_message_at: conv.last_message_at,

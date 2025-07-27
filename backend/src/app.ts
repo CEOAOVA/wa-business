@@ -30,12 +30,25 @@ app.set('trust proxy', true);
 // Aplicar configuración de seguridad ANTES de cualquier otra cosa
 applySecurity(app);
 
-// Configurar Socket.IO con CORS
+// Configuración optimizada de Socket.IO para mejor rendimiento en tiempo real
 const io = new Server(httpServer, {
   cors: {
-    origin: whatsappConfig.server.frontendUrl,
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     methods: ["GET", "POST"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
+  },
+  // Configuraciones optimizadas para tiempo real
+  transports: ['websocket', 'polling'],
+  allowEIO3: true,
+  pingTimeout: 60000, // 60 segundos
+  pingInterval: 25000, // 25 segundos
+  upgradeTimeout: 10000, // 10 segundos
+  maxHttpBufferSize: 1e6, // 1MB
+  connectTimeout: 45000,
+  allowRequest: (req, callback) => {
+    // Permitir todas las conexiones por ahora
+    callback(null, true);
   }
 });
 
@@ -48,22 +61,37 @@ app.use((req, res, next) => {
   next();
 });
 
-// Socket.IO connection handling
+// Configurar eventos de Socket.IO optimizados para tiempo real
 io.on('connection', (socket) => {
-  console.log(`👤 Cliente conectado: ${socket.id}`);
-  
-  socket.on('join_conversation', (conversationId) => {
-    socket.join(`conversation_${conversationId}`);
-    console.log(`📨 Cliente ${socket.id} se unió a conversación ${conversationId}`);
+  console.log(`🌐 Cliente conectado: ${socket.id}`);
+
+  // Unirse a una conversación específica
+  socket.on('join_conversation', (conversationId: string) => {
+    console.log(`📨 Cliente ${socket.id} uniéndose a conversación: ${conversationId}`);
+    socket.join(conversationId);
+    socket.emit('joined_conversation', { conversationId });
   });
 
-  socket.on('leave_conversation', (conversationId) => {
-    socket.leave(`conversation_${conversationId}`);
-    console.log(`📤 Cliente ${socket.id} salió de conversación ${conversationId}`);
+  // Salir de una conversación
+  socket.on('leave_conversation', (conversationId: string) => {
+    console.log(`📤 Cliente ${socket.id} saliendo de conversación: ${conversationId}`);
+    socket.leave(conversationId);
+    socket.emit('left_conversation', { conversationId });
   });
 
-  socket.on('disconnect', () => {
-    console.log(`👋 Cliente desconectado: ${socket.id}`);
+  // Heartbeat optimizado
+  socket.on('ping', (data: { timestamp: number }) => {
+    socket.emit('pong', { timestamp: data.timestamp });
+  });
+
+  // Manejar desconexión
+  socket.on('disconnect', (reason) => {
+    console.log(`❌ Cliente desconectado: ${socket.id}, razón: ${reason}`);
+  });
+
+  // Manejar errores de socket
+  socket.on('error', (error) => {
+    console.error(`❌ Error en socket ${socket.id}:`, error);
   });
 });
 

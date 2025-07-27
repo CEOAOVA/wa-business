@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useChat } from "../hooks/useChat";
 import { useAuth } from "../context/AuthContext";
+import { useApp } from "../context/AppContext";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
 import { MESSAGES } from "../constants/messages";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
+import whatsappApi from "../services/whatsapp-api";
 import type { Message } from "../types";
 
 // Componente para una burbuja de mensaje individual
@@ -63,6 +65,7 @@ const MessageBubble: React.FC<{
 const ChatPanel: React.FC = () => {
   const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
   const { state: authState, logout } = useAuth();
+  const { updateChatTakeoverMode } = useApp();
   const { 
     sendMessage: sendWhatsAppMessage, 
     checkConnection: checkWhatsAppConnection,
@@ -142,8 +145,15 @@ const ChatPanel: React.FC = () => {
 
   // Funciones para takeover
   const getCurrentConversationId = (): string | null => {
-    if (!currentChat?.clientPhone) return null;
-    return `conv-${currentChat.clientPhone.replace(/[^0-9]/g, '')}`;
+    if (!currentChat?.id) return null;
+    
+    // Si el ID ya es un UUID (sin prefijo conv-), usarlo directamente
+    if (!currentChat.id.startsWith('conv-')) {
+      return currentChat.id;
+    }
+    
+    // Si tiene prefijo conv-, extraer el ID real
+    return currentChat.id.replace('conv-', '');
   };
 
   // Determinar si el input debe estar deshabilitado
@@ -155,6 +165,37 @@ const ChatPanel: React.FC = () => {
       setWhatsappNumber(currentChat.clientPhone.replace(/[^0-9]/g, ''));
     }
   }, [currentChat, whatsappNumber]);
+
+  // Cargar modo takeover cuando cambia la conversación
+  useEffect(() => {
+    const loadTakeoverMode = async () => {
+      if (!currentChat) {
+        setTakeoverMode('spectator');
+        return;
+      }
+
+      // Usar el takeover mode del chat actual como valor inicial
+      const initialTakeoverMode = currentChat.takeoverMode || 'spectator';
+      setTakeoverMode(initialTakeoverMode);
+
+      try {
+        const conversationId = getCurrentConversationId();
+        if (conversationId) {
+          const response = await whatsappApi.getTakeoverMode(conversationId);
+          if (response.success && response.data) {
+            setTakeoverMode(response.data.takeoverMode);
+            console.log(`📋 Modo takeover cargado: ${response.data.takeoverMode}`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error cargando modo takeover:', error);
+        // Mantener el valor del chat actual como fallback
+        setTakeoverMode(initialTakeoverMode);
+      }
+    };
+
+    loadTakeoverMode();
+  }, [currentChat]);
 
   const handleSendMessage = useCallback(async () => {
     if (!currentChat && !whatsappMode) return;
@@ -198,20 +239,41 @@ const ChatPanel: React.FC = () => {
 
     setIsChangingMode(true);
     
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     try {
+      const conversationId = getCurrentConversationId();
+      if (!conversationId) {
+        alert('❌ No hay conversación activa para cambiar el modo takeover');
+        return;
+      }
+
       const newMode: 'spectator' | 'takeover' | 'ai_only' = takeoverMode === 'spectator' ? 'takeover' : 'spectator';
       
-      setTakeoverMode(newMode);
-      console.log(`✅ Takeover cambiado a: ${newMode}`);
-      
-      // Mostrar notificación de éxito
-      const message = newMode === 'takeover' 
-        ? `✅ Control tomado por ${authState.user?.name?.split(' ')[0] || 'Usuario'}`
-        : '✅ IA reactivada';
-      alert(message);
+      // Llamar al backend para cambiar el modo takeover
+      const response = await whatsappApi.setTakeoverMode({
+        conversationId,
+        mode: newMode,
+        agentId: authState.user?.id,
+        reason: newMode === 'takeover' ? 'Agente tomó control manualmente' : 'IA reactivada por agente'
+      });
+
+      if (response.success) {
+        setTakeoverMode(newMode);
+        
+        // Actualizar el chat en el contexto
+        if (currentChat) {
+          updateChatTakeoverMode(currentChat.id, newMode);
+        }
+        
+        console.log(`✅ Takeover cambiado a: ${newMode}`, response.data);
+        
+        // Mostrar notificación de éxito
+        const message = newMode === 'takeover' 
+          ? `✅ Control tomado por ${authState.user?.name?.split(' ')[0] || 'Usuario'}`
+          : '✅ IA reactivada';
+        alert(message);
+      } else {
+        throw new Error(response.error || 'Error desconocido');
+      }
       
     } catch (error) {
       console.error('❌ Error en takeover:', error);

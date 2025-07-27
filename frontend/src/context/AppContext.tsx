@@ -154,6 +154,8 @@ interface AppContextType {
   // Funciones de testing manual
   injectTestWhatsAppMessage: (from: string, message: string, name?: string) => void;
   injectTestOutgoingMessage: (to: string, message: string, name?: string) => void;
+  // Funciones de takeover
+  updateChatTakeoverMode: (chatId: string, takeoverMode: 'spectator' | 'takeover' | 'ai_only') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -338,14 +340,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       if (conversations.length > 0) {
         console.log(`🔍 [AppContext] ${conversations.length} conversaciones encontradas`);
         
-        // Convertir conversaciones a chats del frontend
-        conversations.forEach(conv => {
-          const chatId = `conv-${conv.id}`;
-          
-          console.log(`🔍 [AppContext] Procesando conversación ${chatId}`);
-          
-          // Verificar si el chat ya existe en el estado actual
-          const existingChat = state.chats.find(c => c.id === chatId);
+                  // Convertir conversaciones a chats del frontend
+          conversations.forEach(conv => {
+            const chatId = `conv-${conv.id}`;
+            
+            console.log(`🔍 [AppContext] Procesando conversación ${chatId} (takeover_mode: ${conv.takeover_mode})`);
+            
+            // Verificar si el chat ya existe en el estado actual
+            const existingChat = state.chats.find(c => c.id === chatId);
           
           if (!existingChat) {
             console.log(`🔍 [AppContext] Creando nuevo chat para conversación ${conv.id}`);
@@ -365,7 +367,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
               updatedAt: new Date(conv.updated_at),
               tags: ['conversation'],
               priority: 'medium',
-              status: conv.status === 'active' ? 'open' : conv.status
+              status: conv.status === 'active' ? 'open' : conv.status,
+              takeoverMode: conv.takeover_mode || 'spectator' // Agregar takeover_mode
             };
             
             console.log('🔍 [AppContext] Nuevo chat creado:', newChat);
@@ -784,6 +787,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch({ type: 'ADD_MESSAGE', payload: sentMessage });
   };
 
+  // Función para actualizar el takeover mode de un chat
+  const updateChatTakeoverMode = (chatId: string, takeoverMode: 'spectator' | 'takeover' | 'ai_only') => {
+    console.log(`🔄 [AppContext] Actualizando takeover mode: ${chatId} -> ${takeoverMode}`);
+    
+    const chat = state.chats.find(c => c.id === chatId);
+    if (chat) {
+      const updatedChat = {
+        ...chat,
+        takeoverMode
+      };
+      dispatch({ type: 'UPDATE_CHAT', payload: updatedChat });
+      console.log(`✅ [AppContext] Takeover mode actualizado para ${chatId}`);
+    } else {
+      console.warn(`⚠️ [AppContext] No se encontró chat ${chatId} para actualizar takeover mode`);
+    }
+  };
+
   const value: AppContextType = {
     state,
     dispatch,
@@ -803,6 +823,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     addSentWhatsAppMessage,
     injectTestWhatsAppMessage,
     injectTestOutgoingMessage,
+    updateChatTakeoverMode,
   };
 
   return (

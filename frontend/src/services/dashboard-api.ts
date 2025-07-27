@@ -66,6 +66,7 @@ export interface Conversation {
   contact_phone: string;
   status: 'active' | 'waiting' | 'closed';
   ai_mode: 'active' | 'inactive' | 'paused';
+  takeover_mode: 'spectator' | 'takeover' | 'ai_only'; // Agregar campo takeover_mode
   assigned_agent_id?: string;
   unread_count: number;
   last_message_at?: string;
@@ -194,6 +195,19 @@ class DashboardApiService {
     }
 
     return response.data as Conversation[];
+  }
+
+  /**
+   * Obtener mensajes de una conversación
+   */
+  async getConversationMessages(conversationId: string): Promise<ApiResponse<any[]>> {
+    const response = await this.request<any[]>(`/conversations/${conversationId}/messages`);
+
+    if (!response.success) {
+      throw new Error(response.message || 'Error al obtener mensajes de la conversación');
+    }
+
+    return response;
   }
 
   /**

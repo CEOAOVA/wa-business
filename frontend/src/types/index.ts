@@ -46,6 +46,7 @@ export interface Message {
   content: string;
   message_type?: 'text' | 'image' | 'quote' | 'document';
   whatsapp_message_id?: string;
+  waMessageId?: string; // Alias para whatsapp_message_id
   is_read?: boolean;
   metadata?: any;
   created_at?: string;
@@ -93,6 +94,7 @@ export interface Chat {
   tags: string[];
   priority: 'low' | 'medium' | 'high';
   status: 'open' | 'assigned' | 'waiting' | 'closed';
+  takeoverMode?: 'spectator' | 'takeover' | 'ai_only'; // Agregar campo takeover_mode
 }
 
 export interface Client {
