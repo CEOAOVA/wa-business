@@ -6,7 +6,6 @@ import { useMediaUpload } from "../hooks/useMediaUpload";
 import { MESSAGES } from "../constants/messages";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
-import whatsappApi from "../services/whatsapp-api";
 import type { Message } from "../types";
 
 // Componente para una burbuja de mensaje individual
