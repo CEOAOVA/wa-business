@@ -194,6 +194,33 @@ class WhatsAppApiService {
   }
 
   /**
+   * Formatear número para envío (compatible con backend)
+   */
+  formatPhoneForSending(phoneNumber: string): string {
+    // Limpiar el número (solo dígitos)
+    let cleaned = phoneNumber.replace(/[^\d]/g, '');
+    
+    // Si el número tiene más de 10 dígitos, tomar los últimos 10
+    if (cleaned.length > 10) {
+      cleaned = cleaned.slice(-10);
+      console.log(`📱 [Frontend] Número truncado a últimos 10 dígitos: ${cleaned}`);
+    }
+    
+    // Si tiene 10 dígitos y no empieza con 52, agregar código de país
+    if (cleaned.length === 10 && !cleaned.startsWith('52')) {
+      return '52' + cleaned;
+    }
+    
+    // Si ya tiene código de país, devolver tal como está
+    if (cleaned.length === 12 && cleaned.startsWith('52')) {
+      return cleaned;
+    }
+    
+    // Para otros casos, devolver el número limpio
+    return cleaned;
+  }
+
+  /**
    * Formatear número para mostrar
    */
   formatPhoneForDisplay(phoneNumber: string): string {

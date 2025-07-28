@@ -27,6 +27,12 @@ export function validatePhoneNumber(phone: string): PhoneValidationResult {
       };
     }
     
+    // Si el número tiene más de 10 dígitos, tomar los últimos 10
+    if (cleaned.length > 10) {
+      cleaned = cleaned.slice(-10);
+      console.log(`📱 [PhoneValidation] Número truncado a últimos 10 dígitos: ${cleaned}`);
+    }
+    
     // Si empieza con 1 (código de país), removerlo para México
     if (cleaned.startsWith('1') && cleaned.length === 11) {
       cleaned = cleaned.substring(1);

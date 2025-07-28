@@ -9,16 +9,23 @@ const router = express.Router();
 // POST /api/chat/send - Enviar mensaje de texto
 router.post('/send', async (req: any, res: any) => {
   try {
+    console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
     const { to, message } = req.body;
+    
     if (!to || !message) {
+      console.log('❌ [ChatRouter] Campos faltantes:', { to, message });
       return res.status(400).json({
         success: false,
         error: 'Los campos "to" y "message" son requeridos'
       });
     }
 
+    console.log('📱 [ChatRouter] Validando número:', to);
     const phoneValidation = validatePhoneNumber(to);
+    console.log('📱 [ChatRouter] Resultado validación:', phoneValidation);
+    
     if (!phoneValidation.isValid) {
+      console.log('❌ [ChatRouter] Número inválido:', phoneValidation.error);
       return res.status(400).json({
         success: false,
         error: phoneValidation.error

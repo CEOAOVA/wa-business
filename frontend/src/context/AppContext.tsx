@@ -511,9 +511,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       try {
         console.log(`📤 [AppContext] Enviando mensaje a conversación ${conversationId} (${phoneNumber}): ${content}`);
         
+        // Formatear número para envío
+        const formattedPhone = whatsappApi.formatPhoneForSending(phoneNumber);
+        console.log(`📱 [AppContext] Número original: ${phoneNumber}, formateado: ${formattedPhone}`);
+        
         // Usar el endpoint correcto para el nuevo esquema
         const result = await whatsappApi.sendMessage({
-          to: phoneNumber,
+          to: formattedPhone,
           message: content
         });
 
@@ -561,8 +565,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       try {
         console.log(`📤 [AppContext] Enviando mensaje WhatsApp legacy a ${phoneNumber}: ${content}`);
         
+        // Formatear número para envío
+        const formattedPhone = whatsappApi.formatPhoneForSending(phoneNumber);
+        console.log(`📱 [AppContext] Número original: ${phoneNumber}, formateado: ${formattedPhone}`);
+        
         const result = await whatsappApi.sendMessage({
-          to: phoneNumber,
+          to: formattedPhone,
           message: content
         });
 
