@@ -49,7 +49,7 @@ export interface MessagesResponse {
 }
 
 class WhatsAppApiService {
-  private baseUrl: string = `${BACKEND_URL}/api/chat`;
+  private baseUrl: string = `${BACKEND_URL}/api`;
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     
@@ -93,7 +93,7 @@ class WhatsAppApiService {
   async sendMessage(data: SendMessageRequest): Promise<ApiResponse<any>> {
     console.log('📤 Enviando mensaje:', data);
     
-    return this.request('/send', {
+    return this.request('/chat/send', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -105,7 +105,7 @@ class WhatsAppApiService {
   async getMessages(): Promise<ApiResponse<any[]>> {
     console.log('📥 Obteniendo mensajes');
     
-    return this.request('/messages', {
+    return this.request('/chat/messages', {
       method: 'GET'
     });
   }
@@ -116,7 +116,7 @@ class WhatsAppApiService {
   async sendTemplate(data: SendTemplateRequest): Promise<ApiResponse<any>> {
     console.log('📤 Enviando template:', data);
     
-    return this.request('/template', {
+    return this.request('/chat/template', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -126,21 +126,21 @@ class WhatsAppApiService {
    * Obtener estado de configuración
    */
   async getStatus(): Promise<ApiResponse<{ status: WhatsAppStatus }>> {
-    return this.request('/status');
+    return this.request('/chat/status');
   }
 
   /**
    * Obtener información del número
    */
   async getPhoneInfo(): Promise<ApiResponse<any>> {
-    return this.request('/info');
+    return this.request('/chat/info');
   }
 
   /**
    * Ejecutar prueba
    */
   async runTest(data?: Partial<SendMessageRequest>): Promise<ApiResponse<any>> {
-    return this.request('/test', {
+    return this.request('/chat/test', {
       method: 'POST',
       body: JSON.stringify(data || {})
     });
@@ -150,7 +150,7 @@ class WhatsAppApiService {
    * Configurar webhook
    */
   async setWebhook(callbackUrl: string): Promise<ApiResponse<any>> {
-    return this.request('/webhook/config', {
+    return this.request('/chat/webhook/config', {
       method: 'POST',
       body: JSON.stringify({ callbackUrl })
     });
@@ -231,7 +231,7 @@ class WhatsAppApiService {
     console.log(`🔍 [WhatsAppApi] Obteniendo mensajes entrantes (limit: ${limit}, offset: ${offset})`);
     
     try {
-      const response = await this.request(`/messages?limit=${limit}&offset=${offset}`, {
+      const response = await this.request(`/chat/messages?limit=${limit}&offset=${offset}`, {
         method: 'GET'
       }) as any;
       
@@ -258,7 +258,7 @@ class WhatsAppApiService {
    * Marcar mensaje como leído
    */
   async markMessageAsRead(messageId: string): Promise<ApiResponse<any>> {
-    return this.request(`/messages/${messageId}/read`, {
+    return this.request(`/chat/messages/${messageId}/read`, {
       method: 'PUT'
     });
   }
@@ -267,7 +267,7 @@ class WhatsAppApiService {
    * Limpiar mensajes antiguos
    */
   async cleanupOldMessages(hours: number = 24): Promise<ApiResponse<any>> {
-    return this.request(`/messages/cleanup?hours=${hours}`, {
+    return this.request(`/chat/messages/cleanup?hours=${hours}`, {
       method: 'DELETE'
     });
   }
@@ -302,7 +302,7 @@ class WhatsAppApiService {
       conversationId: string;
       aiMode: 'active' | 'inactive';
       assignedAgentId?: string;
-    }>(`/conversations/${conversationId}/set-mode`, {
+    }>(`/chat/conversations/${conversationId}/set-mode`, {
       method: 'POST',
       body: JSON.stringify(requestData)
     });
@@ -322,7 +322,7 @@ class WhatsAppApiService {
       conversationId: string;
       aiMode: 'active' | 'inactive';
       assignedAgentId?: string;
-    }>(`/conversations/${conversationId}/mode`);
+    }>(`/chat/conversations/${conversationId}/mode`);
   }
 
   /**
@@ -363,7 +363,7 @@ class WhatsAppApiService {
       conversationId: string;
       messageCount: number;
       generatedAt: string;
-    }>(`/conversations/${conversationId}/summary${queryParams}`);
+    }>(`/chat/conversations/${conversationId}/summary${queryParams}`);
   }
 
   /**
@@ -391,7 +391,7 @@ class WhatsAppApiService {
     if (offset) queryParams.append('offset', offset.toString());
     
     const queryString = queryParams.toString();
-    const endpoint = `/conversations/${conversationId}/messages${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/chat/conversations/${conversationId}/messages${queryString ? `?${queryString}` : ''}`;
     
     return this.request<{
       messages: any[];
