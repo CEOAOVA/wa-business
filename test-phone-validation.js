@@ -1,19 +1,10 @@
-import { whatsappConfig } from '../config/whatsapp';
-
 /**
- * Utilidades para WhatsApp Business API
+ * Script de prueba para validar números de teléfono
+ * Verifica que los números mexicanos se procesen correctamente
  */
 
-export interface PhoneValidationResult {
-  isValid: boolean;
-  formatted: string;
-  error?: string;
-}
-
-/**
- * Validar y formatear número de teléfono para WhatsApp
- */
-export function validatePhoneNumber(phone: string): PhoneValidationResult {
+// Simular la función validatePhoneNumber del backend (versión corregida con lógica inteligente)
+function validatePhoneNumber(phone) {
   try {
     // Remover todos los caracteres no numéricos
     let cleaned = phone.replace(/\D/g, '');
@@ -115,94 +106,55 @@ export function validatePhoneNumber(phone: string): PhoneValidationResult {
   }
 }
 
-/**
- * Verificar webhook de WhatsApp
- */
-export function verifyWebhook(mode: string, token: string, challenge: string): string | null {
-  try {
-    // Verificar que el modo sea 'subscribe'
-    if (mode !== 'subscribe') {
-      console.error('❌ Modo de webhook inválido:', mode);
-      return null;
+// Casos de prueba específicos para el problema reportado
+const testCases = [
+  // Caso específico del problema reportado
+  { input: '5215549679734', expected: '5215549679734', description: 'Número mexicano completo con 52155 (CASO PROBLEMA)' },
+  { input: '15549679734', expected: '5215549679734', description: 'Número mexicano sin código país (155)' },
+  { input: '5549679734', expected: '525549679734', description: 'Número mexicano sin código país (55)' },
+  
+  // Números mexicanos correctos
+  { input: '521551234567', expected: '521551234567', description: 'Número mexicano completo con 52' },
+  { input: '1551234567', expected: '521551234567', description: 'Número mexicano sin código país' },
+  { input: '551234567', expected: '52551234567', description: 'Número mexicano sin código país' },
+  
+  // Números con formato internacional
+  { input: '+521551234567', expected: '521551234567', description: 'Número con +52' },
+  { input: '52 155 123 4567', expected: '521551234567', description: 'Número con espacios' },
+  { input: '52-155-123-4567', expected: '521551234567', description: 'Número con guiones' },
+  
+  // Números largos (deberían truncarse inteligentemente)
+  { input: '521551234567890', expected: '5215512345678', description: 'Número largo con 521 (truncar a 13 dígitos)' },
+  { input: '521234567890123', expected: '521234567890', description: 'Número largo con 52 (truncar últimos 12)' },
+  { input: '1551234567890', expected: '521551234567', description: 'Número largo sin código país (truncar)' },
+  
+  // Casos inválidos
+  { input: '123', expected: 'invalid', description: 'Número muy corto' },
+  { input: '521234', expected: 'invalid', description: 'Número mexicano incompleto' },
+];
+
+console.log('🧪 Probando validación de números de teléfono (VERSIÓN FINAL)...\n');
+
+testCases.forEach((testCase, index) => {
+  console.log(`📱 Test ${index + 1}: ${testCase.description}`);
+  console.log(`   Input: ${testCase.input}`);
+  
+  const result = validatePhoneNumber(testCase.input);
+  
+  if (testCase.expected === 'invalid') {
+    if (!result.isValid) {
+      console.log(`   ✅ PASÓ - Correctamente inválido: ${result.error}`);
+    } else {
+      console.log(`   ❌ FALLÓ - Debería ser inválido pero resultó válido: ${result.formatted}`);
     }
-    
-    // Verificar que el token coincida
-    if (token !== whatsappConfig.webhook.verifyToken) {
-      console.error('❌ Token de verificación inválido');
-      console.error('❌ Token recibido:', token);
-      console.error('❌ Token esperado:', whatsappConfig.webhook.verifyToken);
-      return null;
+  } else {
+    if (result.isValid && result.formatted === testCase.expected) {
+      console.log(`   ✅ PASÓ - Resultado correcto: ${result.formatted}`);
+    } else {
+      console.log(`   ❌ FALLÓ - Esperado: ${testCase.expected}, Obtenido: ${result.formatted} (${result.error || 'sin error'})`);
     }
-    
-    // Verificar que el challenge esté presente
-    if (!challenge) {
-      console.error('❌ Challenge no proporcionado');
-      return null;
-    }
-    
-    console.log('✅ Verificación de webhook exitosa');
-    console.log('✅ Challenge:', challenge);
-    
-    // Retornar el challenge para que WhatsApp lo reciba
-    return challenge;
-  } catch (error) {
-    console.error('❌ Error en verificación de webhook:', error);
-    return null;
   }
-}
+  console.log('');
+});
 
-/**
- * Obtener información de debug del webhook
- */
-export function getWebhookDebugInfo() {
-  return {
-    url: whatsappConfig.webhook.url,
-    path: whatsappConfig.webhook.path,
-    verifyTokenConfigured: whatsappConfig.webhook.verifyToken !== 'not_configured',
-    verifyTokenLength: whatsappConfig.webhook.verifyToken.length,
-    accessTokenConfigured: whatsappConfig.accessToken !== 'not_configured',
-    phoneNumberIdConfigured: whatsappConfig.phoneNumberId !== 'not_configured',
-    signatureVerificationEnabled: whatsappConfig.webhook.enableSignatureVerification,
-    apiVersion: whatsappConfig.apiVersion
-  };
-}
-
-/**
- * Configurar URL del webhook
- */
-export async function setWebhookUrl(callbackUrl: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    // En una implementación real, aquí se haría una llamada a la API de Meta
-    // para configurar el webhook en el panel de desarrolladores
-    
-    console.log('🔧 Configurando webhook URL:', callbackUrl);
-    
-    // Por ahora, solo loggeamos la URL
-    // En producción, esto debería hacer una llamada a la API de Meta
-    
-    return {
-      success: true
-    };
-  } catch (error: any) {
-    console.error('❌ Error configurando webhook:', error);
-    return {
-      success: false,
-      error: error.message
-    };
-  }
-}
-
-/**
- * Obtener estadísticas básicas
- */
-export function getStats() {
-  return {
-    success: true,
-    stats: {
-      whatsappConfigured: whatsappConfig.isConfigured,
-      webhookConfigured: whatsappConfig.webhook.verifyToken !== 'not_configured',
-      apiVersion: whatsappConfig.apiVersion,
-      timestamp: new Date().toISOString()
-    }
-  };
-} 
+console.log('🎯 Pruebas completadas. Verifica que el caso específico 5215549679734 mantenga el "1" y no se convierta en 525549679734.');

@@ -3272,3 +3272,147 @@
   message: 'Refresh token error:',
   timestamp: '2025-07-28 16:10:10.452'
 }
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-28 16:30:52.729'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-28 16:30:52.729'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-28 16:30:52.730'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-28 16:30:52.733'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-28 16:30:52.733'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-28 16:30:52.733'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-28 16:31:57.713'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-28 16:31:57.714'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-28 16:31:57.714'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-07-28 16:31:57.771'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-07-28 16:31:57.772'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-07-28 16:31:57.772'
+}

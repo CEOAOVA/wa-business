@@ -200,6 +200,43 @@ class WhatsAppApiService {
     // Limpiar el número (solo dígitos)
     let cleaned = phoneNumber.replace(/[^\d]/g, '');
     
+    // Si el número empieza con 52 (código de México), procesarlo correctamente
+    if (cleaned.startsWith('52')) {
+      // Si tiene exactamente 12 dígitos (52 + 10 dígitos), está bien formateado
+      if (cleaned.length === 12) {
+        return cleaned;
+      }
+      // Si tiene exactamente 13 dígitos y empieza con 521, está bien formateado
+      if (cleaned.length === 13 && cleaned.startsWith('521')) {
+        return cleaned;
+      }
+      // Si tiene más de 13 dígitos, verificar si es un número válido de México
+      if (cleaned.length > 13) {
+        // Si empieza con 521 (código de México + área), mantener el formato
+        if (cleaned.startsWith('521')) {
+          // Tomar los primeros 13 dígitos para mantener el formato correcto
+          cleaned = cleaned.substring(0, 13);
+          console.log(`📱 [Frontend] Número mexicano con área truncado a 13 dígitos: ${cleaned}`);
+          return cleaned;
+        } else {
+          // Para otros casos, tomar los últimos 12 dígitos
+          cleaned = cleaned.slice(-12);
+          console.log(`📱 [Frontend] Número con código 52 truncado a últimos 12 dígitos: ${cleaned}`);
+          return cleaned;
+        }
+      }
+      // Si tiene menos de 12 dígitos pero empieza con 52, es inválido
+      console.warn(`📱 [Frontend] Número mexicano incompleto: ${cleaned}`);
+      return cleaned; // Devolver tal como está para que el backend lo valide
+    }
+    
+    // Si empieza con 1 (código de país), removerlo para México
+    // SOLO si no es un número mexicano (no empieza con 52)
+    if (cleaned.startsWith('1') && cleaned.length === 11 && !cleaned.startsWith('521')) {
+      cleaned = cleaned.substring(1);
+      console.log(`📱 [Frontend] Removido código de país 1: ${cleaned}`);
+    }
+    
     // Si el número tiene más de 10 dígitos, tomar los últimos 10
     if (cleaned.length > 10) {
       cleaned = cleaned.slice(-10);
