@@ -98,12 +98,19 @@ export class AutomotivePartsConversationService {
     // Patrones para extraer información de marca
     const marcaPatterns = [
       /(?:para|de|mi)\s+(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai|bmw|mercedes|audi|kia|subaru|mitsubishi|suzuki|isuzu|jeep|dodge|vw|volkswagen)/i,
-      /(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai|bmw|mercedes|audi|kia|subaru|mitsubishi|suzuki|isuzu|jeep|dodge|vw|volkswagen)\s+(corolla|civic|sentra|focus|cruze|golf|3|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra|sprinter|crafter)/i
+      /(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai|bmw|mercedes|audi|kia|subaru|mitsubishi|suzuki|isuzu|jeep|dodge|vw|volkswagen)\s+(corolla|civic|sentra|focus|cruze|golf|3|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra|sprinter|crafter)/i,
+      // Patrones específicos para VW
+      /(vw|volkswagen)\s+(crafter|sprinter)/i,
+      /(crafter|sprinter)\s+(w906|w906)/i
     ];
 
     // Patrones para extraer información de modelo
     const modeloPatterns = [
-      /(corolla|civic|sentra|focus|cruze|golf|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra|sprinter|crafter|w906)/i
+      /(corolla|civic|sentra|focus|cruze|golf|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra|sprinter|crafter|w906)/i,
+      // Patrones específicos para modelos VW
+      /(sprinter\s+w906)/i,
+      /(crafter\s+w906)/i,
+      /(w906)/i
     ];
 
     // Patrones para extraer año
@@ -112,21 +119,51 @@ export class AutomotivePartsConversationService {
       /(\d{4})/i
     ];
 
-    // Extraer marca
+    // Extraer marca y modelo con mejor lógica
+    let marcaFound = false;
+    let modeloFound = false;
+
+    // Buscar patrones específicos primero
     for (const pattern of marcaPatterns) {
       const match = message.match(pattern);
       if (match) {
         carInfo.marca = match[1].toLowerCase();
+        marcaFound = true;
         break;
       }
     }
 
-    // Extraer modelo
+    // Buscar modelo específico
     for (const pattern of modeloPatterns) {
       const match = message.match(pattern);
       if (match) {
         carInfo.modelo = match[1].toLowerCase();
+        modeloFound = true;
         break;
+      }
+    }
+
+    // Si no se encontró marca, buscar en el texto completo
+    if (!marcaFound) {
+      const marcaKeywords = ['vw', 'volkswagen', 'toyota', 'honda', 'nissan', 'ford', 'chevrolet'];
+      for (const keyword of marcaKeywords) {
+        if (message.toLowerCase().includes(keyword)) {
+          carInfo.marca = keyword;
+          marcaFound = true;
+          break;
+        }
+      }
+    }
+
+    // Si no se encontró modelo, buscar en el texto completo
+    if (!modeloFound) {
+      const modeloKeywords = ['sprinter', 'crafter', 'w906', 'corolla', 'civic', 'sentra'];
+      for (const keyword of modeloKeywords) {
+        if (message.toLowerCase().includes(keyword)) {
+          carInfo.modelo = keyword;
+          modeloFound = true;
+          break;
+        }
       }
     }
 
@@ -155,9 +192,13 @@ export class AutomotivePartsConversationService {
     
     // Patrones genéricos para piezas (sin sobre-ingeniería específica)
     const partPatterns = [
-      // Frases completas comunes
+      // Frases completas específicas para funda de palanca
+      /(funda\s+(?:de\s+)?palanca\s+(?:de\s+)?velocidades?\s+(?:de\s+)?transmision\s+estandar)/i,
+      /(funda\s+(?:de\s+)?palanca\s+(?:de\s+)?transmision\s+estandar)/i,
       /(funda\s+(?:de\s+)?palanca\s+(?:de\s+)?velocidades?)/i,
       /(funda\s+(?:de\s+)?palanca\s+(?:de\s+)?transmision)/i,
+      
+      // Otras frases completas comunes
       /(pastillas?\s+(?:de\s+)?freno)/i,
       /(discos?\s+(?:de\s+)?freno)/i,
       /(balatas?\s+(?:de\s+)?freno)/i,
@@ -169,7 +210,7 @@ export class AutomotivePartsConversationService {
       /(bateria)/i,
       /(llantas?)/i,
       
-      // Palabras individuales
+      // Palabras individuales (fallback)
       /(funda)/i,
       /(palanca)/i,
       /(pastillas?)/i,
@@ -186,13 +227,36 @@ export class AutomotivePartsConversationService {
       /(llantas?)/i
     ];
 
-    // Buscar coincidencias
+    // Buscar coincidencias en el texto normalizado
     for (const pattern of partPatterns) {
       const match = normalizedMessage.match(pattern);
       if (match) {
         const extractedPart = match[1].toLowerCase().trim();
         console.log(`[AutomotivePartsConversation] ✅ Pieza extraída: "${extractedPart}"`);
         return extractedPart;
+      }
+    }
+
+    // Si no se encontró con patrones, buscar palabras clave específicas
+    const partKeywords = [
+      'funda palanca velocidades transmision estandar',
+      'funda palanca transmision estandar',
+      'funda palanca velocidades',
+      'funda palanca',
+      'pastillas freno',
+      'discos freno',
+      'filtro aceite',
+      'filtro aire',
+      'kit embrague',
+      'amortiguador',
+      'bateria',
+      'llantas'
+    ];
+
+    for (const keyword of partKeywords) {
+      if (normalizedMessage.includes(keyword)) {
+        console.log(`[AutomotivePartsConversation] ✅ Pieza extraída por palabra clave: "${keyword}"`);
+        return keyword;
       }
     }
 

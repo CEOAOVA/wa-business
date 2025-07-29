@@ -9,6 +9,7 @@ import { databaseService } from './database.service';
 import { getConfig } from '../config';
 import { openRouterClient } from '../config/openai-client';
 import { AdvancedConversationEngine } from './conversation/advanced-conversation-engine';
+import { AutomotivePartsConversationService } from './conversation/automotive-parts-conversation.service';
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -113,9 +114,11 @@ export class ChatbotService {
 
   // NUEVO: Instancia del motor de conversación avanzado
   private advancedEngine: AdvancedConversationEngine;
+  private automotivePartsService: AutomotivePartsConversationService;
 
   constructor() {
     this.advancedEngine = new AdvancedConversationEngine();
+    this.automotivePartsService = new AutomotivePartsConversationService();
     this.startCleanupInterval();
   }
 
@@ -124,6 +127,49 @@ export class ChatbotService {
    */
   private startCleanupInterval(): void {
     setInterval(() => this.cleanupExpiredSessions(), 5 * 60 * 1000); // Cada 5 minutos
+  }
+
+  /**
+   * Detectar si el mensaje es sobre piezas automotrices
+   */
+  private isAutomotivePartsMessage(message: string): boolean {
+    const normalizedMessage = message.toLowerCase();
+    
+    // Palabras clave relacionadas con piezas automotrices
+    const automotiveKeywords = [
+      'funda', 'palanca', 'velocidades', 'transmision', 'estandar',
+      'pastillas', 'freno', 'discos', 'balatas',
+      'filtro', 'aceite', 'aire', 'combustible',
+      'embrague', 'clutch', 'amortiguador', 'bateria',
+      'llantas', 'neumaticos', 'aceite', 'refrigerante',
+      'bujias', 'correa', 'bomba', 'radiador',
+      'escape', 'silenciador', 'suspension', 'direccion'
+    ];
+
+    // Verificar si el mensaje contiene palabras clave automotrices
+    for (const keyword of automotiveKeywords) {
+      if (normalizedMessage.includes(keyword)) {
+        console.log(`[ChatbotService] Detectada palabra clave automotriz: "${keyword}"`);
+        return true;
+      }
+    }
+
+    // Verificar si el mensaje menciona marcas de autos
+    const carBrands = [
+      'toyota', 'honda', 'nissan', 'ford', 'chevrolet', 'volkswagen',
+      'mazda', 'hyundai', 'bmw', 'mercedes', 'audi', 'kia',
+      'subaru', 'mitsubishi', 'suzuki', 'isuzu', 'jeep', 'dodge',
+      'vw', 'volkswagen', 'sprinter', 'crafter'
+    ];
+
+    for (const brand of carBrands) {
+      if (normalizedMessage.includes(brand)) {
+        console.log(`[ChatbotService] Detectada marca de auto: "${brand}"`);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -138,32 +184,65 @@ export class ChatbotService {
     try {
       console.log(`[ChatbotService] Procesando mensaje de ${phoneNumber}: ${message.substring(0, 50)}...`);
 
-      // NUEVO: Usar el motor de conversación avanzado
-      const request = {
-        conversationId: `wa-${phoneNumber}`,
-        userId: phoneNumber,
-        phoneNumber: phoneNumber,
-        message: message,
-        pointOfSaleId: 'default'
-      };
-
-      const response = await this.advancedEngine.processConversation(request);
-
-      console.log(`[ChatbotService] Respuesta generada: ${response.response.substring(0, 100)}...`);
-
-      return {
-        response: response.response,
-        shouldSend: true,
-        conversationState: {
-          conversationId: request.conversationId,
+      // Detectar si el mensaje es sobre piezas automotrices
+      const isAutomotivePartsRequest = this.isAutomotivePartsMessage(message);
+      
+      if (isAutomotivePartsRequest) {
+        console.log(`[ChatbotService] Detectado mensaje de piezas automotrices, usando servicio especializado`);
+        
+        const request = {
+          conversationId: `wa-${phoneNumber}`,
+          userId: phoneNumber,
           phoneNumber: phoneNumber,
-          status: 'greeting' as DataCollectionStatus,
-          clientInfo: {},
-          messages: [],
-          createdAt: new Date(),
-          lastActivity: new Date()
-        }
-      };
+          message: message,
+          pointOfSaleId: 'default'
+        };
+
+        const response = await this.automotivePartsService.processAutomotivePartsConversation(request);
+        
+        console.log(`[ChatbotService] Respuesta de piezas automotrices: ${response.response.substring(0, 100)}...`);
+
+        return {
+          response: response.response,
+          shouldSend: true,
+          conversationState: {
+            conversationId: request.conversationId,
+            phoneNumber: phoneNumber,
+            status: 'greeting' as DataCollectionStatus,
+            clientInfo: {},
+            messages: [],
+            createdAt: new Date(),
+            lastActivity: new Date()
+          }
+        };
+      } else {
+        // Usar el motor de conversación general
+        const request = {
+          conversationId: `wa-${phoneNumber}`,
+          userId: phoneNumber,
+          phoneNumber: phoneNumber,
+          message: message,
+          pointOfSaleId: 'default'
+        };
+
+        const response = await this.advancedEngine.processConversation(request);
+
+        console.log(`[ChatbotService] Respuesta general: ${response.response.substring(0, 100)}...`);
+
+        return {
+          response: response.response,
+          shouldSend: true,
+          conversationState: {
+            conversationId: request.conversationId,
+            phoneNumber: phoneNumber,
+            status: 'greeting' as DataCollectionStatus,
+            clientInfo: {},
+            messages: [],
+            createdAt: new Date(),
+            lastActivity: new Date()
+          }
+        };
+      }
 
     } catch (error) {
       console.error('[ChatbotService] Error procesando mensaje:', error);
