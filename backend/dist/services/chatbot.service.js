@@ -55,18 +55,32 @@ const env_loader_1 = require("../config/env-loader");
 const whatsapp_service_1 = require("./whatsapp.service");
 const database_service_1 = require("./database.service");
 const config_1 = require("../config");
+const advanced_conversation_engine_1 = require("./conversation/advanced-conversation-engine");
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 class ChatbotService {
     constructor() {
         this.conversations = new Map();
         this.SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
+        // NUEVO: Usar configuración centralizada
+        this.config = (0, config_1.getConfig)();
         this.openRouterConfig = {
-            baseURL: 'https://openrouter.ai/api/v1',
-            model: 'google/gemini-2.5-flash-lite-preview-06-17',
-            timeout: 30000
+            baseURL: this.config.llm.openRouterBaseUrl,
+            model: this.config.llm.openRouterModel,
+            timeout: this.config.llm.timeout,
+            headers: {
+                'Authorization': `Bearer ${this.config.llm.openRouterApiKey}`,
+                'HTTP-Referer': 'http://localhost:3002',
+                'X-Title': 'Embler WhatsApp Chatbot'
+            }
         };
-        // Limpieza automática de sesiones expiradas
+        this.advancedEngine = new advanced_conversation_engine_1.AdvancedConversationEngine();
+        this.startCleanupInterval();
+    }
+    /**
+     * Limpiar sesiones expiradas
+     */
+    startCleanupInterval() {
         setInterval(() => this.cleanupExpiredSessions(), 5 * 60 * 1000); // Cada 5 minutos
     }
     /**
@@ -76,52 +90,28 @@ class ChatbotService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`[ChatbotService] Procesando mensaje de ${phoneNumber}: ${message.substring(0, 50)}...`);
-                // Obtener o crear conversación
-                const conversationId = `wa-${phoneNumber}`;
-                let conversation = this.conversations.get(conversationId);
-                if (!conversation) {
-                    conversation = yield this.startConversation(conversationId, phoneNumber);
-                }
-                // Actualizar actividad
-                conversation.lastActivity = new Date();
-                // Agregar mensaje del usuario (SOLO EN MEMORIA, NO EN BD)
-                const userMsg = {
-                    id: `msg-${Date.now()}-user`,
-                    role: 'user',
-                    content: message,
-                    timestamp: new Date()
+                // NUEVO: Usar el motor de conversación avanzado
+                const request = {
+                    conversationId: `wa-${phoneNumber}`,
+                    userId: phoneNumber,
+                    phoneNumber: phoneNumber,
+                    message: message,
+                    pointOfSaleId: 'default'
                 };
-                conversation.messages.push(userMsg);
-                // NO guardar mensaje del usuario en la base de datos aquí
-                // await this.saveMessageToDatabase(conversation.phoneNumber, userMsg);
-                // Generar respuesta con IA
-                const aiResponse = yield this.generateAIResponse(conversation);
-                // Agregar respuesta del asistente (SOLO EN MEMORIA, NO EN BD)
-                const assistantMsg = {
-                    id: `msg-${Date.now()}-assistant`,
-                    role: 'assistant',
-                    content: aiResponse.content,
-                    timestamp: new Date(),
-                    functionCalled: aiResponse.functionCalled,
-                    clientData: conversation.clientInfo
-                };
-                conversation.messages.push(assistantMsg);
-                // NO guardar respuesta del asistente en la base de datos aquí
-                // await this.saveMessageToDatabase(conversation.phoneNumber, assistantMsg);
-                // Actualizar estado de la conversación si se procesó datos
-                if (aiResponse.updatedClientInfo) {
-                    conversation.clientInfo = Object.assign(Object.assign({}, conversation.clientInfo), aiResponse.updatedClientInfo);
-                    conversation.status = this.determineNextStatus(conversation.clientInfo);
-                    // Guardar resumen actualizado en la base de datos (esto sí es necesario)
-                    yield this.saveConversationSummary(conversation);
-                }
-                // Guardar conversación actualizada en memoria
-                this.conversations.set(conversationId, conversation);
-                console.log(`[ChatbotService] Respuesta generada: ${aiResponse.content.substring(0, 100)}...`);
+                const response = yield this.advancedEngine.processConversation(request);
+                console.log(`[ChatbotService] Respuesta generada: ${response.response.substring(0, 100)}...`);
                 return {
-                    response: aiResponse.content,
+                    response: response.response,
                     shouldSend: true,
-                    conversationState: conversation
+                    conversationState: {
+                        conversationId: request.conversationId,
+                        phoneNumber: phoneNumber,
+                        status: 'greeting',
+                        clientInfo: {},
+                        messages: [],
+                        createdAt: new Date(),
+                        lastActivity: new Date()
+                    }
                 };
             }
             catch (error) {

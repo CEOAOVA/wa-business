@@ -18,12 +18,15 @@ const openai_client_1 = require("../../config/openai-client");
 const function_handler_1 = require("../llm/function-handler");
 const concepts_service_1 = require("../concepts-service");
 const conversation_memory_1 = require("./conversation-memory");
+const config_1 = require("../../config");
 const functionHandler = new function_handler_1.FunctionCallHandler();
 const dynamic_prompt_generator_1 = require("./dynamic-prompt-generator");
 class AdvancedConversationEngine {
     constructor(config) {
         this.activeConversations = new Map();
-        this.config = Object.assign({ maxContextLength: 4000, maxFunctionCalls: 5, timeoutMs: 30000, retryAttempts: 3, enableMemoryLearning: true, enableDynamicPrompts: true }, config);
+        // NUEVO: Configuración centralizada de LLM
+        this.llmConfig = (0, config_1.getConfig)().llm;
+        this.config = Object.assign({ maxContextLength: 4000, maxFunctionCalls: 5, timeoutMs: this.llmConfig.timeout, retryAttempts: 3, enableMemoryLearning: true, enableDynamicPrompts: true }, config);
     }
     /**
      * Procesa un mensaje completo con toda la funcionalidad avanzada
@@ -365,16 +368,16 @@ class AdvancedConversationEngine {
                 : this.generateStaticPrompt(context);
             const functions = functionHandler.getFunctionDefinitions();
             const availableFunctions = functions.filter(f => context.availableFunctions.includes(f.name));
-            const response = yield openai_client_1.openAIClient.createChatCompletion({
-                model: "gpt-4o-mini",
+            const response = yield openai_client_1.openRouterClient.createChatCompletion({
+                model: this.llmConfig.openRouterModel,
                 messages: [
                     { role: "system", content: prompt },
                     { role: "user", content: context.currentMessage }
                 ],
                 functions: availableFunctions,
                 function_call: "auto",
-                temperature: 0.7,
-                max_tokens: 1000
+                temperature: this.llmConfig.defaultTemperature,
+                max_tokens: this.llmConfig.defaultMaxTokens
             });
             return response.choices[0].message;
         });
@@ -400,7 +403,7 @@ Responde de manera profesional y usa funciones cuando sea necesario.`;
             if (llmResponse.function_call) {
                 try {
                     const result = yield functionHandler.processFunctionCall(llmResponse.function_call, [], {
-                        model: "gpt-4o-mini",
+                        model: this.llmConfig.openRouterModel,
                         messages: []
                     }, { pointOfSaleId: conversationId });
                     functionResults.push(result);
@@ -439,7 +442,7 @@ Responde de manera profesional y usa funciones cuando sea necesario.`;
         
         Genera una respuesta mejorada que integre los datos de manera natural.`;
                     try {
-                        const enhancedResponse = yield openai_client_1.openAIClient.createChatCompletion({
+                        const enhancedResponse = yield openai_client_1.openRouterClient.createChatCompletion({
                             model: "gpt-4o-mini",
                             messages: [
                                 { role: "system", content: contextualPrompt },

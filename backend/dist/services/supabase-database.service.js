@@ -531,7 +531,36 @@ class SupabaseDatabaseService {
                 };
                 // Incrementar contador de mensajes no leídos si es mensaje del usuario
                 if (data.senderType === 'user') {
-                    updateData.unread_count = supabase_1.supabase.rpc('increment_unread_count');
+                    try {
+                        // Intentar usar la función RPC si existe
+                        const { error: incrementError } = yield supabase_1.supabase.rpc('increment_unread_count', {
+                            conversation_id: data.conversationId
+                        });
+                        if (incrementError) {
+                            console.log('⚠️ Función RPC no disponible, usando método alternativo');
+                            // Método alternativo: obtener el valor actual y sumar 1
+                            const { data: currentConversation } = yield supabase_1.supabase
+                                .from('conversations')
+                                .select('unread_count')
+                                .eq('id', data.conversationId)
+                                .single();
+                            if (currentConversation) {
+                                updateData.unread_count = (currentConversation.unread_count || 0) + 1;
+                            }
+                        }
+                    }
+                    catch (error) {
+                        console.log('⚠️ Error con función RPC, usando método alternativo');
+                        // Método alternativo: obtener el valor actual y sumar 1
+                        const { data: currentConversation } = yield supabase_1.supabase
+                            .from('conversations')
+                            .select('unread_count')
+                            .eq('id', data.conversationId)
+                            .single();
+                        if (currentConversation) {
+                            updateData.unread_count = (currentConversation.unread_count || 0) + 1;
+                        }
+                    }
                 }
                 const { error: updateError } = yield supabase_1.supabase
                     .from('conversations')
@@ -1004,16 +1033,25 @@ class SupabaseDatabaseService {
     canChatbotProcessMessage(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.isEnabled || !supabase_1.supabase) {
-                return false;
+                // TEMPORAL: Permitir procesamiento si Supabase no está disponible
+                console.log('⚠️ Supabase no disponible, permitiendo procesamiento de chatbot por defecto');
+                return true;
             }
             try {
                 const mode = yield this.getConversationTakeoverMode(conversationId);
                 // El chatbot puede procesar solo si está en modo 'spectator' o 'ai_only'
+                // TEMPORAL: Si no se puede obtener el modo, permitir procesamiento
+                if (mode === null) {
+                    console.log('⚠️ No se pudo obtener takeover_mode, permitiendo procesamiento por defecto');
+                    return true;
+                }
                 return mode === 'spectator' || mode === 'ai_only';
             }
             catch (error) {
                 console.error('Error verificando si chatbot puede procesar:', error);
-                return false;
+                // TEMPORAL: En caso de error, permitir procesamiento
+                console.log('⚠️ Error verificando takeover_mode, permitiendo procesamiento por defecto');
+                return true;
             }
         });
     }

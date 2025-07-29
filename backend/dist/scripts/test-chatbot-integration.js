@@ -12,37 +12,47 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testChatbotIntegration = testChatbotIntegration;
 const chatbot_service_1 = require("../services/chatbot.service");
 /**
- * Script para probar la integración del chatbot con las nuevas funciones
+ * Script para probar la integración del ChatbotService con AdvancedConversationEngine
  */
 function testChatbotIntegration() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('🧪 Probando integración del chatbot con búsqueda de productos...\n');
+        var _a;
+        console.log('🧪 Probando integración ChatbotService + AdvancedConversationEngine...\n');
         try {
             const chatbotService = new chatbot_service_1.ChatbotService();
-            // Simular un mensaje de WhatsApp
-            const phoneNumber = '5512345678';
-            const testMessage = 'Necesito balatas para mi Toyota Corolla 2018';
-            console.log(`📱 Mensaje de prueba: "${testMessage}"`);
-            console.log(`📞 Número: ${phoneNumber}\n`);
-            // Procesar el mensaje
-            const result = yield chatbotService.processWhatsAppMessage(phoneNumber, testMessage);
-            console.log('📤 Respuesta del chatbot:');
-            console.log('✅ Éxito:', result.shouldSend);
-            console.log('💬 Mensaje:', result.response);
-            if (result.error) {
-                console.log('❌ Error:', result.error);
+            // Simular mensajes de prueba
+            const testMessages = [
+                // 1. Solo saludo - no debe buscar productos
+                "Hola",
+                // 2. Solo pieza - debe preguntar por datos del auto
+                "Necesito balatas",
+                // 3. Solo datos del auto - debe preguntar qué pieza busca
+                "Tengo un Toyota Corolla 2018",
+                // 4. Información completa - debe buscar productos
+                "Necesito balatas para mi Toyota Corolla 2018",
+                // 5. Información completa con marca específica
+                "Busco filtro de aceite para Honda Civic 2020"
+            ];
+            for (let i = 0; i < testMessages.length; i++) {
+                const message = testMessages[i];
+                console.log(`\n📝 Mensaje ${i + 1}: "${message}"`);
+                try {
+                    const result = yield chatbotService.processWhatsAppMessage('1234567890', message);
+                    console.log(`  ✅ Respuesta: ${result.response.substring(0, 100)}...`);
+                    console.log(`  Intent: ${(_a = result.conversationState) === null || _a === void 0 ? void 0 : _a.status}`);
+                    console.log(`  Debe enviar: ${result.shouldSend}`);
+                    if (result.error) {
+                        console.log(`  ❌ Error: ${result.error}`);
+                    }
+                }
+                catch (error) {
+                    console.log(`  ❌ Error procesando mensaje: ${error}`);
+                }
             }
-            if (result.conversationState) {
-                console.log('\n📊 Estado de la conversación:');
-                console.log('  ID:', result.conversationState.conversationId);
-                console.log('  Estado:', result.conversationState.status);
-                console.log('  Datos del cliente:', JSON.stringify(result.conversationState.clientInfo, null, 2));
-                console.log('  Mensajes:', result.conversationState.messages.length);
-            }
-            console.log('\n🎉 Prueba completada!');
+            console.log('\n🎉 Pruebas de integración completadas!');
         }
         catch (error) {
-            console.error('❌ Error en la prueba:', error);
+            console.error('❌ Error en las pruebas:', error);
             throw error;
         }
     });
@@ -51,11 +61,11 @@ function testChatbotIntegration() {
 if (require.main === module) {
     testChatbotIntegration()
         .then(() => {
-        console.log('✅ Prueba de integración completada');
+        console.log('✅ Pruebas de integración completadas');
         process.exit(0);
     })
         .catch((error) => {
-        console.error('❌ Error en prueba de integración:', error);
+        console.error('❌ Error en pruebas:', error);
         process.exit(1);
     });
 }

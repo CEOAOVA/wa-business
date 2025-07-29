@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Function Call Handler para WhatsApp Backend
+ * Procesa function calls y coordina con el OpenRouter client
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,10 +16,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.functionCallHandler = exports.FunctionCallHandler = void 0;
 const openai_client_1 = require("./openai-client");
 const function_service_1 = require("./function-service");
-const text_processing_1 = require("../../utils/text-processing");
 class FunctionCallHandler {
     constructor() {
-        this.openaiClient = new openai_client_1.OpenAIClient();
+        this.functionService = new function_service_1.FunctionService();
+        this.openRouterClient = new openai_client_1.OpenRouterClient();
     }
     /**
      * Procesa una llamada a función LLM
@@ -35,7 +39,7 @@ class FunctionCallHandler {
                     throw new Error(`Argumentos de función inválidos: ${functionCallInfo.arguments}`);
                 }
                 // Ejecutar la función
-                const functionResult = yield function_service_1.functionService.executeFunction(functionCallInfo.name, functionArgs, context);
+                const functionResult = yield this.functionService.executeFunction(functionCallInfo.name, functionArgs, context);
                 console.log(`[FunctionCallHandler] Resultado de función:`, {
                     success: functionResult.success,
                     hasData: !!functionResult.data,
@@ -49,7 +53,7 @@ class FunctionCallHandler {
                 };
                 const updatedMessages = [...messages, functionMessage];
                 // Llamar a OpenAI con el resultado de la función
-                const response = yield this.openaiClient.createChatCompletion(Object.assign(Object.assign({}, options), { messages: updatedMessages, tools: undefined }));
+                const response = yield this.openRouterClient.createChatCompletion(Object.assign(Object.assign({}, options), { messages: updatedMessages, tools: undefined }));
                 // Procesar respuesta
                 if (response.content) {
                     response.content = this.processResponseText(response.content);
@@ -125,20 +129,18 @@ class FunctionCallHandler {
         });
     }
     /**
-     * Procesa el texto de respuesta aplicando sanitización y formateo
+     * Procesa y sanitiza el texto de respuesta
      */
     processResponseText(text) {
         if (!text)
             return text;
-        // Aplicar sanitización y preprocessing
-        let processedText = (0, text_processing_1.sanitizeText)(text);
-        processedText = (0, text_processing_1.preprocessText)(processedText);
-        // Sanitización adicional para caracteres especiales
-        processedText = processedText
+        // Sanitización básica
+        let processedText = text
             .replace(/\\n/g, "\n")
             .replace(/\\t/g, "\t")
             .replace(/\\r/g, "\r")
-            .replace(/\\([^\\])/g, "$1");
+            .replace(/\\([^\\])/g, "$1")
+            .trim();
         return processedText;
     }
     /**
@@ -170,21 +172,21 @@ class FunctionCallHandler {
      * Valida si una función está disponible
      */
     isFunctionAvailable(functionName) {
-        const stats = function_service_1.functionService.getStats();
+        const stats = this.functionService.getStats();
         return stats.registeredFunctions.includes(functionName);
     }
     /**
      * Obtiene las funciones disponibles
      */
     getAvailableFunctions() {
-        const stats = function_service_1.functionService.getStats();
+        const stats = this.functionService.getStats();
         return stats.registeredFunctions;
     }
     /**
      * Obtiene las definiciones de funciones para OpenAI
      */
     getFunctionDefinitions() {
-        return function_service_1.functionService.getFunctionDefinitions();
+        return this.functionService.getFunctionDefinitions();
     }
     /**
      * Convierte definiciones de funciones al formato tools de OpenAI
@@ -278,11 +280,11 @@ Responde en español mexicano de manera amigable y profesional.`;
      * Obtiene estadísticas del handler
      */
     getStats() {
-        const functionStats = function_service_1.functionService.getStats();
+        const functionStats = this.functionService.getStats();
         return {
             availableFunctions: functionStats.totalFunctions,
             functionNames: functionStats.registeredFunctions,
-            clientConnected: this.openaiClient ? true : false
+            clientConnected: this.openRouterClient ? true : false
         };
     }
     /**
@@ -290,11 +292,11 @@ Responde en español mexicano de manera amigable y profesional.`;
      */
     validateServices() {
         return __awaiter(this, void 0, void 0, function* () {
-            const functionStats = function_service_1.functionService.getStats();
+            const functionStats = this.functionService.getStats();
             // Testear conexión OpenAI
             let openaiConnected = false;
             try {
-                const connectionResult = yield this.openaiClient.testConnection();
+                const connectionResult = yield this.openRouterClient.testConnection();
                 openaiConnected = connectionResult.success;
             }
             catch (error) {

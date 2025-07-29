@@ -23,7 +23,7 @@ async function testMessageCreation(): Promise<void> {
 
     // 3. Crear un mensaje del usuario
     console.log('\n📨 Creando mensaje del usuario...');
-    const userMessage = await databaseService.createMessage({
+    const userMessageResult = await databaseService.createChatbotMessage({
       conversationId: conversation.id,
       senderType: 'user',
       content: 'Hola, esto es una prueba',
@@ -31,15 +31,15 @@ async function testMessageCreation(): Promise<void> {
       whatsappMessageId: 'msg-test-user-123'
     });
 
-    if (userMessage) {
-      console.log('✅ Mensaje del usuario creado:', userMessage.id);
+    if (userMessageResult.success) {
+      console.log('✅ Mensaje del usuario creado:', userMessageResult.messageId);
     } else {
       console.log('❌ Error creando mensaje del usuario');
     }
 
     // 4. Crear un mensaje del bot
     console.log('\n🤖 Creando mensaje del bot...');
-    const botMessage = await databaseService.createMessage({
+    const botMessageResult = await databaseService.createChatbotMessage({
       conversationId: conversation.id,
       senderType: 'bot',
       content: 'Hola! ¿En qué puedo ayudarte?',
@@ -47,15 +47,15 @@ async function testMessageCreation(): Promise<void> {
       whatsappMessageId: 'msg-test-bot-123'
     });
 
-    if (botMessage) {
-      console.log('✅ Mensaje del bot creado:', botMessage.id);
+    if (botMessageResult.success) {
+      console.log('✅ Mensaje del bot creado:', botMessageResult.messageId);
     } else {
       console.log('❌ Error creando mensaje del bot');
     }
 
     // 5. Verificar mensajes creados
     console.log('\n📋 Verificando mensajes creados...');
-    const messages = await databaseService.getConversationMessages(conversation.id, 10);
+    const messages = await databaseService.getChatbotConversationMessages(conversation.id, 10);
     console.log(`✅ ${messages.length} mensajes encontrados:`);
     messages.forEach((msg, index) => {
       console.log(`  ${index + 1}. [${msg.sender_type}] ${msg.content.substring(0, 50)}...`);
