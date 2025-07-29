@@ -650,7 +650,38 @@ export class SupabaseDatabaseService {
 
       // Incrementar contador de mensajes no leídos si es mensaje del usuario
       if (data.senderType === 'user') {
-        updateData.unread_count = supabase.rpc('increment_unread_count');
+        try {
+          // Intentar usar la función RPC si existe
+          const { error: incrementError } = await supabase.rpc('increment_unread_count', {
+            conversation_id: data.conversationId
+          });
+          
+          if (incrementError) {
+            console.log('⚠️ Función RPC no disponible, usando método alternativo');
+            // Método alternativo: obtener el valor actual y sumar 1
+            const { data: currentConversation } = await supabase
+              .from('conversations')
+              .select('unread_count')
+              .eq('id', data.conversationId)
+              .single();
+            
+            if (currentConversation) {
+              updateData.unread_count = (currentConversation.unread_count || 0) + 1;
+            }
+          }
+        } catch (error) {
+          console.log('⚠️ Error con función RPC, usando método alternativo');
+          // Método alternativo: obtener el valor actual y sumar 1
+          const { data: currentConversation } = await supabase
+            .from('conversations')
+            .select('unread_count')
+            .eq('id', data.conversationId)
+            .single();
+          
+          if (currentConversation) {
+            updateData.unread_count = (currentConversation.unread_count || 0) + 1;
+          }
+        }
       }
 
       const { error: updateError } = await supabase
