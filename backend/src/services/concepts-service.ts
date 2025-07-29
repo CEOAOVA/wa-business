@@ -3,6 +3,7 @@
  * Mejora la búsqueda de productos con terminología local
  */
 import { normalizeForSearch } from '../utils/text-processing';
+import { supabase } from '../config/supabase';
 import path from 'path';
 import fs from 'fs';
 
@@ -10,12 +11,6 @@ interface ConceptMapping {
   pieza: string;           // Término técnico
   variantes: string[];     // Variantes coloquiales
   categoria?: string;      // Categoría del producto
-}
-
-// Interfaz para el JSON externo
-interface ExternalConceptMapping {
-  pieza: string;
-  variantes: string[];
 }
 
 export class ConceptsService {
@@ -29,19 +24,84 @@ export class ConceptsService {
   }
 
   /**
-   * Carga los mapeos de conceptos mexicanos desde múltiples fuentes
+   * Carga los mapeos de conceptos desde la tabla conceptos_json de Supabase
    */
-  private loadConceptMappings(): void {
-    // 1. Cargar conceptos hardcodeados (sistema existente)
-    const hardcodedMappings = this.getHardcodedMappings();
-    
-    // 2. Cargar conceptos desde archivo JSON externo
-    const externalMappings = this.loadExternalConceptsJSON();
-    
-    // 3. Combinar ambos sistemas
-    this.conceptMappings = [...hardcodedMappings, ...externalMappings];
+  private async loadConceptMappings(): Promise<void> {
+    try {
+      console.log('[ConceptsService] Cargando conceptos desde Supabase...');
+      
+      if (!supabase) {
+        console.error('[ConceptsService] Supabase no está configurado');
+        this.loadBasicMappings();
+        return;
+      }
 
-    // 4. Crear mapa inverso para búsqueda rápida
+      // Consultar directamente la tabla conceptos_json
+      const { data, error } = await supabase
+        .from('conceptos_json')
+        .select('*');
+
+      if (error) {
+        console.error('[ConceptsService] Error cargando conceptos:', error);
+        // Fallback a mapeos básicos
+        this.loadBasicMappings();
+        return;
+      }
+
+      // Convertir datos de Supabase al formato interno
+      this.conceptMappings = data.map((item: any) => ({
+        pieza: item.pieza || item.termino_tecnico || '',
+        variantes: item.variantes || item.terminos_coloquiales || [],
+        categoria: item.categoria || 'general'
+      }));
+
+      // Crear mapa inverso para búsqueda rápida
+      this.variantMap.clear();
+      this.conceptMappings.forEach(mapping => {
+        mapping.variantes.forEach(variante => {
+          const normalized = this.normalizeTerm(variante);
+          this.variantMap.set(normalized, mapping.pieza);
+        });
+      });
+
+      this.isLoaded = true;
+      console.log(`[ConceptsService] ✅ Cargados ${this.conceptMappings.length} conceptos desde Supabase`);
+      console.log(`[ConceptsService] ✅ Total de variantes: ${this.variantMap.size}`);
+
+    } catch (error) {
+      console.error('[ConceptsService] Error en carga de conceptos:', error);
+      this.loadBasicMappings();
+    }
+  }
+
+  /**
+   * Carga mapeos básicos como fallback
+   */
+  private loadBasicMappings(): void {
+    const basicMappings: ConceptMapping[] = [
+      {
+        pieza: 'pastillas de freno',
+        variantes: ['balatas', 'pastillas', 'frenos', 'pastillas de freno'],
+        categoria: 'frenos'
+      },
+      {
+        pieza: 'discos de freno',
+        variantes: ['discos', 'rotores', 'discos de freno'],
+        categoria: 'frenos'
+      },
+      {
+        pieza: 'filtro de aceite',
+        variantes: ['filtro aceite', 'filtro de aceite'],
+        categoria: 'motor'
+      },
+      {
+        pieza: 'filtro de aire',
+        variantes: ['filtro aire', 'filtro de aire'],
+        categoria: 'motor'
+      }
+    ];
+
+    this.conceptMappings = basicMappings;
     this.variantMap.clear();
     this.conceptMappings.forEach(mapping => {
       mapping.variantes.forEach(variante => {
@@ -50,45 +110,8 @@ export class ConceptsService {
       });
     });
 
-    // 5. Cargar mapeo de imágenes (si existe)
-    this.loadProductImages();
-
     this.isLoaded = true;
-    console.log(`[ConceptsService] ✅ Cargados ${this.conceptMappings.length} mapeos de conceptos`);
-    console.log(`[ConceptsService] ✅ Total de variantes: ${this.variantMap.size}`);
-    console.log(`[ConceptsService] ✅ Imágenes de productos: ${this.productImageMap.size}`);
-  }
-
-  /**
-   * Carga conceptos desde el archivo JSON externo
-   */
-  private loadExternalConceptsJSON(): ConceptMapping[] {
-    try {
-      // Ruta al archivo JSON en /public
-      const jsonPath = path.join(process.cwd(), 'public', 'embler', 'inventario', 'conceptos.json');
-      
-      if (!fs.existsSync(jsonPath)) {
-        console.warn('[ConceptsService] ⚠️ Archivo conceptos.json no encontrado, usando solo mapeos hardcodeados');
-        return [];
-      }
-
-      const jsonData = fs.readFileSync(jsonPath, 'utf8');
-      const externalConcepts: ExternalConceptMapping[] = JSON.parse(jsonData);
-      
-      // Convertir al formato interno
-      const mappings: ConceptMapping[] = externalConcepts.map(concept => ({
-        pieza: concept.pieza,
-        variantes: concept.variantes,
-        categoria: 'externo'
-      }));
-
-      console.log(`[ConceptsService] ✅ Cargados ${mappings.length} conceptos desde JSON externo`);
-      return mappings;
-
-    } catch (error) {
-      console.error('[ConceptsService] ❌ Error cargando conceptos externos:', error);
-      return [];
-    }
+    console.log(`[ConceptsService] ✅ Cargados ${this.conceptMappings.length} conceptos básicos`);
   }
 
   /**
@@ -99,20 +122,20 @@ export class ConceptsService {
       const imagesPath = path.join(process.cwd(), 'public', 'embler', 'inventario', 'images');
       
       if (!fs.existsSync(imagesPath)) {
-        console.log('[ConceptsService] ℹ️ Directorio de imágenes no encontrado');
+        console.warn('[ConceptsService] ⚠️ Directorio de imágenes no encontrado');
         return;
       }
 
-      const imageFiles = fs.readdirSync(imagesPath);
+      const files = fs.readdirSync(imagesPath);
       
-      // Mapear archivos de imagen a productos
-      imageFiles.forEach(file => {
-        if (file.match(/\.(jpg|jpeg|png|webp)$/i)) {
-          const productName = path.parse(file).name.toLowerCase();
-          const imagePath = `/embler/inventario/images/${file}`;
-          this.productImageMap.set(productName, imagePath);
+      files.forEach(file => {
+        if (file.endsWith('.jpg') || file.endsWith('.png')) {
+          const productName = file.replace(/\.(jpg|png)$/i, '').toLowerCase();
+          this.productImageMap.set(productName, `/embler/inventario/images/${file}`);
         }
       });
+
+      console.log(`[ConceptsService] ✅ Cargadas ${this.productImageMap.size} imágenes de productos`);
 
     } catch (error) {
       console.error('[ConceptsService] ❌ Error cargando imágenes:', error);
@@ -120,20 +143,20 @@ export class ConceptsService {
   }
 
   /**
-   * Obtiene la imagen asociada a un producto
+   * Obtiene la imagen de un producto
    */
   getProductImage(productName: string): string | undefined {
-    const normalized = this.normalizeTerm(productName);
+    const normalizedName = this.normalizeTerm(productName);
     
-    // Buscar imagen exacta
-    if (this.productImageMap.has(normalized)) {
-      return this.productImageMap.get(normalized);
+    // Buscar coincidencia exacta
+    if (this.productImageMap.has(normalizedName)) {
+      return this.productImageMap.get(normalizedName);
     }
 
-    // Buscar imagen por coincidencia parcial
-    for (const [imageName, imagePath] of this.productImageMap.entries()) {
-      if (normalized.includes(imageName) || imageName.includes(normalized)) {
-        return imagePath;
+    // Buscar coincidencia parcial
+    for (const [key, value] of this.productImageMap.entries()) {
+      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+        return value;
       }
     }
 
@@ -141,373 +164,97 @@ export class ConceptsService {
   }
 
   /**
-   * Retorna los mapeos hardcodeados originales
-   */
-  private getHardcodedMappings(): ConceptMapping[] {
-    return [
-      // Frenos
-      {
-        pieza: 'balatas',
-        variantes: ['balatas', 'pastillas', 'pastillas de freno', 'frenos delanteros', 'frenos traseros'],
-        categoria: 'frenos'
-      },
-      {
-        pieza: 'discos',
-        variantes: ['discos', 'discos de freno', 'rotores', 'disco delantero', 'disco trasero'],
-        categoria: 'frenos'
-      },
-      {
-        pieza: 'tambores',
-        variantes: ['tambores', 'tambor de freno', 'tambor trasero'],
-        categoria: 'frenos'
-      },
-      
-      // Suspensión
-      {
-        pieza: 'amortiguador',
-        variantes: ['amortiguador', 'amortiguadores', 'shock', 'shocks', 'suspension'],
-        categoria: 'suspension'
-      },
-      {
-        pieza: 'huesitos',
-        variantes: ['huesitos', 'huesito', 'terminal', 'terminales', 'terminal direccion', 'rotula'],
-        categoria: 'suspension'
-      },
-      {
-        pieza: 'muelles',
-        variantes: ['muelles', 'resortes', 'resorte', 'springs'],
-        categoria: 'suspension'
-      },
-      {
-        pieza: 'bieletas',
-        variantes: ['bieletas', 'bieleta', 'estabilizadora', 'link'],
-        categoria: 'suspension'
-      },
-      
-      // Motor
-      {
-        pieza: 'aceite',
-        variantes: ['aceite', 'aceite motor', 'lubricante', 'oil', 'cambio aceite'],
-        categoria: 'motor'
-      },
-      {
-        pieza: 'filtro aceite',
-        variantes: ['filtro aceite', 'filtro de aceite', 'filtro motor'],
-        categoria: 'motor'
-      },
-      {
-        pieza: 'filtro aire',
-        variantes: ['filtro aire', 'filtro de aire', 'filtro del aire'],
-        categoria: 'motor'
-      },
-      {
-        pieza: 'bujias',
-        variantes: ['bujias', 'bujía', 'spark plug', 'chispa'],
-        categoria: 'motor'
-      },
-      {
-        pieza: 'banda',
-        variantes: ['banda', 'banda serpentina', 'correa', 'belt'],
-        categoria: 'motor'
-      },
-      {
-        pieza: 'radiador',
-        variantes: ['radiador', 'radiador agua', 'enfriamiento'],
-        categoria: 'motor'
-      },
-      {
-        pieza: 'termostato',
-        variantes: ['termostato', 'válvula termostática'],
-        categoria: 'motor'
-      },
-      
-      // Transmisión
-      {
-        pieza: 'clutch',
-        variantes: ['clutch', 'embrague', 'kit clutch', 'disco clutch', 'prensa'],
-        categoria: 'transmision'
-      },
-      {
-        pieza: 'bomba clutch',
-        variantes: ['bomba clutch', 'bomba embrague', 'cilindro maestro clutch'],
-        categoria: 'transmision'
-      },
-      {
-        pieza: 'caja velocidades',
-        variantes: ['caja', 'transmision', 'caja velocidades', 'gearbox'],
-        categoria: 'transmision'
-      },
-      
-      // Eléctrico
-      {
-        pieza: 'bateria',
-        variantes: ['bateria', 'acumulador', 'pila', 'battery'],
-        categoria: 'electrico'
-      },
-      {
-        pieza: 'alternador',
-        variantes: ['alternador', 'generador', 'dínamo'],
-        categoria: 'electrico'
-      },
-      {
-        pieza: 'motor arranque',
-        variantes: ['motor arranque', 'marcha', 'starter', 'bendix'],
-        categoria: 'electrico'
-      },
-      {
-        pieza: 'sensor',
-        variantes: ['sensor', 'bulbo', 'switch', 'interruptor'],
-        categoria: 'electrico'
-      },
-      
-      // Neumáticos
-      {
-        pieza: 'llantas',
-        variantes: ['llantas', 'llanta', 'neumatico', 'tire', 'goma'],
-        categoria: 'neumaticos'
-      },
-      {
-        pieza: 'rines',
-        variantes: ['rines', 'rin', 'rueda', 'rim', 'aro'],
-        categoria: 'neumaticos'
-      },
-      
-      // Carrocería
-      {
-        pieza: 'faro',
-        variantes: ['faro', 'faros', 'luz', 'luces', 'headlight'],
-        categoria: 'carroceria'
-      },
-      {
-        pieza: 'calavera',
-        variantes: ['calavera', 'calaveras', 'luz trasera', 'taillight'],
-        categoria: 'carroceria'
-      },
-      {
-        pieza: 'espejo',
-        variantes: ['espejo', 'espejos', 'retrovisor', 'mirror'],
-        categoria: 'carroceria'
-      },
-      
-      // Combustible
-      {
-        pieza: 'filtro combustible',
-        variantes: ['filtro combustible', 'filtro gasolina', 'filtro nafta'],
-        categoria: 'combustible'
-      },
-      {
-        pieza: 'bomba gasolina',
-        variantes: ['bomba gasolina', 'bomba combustible', 'fuel pump'],
-        categoria: 'combustible'
-      },
-      
-      // Aire acondicionado
-      {
-        pieza: 'compresor aire',
-        variantes: ['compresor', 'compresor aire', 'ac', 'aire acondicionado'],
-        categoria: 'aire_acondicionado'
-      },
-      {
-        pieza: 'filtro cabina',
-        variantes: ['filtro cabina', 'filtro aire cabina', 'filtro polen'],
-        categoria: 'aire_acondicionado'
-      },
-      
-      // Dirección
-      {
-        pieza: 'bomba direccion',
-        variantes: ['bomba direccion', 'bomba hidraulica', 'power steering'],
-        categoria: 'direccion'
-      },
-      {
-        pieza: 'cremallera',
-        variantes: ['cremallera', 'caja direccion', 'rack'],
-        categoria: 'direccion'
-      },
-      
-      // Términos generales
-      {
-        pieza: 'refaccion',
-        variantes: ['refaccion', 'refacciones', 'repuesto', 'parte', 'pieza'],
-        categoria: 'general'
-      },
-      {
-        pieza: 'original',
-        variantes: ['original', 'oem', 'genuino', 'de agencia'],
-        categoria: 'general'
-      },
-      {
-        pieza: 'aftermarket',
-        variantes: ['aftermarket', 'alternativo', 'compatible', 'generico'],
-        categoria: 'general'
-      }
-    ];
-  }
-
-  /**
-   * Normaliza un término de búsqueda reemplazando variantes coloquiales con términos formales
+   * Normaliza un término de búsqueda usando conceptos_json
    */
   normalizeSearchTerm(searchTerm: string): string {
-    if (!this.isLoaded) {
-      return searchTerm;
+    if (!searchTerm || typeof searchTerm !== 'string') {
+      return '';
     }
 
     const normalizedInput = this.normalizeTerm(searchTerm);
-    
-    // Comprobar si el término completo coincide con una variante
+    console.log(`[ConceptsService] Normalizando: "${searchTerm}" -> "${normalizedInput}"`);
+
+    // Buscar en el mapa de variantes
     if (this.variantMap.has(normalizedInput)) {
-      const formalTerm = this.variantMap.get(normalizedInput);
-      console.log(`[ConceptsService] Término completo "${searchTerm}" normalizado a "${formalTerm}"`);
-      return formalTerm!;
+      const technicalTerm = this.variantMap.get(normalizedInput)!;
+      console.log(`[ConceptsService] Encontrado mapeo: "${normalizedInput}" -> "${technicalTerm}"`);
+      return technicalTerm;
     }
-    
-    // Si no hay coincidencia exacta, revisar tokens individuales
-    const tokens = normalizedInput.split(' ');
-    let modified = false;
-    const productTokens: string[] = [];
-    
-    tokens.forEach(token => {
-      if (this.variantMap.has(token)) {
-        modified = true;
-        productTokens.push(this.variantMap.get(token)!);
-        console.log(`[ConceptsService] Token "${token}" normalizado a "${this.variantMap.get(token)}"`);
-      } else if (this.isProductRelatedWord(token)) {
-        productTokens.push(token);
-        console.log(`[ConceptsService] Token "${token}" mantenido como palabra de producto`);
-      } else {
-        console.log(`[ConceptsService] Token "${token}" ignorado (stop word)`);
-      }
-    });
-    
-    if (productTokens.length > 0) {
-      const result = productTokens.join(' ');
-      console.log(`[ConceptsService] Términos de producto extraídos de "${searchTerm}": "${result}" (modificado: ${modified})`);
-      return result;
-    }
-    
-    console.log(`[ConceptsService] No se encontraron términos de producto en "${searchTerm}", devolviendo original`);
-    return searchTerm;
+
+    // Si no se encuentra, devolver el término original normalizado
+    return normalizedInput;
   }
 
   /**
-   * Verifica si una palabra está relacionada con productos automotrices
+   * Verifica si una palabra está relacionada con productos
    */
   private isProductRelatedWord(word: string): boolean {
-    const productWords = [
-      // Marcas comunes
-      'honda', 'toyota', 'nissan', 'ford', 'chevrolet', 'volkswagen', 'bmw', 'mercedes', 'audi',
-      'mazda', 'hyundai', 'kia', 'subaru', 'mitsubishi', 'suzuki', 'isuzu', 'jeep', 'dodge',
-      
-      // Modelos comunes
-      'civic', 'corolla', 'sentra', 'focus', 'aveo', 'jetta', 'tsuru', 'altima', 'accord',
-      'camry', 'prius', 'rav4', 'cr-v', 'pilot', 'odyssey', 'fit', 'city',
-      
-      // Términos técnicos
-      'delantero', 'trasero', 'izquierdo', 'derecho', 'superior', 'inferior',
-      'automatico', 'manual', 'hidraulico', 'electronico', 'mecanico',
-      
-      // Años
-      '2018', '2019', '2020', '2021', '2022', '2023', '2024',
-      
-      // Materiales y tipos
-      'metalico', 'ceramico', 'sintetico', 'mineral', 'organico',
-      'iridium', 'platino', 'cobre', 'grafito'
+    const productKeywords = [
+      'pieza', 'parte', 'componente', 'repuesto', 'accesorio',
+      'freno', 'motor', 'transmision', 'suspension', 'electrico',
+      'filtro', 'aceite', 'agua', 'aire', 'combustible'
     ];
-    
-    return productWords.includes(word.toLowerCase());
+
+    return productKeywords.some(keyword => 
+      word.toLowerCase().includes(keyword.toLowerCase())
+    );
   }
 
   /**
-   * Convierte un término coloquial mexicano a nombre técnico
+   * Convierte un término de usuario a su nombre técnico
    */
   convertToTechnicalName(userTerm: string): string {
-    if (!this.isLoaded) {
-      return userTerm;
-    }
-
-    const cleanTerm = this.normalizeTerm(userTerm);
+    const normalized = this.normalizeSearchTerm(userTerm);
     
-    // Buscar en las variantes
-    if (this.variantMap.has(cleanTerm)) {
-      const technical = this.variantMap.get(cleanTerm)!;
-      console.log(`[ConceptsService] Convertido: "${userTerm}" → "${technical}"`);
-      return technical;
+    if (normalized !== userTerm.toLowerCase().trim()) {
+      return normalized;
     }
 
-    // Si no encuentra mapeo exacto, buscar coincidencias parciales
-    for (const mapping of this.conceptMappings) {
-      for (const variante of mapping.variantes) {
-        if (cleanTerm.includes(this.normalizeTerm(variante)) || 
-            this.normalizeTerm(variante).includes(cleanTerm)) {
-          console.log(`[ConceptsService] Convertido (parcial): "${userTerm}" → "${mapping.pieza}"`);
-          return mapping.pieza;
-        }
-      }
-    }
-
-    console.log(`[ConceptsService] Sin conversión: "${userTerm}"`);
-    return userTerm;
+    // Si no se encontró mapeo, devolver el término original
+    return userTerm.toLowerCase().trim();
   }
 
   /**
-   * Procesa un texto completo y convierte todos los términos coloquiales encontrados
+   * Procesa texto completo para extraer términos técnicos
    */
   processFullText(text: string): string {
-    if (!this.isLoaded) {
-      return text;
+    if (!text || typeof text !== 'string') {
+      return '';
     }
 
-    let processedText = text;
-    
-    // Procesar cada mapeo
-    for (const mapping of this.conceptMappings) {
-      for (const variante of mapping.variantes) {
-        // Crear regex para buscar la variante como palabra completa
-        const regex = new RegExp(`\\b${variante.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-        processedText = processedText.replace(regex, mapping.pieza);
-      }
-    }
+    const words = text.toLowerCase().split(/\s+/);
+    const processedWords = words.map(word => {
+      const normalized = this.normalizeTerm(word);
+      return this.variantMap.has(normalized) ? this.variantMap.get(normalized)! : word;
+    });
 
-    if (processedText !== text) {
-      console.log(`[ConceptsService] Texto procesado: "${text}" → "${processedText}"`);
-    }
-
-    return processedText;
+    return processedWords.join(' ');
   }
 
   /**
    * Obtiene sugerencias para un término
    */
   getSuggestions(term: string): string[] {
-    if (!this.isLoaded) {
+    if (!term || typeof term !== 'string') {
       return [];
     }
 
     const normalizedTerm = this.normalizeTerm(term);
     const suggestions: string[] = [];
 
-    // Buscar mapeos que contengan el término
-    for (const mapping of this.conceptMappings) {
-      const hasMatch = mapping.variantes.some(variante => 
-        this.normalizeTerm(variante).includes(normalizedTerm) ||
-        normalizedTerm.includes(this.normalizeTerm(variante))
-      );
-
-      if (hasMatch) {
-        suggestions.push(mapping.pieza);
-        // Agregar también algunas variantes comunes
-        suggestions.push(...mapping.variantes.slice(0, 2));
+    // Buscar coincidencias parciales
+    for (const [variant, technical] of this.variantMap.entries()) {
+      if (variant.includes(normalizedTerm) || normalizedTerm.includes(variant)) {
+        suggestions.push(technical);
       }
     }
 
-    // Eliminar duplicados y el término original
-    return [...new Set(suggestions)].filter(s => 
-      this.normalizeTerm(s) !== normalizedTerm
-    ).slice(0, 5);
+    // Eliminar duplicados y limitar resultados
+    return [...new Set(suggestions)].slice(0, 5);
   }
 
   /**
-   * Normaliza un término para comparación
+   * Normaliza un término para búsqueda
    */
   private normalizeTerm(term: string): string {
     return normalizeForSearch(term);
@@ -522,7 +269,7 @@ export class ConceptsService {
     categorías: string[];
     hasImages: boolean;
   } {
-    const categorías = [...new Set(this.conceptMappings.map(m => m.categoria).filter(Boolean))] as string[];
+    const categorías = [...new Set(this.conceptMappings.map(m => m.categoria || 'general'))];
     
     return {
       totalMappings: this.conceptMappings.length,

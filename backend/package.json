@@ -11,7 +11,8 @@
     "security:test": "node src/scripts/test-webhook-security.js",
     "cleanup:duplicates": "node cleanup-duplicate-messages.js",
     "test:natural-flow": "ts-node src/scripts/test-natural-conversation-flow.ts",
-    "test:automotive-parts": "ts-node src/scripts/test-automotive-parts-search.ts"
+    "test:automotive-parts": "ts-node src/scripts/test-automotive-parts-search.ts",
+    "test:simplified-parts": "ts-node src/scripts/test-simplified-parts-search.ts"
   },
   "keywords": [],
   "author": "",

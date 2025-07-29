@@ -80,7 +80,25 @@ export class AutomotivePartsSearchService {
    */
   private async normalizePartTerm(userTerm: string): Promise<string> {
     try {
-      // Usar ConceptsService para normalización
+      // Consultar directamente la tabla conceptos_json de Supabase
+      const { data, error } = await supabase
+        .from('conceptos_json')
+        .select('*')
+        .ilike('terminos_coloquiales', `%${userTerm.toLowerCase()}%`);
+
+      if (error) {
+        console.error('[AutomotivePartsSearch] Error consultando conceptos_json:', error);
+        return userTerm.toLowerCase().trim();
+      }
+
+      // Si se encuentra un término técnico, usarlo
+      if (data && data.length > 0) {
+        const normalizedTerm = data[0].termino_tecnico || data[0].pieza;
+        console.log(`[AutomotivePartsSearch] Término normalizado: "${userTerm}" -> "${normalizedTerm}"`);
+        return normalizedTerm;
+      }
+
+      // Fallback al ConceptsService
       const normalizedTerm = this.conceptsService.normalizeSearchTerm(userTerm);
       return normalizedTerm;
     } catch (error) {

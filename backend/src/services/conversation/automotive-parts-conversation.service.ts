@@ -95,16 +95,18 @@ export class AutomotivePartsConversationService {
     };
     let partName: string | undefined;
 
-    // Patrones para extraer información
+    // Patrones para extraer información de marca
     const marcaPatterns = [
-      /(?:para|de|mi)\s+(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai)/i,
-      /(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai)\s+(corolla|civic|sentra|focus|cruze|golf|3|accent)/i
+      /(?:para|de|mi)\s+(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai|bmw|mercedes|audi|kia|subaru|mitsubishi|suzuki|isuzu|jeep|dodge|vw|volkswagen)/i,
+      /(toyota|honda|nissan|ford|chevrolet|volkswagen|mazda|hyundai|bmw|mercedes|audi|kia|subaru|mitsubishi|suzuki|isuzu|jeep|dodge|vw|volkswagen)\s+(corolla|civic|sentra|focus|cruze|golf|3|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra|sprinter|crafter)/i
     ];
 
+    // Patrones para extraer información de modelo
     const modeloPatterns = [
-      /(corolla|civic|sentra|focus|cruze|golf|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra)/i
+      /(corolla|civic|sentra|focus|cruze|golf|accent|camry|accord|altima|fusion|malibu|jetta|cx-5|elantra|sprinter|crafter|w906)/i
     ];
 
+    // Patrones para extraer año
     const añoPatterns = [
       /(?:año|modelo|del)\s+(\d{4})/i,
       /(\d{4})/i
@@ -139,21 +141,63 @@ export class AutomotivePartsConversationService {
       }
     }
 
-    // Extraer nombre de pieza (asumiendo que está al inicio o después de "necesito")
+    // Extraer nombre de pieza - Mejorado para reconocer frases completas
+    partName = this.extractPartNameFromMessage(message);
+
+    return { carInfo: (carInfo.marca && carInfo.modelo) ? carInfo : undefined, partName };
+  }
+
+  /**
+   * Extraer nombre de pieza del mensaje usando patrones mejorados
+   */
+  private extractPartNameFromMessage(message: string): string | undefined {
+    const normalizedMessage = message.toLowerCase();
+    
+    // Patrones genéricos para piezas (sin sobre-ingeniería específica)
     const partPatterns = [
-      /^(balatas?|frenos?|pastillas?|filtros?|aceite|batería|llantas?|amortiguadores?|bujías?|correas?)/i,
-      /(?:necesito|busco|quiero)\s+(balatas?|frenos?|pastillas?|filtros?|aceite|batería|llantas?|amortiguadores?|bujías?|correas?)/i
+      // Frases completas comunes
+      /(funda\s+(?:de\s+)?palanca\s+(?:de\s+)?velocidades?)/i,
+      /(funda\s+(?:de\s+)?palanca\s+(?:de\s+)?transmision)/i,
+      /(pastillas?\s+(?:de\s+)?freno)/i,
+      /(discos?\s+(?:de\s+)?freno)/i,
+      /(balatas?\s+(?:de\s+)?freno)/i,
+      /(filtro\s+(?:de\s+)?aceite)/i,
+      /(filtro\s+(?:de\s+)?aire)/i,
+      /(kit\s+(?:de\s+)?embrague)/i,
+      /(disco\s+(?:de\s+)?embrague)/i,
+      /(amortiguador)/i,
+      /(bateria)/i,
+      /(llantas?)/i,
+      
+      // Palabras individuales
+      /(funda)/i,
+      /(palanca)/i,
+      /(pastillas?)/i,
+      /(frenos?)/i,
+      /(discos?)/i,
+      /(balatas?)/i,
+      /(filtro)/i,
+      /(aceite)/i,
+      /(aire)/i,
+      /(embrague)/i,
+      /(clutch)/i,
+      /(amortiguador)/i,
+      /(bateria)/i,
+      /(llantas?)/i
     ];
 
+    // Buscar coincidencias
     for (const pattern of partPatterns) {
-      const match = message.match(pattern);
+      const match = normalizedMessage.match(pattern);
       if (match) {
-        partName = match[1].toLowerCase();
-        break;
+        const extractedPart = match[1].toLowerCase().trim();
+        console.log(`[AutomotivePartsConversation] ✅ Pieza extraída: "${extractedPart}"`);
+        return extractedPart;
       }
     }
 
-    return { carInfo: (carInfo.marca && carInfo.modelo) ? carInfo : undefined, partName };
+    console.log(`[AutomotivePartsConversation] ❌ No se pudo extraer nombre de pieza del mensaje`);
+    return undefined;
   }
 
   /**
