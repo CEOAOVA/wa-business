@@ -67,6 +67,7 @@ class FunctionService {
         this.registerTransactionFunctions();
         this.registerVinFunctions();
         this.registerShippingFunctions();
+        this.registerAutomotivePartsFunctions();
     }
     /**
      * Registra una función LLM
@@ -1867,6 +1868,127 @@ class FunctionService {
         // En un escenario real, esto podría ser una búsqueda en un archivo CSV o base de datos
         // Por ahora, simplemente devolvemos el término de búsqueda
         return termino;
+    }
+    /**
+     * Registra funciones de búsqueda de piezas automotrices
+     */
+    registerAutomotivePartsFunctions() {
+        // buscarPiezaAutomotriz - Nueva función específica para piezas automotrices
+        this.registerFunction('buscarPiezaAutomotriz', (args, context) => __awaiter(this, void 0, void 0, function* () {
+            const { nombrePieza, marcaAuto, modeloAuto, añoAuto, limit = 5 } = args;
+            console.log(`[FunctionService] buscarPiezaAutomotriz - Pieza: "${nombrePieza}" para ${marcaAuto} ${modeloAuto}`);
+            try {
+                // Importar AutomotivePartsSearchService
+                const { AutomotivePartsSearchService } = yield Promise.resolve().then(() => __importStar(require('../automotive-parts-search.service')));
+                const partsSearchService = new AutomotivePartsSearchService();
+                // Realizar búsqueda específica
+                const searchResult = yield partsSearchService.searchAutomotiveParts(nombrePieza, { marca: marcaAuto, modelo: modeloAuto, año: añoAuto }, { limit, minConfidence: 0.4 });
+                if (!searchResult.success || searchResult.results.length === 0) {
+                    return {
+                        success: true,
+                        data: {
+                            sinResultados: true,
+                            nombrePieza,
+                            marcaAuto,
+                            modeloAuto,
+                            mensaje: `No encontré piezas de ${nombrePieza} para tu ${marcaAuto} ${modeloAuto}. ¿Podrías verificar la información de tu auto o el nombre de la pieza?`,
+                            sugerencias: this.generatePartSuggestions(nombrePieza)
+                        }
+                    };
+                }
+                // Formatear resultados para mostrar solo clave y marca
+                const resultadosFormateados = searchResult.results.map(result => ({
+                    clave: result.clave,
+                    marca: result.marca,
+                    nombre: result.nombre,
+                    compatible: result.carCompatibility
+                }));
+                let mensaje = '';
+                if (searchResult.results.length === 1) {
+                    const result = searchResult.results[0];
+                    mensaje = `✅ Encontré esta pieza para tu ${marcaAuto} ${modeloAuto}:\n\n` +
+                        `🔑 **Clave:** ${result.clave}\n` +
+                        `🏷️ **Marca:** ${result.marca}\n` +
+                        `📝 **Descripción:** ${result.nombre}`;
+                }
+                else {
+                    mensaje = `✅ Encontré ${searchResult.results.length} opciones para tu ${marcaAuto} ${modeloAuto}:\n\n`;
+                    searchResult.results.forEach((result, index) => {
+                        mensaje += `${index + 1}. **Clave:** ${result.clave} | **Marca:** ${result.marca}\n   ${result.nombre}\n\n`;
+                    });
+                }
+                return {
+                    success: true,
+                    data: {
+                        resultados: resultadosFormateados,
+                        totalEncontrados: searchResult.totalFound,
+                        nombrePieza,
+                        marcaAuto,
+                        modeloAuto,
+                        mensaje,
+                        terminoNormalizado: searchResult.normalizedTerm,
+                        esperandoConfirmacion: true
+                    }
+                };
+            }
+            catch (error) {
+                console.error('[FunctionService] Error en búsqueda de piezas automotrices:', error);
+                return {
+                    success: false,
+                    data: {
+                        error: true,
+                        mensaje: `Lo siento, hubo un error buscando piezas de ${nombrePieza} para tu ${marcaAuto} ${modeloAuto}. Te conectaré con un asesor para ayudarte.`,
+                        requiereAsesor: true
+                    }
+                };
+            }
+        }), {
+            name: 'buscarPiezaAutomotriz',
+            description: 'Buscar piezas automotrices específicas usando marca, modelo y nombre de pieza. Devuelve solo clave y marca de la pieza.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    nombrePieza: {
+                        type: 'string',
+                        description: 'Nombre de la pieza a buscar (ej: balatas, frenos, filtros)'
+                    },
+                    marcaAuto: {
+                        type: 'string',
+                        description: 'Marca del automóvil (ej: Toyota, Honda, Nissan)'
+                    },
+                    modeloAuto: {
+                        type: 'string',
+                        description: 'Modelo del automóvil (ej: Corolla, Civic, Sentra)'
+                    },
+                    añoAuto: {
+                        type: 'number',
+                        description: 'Año del automóvil (opcional)'
+                    },
+                    limit: {
+                        type: 'number',
+                        description: 'Número máximo de resultados a devolver'
+                    }
+                },
+                required: ['nombrePieza', 'marcaAuto', 'modeloAuto']
+            }
+        });
+    }
+    /**
+     * Generar sugerencias de piezas
+     */
+    generatePartSuggestions(nombrePieza) {
+        const sugerencias = [
+            'balatas delanteras',
+            'balatas traseras',
+            'filtro de aceite',
+            'filtro de aire',
+            'batería',
+            'amortiguadores',
+            'llantas',
+            'bujías',
+            'correa de distribución'
+        ];
+        return sugerencias.filter(s => s.includes(nombrePieza) || nombrePieza.includes(s));
     }
     /**
      * Obtiene estadísticas del servicio
