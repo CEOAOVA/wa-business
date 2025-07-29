@@ -81,6 +81,11 @@ export class AutomotivePartsSearchService {
   private async normalizePartTerm(userTerm: string): Promise<string> {
     try {
       // Consultar directamente la tabla conceptos_json de Supabase
+      if (!supabase) {
+        console.error('[AutomotivePartsSearch] Supabase no está configurado');
+        return userTerm.toLowerCase().trim();
+      }
+
       const { data, error } = await supabase
         .from('conceptos_json')
         .select('*')

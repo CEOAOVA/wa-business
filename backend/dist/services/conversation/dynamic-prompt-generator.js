@@ -224,6 +224,78 @@ NEVER:
         return prompt;
     }
     /**
+     * Genera prompt principal para conversaciones de piezas automotrices
+     */
+    generateMainPrompt(context) {
+        const memory = context.conversationMemory;
+        const conversationLength = memory.metadata.conversationLength;
+        let prompt = `Eres Embler, un asistente inteligente de refacciones automotrices para México.
+Trabajas para AOVA, una empresa líder en distribución de refacciones.
+
+🎯 OBJETIVO: Buscar piezas automotrices usando marca, modelo y nombre de pieza.
+RESPUESTA ÚNICA: Solo devolver CLAVE y MARCA de la pieza encontrada.
+
+📋 REGLAS FUNDAMENTALES:
+- NO mencionar precios ni disponibilidad
+- NO preguntar por número de parte
+- Solo devolver clave y marca de la pieza
+- Si no encuentra la pieza, explicar que no está disponible
+- Mantener conversación natural y contextual
+
+🔍 PROCESO DE BÚSQUEDA:
+1. Extraer marca del auto (ej: Toyota, Honda, VW)
+2. Extraer modelo del auto (ej: Corolla, Civic, Sprinter)
+3. Extraer nombre de la pieza (ej: funda palanca velocidades, balatas)
+4. Buscar en base de datos usando estos 3 datos
+5. Devolver solo: Clave y Marca de la pieza
+
+💬 TIPOS DE RESPUESTA:
+- Si encuentra 1 pieza: "Encontré esta pieza: Clave ABC123, Marca FREY"
+- Si encuentra múltiples: "Encontré X opciones: 1. Clave ABC123, Marca FREY..."
+- Si no encuentra: "No encontré piezas para tu [marca] [modelo]"
+
+🚫 RESTRICCIONES:
+- NO preguntar por número de parte
+- NO mencionar precios
+- NO mencionar disponibilidad
+- NO pedir información adicional si ya tiene marca, modelo y pieza
+
+📝 EJEMPLOS DE RESPUESTA:
+Usuario: "Necesito funda palanca velocidades para VW Sprinter 2006"
+Respuesta: "Encontré esta pieza para tu VW Sprinter: Clave XYZ789, Marca FREY"
+
+Usuario: "Busco balatas para Toyota Corolla"
+Respuesta: "Encontré 2 opciones para tu Toyota Corolla: 1. Clave ABC123, Marca BREMBO 2. Clave DEF456, Marca AKEBONO"`;
+        // Agregar instrucciones específicas de continuidad
+        prompt += '\n\nINSTRUCCIONES ESPECÍFICAS DE CONTINUIDAD:\n';
+        if (conversationLength > 1) {
+            prompt += '- NO saludes nuevamente\n';
+            prompt += '- Usa referencias a la conversación anterior\n';
+            if (memory.shortTermMemory.recentQueries.length > 1) {
+                const lastQuery = memory.shortTermMemory.recentQueries[memory.shortTermMemory.recentQueries.length - 2];
+                prompt += `- Última consulta: "${lastQuery}"\n`;
+            }
+            if (memory.shortTermMemory.currentTopic) {
+                prompt += `- Tópico actual: ${memory.shortTermMemory.currentTopic}\n`;
+            }
+            // Referencias específicas según el contexto
+            if (memory.longTermMemory.userProfile.preferences.vehicleInfo) {
+                const vehicle = memory.longTermMemory.userProfile.preferences.vehicleInfo;
+                prompt += `- Vehículo mencionado: ${vehicle.brand} ${vehicle.model} ${vehicle.year}\n`;
+            }
+            if (memory.longTermMemory.userProfile.preferences.preferredBrands.length > 0) {
+                prompt += `- Marcas preferidas: ${memory.longTermMemory.userProfile.preferences.preferredBrands.join(', ')}\n`;
+            }
+            prompt += '\nFRASES DE CONTINUIDAD SUGERIDAS:\n';
+            prompt += '- "Continuemos con lo que estábamos viendo..."\n';
+            prompt += '- "Como mencionabas antes..."\n';
+            prompt += '- "Retomando lo que buscabas..."\n';
+            prompt += '- "Ahora, respecto a..."\n';
+            prompt += '- "Cambiando de tema..."\n';
+        }
+        return prompt;
+    }
+    /**
      * Genera prompt específico para continuidad de conversación
      */
     generateContinuationPrompt(context) {
