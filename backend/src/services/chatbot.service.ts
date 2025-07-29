@@ -7,6 +7,8 @@ import { loadEnvWithUnicodeSupport } from '../config/env-loader';
 import { whatsappService } from './whatsapp.service';
 import { databaseService } from './database.service';
 import { getConfig } from '../config';
+import { openAIClient } from '../config/openai-client';
+import { AdvancedConversationEngine } from './conversation/advanced-conversation-engine';
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -98,11 +100,26 @@ export class ChatbotService {
   private readonly openRouterConfig = {
     baseURL: 'https://openrouter.ai/api/v1',
     model: 'google/gemini-2.5-flash-lite-preview-06-17',
-    timeout: 30000
+    timeout: 30000,
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'http://localhost:3002',
+      'X-Title': 'Embler WhatsApp Chatbot'
+    }
   };
 
+  // NUEVO: Instancia del motor de conversación avanzado
+  private advancedEngine: AdvancedConversationEngine;
+
   constructor() {
-    // Limpieza automática de sesiones expiradas
+    this.advancedEngine = new AdvancedConversationEngine();
+    this.startCleanupInterval();
+  }
+
+  /**
+   * Limpiar sesiones expiradas
+   */
+  private startCleanupInterval(): void {
     setInterval(() => this.cleanupExpiredSessions(), 5 * 60 * 1000); // Cada 5 minutos
   }
 
@@ -118,66 +135,31 @@ export class ChatbotService {
     try {
       console.log(`[ChatbotService] Procesando mensaje de ${phoneNumber}: ${message.substring(0, 50)}...`);
 
-      // Obtener o crear conversación
-      const conversationId = `wa-${phoneNumber}`;
-      let conversation = this.conversations.get(conversationId);
-      
-      if (!conversation) {
-        conversation = await this.startConversation(conversationId, phoneNumber);
-      }
-
-      // Actualizar actividad
-      conversation.lastActivity = new Date();
-
-      // Agregar mensaje del usuario (SOLO EN MEMORIA, NO EN BD)
-      const userMsg: ChatbotMessage = {
-        id: `msg-${Date.now()}-user`,
-        role: 'user',
-        content: message,
-        timestamp: new Date()
-      };
-      
-      conversation.messages.push(userMsg);
-
-      // NO guardar mensaje del usuario en la base de datos aquí
-      // await this.saveMessageToDatabase(conversation.phoneNumber, userMsg);
-
-      // Generar respuesta con IA
-      const aiResponse = await this.generateAIResponse(conversation);
-      
-      // Agregar respuesta del asistente (SOLO EN MEMORIA, NO EN BD)
-      const assistantMsg: ChatbotMessage = {
-        id: `msg-${Date.now()}-assistant`,
-        role: 'assistant',
-        content: aiResponse.content,
-        timestamp: new Date(),
-        functionCalled: aiResponse.functionCalled,
-        clientData: conversation.clientInfo
+      // NUEVO: Usar el motor de conversación avanzado
+      const request = {
+        conversationId: `wa-${phoneNumber}`,
+        userId: phoneNumber,
+        phoneNumber: phoneNumber,
+        message: message,
+        pointOfSaleId: 'default'
       };
 
-      conversation.messages.push(assistantMsg);
+      const response = await this.advancedEngine.processConversation(request);
 
-      // NO guardar respuesta del asistente en la base de datos aquí
-      // await this.saveMessageToDatabase(conversation.phoneNumber, assistantMsg);
-
-      // Actualizar estado de la conversación si se procesó datos
-      if (aiResponse.updatedClientInfo) {
-        conversation.clientInfo = { ...conversation.clientInfo, ...aiResponse.updatedClientInfo };
-        conversation.status = this.determineNextStatus(conversation.clientInfo);
-        
-        // Guardar resumen actualizado en la base de datos (esto sí es necesario)
-        await this.saveConversationSummary(conversation);
-      }
-
-      // Guardar conversación actualizada en memoria
-      this.conversations.set(conversationId, conversation);
-
-      console.log(`[ChatbotService] Respuesta generada: ${aiResponse.content.substring(0, 100)}...`);
+      console.log(`[ChatbotService] Respuesta generada: ${response.response.substring(0, 100)}...`);
 
       return {
-        response: aiResponse.content,
+        response: response.response,
         shouldSend: true,
-        conversationState: conversation
+        conversationState: {
+          conversationId: request.conversationId,
+          phoneNumber: phoneNumber,
+          status: 'greeting' as DataCollectionStatus,
+          clientInfo: {},
+          messages: [],
+          createdAt: new Date(),
+          lastActivity: new Date()
+        }
       };
 
     } catch (error) {
