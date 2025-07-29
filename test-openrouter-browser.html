@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test OpenRouter API</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .api-key {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test OpenRouter API</h1>
+        
+        <div class="test-section">
+            <h3>🔑 API Key</h3>
+            <div class="api-key">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</div>
+        </div>
+
+        <div class="test-section">
+            <h3>📡 Test 1: Llamada Simple</h3>
+            <p>Prueba una llamada básica sin funciones</p>
+            <button onclick="testSimpleCall()">Probar Llamada Simple</button>
+            <div id="result1" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test 2: Llamada con Funciones</h3>
+            <p>Prueba una llamada con funciones para chatbot de repuestos</p>
+            <button onclick="testFunctionCall()">Probar con Funciones</button>
+            <div id="result2" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>💰 Test 3: Verificar Créditos</h3>
+            <p>Verifica los créditos disponibles en tu cuenta</p>
+            <button onclick="testCredits()">Verificar Créditos</button>
+            <div id="result3" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Test Completo</h3>
+            <p>Ejecuta todos los tests en secuencia</p>
+            <button onclick="runAllTests()">Ejecutar Todos los Tests</button>
+            <div id="resultAll" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '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';
+        const BASE_URL = 'https://openrouter.ai/api/v1';
+        const MODEL = 'google/gemini-flash-1.5';
+
+        function showResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = content;
+        }
+
+        function showInfo(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result info';
+            element.textContent = content;
+        }
+
+        async function makeRequest(endpoint, payload = null) {
+            const headers = {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': window.location.origin,
+                'X-Title': 'Embler WhatsApp Chatbot'
+            };
+
+            const options = {
+                method: payload ? 'POST' : 'GET',
+                headers: headers,
+                body: payload ? JSON.stringify(payload) : undefined
+            };
+
+            const response = await fetch(`${BASE_URL}${endpoint}`, options);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${data.error?.message || 'Error desconocido'}`);
+            }
+
+            return data;
+        }
+
+        async function testSimpleCall() {
+            try {
+                const payload = {
+                    model: MODEL,
+                    messages: [
+                        {
+                            role: 'user',
+                            content: 'Hola, ¿cómo estás? Responde en español.'
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 100
+                };
+
+                const result = await makeRequest('/chat/completions', payload);
+                
+                const response = {
+                    success: true,
+                    message: result.choices[0]?.message?.content,
+                    usage: result.usage,
+                    model: result.model
+                };
+
+                showResult('result1', JSON.stringify(response, null, 2), true);
+            } catch (error) {
+                showResult('result1', `Error: ${error.message}`, false);
+            }
+        }
+
+        async function testFunctionCall() {
+            try {
+                const payload = {
+                    model: MODEL,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Eres un vendedor de refacciones automotrices. Cuando el cliente mencione un producto, usa las funciones disponibles para buscar en el catálogo.'
+                        },
+                        {
+                            role: 'user',
+                            content: 'Necesito balatas para mi Toyota Corolla 2018'
+                        }
+                    ],
+                    tools: [
+                        {
+                            type: 'function',
+                            function: {
+                                name: 'buscarProductoPorTermino',
+                                description: 'Buscar productos en el catálogo de refacciones',
+                                parameters: {
+                                    type: 'object',
+                                    properties: {
+                                        termino: {
+                                            type: 'string',
+                                            description: 'Término de búsqueda del producto'
+                                        },
+                                        datosAuto: {
+                                            type: 'object',
+                                            description: 'Datos del automóvil',
+                                            properties: {
+                                                marca: { type: 'string' },
+                                                modelo: { type: 'string' },
+                                                año: { type: 'number' }
+                                            }
+                                        }
+                                    },
+                                    required: ['termino']
+                                }
+                            }
+                        }
+                    ],
+                    tool_choice: 'auto',
+                    temperature: 0.7,
+                    max_tokens: 500
+                };
+
+                const result = await makeRequest('/chat/completions', payload);
+                
+                const response = {
+                    success: true,
+                    message: result.choices[0]?.message?.content,
+                    tool_calls: result.choices[0]?.message?.tool_calls,
+                    usage: result.usage,
+                    model: result.model
+                };
+
+                showResult('result2', JSON.stringify(response, null, 2), true);
+            } catch (error) {
+                showResult('result2', `Error: ${error.message}`, false);
+            }
+        }
+
+        async function testCredits() {
+            try {
+                const result = await makeRequest('/auth/key');
+                
+                const response = {
+                    success: true,
+                    credits: result,
+                    timestamp: new Date().toISOString()
+                };
+
+                showResult('result3', JSON.stringify(response, null, 2), true);
+            } catch (error) {
+                showResult('result3', `Error: ${error.message}`, false);
+            }
+        }
+
+        async function runAllTests() {
+            const results = [];
+            
+            try {
+                showInfo('resultAll', '🧪 Ejecutando todos los tests...\n');
+                
+                // Test 1
+                try {
+                    const test1 = await testSimpleCall();
+                    results.push('✅ Test 1 (Simple): Exitoso');
+                } catch (error) {
+                    results.push(`❌ Test 1 (Simple): ${error.message}`);
+                }
+
+                // Test 2
+                try {
+                    const test2 = await testFunctionCall();
+                    results.push('✅ Test 2 (Funciones): Exitoso');
+                } catch (error) {
+                    results.push(`❌ Test 2 (Funciones): ${error.message}`);
+                }
+
+                // Test 3
+                try {
+                    const test3 = await testCredits();
+                    results.push('✅ Test 3 (Créditos): Exitoso');
+                } catch (error) {
+                    results.push(`❌ Test 3 (Créditos): ${error.message}`);
+                }
+
+                const summary = results.join('\n');
+                const isAllSuccess = results.every(r => r.startsWith('✅'));
+                
+                showResult('resultAll', `🎯 Resumen de Tests:\n\n${summary}\n\n${isAllSuccess ? '🎉 ¡Todos los tests exitosos! La API key es válida.' : '⚠️ Algunos tests fallaron. Revisa los errores.'}`, isAllSuccess);
+                
+            } catch (error) {
+                showResult('resultAll', `Error general: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>
