@@ -7,6 +7,7 @@ import { openAIClient } from '../../config/openai-client';
 import { FunctionCallHandler } from '../llm/function-handler';
 import { conceptsService } from '../concepts-service';
 import { conversationMemoryManager, ConversationMemory } from './conversation-memory';
+import { getConfig } from '../../config';
 
 const functionHandler = new FunctionCallHandler();
 import { dynamicPromptGenerator, PromptContext } from './dynamic-prompt-generator';
@@ -55,12 +56,15 @@ export interface ConversationConfig {
 export class AdvancedConversationEngine {
   private config: ConversationConfig;
   private activeConversations = new Map<string, { lastActivity: Date; requestCount: number }>();
+  
+  // NUEVO: Configuración centralizada de LLM
+  private readonly llmConfig = getConfig().llm;
 
   constructor(config?: Partial<ConversationConfig>) {
     this.config = {
       maxContextLength: 4000,
       maxFunctionCalls: 5,
-      timeoutMs: 30000,
+      timeoutMs: this.llmConfig.timeout,
       retryAttempts: 3,
       enableMemoryLearning: true,
       enableDynamicPrompts: true,
@@ -461,15 +465,15 @@ export class AdvancedConversationEngine {
     );
     
     const response = await openAIClient.createChatCompletion({
-      model: "gpt-4o-mini",
+      model: this.llmConfig.openRouterModel,
       messages: [
         { role: "system", content: prompt },
         { role: "user", content: context.currentMessage }
       ],
       functions: availableFunctions,
       function_call: "auto",
-      temperature: 0.7,
-      max_tokens: 1000
+      temperature: this.llmConfig.defaultTemperature,
+      max_tokens: this.llmConfig.defaultMaxTokens
     });
     
     return response.choices[0].message;
@@ -500,7 +504,7 @@ Responde de manera profesional y usa funciones cuando sea necesario.`;
           llmResponse.function_call,
           [],
           { 
-            model: "gpt-4o-mini",
+            model: this.llmConfig.openRouterModel,
             messages: []
           },
           { pointOfSaleId: conversationId }

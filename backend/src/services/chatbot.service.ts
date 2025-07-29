@@ -97,12 +97,15 @@ interface OpenRouterTool {
 export class ChatbotService {
   private conversations = new Map<string, ConversationState>();
   private readonly SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
+  
+  // NUEVO: Usar configuración centralizada
+  private readonly config = getConfig();
   private readonly openRouterConfig = {
-    baseURL: 'https://openrouter.ai/api/v1',
-    model: 'google/gemini-2.5-flash-lite-preview-06-17',
-    timeout: 30000,
+    baseURL: this.config.llm.openRouterBaseUrl,
+    model: this.config.llm.openRouterModel,
+    timeout: this.config.llm.timeout,
     headers: {
-      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'Authorization': `Bearer ${this.config.llm.openRouterApiKey}`,
       'HTTP-Referer': 'http://localhost:3002',
       'X-Title': 'Embler WhatsApp Chatbot'
     }
