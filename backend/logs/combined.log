@@ -36824,3 +36824,513 @@
   message: 'System health is unhealthy',
   timestamp: '2025-07-28 19:56:08.487'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 20:46:23.802'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 20:46:23.991'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 20:46:23.993'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 20:46:24.020'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 20:46:24.020'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 20:46:24.021'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753757188541-2d2nn87yu',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 20:46:28.541'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1662,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 53,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 1609 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 87,
+          heapUsed: 223,
+          heapTotal: 257,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 78 }
+    ],
+    timestamp: 2025-07-29T02:46:28.541Z,
+    uptime: 8.3284669
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 20:46:28.542'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 20:46:31.231'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 20:46:31.413'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 20:46:31.414'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 20:46:31.439'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 20:46:31.439'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 20:46:31.440'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753757194442-uxke5mpht',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 20:46:34.443'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1346,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 53,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 709 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 90,
+          heapUsed: 231,
+          heapTotal: 257,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 78 }
+    ],
+    timestamp: 2025-07-29T02:46:34.443Z,
+    uptime: 5.7937364
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 20:46:34.443'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 20:47:03.629'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 20:47:03.799'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 20:47:03.800'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 20:47:03.825'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 20:47:03.826'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 20:47:03.827'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753757227378-c92k5ojij',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 20:47:07.378'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1281,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 53,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 1155 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 86,
+          heapUsed: 222,
+          heapTotal: 258,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 30 }
+    ],
+    timestamp: 2025-07-29T02:47:07.379Z,
+    uptime: 6.3811721
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 20:47:07.379'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 20:47:23.015'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 20:47:23.162'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 20:47:23.163'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 20:47:23.187'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 20:47:23.187'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 20:47:23.188'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753757246058-bolukaplf',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 20:47:26.059'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1111,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 55,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 755 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 87,
+          heapUsed: 223,
+          heapTotal: 257,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 65 }
+    ],
+    timestamp: 2025-07-29T02:47:26.059Z,
+    uptime: 5.6837083
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 20:47:26.059'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 256, heapUsed: 198, heapTotal: 204 },
+    uptime: 33,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 20:47:52.978'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 998,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 55,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 198,
+          heapTotal: 204,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 64 }
+    ],
+    timestamp: 2025-07-29T02:47:55.200Z,
+    uptime: 34.824692
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 20:47:55.200'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 20:48:23.705'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 20:48:23.877'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 20:48:23.879'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 20:48:23.903'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 20:48:23.904'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 20:48:23.904'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753757306819-ztgxsosl9',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 20:48:26.819'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1168,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 55,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 763 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 90,
+          heapUsed: 231,
+          heapTotal: 257,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 72 }
+    ],
+    timestamp: 2025-07-29T02:48:26.819Z,
+    uptime: 5.7965159
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 20:48:26.820'
+}
