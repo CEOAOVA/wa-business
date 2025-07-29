@@ -1,5 +1,5 @@
 import { getConfig } from '../config';
-import { openAIClient } from '../config/openai-client';
+import { openRouterClient } from '../config/openai-client';
 
 /**
  * Script para verificar que solo se use OpenRouter y nunca OpenAI
@@ -33,7 +33,7 @@ async function verifyOpenRouterOnly(): Promise<void> {
     // 3. Probar llamada y verificar URL
     console.log('\n🔗 PROBANDO LLAMADA:');
     try {
-      const response = await openAIClient.createChatCompletion({
+      const response = await openRouterClient.createChatCompletion({
         messages: [
           { role: 'system', content: 'Eres un asistente útil.' },
           { role: 'user', content: 'Responde solo con "OK" si me escuchas.' }

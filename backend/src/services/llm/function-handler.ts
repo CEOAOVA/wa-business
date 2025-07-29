@@ -1,29 +1,37 @@
 /**
- * Manejador de llamadas a funciones LLM
- * Procesa function calls y coordina con el OpenAI client
+ * Function Call Handler para WhatsApp Backend
+ * Procesa function calls y coordina con el OpenRouter client
  */
-import { FunctionResult } from '../../models/functions';
-import { OpenAIClient, ChatCompletionOptions, ChatCompletionResponse } from './openai-client';
-import { functionService } from './function-service';
-import { sanitizeText, preprocessText } from '../../utils/text-processing';
 
-export interface FunctionCallInfo {
+import { OpenRouterClient, ChatCompletionOptions, ChatCompletionResponse } from './openai-client';
+import { FunctionService } from './function-service';
+
+export interface FunctionCall {
   name: string;
   arguments: string;
 }
 
+export interface FunctionResult {
+  functionName: string;
+  success: boolean;
+  data?: any;
+  error?: string;
+}
+
 export class FunctionCallHandler {
-  private openaiClient: OpenAIClient;
+  private functionService: FunctionService;
+  private openRouterClient: OpenRouterClient;
 
   constructor() {
-    this.openaiClient = new OpenAIClient();
+    this.functionService = new FunctionService();
+    this.openRouterClient = new OpenRouterClient();
   }
 
   /**
    * Procesa una llamada a función LLM
    */
   async processFunctionCall(
-    functionCallInfo: FunctionCallInfo,
+    functionCallInfo: FunctionCall,
     messages: Array<any>,
     options: ChatCompletionOptions,
     context: { pointOfSaleId: string; userId?: string; model?: string }
@@ -42,7 +50,7 @@ export class FunctionCallHandler {
       }
 
       // Ejecutar la función
-      const functionResult = await functionService.executeFunction(
+      const functionResult = await this.functionService.executeFunction(
         functionCallInfo.name,
         functionArgs,
         context
@@ -64,7 +72,7 @@ export class FunctionCallHandler {
       const updatedMessages = [...messages, functionMessage];
 
       // Llamar a OpenAI con el resultado de la función
-      const response = await this.openaiClient.createChatCompletion({
+      const response = await this.openRouterClient.createChatCompletion({
         ...options,
         messages: updatedMessages,
         tools: undefined
@@ -100,7 +108,7 @@ export class FunctionCallHandler {
    * Maneja múltiples llamadas a funciones en secuencia
    */
   async processMultipleFunctionCalls(
-    functionCalls: FunctionCallInfo[],
+    functionCalls: FunctionCall[],
     messages: Array<any>,
     options: ChatCompletionOptions,
     context: { pointOfSaleId: string; userId?: string; model?: string }
@@ -163,21 +171,18 @@ export class FunctionCallHandler {
   }
 
   /**
-   * Procesa el texto de respuesta aplicando sanitización y formateo
+   * Procesa y sanitiza el texto de respuesta
    */
   private processResponseText(text: string): string {
     if (!text) return text;
 
-    // Aplicar sanitización y preprocessing
-    let processedText = sanitizeText(text);
-    processedText = preprocessText(processedText);
-
-    // Sanitización adicional para caracteres especiales
-    processedText = processedText
+    // Sanitización básica
+    let processedText = text
       .replace(/\\n/g, "\n")
       .replace(/\\t/g, "\t")
       .replace(/\\r/g, "\r")
-      .replace(/\\([^\\])/g, "$1");
+      .replace(/\\([^\\])/g, "$1")
+      .trim();
 
     return processedText;
   }
@@ -219,7 +224,7 @@ export class FunctionCallHandler {
    * Valida si una función está disponible
    */
   isFunctionAvailable(functionName: string): boolean {
-    const stats = functionService.getStats();
+    const stats = this.functionService.getStats();
     return stats.registeredFunctions.includes(functionName);
   }
 
@@ -227,7 +232,7 @@ export class FunctionCallHandler {
    * Obtiene las funciones disponibles
    */
   getAvailableFunctions(): string[] {
-    const stats = functionService.getStats();
+    const stats = this.functionService.getStats();
     return stats.registeredFunctions;
   }
 
@@ -235,7 +240,7 @@ export class FunctionCallHandler {
    * Obtiene las definiciones de funciones para OpenAI
    */
   getFunctionDefinitions() {
-    return functionService.getFunctionDefinitions();
+    return this.functionService.getFunctionDefinitions();
   }
 
   /**
@@ -256,7 +261,7 @@ export class FunctionCallHandler {
   /**
    * Extrae información de function call de una respuesta de OpenAI
    */
-  extractFunctionCallInfo(response: any): FunctionCallInfo | null {
+  extractFunctionCallInfo(response: any): FunctionCall | null {
     // Formato legacy (function_call)
     if (response.function_call) {
       return {
@@ -282,8 +287,8 @@ export class FunctionCallHandler {
   /**
    * Extrae múltiples function calls de una respuesta
    */
-  extractMultipleFunctionCalls(response: any): FunctionCallInfo[] {
-    const functionCalls: FunctionCallInfo[] = [];
+  extractMultipleFunctionCalls(response: any): FunctionCall[] {
+    const functionCalls: FunctionCall[] = [];
 
     // Formato legacy (function_call)
     if (response.function_call) {
@@ -345,12 +350,12 @@ Responde en español mexicano de manera amigable y profesional.`;
     functionNames: string[];
     clientConnected: boolean;
   } {
-    const functionStats = functionService.getStats();
+    const functionStats = this.functionService.getStats();
     
     return {
       availableFunctions: functionStats.totalFunctions,
       functionNames: functionStats.registeredFunctions,
-      clientConnected: this.openaiClient ? true : false
+      clientConnected: this.openRouterClient ? true : false
     };
   }
 
@@ -362,12 +367,12 @@ Responde en español mexicano de manera amigable y profesional.`;
     functionService: boolean;
     totalFunctions: number;
   }> {
-    const functionStats = functionService.getStats();
+    const functionStats = this.functionService.getStats();
     
     // Testear conexión OpenAI
     let openaiConnected = false;
     try {
-      const connectionResult = await this.openaiClient.testConnection();
+      const connectionResult = await this.openRouterClient.testConnection();
       openaiConnected = connectionResult.success;
     } catch (error) {
       console.error('[FunctionCallHandler] Error testing OpenAI connection:', error);

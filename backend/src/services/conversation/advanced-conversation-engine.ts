@@ -3,7 +3,7 @@
  * Integra memoria, prompts dinámicos y funciones LLM para conversaciones inteligentes
  */
 
-import { openAIClient } from '../../config/openai-client';
+import { openRouterClient } from '../../config/openai-client';
 import { FunctionCallHandler } from '../llm/function-handler';
 import { conceptsService } from '../concepts-service';
 import { conversationMemoryManager, ConversationMemory } from './conversation-memory';
@@ -464,7 +464,7 @@ export class AdvancedConversationEngine {
       context.availableFunctions.includes(f.name)
     );
     
-    const response = await openAIClient.createChatCompletion({
+    const response = await openRouterClient.createChatCompletion({
       model: this.llmConfig.openRouterModel,
       messages: [
         { role: "system", content: prompt },
@@ -551,7 +551,7 @@ Responde de manera profesional y usa funciones cuando sea necesario.`;
         Genera una respuesta mejorada que integre los datos de manera natural.`;
         
         try {
-          const enhancedResponse = await openAIClient.createChatCompletion({
+          const enhancedResponse = await openRouterClient.createChatCompletion({
             model: "gpt-4o-mini",
             messages: [
               { role: "system", content: contextualPrompt },

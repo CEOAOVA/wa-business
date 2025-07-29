@@ -1,3 +1,3 @@
-import { OpenAIClient } from '../services/llm/openai-client';
+import { OpenRouterClient } from '../services/llm/openai-client';
 
-export const openAIClient = new OpenAIClient(); 
+export const openRouterClient = new OpenRouterClient(); 

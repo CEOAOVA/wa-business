@@ -7,7 +7,7 @@ import { loadEnvWithUnicodeSupport } from '../config/env-loader';
 import { whatsappService } from './whatsapp.service';
 import { databaseService } from './database.service';
 import { getConfig } from '../config';
-import { openAIClient } from '../config/openai-client';
+import { openRouterClient } from '../config/openai-client';
 import { AdvancedConversationEngine } from './conversation/advanced-conversation-engine';
 
 // Cargar variables de entorno con soporte Unicode

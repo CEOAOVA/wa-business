@@ -1,6 +1,6 @@
 /**
- * OpenAI Client mejorado para OpenRouter + Gemini
- * Migrado desde Backend-Embler y adaptado para WhatsApp Backend
+ * OpenRouter Client para WhatsApp Backend
+ * Usa la API de OpenRouter para acceder a múltiples modelos LLM
  */
 
 import axios, { AxiosInstance } from 'axios';
@@ -39,7 +39,7 @@ export interface ChatCompletionResponse {
   model?: string;
 }
 
-export class OpenAIClient {
+export class OpenRouterClient {
   private client: AxiosInstance;
   private config: any;
 
@@ -78,7 +78,7 @@ export class OpenAIClient {
 
       return result;
     } catch (error) {
-      console.error('Error en OpenAI client:', error);
+      console.error('Error en OpenRouter client:', error);
       throw error;
     }
   }
@@ -98,4 +98,4 @@ export class OpenAIClient {
   }
 }
 
-export const openAIClient = new OpenAIClient(); 
+export const openRouterClient = new OpenRouterClient(); 

@@ -1,5 +1,5 @@
 import { getConfig } from '../config';
-import { openAIClient } from '../config/openai-client';
+import { openRouterClient } from '../config/openai-client';
 
 /**
  * Script para verificar la configuración de OpenRouter
@@ -24,7 +24,7 @@ async function testOpenRouterConfig(): Promise<void> {
 
     // 3. Probar conexión
     console.log('\n🔗 Probando conexión con OpenRouter...');
-    const connectionTest = await openAIClient.testConnection();
+    const connectionTest = await openRouterClient.testConnection();
     
     if (connectionTest.success) {
       console.log(`✅ Conexión exitosa (latencia: ${connectionTest.latency}ms)`);
@@ -35,7 +35,7 @@ async function testOpenRouterConfig(): Promise<void> {
     // 4. Probar llamada completa
     console.log('\n📝 Probando llamada completa...');
     try {
-      const response = await openAIClient.createChatCompletion({
+      const response = await openRouterClient.createChatCompletion({
         messages: [
           { role: 'system', content: 'Eres un asistente útil.' },
           { role: 'user', content: 'Hola, ¿cómo estás?' }
