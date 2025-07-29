@@ -40401,3 +40401,324 @@
   message: 'System health is unhealthy',
   timestamp: '2025-07-28 21:05:01.073'
 }
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 263, heapUsed: 202, heapTotal: 208 },
+    uptime: 243,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 21:05:28.715'
+}
+{
+  service: 'monitoring',
+  metrics: { requests: 0, averageResponseTime: 0, memoryUsage: 202 },
+  level: 'debug',
+  message: 'Metrics updated',
+  timestamp: '2025-07-28 21:05:28.916'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1033,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 63,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 202,
+          heapTotal: 209,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 57 }
+    ],
+    timestamp: 2025-07-29T03:05:30.953Z,
+    uptime: 244.8885984
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 21:05:30.954'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 263, heapUsed: 202, heapTotal: 209 },
+    uptime: 273,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 21:05:58.716'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1052,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 63,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 203,
+          heapTotal: 208,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 1 }
+    ],
+    timestamp: 2025-07-29T03:06:01.029Z,
+    uptime: 274.9641857
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 21:06:01.029'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 264, heapUsed: 203, heapTotal: 208 },
+    uptime: 303,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 21:06:28.721'
+}
+{
+  service: 'monitoring',
+  metrics: { requests: 0, averageResponseTime: 0, memoryUsage: 203 },
+  level: 'debug',
+  message: 'Metrics updated',
+  timestamp: '2025-07-28 21:06:28.919'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1125,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 63,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 203,
+          heapTotal: 209,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 8 }
+    ],
+    timestamp: 2025-07-29T03:06:31.024Z,
+    uptime: 304.9597853
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 21:06:31.025'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 265, heapUsed: 203, heapTotal: 209 },
+    uptime: 333,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 21:06:58.735'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1021,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 63,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 204,
+          heapTotal: 210,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 21 }
+    ],
+    timestamp: 2025-07-29T03:07:00.929Z,
+    uptime: 334.864484
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 21:07:00.930'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 265, heapUsed: 204, heapTotal: 210 },
+    uptime: 363,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 21:07:28.740'
+}
+{
+  service: 'monitoring',
+  metrics: { requests: 0, averageResponseTime: 0, memoryUsage: 204 },
+  level: 'debug',
+  message: 'Metrics updated',
+  timestamp: '2025-07-28 21:07:28.925'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1071,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 63,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 204,
+          heapTotal: 211,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 22 }
+    ],
+    timestamp: 2025-07-29T03:07:31.003Z,
+    uptime: 364.9381863
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 21:07:31.003'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 265, heapUsed: 204, heapTotal: 211 },
+    uptime: 393,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 21:07:58.750'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1125,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 63,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 205,
+          heapTotal: 210,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 25 }
+    ],
+    timestamp: 2025-07-29T03:08:01.123Z,
+    uptime: 395.0582766
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 21:08:01.124'
+}
