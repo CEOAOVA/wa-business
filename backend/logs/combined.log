@@ -35943,3 +35943,884 @@
   message: 'System health is unhealthy',
   timestamp: '2025-07-28 17:50:48.095'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 19:49:47.875'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 19:49:48.071'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 19:49:48.073'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 19:49:48.102'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 19:49:48.103'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 19:49:48.103'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753753791815-4uu44n6gg',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 19:49:51.816'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1841,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 46,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 810 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 90,
+          heapUsed: 232,
+          heapTotal: 257,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 78 }
+    ],
+    timestamp: 2025-07-29T01:49:51.816Z,
+    uptime: 7.3712651
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:49:51.817'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 19:50:12.312'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 19:50:12.512'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 19:50:12.514'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 19:50:12.542'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 19:50:12.543'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 19:50:12.543'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753753815839-dvza58gfa',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 19:50:15.840'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1423,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 46,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 729 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 91,
+          heapUsed: 233,
+          heapTotal: 256,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 94 }
+    ],
+    timestamp: 2025-07-29T01:50:15.840Z,
+    uptime: 6.403755
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:50:15.841'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 19:50:30.850'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 19:50:31.040'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 19:50:31.042'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 19:50:31.070'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 19:50:31.070'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 19:50:31.071'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753753833969-8jjd6hjdj',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 19:50:33.969'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1144,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 46,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 738 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 90,
+          heapUsed: 231,
+          heapTotal: 257,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 85 }
+    ],
+    timestamp: 2025-07-29T01:50:33.970Z,
+    uptime: 6.0100931
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:50:33.970'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 256, heapUsed: 198, heapTotal: 204 },
+    uptime: 33,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:51:00.804'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1036,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 46,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 198,
+          heapTotal: 204,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 44 }
+    ],
+    timestamp: 2025-07-29T01:51:03.175Z,
+    uptime: 35.2159304
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:51:03.176'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 257, heapUsed: 199, heapTotal: 204 },
+    uptime: 63,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:51:30.810'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1130,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 46,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 199,
+          heapTotal: 204,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 2 }
+    ],
+    timestamp: 2025-07-29T01:51:33.277Z,
+    uptime: 65.3167563
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:51:33.277'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 258, heapUsed: 199, heapTotal: 206 },
+    uptime: 93,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:52:00.823'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1051,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 199,
+          heapTotal: 205,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 78 }
+    ],
+    timestamp: 2025-07-29T01:52:03.112Z,
+    uptime: 95.1521257
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:52:03.113'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 258, heapUsed: 199, heapTotal: 205 },
+    uptime: 123,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:52:30.828'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 991,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 200,
+          heapTotal: 205,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 64 }
+    ],
+    timestamp: 2025-07-29T01:52:33.081Z,
+    uptime: 125.1203978
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:52:33.081'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 259, heapUsed: 200, heapTotal: 206 },
+    uptime: 153,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:53:00.840'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1038,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 200,
+          heapTotal: 206,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 95 }
+    ],
+    timestamp: 2025-07-29T01:53:03.179Z,
+    uptime: 155.2187852
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:53:03.179'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 259, heapUsed: 200, heapTotal: 206 },
+    uptime: 183,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:53:30.850'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1091,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 201,
+          heapTotal: 207,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 91 }
+    ],
+    timestamp: 2025-07-29T01:53:33.182Z,
+    uptime: 185.2214853
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:53:33.182'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 260, heapUsed: 201, heapTotal: 207 },
+    uptime: 213,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:54:00.856'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1112,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 1 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 201,
+          heapTotal: 208,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 24 }
+    ],
+    timestamp: 2025-07-29T01:54:03.289Z,
+    uptime: 215.3284952
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:54:03.289'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 260, heapUsed: 201, heapTotal: 208 },
+    uptime: 243,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:54:30.864'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1084,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 202,
+          heapTotal: 207,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 25 }
+    ],
+    timestamp: 2025-07-29T01:54:33.176Z,
+    uptime: 245.2154538
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:54:33.176'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 261, heapUsed: 202, heapTotal: 207 },
+    uptime: 273,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:55:00.875'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 987,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 98,
+          heapUsed: 202,
+          heapTotal: 208,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 5 }
+    ],
+    timestamp: 2025-07-29T01:55:03.176Z,
+    uptime: 275.2157602
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:55:03.176'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 262, heapUsed: 202, heapTotal: 208 },
+    uptime: 303,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:55:30.881'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1099,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 0 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 97,
+          heapUsed: 203,
+          heapTotal: 208,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 71 }
+    ],
+    timestamp: 2025-07-29T01:55:33.166Z,
+    uptime: 305.2056009
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:55:33.166'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 262, heapUsed: 203, heapTotal: 208 },
+    uptime: 333,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-07-28 19:56:00.885'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-07-28 19:56:05.432'
+}
+{
+  service: 'monitoring',
+  level: 'info',
+  message: 'Starting monitoring service',
+  timestamp: '2025-07-28 19:56:05.622'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-07-28 19:56:05.623'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-07-28 19:56:05.650'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-07-28 19:56:05.651'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-07-28 19:56:05.651'
+}
+{
+  service: 'monitoring',
+  alert: {
+    id: 'alert-1753754168486-7xs4vhph3',
+    type: 'critical',
+    service: 'memory'
+  },
+  level: 'warn',
+  message: 'Alert created: Service memory is unhealthy: Unknown error',
+  timestamp: '2025-07-28 19:56:08.486'
+}
+{
+  service: 'monitoring',
+  healthCheck: {
+    overall: 'unhealthy',
+    services: [
+      {
+        service: 'database',
+        status: 'healthy',
+        responseTime: 1190,
+        metadata: {
+          totalConversations: 4,
+          totalMessages: 47,
+          totalOrders: 0,
+          activeConversations: 4
+        }
+      },
+      { service: 'soap', status: 'healthy', responseTime: 735 },
+      {
+        service: 'memory',
+        status: 'unhealthy',
+        responseTime: 0,
+        metadata: {
+          memoryPercent: 86,
+          heapUsed: 222,
+          heapTotal: 258,
+          external: 9
+        }
+      },
+      { service: 'llm', status: 'healthy', responseTime: 96 }
+    ],
+    timestamp: 2025-07-29T01:56:08.486Z,
+    uptime: 6.1238459
+  },
+  level: 'warn',
+  message: 'System health is unhealthy',
+  timestamp: '2025-07-28 19:56:08.487'
+}

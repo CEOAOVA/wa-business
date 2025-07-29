@@ -1172,16 +1172,25 @@ export class SupabaseDatabaseService {
    */
   async canChatbotProcessMessage(conversationId: string): Promise<boolean> {
     if (!this.isEnabled || !supabase) {
-      return false;
+      // TEMPORAL: Permitir procesamiento si Supabase no está disponible
+      console.log('⚠️ Supabase no disponible, permitiendo procesamiento de chatbot por defecto');
+      return true;
     }
 
     try {
       const mode = await this.getConversationTakeoverMode(conversationId);
       // El chatbot puede procesar solo si está en modo 'spectator' o 'ai_only'
+      // TEMPORAL: Si no se puede obtener el modo, permitir procesamiento
+      if (mode === null) {
+        console.log('⚠️ No se pudo obtener takeover_mode, permitiendo procesamiento por defecto');
+        return true;
+      }
       return mode === 'spectator' || mode === 'ai_only';
     } catch (error) {
       console.error('Error verificando si chatbot puede procesar:', error);
-      return false;
+      // TEMPORAL: En caso de error, permitir procesamiento
+      console.log('⚠️ Error verificando takeover_mode, permitiendo procesamiento por defecto');
+      return true;
     }
   }
 
