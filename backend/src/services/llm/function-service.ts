@@ -1105,7 +1105,7 @@ export class FunctionService {
           }
 
           // Formatear resultados para mostrar
-          const { formatSearchResults } = await import('../utils/product-search-utils');
+          const { formatSearchResults } = await import('../../utils/product-search-utils');
           const mensajeFormateado = formatSearchResults(searchResult.matches, datosAuto);
 
           return {
@@ -1352,7 +1352,7 @@ export class FunctionService {
 
         try {
           // Importar utilidades
-          const { generateSearchSuggestions } = await import('../utils/product-search-utils');
+          const { generateSearchSuggestions } = await import('../../utils/product-search-utils');
           const suggestions = generateSearchSuggestions(terminoOriginal);
 
           const mensaje = `No encontré "${terminoOriginal}". ${suggestions[0]}`;

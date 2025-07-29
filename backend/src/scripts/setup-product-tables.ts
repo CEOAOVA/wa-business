@@ -66,6 +66,10 @@ export async function setupProductTables(): Promise<void> {
  * Crear tabla conceptos_json
  */
 async function createConceptosTable(): Promise<void> {
+  if (!supabase) {
+    throw new Error('Supabase client no está inicializado');
+  }
+
   const { error } = await supabase.rpc('exec_sql', {
     sql: `
       CREATE TABLE IF NOT EXISTS conceptos_json (
@@ -92,6 +96,10 @@ async function createConceptosTable(): Promise<void> {
  * Crear tabla c_embler_json
  */
 async function createEmblerTable(): Promise<void> {
+  if (!supabase) {
+    throw new Error('Supabase client no está inicializado');
+  }
+
   const { error } = await supabase.rpc('exec_sql', {
     sql: `
       CREATE TABLE IF NOT EXISTS c_embler_json (
@@ -121,6 +129,10 @@ async function createEmblerTable(): Promise<void> {
  * Crear tabla c_embler_ml_json
  */
 async function createEmblerMlTable(): Promise<void> {
+  if (!supabase) {
+    throw new Error('Supabase client no está inicializado');
+  }
+
   const { error } = await supabase.rpc('exec_sql', {
     sql: `
       CREATE TABLE IF NOT EXISTS c_embler_ml_json (
@@ -153,6 +165,11 @@ export async function loadProductData(): Promise<void> {
   console.log('📦 Cargando datos de productos...');
 
   try {
+    // Verificar conexión a Supabase
+    if (!supabase) {
+      throw new Error('Supabase client no está inicializado');
+    }
+
     // Cargar conceptos.json
     await loadConceptosData();
     
@@ -175,6 +192,10 @@ export async function loadProductData(): Promise<void> {
  */
 async function loadConceptosData(): Promise<void> {
   try {
+    if (!supabase) {
+      throw new Error('Supabase client no está inicializado');
+    }
+
     const fs = require('fs');
     const path = require('path');
     
@@ -220,6 +241,10 @@ async function loadConceptosData(): Promise<void> {
  */
 async function loadEmblerData(): Promise<void> {
   try {
+    if (!supabase) {
+      throw new Error('Supabase client no está inicializado');
+    }
+
     const fs = require('fs');
     const path = require('path');
     
@@ -249,7 +274,7 @@ async function loadEmblerData(): Promise<void> {
       
       const { error } = await supabase
         .from('c_embler_json')
-        .insert(batch.map(item => ({ catalogo: item })));
+        .insert(batch.map((item: any) => ({ catalogo: item })));
 
       if (error) {
         console.error('❌ Error insertando lote de c_embler:', error);
@@ -270,6 +295,10 @@ async function loadEmblerData(): Promise<void> {
  */
 async function loadEmblerMlData(): Promise<void> {
   try {
+    if (!supabase) {
+      throw new Error('Supabase client no está inicializado');
+    }
+
     const fs = require('fs');
     const path = require('path');
     
@@ -299,7 +328,7 @@ async function loadEmblerMlData(): Promise<void> {
       
       const { error } = await supabase
         .from('c_embler_ml_json')
-        .insert(batch.map(item => ({ catalogo: item })));
+        .insert(batch.map((item: any) => ({ catalogo: item })));
 
       if (error) {
         console.error('❌ Error insertando lote de c_embler_ml:', error);

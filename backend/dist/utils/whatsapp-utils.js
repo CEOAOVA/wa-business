@@ -30,14 +30,65 @@ function validatePhoneNumber(phone) {
                 error: 'El número debe tener al menos 10 dígitos'
             };
         }
+        // Si el número empieza con 52 (código de México), procesarlo correctamente
+        if (cleaned.startsWith('52')) {
+            // Si tiene exactamente 12 dígitos (52 + 10 dígitos), está bien formateado
+            if (cleaned.length === 12) {
+                return {
+                    isValid: true,
+                    formatted: cleaned,
+                    error: undefined
+                };
+            }
+            // Si tiene exactamente 13 dígitos y empieza con 521, está bien formateado
+            if (cleaned.length === 13 && cleaned.startsWith('521')) {
+                return {
+                    isValid: true,
+                    formatted: cleaned,
+                    error: undefined
+                };
+            }
+            // Si tiene más de 13 dígitos, verificar si es un número válido de México
+            if (cleaned.length > 13) {
+                // Si empieza con 521 (código de México + área), mantener el formato
+                if (cleaned.startsWith('521')) {
+                    // Tomar los primeros 13 dígitos para mantener el formato correcto
+                    cleaned = cleaned.substring(0, 13);
+                    console.log(`📱 [PhoneValidation] Número mexicano con área truncado a 13 dígitos: ${cleaned}`);
+                    return {
+                        isValid: true,
+                        formatted: cleaned,
+                        error: undefined
+                    };
+                }
+                else {
+                    // Para otros casos, tomar los últimos 12 dígitos
+                    cleaned = cleaned.slice(-12);
+                    console.log(`📱 [PhoneValidation] Número con código 52 truncado a últimos 12 dígitos: ${cleaned}`);
+                    return {
+                        isValid: true,
+                        formatted: cleaned,
+                        error: undefined
+                    };
+                }
+            }
+            // Si tiene menos de 12 dígitos pero empieza con 52, es inválido
+            return {
+                isValid: false,
+                formatted: phone,
+                error: 'Número mexicano incompleto (debe tener 12 dígitos con código 52)'
+            };
+        }
+        // Si empieza con 1 (código de país), removerlo para México
+        // SOLO si no es un número mexicano (no empieza con 52)
+        if (cleaned.startsWith('1') && cleaned.length === 11 && !cleaned.startsWith('521')) {
+            cleaned = cleaned.substring(1);
+            console.log(`📱 [PhoneValidation] Removido código de país 1: ${cleaned}`);
+        }
         // Si el número tiene más de 10 dígitos, tomar los últimos 10
         if (cleaned.length > 10) {
             cleaned = cleaned.slice(-10);
             console.log(`📱 [PhoneValidation] Número truncado a últimos 10 dígitos: ${cleaned}`);
-        }
-        // Si empieza con 1 (código de país), removerlo para México
-        if (cleaned.startsWith('1') && cleaned.length === 11) {
-            cleaned = cleaned.substring(1);
         }
         // Verificar que sea un número válido de México (10 dígitos)
         if (cleaned.length !== 10) {
