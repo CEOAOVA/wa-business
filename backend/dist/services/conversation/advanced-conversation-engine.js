@@ -363,9 +363,23 @@ class AdvancedConversationEngine {
      */
     generateLLMResponse(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            const prompt = this.config.enableDynamicPrompts
-                ? dynamic_prompt_generator_1.dynamicPromptGenerator.generatePrompt('main', context)
-                : this.generateStaticPrompt(context);
+            // Determinar si usar prompt de continuidad
+            const memory = context.conversationMemory;
+            const conversationLength = memory.metadata.conversationLength;
+            let prompt;
+            if (this.config.enableDynamicPrompts) {
+                if (conversationLength > 1) {
+                    // Usar prompt de continuidad para conversaciones en curso
+                    prompt = dynamic_prompt_generator_1.dynamicPromptGenerator.generateContinuationPrompt(context);
+                }
+                else {
+                    // Usar prompt normal para primera interacción
+                    prompt = dynamic_prompt_generator_1.dynamicPromptGenerator.generatePrompt('main', context);
+                }
+            }
+            else {
+                prompt = this.generateStaticPrompt(context);
+            }
             const functions = functionHandler.getFunctionDefinitions();
             const availableFunctions = functions.filter(f => context.availableFunctions.includes(f.name));
             const response = yield openai_client_1.openRouterClient.createChatCompletion({
@@ -386,13 +400,42 @@ class AdvancedConversationEngine {
      * Genera prompt estático de respaldo
      */
     generateStaticPrompt(context) {
-        return `Eres Embler, un asistente de refacciones automotrices.
-    
-Ayuda al cliente con: ${context.intent}
-Mensaje: ${context.currentMessage}
-Funciones disponibles: ${context.availableFunctions.join(', ')}
+        const memory = context.conversationMemory;
+        const conversationLength = memory.metadata.conversationLength;
+        let prompt = `Eres Embler, un asistente inteligente de refacciones automotrices para México.
+Trabajas para AOVA, una empresa líder en distribución de refacciones.
 
-Responde de manera profesional y usa funciones cuando sea necesario.`;
+🎯 OBJETIVO: Mantener conversaciones naturales y contextuales.
+
+📋 REGLAS DE CONVERSACIÓN NATURAL:
+- Si es primera interacción: Saluda apropiadamente
+- Si es conversación en curso: Usa referencias y mantén continuidad
+- NO repitas saludos si ya saludaste en la sesión
+- Usa referencias como "Como mencionabas antes..." o "Continuemos con..."
+- Mantén el contexto de la conversación anterior
+
+CAPACIDADES:
+- Consultar inventario en tiempo real
+- Generar tickets de compra
+- Buscar por número VIN
+- Procesar envíos
+- Conectar con asesores humanos
+
+CONTEXTO ACTUAL:
+- Intención: ${context.intent}
+- Mensaje: ${context.currentMessage}
+- Funciones disponibles: ${context.availableFunctions.join(', ')}
+- Longitud de conversación: ${conversationLength}`;
+        // Agregar instrucciones específicas para continuidad
+        if (conversationLength > 1) {
+            prompt += '\n\nINSTRUCCIONES DE CONTINUIDAD:\n';
+            prompt += '- NO saludes nuevamente\n';
+            prompt += '- Usa referencias a la conversación anterior\n';
+            prompt += '- Mantén el contexto de la conversación\n';
+            prompt += '- Haz transiciones naturales entre temas\n';
+        }
+        prompt += '\n\nResponde de manera profesional, amigable y contextual.';
+        return prompt;
     }
     /**
      * Maneja llamadas a funciones

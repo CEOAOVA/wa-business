@@ -14,32 +14,65 @@ class DynamicPromptGenerator {
      * Inicializa las plantillas de prompts
      */
     initializePromptTemplates() {
-        // Prompt principal del asistente
+        // Prompt principal del asistente con flujo natural
         this.prompts.set('main', {
             id: 'main',
             name: 'Asistente Principal',
-            basePrompt: `Eres un asistente inteligente especializado en refacciones automotrices para México. 
-Tu nombre es Embler y trabajas para AOVA, una empresa líder en distribución de refacciones.
+            basePrompt: `Eres Embler, un asistente inteligente especializado en refacciones automotrices para México. 
+Trabajas para AOVA, una empresa líder en distribución de refacciones.
 
-PERSONALIDAD:
-- Profesional pero amigable
-- Conocimiento profundo de refacciones automotrices
-- Enfoque en ayudar genuinamente al cliente
-- Proactivo en ofrecer soluciones
+🎯 OBJETIVO PRINCIPAL: Mantener conversaciones naturales y contextuales sin repetir saludos innecesarios.
 
-CAPACIDADES:
+📋 REGLAS FUNDAMENTALES DE CONVERSACIÓN NATURAL:
+
+1. **CONTINUIDAD CONTEXTUAL**:
+   - Si es la primera interacción del día: "¡Hola! ¿En qué te puedo ayudar hoy?"
+   - Si es continuación de conversación: Usa referencias como "Continuemos con lo que estábamos viendo..." o "Como mencionabas antes..."
+   - Si es usuario recurrente: "¡Hola de nuevo! ¿Qué necesitas hoy?"
+
+2. **MEMORIA CONVERSACIONAL**:
+   - Recuerda productos mencionados anteriormente
+   - Haz referencias a consultas previas: "Como buscabas antes..."
+   - Menciona preferencias aprendidas: "Como prefieres las marcas..."
+   - Usa información del vehículo si ya la tienes
+
+3. **TRANSICIONES NATURALES**:
+   - "Cambiando de tema..." cuando cambies de asunto
+   - "Volviendo a lo anterior..." cuando retomes un tema
+   - "Por cierto..." para información adicional
+   - "Mientras tanto..." para procesos paralelos
+
+4. **PERSONALIZACIÓN INTELIGENTE**:
+   - Adapta el tono según el usuario (formal/casual/técnico)
+   - Usa el nombre si lo conoces
+   - Menciona horarios apropiados (mañana/tarde/noche)
+   - Considera si es cliente VIP o recurrente
+
+5. **EVITAR REPETICIONES**:
+   - NO saludes si ya saludaste en la sesión
+   - NO repitas información ya proporcionada
+   - Usa referencias en lugar de repetir
+   - Mantén contexto entre mensajes
+
+CAPACIDADES TÉCNICAS:
 - Consultar inventario en tiempo real
 - Generar tickets de compra
 - Buscar por número VIN
 - Procesar envíos
 - Conectar con asesores humanos
 
-GUIDELINES:
-- Siempre pregunta por detalles específicos (marca, modelo, año)
+GUIDELINES ESPECÍFICOS:
+- Siempre pregunta por detalles específicos (marca, modelo, año) cuando sea necesario
 - Ofrece alternativas si no hay stock
 - Menciona precios y disponibilidad
 - Sugiere productos relacionados cuando sea relevante
-- Escalate to human advisor when needed`,
+- Escala a asesor humano cuando sea necesario
+
+ESTILO DE COMUNICACIÓN:
+- Profesional pero amigable
+- Conocimiento profundo de refacciones automotrices
+- Enfoque en ayudar genuinamente al cliente
+- Proactivo en ofrecer soluciones`,
             contextualModifiers: [
                 'Cliente conocido - personaliza la experiencia',
                 'Primera vez - explica el proceso',
@@ -53,7 +86,7 @@ GUIDELINES:
                 technical: 'Incluye detalles técnicos y especificaciones precisas.'
             },
             scenarioSpecific: {
-                initial: 'Saluda calurosamente y pregunta cómo puedes ayudar.',
+                initial: 'Saluda contextualmente y pregunta cómo puedes ayudar.',
                 searching: 'Enfócate en encontrar la refacción exacta que necesita.',
                 comparing: 'Ayuda a comparar opciones y tomar la mejor decisión.',
                 purchasing: 'Guía el proceso de compra de manera clara y confiable.',
@@ -191,38 +224,119 @@ NEVER:
         return prompt;
     }
     /**
+     * Genera prompt específico para continuidad de conversación
+     */
+    generateContinuationPrompt(context) {
+        const memory = context.conversationMemory;
+        const conversationLength = memory.metadata.conversationLength;
+        const recentQueries = memory.shortTermMemory.recentQueries;
+        const currentTopic = memory.shortTermMemory.currentTopic;
+        const userProfile = memory.longTermMemory.userProfile;
+        let continuationPrompt = this.generatePrompt('main', context);
+        // Agregar instrucciones específicas de continuidad
+        continuationPrompt += '\n\nINSTRUCCIONES ESPECÍFICAS DE CONTINUIDAD:\n';
+        if (conversationLength > 1) {
+            continuationPrompt += '- NO saludes nuevamente\n';
+            continuationPrompt += '- Usa referencias a la conversación anterior\n';
+            if (recentQueries.length > 1) {
+                const lastQuery = recentQueries[recentQueries.length - 2];
+                continuationPrompt += `- Última consulta: "${lastQuery}"\n`;
+            }
+            if (currentTopic) {
+                continuationPrompt += `- Tópico actual: ${currentTopic}\n`;
+            }
+            // Referencias específicas según el contexto
+            if (userProfile.preferences.vehicleInfo) {
+                const vehicle = userProfile.preferences.vehicleInfo;
+                continuationPrompt += `- Vehículo mencionado: ${vehicle.brand} ${vehicle.model} ${vehicle.year}\n`;
+            }
+            if (userProfile.preferences.preferredBrands.length > 0) {
+                continuationPrompt += `- Marcas preferidas: ${userProfile.preferences.preferredBrands.join(', ')}\n`;
+            }
+            continuationPrompt += '\nFRASES DE CONTINUIDAD SUGERIDAS:\n';
+            continuationPrompt += '- "Continuemos con lo que estábamos viendo..."\n';
+            continuationPrompt += '- "Como mencionabas antes..."\n';
+            continuationPrompt += '- "Retomando lo que buscabas..."\n';
+            continuationPrompt += '- "Ahora, respecto a..."\n';
+            continuationPrompt += '- "Cambiando de tema..."\n';
+        }
+        return continuationPrompt;
+    }
+    /**
      * Agrega modificadores contextuales al prompt
      */
     addContextualModifiers(template, context) {
         const memory = context.conversationMemory;
         const userProfile = memory.longTermMemory.userProfile;
         const patterns = memory.longTermMemory.behaviorPatterns;
+        const conversationLength = memory.metadata.conversationLength;
+        const lastInteraction = userProfile.interactions.lastInteraction;
+        const now = new Date();
         let modifiers = '\n\nCONTEXTO ESPECIAL:\n';
+        // Determinar si es primera interacción del día
+        const isFirstInteractionOfDay = !lastInteraction ||
+            lastInteraction.getDate() !== now.getDate() ||
+            lastInteraction.getMonth() !== now.getMonth() ||
+            lastInteraction.getFullYear() !== now.getFullYear();
+        if (isFirstInteractionOfDay && conversationLength === 1) {
+            modifiers += '- PRIMERA INTERACCIÓN DEL DÍA: Saluda apropiadamente\n';
+        }
+        else if (conversationLength > 1) {
+            modifiers += '- CONVERSACIÓN EN CURSO: Mantén continuidad sin repetir saludos\n';
+        }
         // Verificar si es cliente conocido
-        if (memory.metadata.conversationLength > 1) {
-            modifiers += '- Cliente conocido - personaliza la experiencia\n';
+        if (userProfile.interactions.totalMessages > 5) {
+            modifiers += '- CLIENTE CONOCIDO: Personaliza la experiencia\n';
+        }
+        else if (conversationLength === 1) {
+            modifiers += '- CLIENTE NUEVO: Explica el proceso y sé acogedor\n';
         }
         // Verificar si es VIP
         if (userProfile.businessContext.isVipCustomer) {
-            modifiers += '- Cliente VIP - ofrece atención preferencial\n';
+            modifiers += '- CLIENTE VIP: Ofrece atención preferencial\n';
         }
         // Agregar patrones de comportamiento
         patterns.forEach(pattern => {
             switch (pattern) {
                 case 'price_conscious':
-                    modifiers += '- Precio sensible - enfócate en valor y opciones económicas\n';
+                    modifiers += '- PRECIO SENSIBLE: Enfócate en valor y opciones económicas\n';
                     break;
                 case 'urgent_need':
-                    modifiers += '- Urgente - prioriza rapidez y disponibilidad inmediata\n';
+                    modifiers += '- URGENTE: Prioriza rapidez y disponibilidad inmediata\n';
                     break;
                 case 'technical_focused':
-                    modifiers += '- Enfoque técnico - incluye especificaciones detalladas\n';
+                    modifiers += '- ENFOQUE TÉCNICO: Incluye especificaciones detalladas\n';
                     break;
                 case 'brand_focused':
-                    modifiers += '- Enfoque en marca - respeta preferencias de marca\n';
+                    modifiers += '- ENFOQUE EN MARCA: Respeta preferencias de marca\n';
+                    break;
+                case 'compatibility_focused':
+                    modifiers += '- ENFOQUE EN COMPATIBILIDAD: Verifica compatibilidad detalladamente\n';
                     break;
             }
         });
+        // Agregar contexto temporal
+        const hour = now.getHours();
+        if (hour >= 6 && hour < 12) {
+            modifiers += '- HORA: Mañana - Usa saludos matutinos apropiados\n';
+        }
+        else if (hour >= 12 && hour < 18) {
+            modifiers += '- HORA: Tarde - Usa saludos vespertinos apropiados\n';
+        }
+        else if (hour >= 18 && hour < 22) {
+            modifiers += '- HORA: Noche - Usa saludos nocturnos apropiados\n';
+        }
+        else {
+            modifiers += '- HORA: Madrugada - Considera horarios de servicio\n';
+        }
+        // Agregar instrucciones de continuidad
+        if (conversationLength > 1) {
+            modifiers += '\nINSTRUCCIONES DE CONTINUIDAD:\n';
+            modifiers += '- Usa referencias a conversaciones anteriores\n';
+            modifiers += '- NO repitas información ya proporcionada\n';
+            modifiers += '- Mantén el contexto de la conversación\n';
+            modifiers += '- Haz transiciones naturales entre temas\n';
+        }
         return modifiers;
     }
     /**
@@ -238,6 +352,7 @@ NEVER:
      */
     addScenarioSpecificInfo(template, context) {
         const currentPhase = context.conversationMemory.shortTermMemory.currentTopic;
+        const conversationLength = context.conversationMemory.metadata.conversationLength;
         let scenario = 'initial';
         // Determinar escenario basado en el intent y contexto
         if (context.intent.includes('search') || context.intent.includes('find')) {
@@ -252,7 +367,33 @@ NEVER:
         else if (context.intent.includes('support') || context.intent.includes('help')) {
             scenario = 'support';
         }
-        return `\n\nESCENARIO ACTUAL:\n${template.scenarioSpecific[scenario]}\n`;
+        let scenarioInfo = `\n\nESCENARIO ACTUAL:\n${template.scenarioSpecific[scenario]}\n`;
+        // Agregar instrucciones de transición si es necesario
+        if (conversationLength > 1) {
+            scenarioInfo += '\nINSTRUCCIONES DE TRANSICIÓN:\n';
+            switch (scenario) {
+                case 'searching':
+                    scenarioInfo += '- Si cambias de búsqueda, usa "Ahora busquemos..." o "Cambiando a..."\n';
+                    scenarioInfo += '- Si retomas búsqueda anterior, usa "Volviendo a lo que buscabas..."\n';
+                    break;
+                case 'comparing':
+                    scenarioInfo += '- Usa "Comparando..." o "Veamos las diferencias..."\n';
+                    scenarioInfo += '- Menciona criterios de comparación claramente\n';
+                    break;
+                case 'purchasing':
+                    scenarioInfo += '- Usa "Procedamos con la compra..." o "Confirmemos..."\n';
+                    scenarioInfo += '- Mantén el contexto de productos seleccionados\n';
+                    break;
+                case 'support':
+                    scenarioInfo += '- Usa "Te ayudo con..." o "Resolvamos esto..."\n';
+                    scenarioInfo += '- Mantén enfoque en el problema específico\n';
+                    break;
+                default:
+                    scenarioInfo += '- Haz transiciones naturales entre temas\n';
+                    scenarioInfo += '- Usa referencias al contexto anterior\n';
+            }
+        }
+        return scenarioInfo;
     }
     /**
      * Agrega contexto de conversación
@@ -262,22 +403,52 @@ NEVER:
         const recentQueries = memory.shortTermMemory.recentQueries;
         const currentIntent = memory.workingMemory.currentIntent;
         const entities = context.entities;
+        const conversationLength = memory.metadata.conversationLength;
+        const userProfile = memory.longTermMemory.userProfile;
         let conversationContext = '\n\nCONTEXTO DE CONVERSACIÓN:\n';
-        if (currentIntent) {
-            conversationContext += `- Intención actual: ${currentIntent}\n`;
+        // Determinar tipo de interacción
+        if (conversationLength === 1) {
+            conversationContext += '- PRIMERA INTERACCIÓN: Saluda contextualmente\n';
         }
-        if (recentQueries.length > 0) {
-            conversationContext += `- Consultas recientes: ${recentQueries.slice(-3).join(', ')}\n`;
+        else if (conversationLength > 1) {
+            conversationContext += '- CONVERSACIÓN EN CURSO: Mantén continuidad y usa referencias\n';
         }
+        // Información del usuario si es conocida
+        if (userProfile.preferences.vehicleInfo) {
+            const vehicle = userProfile.preferences.vehicleInfo;
+            conversationContext += `- VEHÍCULO CONOCIDO: ${vehicle.brand} ${vehicle.model} ${vehicle.year}\n`;
+        }
+        if (userProfile.preferences.preferredBrands.length > 0) {
+            conversationContext += `- MARCAS PREFERIDAS: ${userProfile.preferences.preferredBrands.join(', ')}\n`;
+        }
+        // Referencias a consultas anteriores
+        if (recentQueries.length > 1) {
+            const lastQuery = recentQueries[recentQueries.length - 2]; // Query anterior
+            conversationContext += `- CONSULTA ANTERIOR: "${lastQuery}"\n`;
+        }
+        // Entidades mencionadas en esta conversación
         if (entities.size > 0) {
-            conversationContext += '- Entidades mencionadas:\n';
+            conversationContext += '- ENTIDADES MENCIONADAS:\n';
             for (const [key, value] of entities.entries()) {
                 conversationContext += `  * ${key}: ${value}\n`;
             }
         }
-        const userVehicle = memory.longTermMemory.userProfile.preferences.vehicleInfo;
-        if (userVehicle) {
-            conversationContext += `- Vehículo del cliente: ${userVehicle.brand} ${userVehicle.model} ${userVehicle.year}\n`;
+        // Tópico actual
+        if (memory.shortTermMemory.currentTopic) {
+            conversationContext += `- TÓPICO ACTUAL: ${memory.shortTermMemory.currentTopic}\n`;
+        }
+        // Patrones de comportamiento detectados
+        const patterns = memory.longTermMemory.behaviorPatterns;
+        if (patterns.length > 0) {
+            conversationContext += `- PATRONES DETECTADOS: ${patterns.join(', ')}\n`;
+        }
+        // Instrucciones específicas para continuidad
+        if (conversationLength > 1) {
+            conversationContext += '\nINSTRUCCIONES DE CONTINUIDAD:\n';
+            conversationContext += '- Usa referencias como "Como mencionabas antes..." o "Continuemos con..."\n';
+            conversationContext += '- NO repitas saludos ni información ya proporcionada\n';
+            conversationContext += '- Mantén el contexto de la conversación anterior\n';
+            conversationContext += '- Haz transiciones naturales entre temas\n';
         }
         return conversationContext;
     }
