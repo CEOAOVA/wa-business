@@ -223,19 +223,23 @@ export class AdvancedConversationEngine {
     // Detectar intent basado en patrones
     let intent = 'general_inquiry';
     
-    // Patrones de búsqueda de productos
-    const productSearchPatterns = [
-      /\b(buscar|encontrar|necesito|quiero|busco|tengo|requiero)\b/i,
-      /\b(balatas|frenos|filtro|aceite|bujías|amortiguadores|suspensión|dirección)\b/i,
-      /\b(pieza|repuesto|refacción|parte|componente)\b/i
-    ];
-
-    const hasProductSearchPattern = productSearchPatterns.some(pattern => pattern.test(message));
+    // MEJORA: Solo detectar búsqueda de productos si hay TANTO pieza COMO datos del auto
     const hasProductTerms = productTerms.length > 0;
     const hasCarData = carData.marca || carData.modelo || carData.año;
-
-    if (hasProductSearchPattern || hasProductTerms) {
+    const hasProductSearchPattern = this.hasProductSearchPattern(message);
+    
+    // Solo buscar productos si hay términos de producto Y datos del auto
+    if (hasProductTerms && hasCarData && hasProductSearchPattern) {
       intent = 'search_product';
+      console.log(`[ConversationEngine] ✅ Intent de búsqueda detectado - Pieza: ${productTerms.join(', ')}, Auto: ${carData.marca} ${carData.modelo} ${carData.año}`);
+    } else if (hasProductTerms && !hasCarData) {
+      // Si hay pieza pero no datos del auto, preguntar por el auto
+      intent = 'request_car_info';
+      console.log(`[ConversationEngine] ⚠️ Pieza detectada pero faltan datos del auto - Pieza: ${productTerms.join(', ')}`);
+    } else if (!hasProductTerms && hasCarData) {
+      // Si hay datos del auto pero no pieza, preguntar qué pieza busca
+      intent = 'request_product_info';
+      console.log(`[ConversationEngine] ⚠️ Datos del auto detectados pero falta pieza - Auto: ${carData.marca} ${carData.modelo} ${carData.año}`);
     } else if (message.includes('precio') || message.includes('costo') || message.includes('cuánto')) {
       intent = 'price_inquiry';
     } else if (message.includes('comprar') || message.includes('ticket') || message.includes('compra')) {
@@ -340,6 +344,19 @@ export class AdvancedConversationEngine {
   }
 
   /**
+   * Verifica si el mensaje tiene patrones de búsqueda de productos
+   */
+  private hasProductSearchPattern(message: string): boolean {
+    const productSearchPatterns = [
+      /\b(buscar|encontrar|necesito|quiero|busco|tengo|requiero)\b/i,
+      /\b(pieza|repuesto|refacción|parte|componente)\b/i,
+      /\b(para mi|de mi|del|de la)\b/i
+    ];
+
+    return productSearchPatterns.some(pattern => pattern.test(message));
+  }
+
+  /**
    * Actualiza memoria conversacional
    */
   private updateConversationMemory(conversationId: string, updates: any): void {
@@ -386,6 +403,16 @@ export class AdvancedConversationEngine {
           'confirmarProductoSeleccionado',
           'obtenerDetallesProducto',
           'sugerirAlternativas',
+          'recopilarDatosCliente'
+        ];
+      case 'request_car_info':
+        return [
+          ...baseFunctions,
+          'recopilarDatosCliente'
+        ];
+      case 'request_product_info':
+        return [
+          ...baseFunctions,
           'recopilarDatosCliente'
         ];
       case 'inventory_check':
