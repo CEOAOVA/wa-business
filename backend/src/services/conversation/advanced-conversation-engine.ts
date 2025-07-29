@@ -189,10 +189,10 @@ export class AdvancedConversationEngine {
     const entities = new Map<string, any>();
     
     // Extraer entidades básicas
-    const brandRegex = /\b(nissan|toyota|honda|ford|chevrolet|volkswagen|hyundai|kia|mazda|subaru)\b/i;
+    const brandRegex = /\b(nissan|toyota|honda|ford|chevrolet|volkswagen|hyundai|kia|mazda|subaru|bmw|mercedes|audi)\b/i;
     const brandMatch = message.match(brandRegex);
     if (brandMatch) {
-      entities.set('brand', brandMatch[0]);
+      entities.set('brand', brandMatch[0].toLowerCase());
     }
     
     const yearRegex = /\b(19|20)\d{2}\b/g;
@@ -206,11 +206,35 @@ export class AdvancedConversationEngine {
     if (vinMatch) {
       entities.set('vin', vinMatch[0]);
     }
+
+    // Extraer datos del auto del mensaje
+    const carData = this.extractCarDataFromMessage(message);
+    if (carData.marca) entities.set('car_marca', carData.marca);
+    if (carData.modelo) entities.set('car_modelo', carData.modelo);
+    if (carData.año) entities.set('car_año', carData.año);
+    if (carData.litraje) entities.set('car_litraje', carData.litraje);
+
+    // Extraer términos de productos
+    const productTerms = this.extractProductTerms(message);
+    if (productTerms.length > 0) {
+      entities.set('product_terms', productTerms);
+    }
     
     // Detectar intent basado en patrones
     let intent = 'general_inquiry';
     
-    if (message.includes('buscar') || message.includes('encontrar') || message.includes('necesito')) {
+    // Patrones de búsqueda de productos
+    const productSearchPatterns = [
+      /\b(buscar|encontrar|necesito|quiero|busco|tengo|requiero)\b/i,
+      /\b(balatas|frenos|filtro|aceite|bujías|amortiguadores|suspensión|dirección)\b/i,
+      /\b(pieza|repuesto|refacción|parte|componente)\b/i
+    ];
+
+    const hasProductSearchPattern = productSearchPatterns.some(pattern => pattern.test(message));
+    const hasProductTerms = productTerms.length > 0;
+    const hasCarData = carData.marca || carData.modelo || carData.año;
+
+    if (hasProductSearchPattern || hasProductTerms) {
       intent = 'search_product';
     } else if (message.includes('precio') || message.includes('costo') || message.includes('cuánto')) {
       intent = 'price_inquiry';
@@ -233,9 +257,86 @@ export class AdvancedConversationEngine {
       if (lastQuery.includes('inventario') && intent === 'general_inquiry') {
         intent = 'inventory_followup';
       }
+      // Si el último mensaje fue sobre productos, mantener el contexto
+      if (lastQuery.includes('producto') || lastQuery.includes('buscar') && intent === 'general_inquiry') {
+        intent = 'product_search_followup';
+      }
     }
     
     return { intent, entities };
+  }
+
+  /**
+   * Extraer datos del auto del mensaje
+   */
+  private extractCarDataFromMessage(message: string): {
+    marca?: string;
+    modelo?: string;
+    año?: number;
+    litraje?: string;
+  } {
+    const carData: any = {};
+    
+    // Extraer marca
+    const brandRegex = /\b(nissan|toyota|honda|ford|chevrolet|volkswagen|hyundai|kia|mazda|subaru|bmw|mercedes|audi)\b/i;
+    const brandMatch = message.match(brandRegex);
+    if (brandMatch) {
+      carData.marca = brandMatch[0].toLowerCase();
+    }
+    
+    // Extraer año
+    const yearRegex = /\b(19|20)\d{2}\b/g;
+    const yearMatch = message.match(yearRegex);
+    if (yearMatch) {
+      carData.año = parseInt(yearMatch[0]);
+    }
+    
+    // Extraer modelo (patrones comunes)
+    const modelPatterns = [
+      /\b(corolla|camry|civic|accord|focus|fusion|jetta|golf|sentra|altima)\b/i,
+      /\b(x5|x3|e90|e46|w203|c200|c300|a3|a4|q3|q5)\b/i
+    ];
+    
+    for (const pattern of modelPatterns) {
+      const modelMatch = message.match(pattern);
+      if (modelMatch) {
+        carData.modelo = modelMatch[0].toLowerCase();
+        break;
+      }
+    }
+    
+    // Extraer litraje
+    const engineRegex = /\b(\d+\.?\d*)\s*(l|litros?|cc|cilindros?)\b/i;
+    const engineMatch = message.match(engineRegex);
+    if (engineMatch) {
+      carData.litraje = engineMatch[0];
+    }
+    
+    return carData;
+  }
+
+  /**
+   * Extraer términos de productos del mensaje
+   */
+  private extractProductTerms(message: string): string[] {
+    const productTerms: string[] = [];
+    const lowerMessage = message.toLowerCase();
+    
+    // Lista de términos de productos comunes
+    const commonProductTerms = [
+      'balatas', 'frenos', 'filtro', 'aceite', 'bujías', 'amortiguadores',
+      'suspensión', 'dirección', 'transmisión', 'motor', 'batería',
+      'correa', 'bomba', 'radiador', 'silenciador', 'luces', 'llantas',
+      'neumáticos', 'pastillas', 'zapatas', 'embrague', 'diferencial'
+    ];
+    
+    for (const term of commonProductTerms) {
+      if (lowerMessage.includes(term)) {
+        productTerms.push(term);
+      }
+    }
+    
+    return productTerms;
   }
 
   /**
@@ -278,18 +379,44 @@ export class AdvancedConversationEngine {
     
     switch (intent) {
       case 'search_product':
+      case 'product_search_followup':
+        return [
+          ...baseFunctions, 
+          'buscarProductoPorTermino', 
+          'confirmarProductoSeleccionado',
+          'obtenerDetallesProducto',
+          'sugerirAlternativas',
+          'recopilarDatosCliente'
+        ];
       case 'inventory_check':
         return [...baseFunctions, 'consultarInventario', 'buscarYConsultarInventario', 'consultarInventarioGeneral'];
       case 'vin_lookup':
         return [...baseFunctions, 'buscarPorVin', 'consultarInventario'];
       case 'purchase_intent':
-        return [...baseFunctions, 'generarTicket', 'confirmarCompra', 'consultarInventario'];
+        return [
+          ...baseFunctions, 
+          'generarTicket', 
+          'confirmarCompra', 
+          'consultarInventario',
+          'buscarProductoPorTermino'
+        ];
       case 'shipping_inquiry':
         return [...baseFunctions, 'procesarEnvio'];
       case 'price_inquiry':
-        return [...baseFunctions, 'consultarInventario', 'buscarYConsultarInventario'];
+        return [
+          ...baseFunctions, 
+          'consultarInventario', 
+          'buscarYConsultarInventario',
+          'buscarProductoPorTermino'
+        ];
       default:
-        return [...baseFunctions, 'consultarInventario', 'buscarYConsultarInventario'];
+        return [
+          ...baseFunctions, 
+          'consultarInventario', 
+          'buscarYConsultarInventario',
+          'buscarProductoPorTermino',
+          'recopilarDatosCliente'
+        ];
     }
   }
 

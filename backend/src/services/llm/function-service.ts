@@ -31,6 +31,7 @@ export class FunctionService {
     this.registerImageFunctions();
     this.registerInventoryFunctions();
     this.registerSearchFunctions();
+    this.registerProductSearchFunctions(); // NUEVA: Funciones de búsqueda de productos
     this.registerTransactionFunctions();
     this.registerVinFunctions();
     this.registerShippingFunctions();
@@ -1036,6 +1037,364 @@ export class FunctionService {
             }
           },
           required: ['termino']
+        }
+      }
+    );
+  }
+
+  /**
+   * Registra funciones de búsqueda de productos usando el nuevo sistema
+   */
+  private registerProductSearchFunctions(): void {
+    // buscarProductoPorTermino - Nueva función para búsqueda de productos
+    this.registerFunction(
+      'buscarProductoPorTermino',
+      async (args, context) => {
+        const { 
+          termino, 
+          datosAuto = {},
+          limit = 10
+        } = args as { 
+          termino: string; 
+          datosAuto?: any;
+          limit?: number;
+        };
+
+        console.log(`[FunctionService] buscarProductoPorTermino - Término: "${termino}"`);
+
+        // ⚠️ VALIDACIÓN OBLIGATORIA: Verificar datos del cliente primero
+        const datosCompletos = this.hasRequiredClientData(context);
+        if (!datosCompletos.valid) {
+          return {
+            success: false,
+            data: {
+              mensaje: datosCompletos.message,
+              requiereDatos: true,
+              detallesFaltantes: datosCompletos.missing
+            }
+          };
+        }
+
+        const nombreCliente = context.clientInfo?.nombre || 'Cliente';
+        console.log(`[FunctionService] ✅ Cliente validado (${nombreCliente}). Procediendo con búsqueda de productos...`);
+
+        try {
+          // Importar ProductSearchService
+          const { ProductSearchService } = await import('../product-search.service');
+          const productSearchService = new ProductSearchService();
+
+          // Realizar búsqueda completa
+          const searchResult = await productSearchService.searchProductFlow(
+            termino, 
+            datosAuto, 
+            { limit }
+          );
+
+          if (searchResult.matches.length === 0) {
+            return {
+              success: true,
+              data: {
+                sinResultados: true,
+                termino: termino,
+                terminoNormalizado: searchResult.normalizedTerm,
+                cliente: nombreCliente,
+                mensaje: `Lo siento ${nombreCliente}, no encontré productos que coincidan con "${termino}". ¿Podrías ser más específico? Por ejemplo: "balatas delanteras Toyota Corolla 2018"`,
+                sugerencias: searchResult.suggestions
+              }
+            };
+          }
+
+          // Formatear resultados para mostrar
+          const { formatSearchResults } = await import('../utils/product-search-utils');
+          const mensajeFormateado = formatSearchResults(searchResult.matches, datosAuto);
+
+          return {
+            success: true,
+            data: {
+              productos: searchResult.matches,
+              totalEncontrados: searchResult.totalFound,
+              terminoNormalizado: searchResult.normalizedTerm,
+              cliente: nombreCliente,
+              mensaje: mensajeFormateado,
+              tiempoBusqueda: searchResult.searchTime,
+              tieneCoincidenciaExacta: searchResult.hasExactMatch,
+              esperandoConfirmacion: true
+            }
+          };
+
+        } catch (error) {
+          console.error('[FunctionService] Error en búsqueda de productos:', error);
+          return {
+            success: false,
+            data: {
+              error: true,
+              mensaje: `Lo siento ${nombreCliente}, hubo un error buscando "${termino}". Te conectaré con un asesor para ayudarte.`,
+              requiereAsesor: true
+            }
+          };
+        }
+      },
+      {
+        name: 'buscarProductoPorTermino',
+        description: 'Buscar productos en el catálogo usando términos coloquiales y datos del auto. Normaliza el término y busca coincidencias.',
+        parameters: {
+          type: 'object',
+          properties: {
+            termino: {
+              type: 'string',
+              description: 'Término de búsqueda del usuario (ej: "balatas", "filtro de aceite")'
+            },
+            datosAuto: {
+              type: 'object',
+              description: 'Datos del auto del cliente (marca, modelo, año, litraje)',
+              properties: {
+                marca: { type: 'string' },
+                modelo: { type: 'string' },
+                año: { type: 'number' },
+                litraje: { type: 'string' }
+              }
+            },
+            limit: {
+              type: 'number',
+              description: 'Número máximo de resultados a mostrar (default: 10)'
+            }
+          },
+          required: ['termino']
+        }
+      }
+    );
+
+    // confirmarProductoSeleccionado - Confirmar selección del usuario
+    this.registerFunction(
+      'confirmarProductoSeleccionado',
+      async (args, context) => {
+        const { 
+          clave, 
+          confirmacion,
+          indiceSeleccionado
+        } = args as { 
+          clave: string; 
+          confirmacion: boolean;
+          indiceSeleccionado?: number;
+        };
+
+        console.log(`[FunctionService] confirmarProductoSeleccionado - Clave: "${clave}", Confirmación: ${confirmacion}`);
+
+        const nombreCliente = context.clientInfo?.nombre || 'Cliente';
+
+        if (!confirmacion) {
+          return {
+            success: true,
+            data: {
+              confirmado: false,
+              cliente: nombreCliente,
+              mensaje: `Entiendo ${nombreCliente}, no es lo que buscabas. ¿Qué más detalles puedes darme para encontrar el producto correcto?`,
+              requiereNuevaBusqueda: true
+            }
+          };
+        }
+
+        try {
+          // Importar ProductSearchService
+          const { ProductSearchService } = await import('../product-search.service');
+          const productSearchService = new ProductSearchService();
+
+          // Obtener detalles del producto
+          const detalles = await productSearchService.getProductDetails(clave);
+
+          if (!detalles) {
+            return {
+              success: true,
+              data: {
+                confirmado: true,
+                cliente: nombreCliente,
+                mensaje: `Perfecto ${nombreCliente}, pero no pude obtener los detalles completos del producto. Te conectaré con un asesor para darte información precisa.`,
+                requiereAsesor: true
+              }
+            };
+          }
+
+          // Formatear detalles del producto
+          let mensajeDetalles = `✅ Perfecto ${nombreCliente}, aquí tienes los detalles:\n\n`;
+          mensajeDetalles += `🔧 **${detalles.nombre || 'Producto'}**\n`;
+          mensajeDetalles += `📋 Clave: ${detalles.pieza}\n`;
+          
+          if (detalles.marca) mensajeDetalles += `🚗 Marca: ${detalles.marca}\n`;
+          if (detalles.modelo) mensajeDetalles += `🏷️ Modelo: ${detalles.modelo}\n`;
+          if (detalles.año) mensajeDetalles += `📅 Año: ${detalles.año}\n`;
+          if (detalles.precio) mensajeDetalles += `💰 Precio: $${detalles.precio}\n`;
+          if (detalles.stock) mensajeDetalles += `📦 Stock: ${detalles.stock} unidades\n`;
+          if (detalles.descripcion) mensajeDetalles += `📝 Descripción: ${detalles.descripcion}\n`;
+
+          mensajeDetalles += `\n¿Te interesa este producto? Puedo ayudarte con la compra.`;
+
+          return {
+            success: true,
+            data: {
+              confirmado: true,
+              producto: detalles,
+              cliente: nombreCliente,
+              mensaje: mensajeDetalles,
+              productoSeleccionado: true
+            }
+          };
+
+        } catch (error) {
+          console.error('[FunctionService] Error confirmando producto:', error);
+          return {
+            success: false,
+            data: {
+              error: true,
+              cliente: nombreCliente,
+              mensaje: `Lo siento ${nombreCliente}, hubo un error procesando tu selección. Te conectaré con un asesor.`,
+              requiereAsesor: true
+            }
+          };
+        }
+      },
+      {
+        name: 'confirmarProductoSeleccionado',
+        description: 'Confirmar la selección de un producto por parte del usuario y obtener sus detalles completos.',
+        parameters: {
+          type: 'object',
+          properties: {
+            clave: {
+              type: 'string',
+              description: 'Clave del producto seleccionado'
+            },
+            confirmacion: {
+              type: 'boolean',
+              description: 'Si el usuario confirma la selección'
+            },
+            indiceSeleccionado: {
+              type: 'number',
+              description: 'Índice del producto seleccionado (opcional)'
+            }
+          },
+          required: ['clave', 'confirmacion']
+        }
+      }
+    );
+
+    // obtenerDetallesProducto - Obtener detalles específicos de un producto
+    this.registerFunction(
+      'obtenerDetallesProducto',
+      async (args, context) => {
+        const { clave } = args as { clave: string };
+
+        console.log(`[FunctionService] obtenerDetallesProducto - Clave: "${clave}"`);
+
+        try {
+          // Importar ProductSearchService
+          const { ProductSearchService } = await import('../product-search.service');
+          const productSearchService = new ProductSearchService();
+
+          const detalles = await productSearchService.getProductDetails(clave);
+
+          if (!detalles) {
+            return {
+              success: false,
+              data: {
+                error: true,
+                mensaje: `No pude encontrar los detalles del producto con clave "${clave}".`
+              }
+            };
+          }
+
+          return {
+            success: true,
+            data: {
+              producto: detalles,
+              mensaje: `Detalles del producto ${detalles.nombre || clave} obtenidos correctamente.`
+            }
+          };
+
+        } catch (error) {
+          console.error('[FunctionService] Error obteniendo detalles:', error);
+          return {
+            success: false,
+            data: {
+              error: true,
+              mensaje: `Error obteniendo detalles del producto.`
+            }
+          };
+        }
+      },
+      {
+        name: 'obtenerDetallesProducto',
+        description: 'Obtener detalles completos de un producto específico usando su clave.',
+        parameters: {
+          type: 'object',
+          properties: {
+            clave: {
+              type: 'string',
+              description: 'Clave del producto'
+            }
+          },
+          required: ['clave']
+        }
+      }
+    );
+
+    // sugerirAlternativas - Sugerir productos alternativos
+    this.registerFunction(
+      'sugerirAlternativas',
+      async (args, context) => {
+        const { 
+          terminoOriginal, 
+          razon = 'no_encontrado'
+        } = args as { 
+          terminoOriginal: string; 
+          razon?: string;
+        };
+
+        console.log(`[FunctionService] sugerirAlternativas - Término: "${terminoOriginal}", Razón: ${razon}`);
+
+        try {
+          // Importar utilidades
+          const { generateSearchSuggestions } = await import('../utils/product-search-utils');
+          const suggestions = generateSearchSuggestions(terminoOriginal);
+
+          const mensaje = `No encontré "${terminoOriginal}". ${suggestions[0]}`;
+
+          return {
+            success: true,
+            data: {
+              sugerencias: suggestions,
+              terminoOriginal: terminoOriginal,
+              mensaje: mensaje,
+              requiereNuevaBusqueda: true
+            }
+          };
+
+        } catch (error) {
+          console.error('[FunctionService] Error generando sugerencias:', error);
+          return {
+            success: false,
+            data: {
+              error: true,
+              mensaje: `Error generando sugerencias para "${terminoOriginal}".`
+            }
+          };
+        }
+      },
+      {
+        name: 'sugerirAlternativas',
+        description: 'Generar sugerencias de búsqueda cuando no se encuentran productos.',
+        parameters: {
+          type: 'object',
+          properties: {
+            terminoOriginal: {
+              type: 'string',
+              description: 'Término original de búsqueda'
+            },
+            razon: {
+              type: 'string',
+              description: 'Razón por la que no se encontraron resultados',
+              enum: ['no_encontrado', 'sin_stock', 'incompatible']
+            }
+          },
+          required: ['terminoOriginal']
         }
       }
     );
