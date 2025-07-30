@@ -94,6 +94,9 @@ const ChatPanel: React.FC = () => {
   const [conversationSummary, setConversationSummary] = useState<any>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
 
+  // NUEVO: Estado para controlar visibilidad de controles de takeover
+  const [showTakeoverControls, setShowTakeoverControls] = useState(false);
+
   // NUEVO: Estado para información de contacto
   const [showContactInfo, setShowContactInfo] = useState(false);
 
@@ -166,11 +169,13 @@ const ChatPanel: React.FC = () => {
     const loadTakeoverMode = async () => {
       if (!currentChat) {
         setTakeoverMode('spectator');
+        setShowTakeoverControls(false); // OCULTAR controles
         setIsLoadingTakeoverMode(false);
         return;
       }
 
       setIsLoadingTakeoverMode(true);
+      setShowTakeoverControls(false); // OCULTAR controles mientras carga
       
       try {
         const conversationId = getCurrentConversationId();
@@ -181,6 +186,7 @@ const ChatPanel: React.FC = () => {
           if (response.success && response.data) {
             const actualMode = response.data.takeoverMode;
             setTakeoverMode(actualMode);
+            setShowTakeoverControls(true); // MOSTRAR controles solo después de cargar
             console.log(`✅ [ChatPanel] Modo takeover cargado: ${actualMode}`);
             
             // Actualizar el chat en el contexto con el modo real
@@ -190,14 +196,17 @@ const ChatPanel: React.FC = () => {
           } else {
             console.warn(`⚠️ [ChatPanel] No se pudo obtener modo takeover, usando valor por defecto`);
             setTakeoverMode('spectator');
+            setShowTakeoverControls(true); // MOSTRAR controles con valor por defecto
           }
         } else {
           console.warn(`⚠️ [ChatPanel] No se pudo obtener conversationId`);
           setTakeoverMode('spectator');
+          setShowTakeoverControls(true); // MOSTRAR controles con valor por defecto
         }
       } catch (error) {
         console.error('❌ [ChatPanel] Error cargando modo takeover:', error);
         setTakeoverMode('spectator');
+        setShowTakeoverControls(true); // MOSTRAR controles con valor por defecto
       } finally {
         setIsLoadingTakeoverMode(false);
       }
@@ -428,84 +437,89 @@ const ChatPanel: React.FC = () => {
                 Cliente
               </button>
 
-              {/* Botón de Takeover - Solo se muestra uno según el estado */}
-              {isLoadingTakeoverMode ? (
-                <button
-                  disabled
-                  className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-gray-400 opacity-50 cursor-not-allowed"
-                  title="Cargando modo takeover..."
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Cargando...</span>
-                  </div>
-                </button>
-              ) : takeoverMode === 'spectator' ? (
-                <button
-                  onClick={handleToggleTakeover}
-                  disabled={isChangingMode}
-                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-orange-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Tomar control manual"
-                >
-                  {isChangingMode ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Tomando Control...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">👨‍💼</span>
-                      <span>Tomar Control</span>
-                    </div>
-                  )}
-                </button>
-              ) : takeoverMode === 'takeover' ? (
-                <button
-                  onClick={handleToggleTakeover}
-                  disabled={isChangingMode}
-                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-green-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Activar IA"
-                >
-                  {isChangingMode ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Activando IA...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🤖</span>
-                      <span>Activar IA</span>
-                    </div>
-                  )}
-                </button>
-              ) : null}
+              {/* NUEVO: Mostrar controles de takeover solo cuando estén cargados */}
+              {showTakeoverControls && (
+                <>
+                  {/* Botón de Takeover - Solo se muestra uno según el estado */}
+                  {isLoadingTakeoverMode ? (
+                    <button
+                      disabled
+                      className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-gray-400 opacity-50 cursor-not-allowed"
+                      title="Cargando modo takeover..."
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Cargando...</span>
+                      </div>
+                    </button>
+                  ) : takeoverMode === 'spectator' ? (
+                    <button
+                      onClick={handleToggleTakeover}
+                      disabled={isChangingMode}
+                      className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-orange-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Tomar control manual"
+                    >
+                      {isChangingMode ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Tomando Control...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">👨‍💼</span>
+                          <span>Tomar Control</span>
+                        </div>
+                      )}
+                    </button>
+                  ) : takeoverMode === 'takeover' ? (
+                    <button
+                      onClick={handleToggleTakeover}
+                      disabled={isChangingMode}
+                      className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-green-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Activar IA"
+                    >
+                      {isChangingMode ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Activando IA...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🤖</span>
+                          <span>Activar IA</span>
+                        </div>
+                      )}
+                    </button>
+                  ) : null}
 
-              {/* Botón de Resumen - Siempre visible */}
-              <button
-                onClick={handleGenerateSummary}
-                disabled={isGeneratingSummary}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-blue-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                title="Generar resumen de conversación"
-              >
-                {isGeneratingSummary ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Generando...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">📋</span>
-                    <span>Resumen</span>
-                  </div>
-                )}
-              </button>
+                  {/* Botón de Resumen - Siempre visible */}
+                  <button
+                    onClick={handleGenerateSummary}
+                    disabled={isGeneratingSummary}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-blue-400 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    title="Generar resumen de conversación"
+                  >
+                    {isGeneratingSummary ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Generando...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">📋</span>
+                        <span>Resumen</span>
+                      </div>
+                    )}
+                  </button>
 
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-400">Agente:</span>
-                <span className="font-medium">
-                  {authState.user?.name?.split(' ')[0] || 'Usuario'}
-                </span>
-              </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-400">Agente:</span>
+                    <span className="font-medium">
+                      {authState.user?.name?.split(' ')[0] || 'Usuario'}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           )}
           
@@ -673,7 +687,8 @@ const ChatPanel: React.FC = () => {
         </div>
 
         {/* Mensaje cuando está en modo spectator */}
-        {!isLoadingTakeoverMode && takeoverMode === 'spectator' && (
+        {/* NUEVO: Mostrar mensajes de modo solo cuando estén cargados */}
+        {showTakeoverControls && !isLoadingTakeoverMode && takeoverMode === 'spectator' && (
           <div className="mt-3 p-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-gray-600">
             <div className="text-center text-sm">
               <div className="flex items-center justify-center gap-2 mb-1">
@@ -687,8 +702,7 @@ const ChatPanel: React.FC = () => {
           </div>
         )}
 
-        {/* Mensaje cuando está en modo takeover */}
-        {!isLoadingTakeoverMode && takeoverMode === 'takeover' && (
+        {showTakeoverControls && !isLoadingTakeoverMode && takeoverMode === 'takeover' && (
           <div className="mt-3 p-3 bg-gradient-to-r from-green-700 to-green-800 rounded-lg border-2 border-green-600">
             <div className="text-center text-sm">
               <div className="flex items-center justify-center gap-2 mb-1">
@@ -703,7 +717,7 @@ const ChatPanel: React.FC = () => {
         )}
 
         {/* Mensaje de carga del modo takeover */}
-        {isLoadingTakeoverMode && (
+        {showTakeoverControls && isLoadingTakeoverMode && (
           <div className="mt-3 p-3 bg-gradient-to-r from-blue-700 to-blue-800 rounded-lg border-2 border-blue-600">
             <div className="text-center text-sm">
               <div className="flex items-center justify-center gap-2 mb-1">
