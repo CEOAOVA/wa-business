@@ -21,7 +21,7 @@ const router = express_1.default.Router();
 router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
-        const { to, message } = req.body;
+        const { to, message, clientId } = req.body; // NUEVO: Incluir clientId
         if (!to || !message) {
             console.log('❌ [ChatRouter] Campos faltantes:', { to, message });
             return res.status(400).json({
@@ -41,13 +41,15 @@ router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         const result = yield whatsapp_service_1.whatsappService.sendMessage({
             to: phoneValidation.formatted,
-            message: message.toString()
+            message: message.toString(),
+            clientId: clientId // NUEVO: Pasar clientId
         });
         if (result.success) {
             res.json({
                 success: true,
                 message: 'Mensaje enviado exitosamente',
                 messageId: result.messageId,
+                waMessageId: result.messageId, // NUEVO: Incluir waMessageId en respuesta
                 to: phoneValidation.formatted
             });
         }

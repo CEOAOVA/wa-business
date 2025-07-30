@@ -515,6 +515,7 @@ class SupabaseDatabaseService {
                     content: data.content,
                     message_type: data.messageType || 'text',
                     whatsapp_message_id: data.whatsappMessageId,
+                    client_id: data.clientId, // NUEVO: Agregar client_id
                     is_read: data.senderType === 'user' ? false : true,
                     metadata: data.metadata
                 })
@@ -576,6 +577,33 @@ class SupabaseDatabaseService {
             }
             catch (error) {
                 console.error('❌ Error en createMessage:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Verificar si ya existe un mensaje con el mismo client_id en una conversación
+     */
+    checkMessageByClientId(conversationId, clientId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                throw new Error('❌ Supabase no disponible');
+            }
+            try {
+                const { data: message, error } = yield supabase_1.supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('conversation_id', conversationId)
+                    .eq('client_id', clientId)
+                    .single();
+                if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+                    console.error('❌ Error verificando mensaje por client_id:', error);
+                    return null;
+                }
+                return message;
+            }
+            catch (error) {
+                console.error('❌ Error en checkMessageByClientId:', error);
                 return null;
             }
         });

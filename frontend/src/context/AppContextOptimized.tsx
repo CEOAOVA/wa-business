@@ -32,13 +32,42 @@ const appReducerOptimized = (state: AppState, action: AppAction): AppState => {
       // Verificar si el mensaje ya existe para evitar duplicados
       const chatId = message.chatId || message.conversation_id || '';
       const existingMessages = state.messages[chatId] || [];
+      
+      // NUEVO: Verificar duplicados por client_id, id, o waMessageId
       const messageExists = existingMessages.some((existing: Message) => 
         existing.id === message.id || 
-        (existing.waMessageId && existing.waMessageId === message.waMessageId)
+        (existing.waMessageId && existing.waMessageId === message.waMessageId) ||
+        (existing.clientId && existing.clientId === message.clientId)
       );
       
       if (messageExists) {
-        console.log(`🔍 [Reducer] Mensaje ${message.id} ya existe, omitiendo`);
+        console.log(`🔍 [Reducer] Mensaje ya existe, omitiendo duplicado`);
+        
+        // NUEVO: Si existe por client_id, actualizar con datos del servidor
+        const existingMessageIndex = existingMessages.findIndex((existing: Message) => 
+          existing.clientId && existing.clientId === message.clientId
+        );
+        
+        if (existingMessageIndex !== -1 && message.waMessageId) {
+          // Actualizar mensaje existente con datos del servidor
+          const updatedMessages = [...existingMessages];
+          updatedMessages[existingMessageIndex] = {
+            ...updatedMessages[existingMessageIndex],
+            id: message.id || updatedMessages[existingMessageIndex].id,
+            waMessageId: message.waMessageId,
+            // Mantener client_id para futuras verificaciones
+            clientId: message.clientId || updatedMessages[existingMessageIndex].clientId
+          };
+          
+          return {
+            ...state,
+            messages: {
+              ...state.messages,
+              [chatId]: updatedMessages,
+            }
+          };
+        }
+        
         return state;
       }
       
@@ -298,7 +327,10 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     if (!state.currentChat) return;
     
     try {
-      // Crear mensaje optimista
+      // NUEVO: Generar client_id único para este mensaje
+      const clientId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Crear mensaje optimista con client_id
       const optimisticMessage: Message = {
         id: `temp_${Date.now()}`,
         content,
@@ -307,25 +339,28 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         timestamp: new Date(),
         type,
         created_at: new Date().toISOString(),
+        clientId: clientId, // NUEVO: Incluir client_id
       };
       
       // Agregar mensaje optimista inmediatamente
       dispatch({ type: 'ADD_MESSAGE', payload: optimisticMessage });
       
-      // Enviar mensaje al servidor
+      // Enviar mensaje al servidor con client_id
       const response = await whatsappApi.sendMessage({
         to: state.currentChat.clientPhone || '',
-        message: content
+        message: content,
+        clientId: clientId // NUEVO: Incluir client_id
       });
       
       if (response.success) {
-        // Actualizar mensaje con ID real
+        // Actualizar mensaje con ID real y mantener client_id
         dispatch({
           type: 'ADD_MESSAGE',
           payload: {
             ...optimisticMessage,
             id: response.data?.messageId || optimisticMessage.id,
             waMessageId: response.data?.waMessageId,
+            clientId: clientId // NUEVO: Mantener client_id
           }
         });
       } else {
@@ -436,6 +471,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         timestamp: new Date(data.message.timestamp),
         type: data.message.type as Message['type'],
         created_at: data.message.timestamp.toISOString(),
+        clientId: data.message.clientId, // NUEVO: Incluir client_id del servidor
       };
       
       dispatch({ type: 'ADD_MESSAGE', payload: message });

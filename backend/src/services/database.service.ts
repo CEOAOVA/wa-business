@@ -318,6 +318,7 @@ export class DatabaseService {
     content: string;
     messageType?: 'text' | 'image' | 'quote' | 'document';
     whatsappMessageId?: string;
+    clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
     metadata?: any;
   }): Promise<{ success: boolean; messageId?: string | number }> {
     try {
@@ -327,6 +328,7 @@ export class DatabaseService {
         content: data.content,
         messageType: data.messageType,
         whatsappMessageId: data.whatsappMessageId,
+        clientId: data.clientId, // NUEVO: Pasar clientId
         metadata: data.metadata
       });
 
@@ -848,6 +850,22 @@ export class DatabaseService {
     } catch (error) {
       console.error('❌ Error verificando si chatbot puede procesar:', error);
       return false;
+    }
+  }
+
+  /**
+   * Verificar si ya existe un mensaje con el mismo client_id en una conversación
+   */
+  async checkMessageByClientId(conversationId: string, clientId: string): Promise<any | null> {
+    try {
+      const message = await supabaseDatabaseService.checkMessageByClientId(conversationId, clientId);
+      if (message) {
+        console.log(`🔍 Mensaje con client_id ${clientId} ya existe en conversación ${conversationId}`);
+      }
+      return message;
+    } catch (error) {
+      console.error('❌ Error en checkMessageByClientId:', error);
+      return null;
     }
   }
 }

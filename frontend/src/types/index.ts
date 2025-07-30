@@ -47,6 +47,7 @@ export interface Message {
   message_type?: 'text' | 'image' | 'quote' | 'document';
   whatsapp_message_id?: string;
   waMessageId?: string; // Alias para whatsapp_message_id
+  clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
   is_read?: boolean;
   metadata?: any;
   created_at?: string;

@@ -343,6 +343,7 @@ class DatabaseService {
                     content: data.content,
                     messageType: data.messageType,
                     whatsappMessageId: data.whatsappMessageId,
+                    clientId: data.clientId, // NUEVO: Pasar clientId
                     metadata: data.metadata
                 });
                 if (message) {
@@ -831,6 +832,24 @@ class DatabaseService {
             catch (error) {
                 console.error('❌ Error verificando si chatbot puede procesar:', error);
                 return false;
+            }
+        });
+    }
+    /**
+     * Verificar si ya existe un mensaje con el mismo client_id en una conversación
+     */
+    checkMessageByClientId(conversationId, clientId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const message = yield supabase_database_service_1.supabaseDatabaseService.checkMessageByClientId(conversationId, clientId);
+                if (message) {
+                    console.log(`🔍 Mensaje con client_id ${clientId} ya existe en conversación ${conversationId}`);
+                }
+                return message;
+            }
+            catch (error) {
+                console.error('❌ Error en checkMessageByClientId:', error);
+                return null;
             }
         });
     }

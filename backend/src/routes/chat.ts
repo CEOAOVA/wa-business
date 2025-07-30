@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/send', async (req: any, res: any) => {
   try {
     console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
-    const { to, message } = req.body;
+    const { to, message, clientId } = req.body; // NUEVO: Incluir clientId
     
     if (!to || !message) {
       console.log('❌ [ChatRouter] Campos faltantes:', { to, message });
@@ -34,7 +34,8 @@ router.post('/send', async (req: any, res: any) => {
 
     const result = await whatsappService.sendMessage({
       to: phoneValidation.formatted,
-      message: message.toString()
+      message: message.toString(),
+      clientId: clientId // NUEVO: Pasar clientId
     });
 
     if (result.success) {
@@ -42,6 +43,7 @@ router.post('/send', async (req: any, res: any) => {
         success: true,
         message: 'Mensaje enviado exitosamente',
         messageId: result.messageId,
+        waMessageId: result.messageId, // NUEVO: Incluir waMessageId en respuesta
         to: phoneValidation.formatted
       });
     } else {

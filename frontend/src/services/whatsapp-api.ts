@@ -9,6 +9,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '
 export interface SendMessageRequest {
   to: string;
   message: string;
+  clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
 }
 
 export interface SendTemplateRequest {

@@ -130,7 +130,8 @@ class WhatsAppService {
                     type: 'text',
                     text: {
                         body: data.message
-                    }
+                    },
+                    client_id: data.clientId // Incluir client_id en el payload
                 };
                 console.log('📤 Enviando mensaje WhatsApp:', {
                     to: data.to,
@@ -166,7 +167,8 @@ class WhatsAppService {
                                 type: 'text',
                                 read: false,
                                 conversationId: result.conversation.id,
-                                contactId: result.contact.id
+                                contactId: result.contact.id,
+                                clientId: data.clientId // Incluir client_id en el evento
                             };
                             this.emitNewMessage(sentMessage, {
                                 id: result.conversation.id,
@@ -375,6 +377,14 @@ class WhatsAppService {
                     console.error('❌ No se pudo obtener/crear conversación para', from);
                     return;
                 }
+                // NUEVO: Generar client_id único para mensajes entrantes
+                const clientId = `incoming_${messageId}_${Date.now()}`;
+                // NUEVO: Verificar si ya existe un mensaje con este client_id
+                const existingMessage = yield database_service_1.databaseService.checkMessageByClientId(conversation.id, clientId);
+                if (existingMessage) {
+                    console.log(`🔍 Mensaje con client_id ${clientId} ya existe, omitiendo procesamiento`);
+                    return;
+                }
                 // NUEVO: Verificar si el chatbot puede procesar este mensaje
                 const canChatbotProcess = yield database_service_1.databaseService.canChatbotProcessMessage(conversation.id);
                 if (canChatbotProcess) {
@@ -387,6 +397,7 @@ class WhatsAppService {
                         content: content,
                         messageType: 'text',
                         whatsappMessageId: messageId,
+                        clientId: clientId, // NUEVO: Incluir client_id
                         metadata: {
                             contactName: contactName,
                             timestamp: timestamp.toISOString()
@@ -424,6 +435,7 @@ class WhatsAppService {
                         content: content,
                         messageType: 'text',
                         whatsappMessageId: messageId,
+                        clientId: clientId, // NUEVO: Incluir client_id
                         metadata: {
                             contactName: contactName,
                             timestamp: timestamp.toISOString()
@@ -436,7 +448,9 @@ class WhatsAppService {
                         content: content,
                         timestamp: timestamp,
                         contactName: contactName,
-                        requiresAgentAction: true
+                        requiresAgentAction: true,
+                        clientId: clientId, // NUEVO: Incluir client_id en el evento
+                        whatsappMessageId: messageId
                     }, {
                         id: conversation.id,
                         contactId: conversation.contact_phone,

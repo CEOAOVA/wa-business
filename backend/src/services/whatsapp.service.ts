@@ -10,6 +10,7 @@ export interface SendMessageRequest {
   message: string;
   type?: 'text';
   isChatbotResponse?: boolean; // NUEVO: Para evitar duplicados del chatbot
+  clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
 }
 
 export interface SendTemplateRequest {
@@ -167,7 +168,8 @@ export class WhatsAppService {
         type: 'text',
         text: {
           body: data.message
-        }
+        },
+        client_id: data.clientId // Incluir client_id en el payload
       };
 
       console.log('📤 Enviando mensaje WhatsApp:', {
@@ -208,7 +210,8 @@ export class WhatsAppService {
               type: 'text',
               read: false,
               conversationId: result.conversation.id,
-              contactId: result.contact.id
+              contactId: result.contact.id,
+              clientId: data.clientId // Incluir client_id en el evento
             };
 
             this.emitNewMessage(sentMessage, {
@@ -421,6 +424,16 @@ export class WhatsAppService {
         return;
       }
 
+      // NUEVO: Generar client_id único para mensajes entrantes
+      const clientId = `incoming_${messageId}_${Date.now()}`;
+      
+      // NUEVO: Verificar si ya existe un mensaje con este client_id
+      const existingMessage = await databaseService.checkMessageByClientId(conversation.id, clientId);
+      if (existingMessage) {
+        console.log(`🔍 Mensaje con client_id ${clientId} ya existe, omitiendo procesamiento`);
+        return;
+      }
+
       // NUEVO: Verificar si el chatbot puede procesar este mensaje
       const canChatbotProcess = await databaseService.canChatbotProcessMessage(conversation.id);
       
@@ -435,6 +448,7 @@ export class WhatsAppService {
           content: content,
           messageType: 'text',
           whatsappMessageId: messageId,
+          clientId: clientId, // NUEVO: Incluir client_id
           metadata: {
             contactName: contactName,
             timestamp: timestamp.toISOString()
@@ -475,6 +489,7 @@ export class WhatsAppService {
           content: content,
           messageType: 'text',
           whatsappMessageId: messageId,
+          clientId: clientId, // NUEVO: Incluir client_id
           metadata: {
             contactName: contactName,
             timestamp: timestamp.toISOString()
@@ -488,7 +503,9 @@ export class WhatsAppService {
           content: content,
           timestamp: timestamp,
           contactName: contactName,
-          requiresAgentAction: true
+          requiresAgentAction: true,
+          clientId: clientId, // NUEVO: Incluir client_id en el evento
+          whatsappMessageId: messageId
         }, {
           id: conversation.id,
           contactId: conversation.contact_phone,

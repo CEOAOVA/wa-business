@@ -46,6 +46,7 @@ export interface SupabaseMessage {
   content: string;
   message_type: 'text' | 'image' | 'quote' | 'document';
   whatsapp_message_id?: string;
+  client_id?: string; // NUEVO: Identificador único del frontend para evitar duplicados
   is_read: boolean;
   metadata?: any;
   created_at: string;
@@ -616,6 +617,7 @@ export class SupabaseDatabaseService {
     content: string;
     messageType?: 'text' | 'image' | 'quote' | 'document';
     whatsappMessageId?: string;
+    clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
     metadata?: any;
   }): Promise<SupabaseMessage | null> {
     if (!this.isEnabled || !supabase) {
@@ -631,6 +633,7 @@ export class SupabaseDatabaseService {
           content: data.content,
           message_type: data.messageType || 'text',
           whatsapp_message_id: data.whatsappMessageId,
+          client_id: data.clientId, // NUEVO: Agregar client_id
           is_read: data.senderType === 'user' ? false : true,
           metadata: data.metadata
         })
@@ -698,6 +701,34 @@ export class SupabaseDatabaseService {
       return message;
     } catch (error) {
       console.error('❌ Error en createMessage:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Verificar si ya existe un mensaje con el mismo client_id en una conversación
+   */
+  async checkMessageByClientId(conversationId: string, clientId: string): Promise<SupabaseMessage | null> {
+    if (!this.isEnabled || !supabase) {
+      throw new Error('❌ Supabase no disponible');
+    }
+
+    try {
+      const { data: message, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .eq('client_id', clientId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('❌ Error verificando mensaje por client_id:', error);
+        return null;
+      }
+
+      return message;
+    } catch (error) {
+      console.error('❌ Error en checkMessageByClientId:', error);
       return null;
     }
   }

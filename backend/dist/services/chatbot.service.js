@@ -56,6 +56,7 @@ const whatsapp_service_1 = require("./whatsapp.service");
 const database_service_1 = require("./database.service");
 const config_1 = require("../config");
 const advanced_conversation_engine_1 = require("./conversation/advanced-conversation-engine");
+const automotive_parts_conversation_service_1 = require("./conversation/automotive-parts-conversation.service");
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 class ChatbotService {
@@ -75,6 +76,7 @@ class ChatbotService {
             }
         };
         this.advancedEngine = new advanced_conversation_engine_1.AdvancedConversationEngine();
+        this.automotivePartsService = new automotive_parts_conversation_service_1.AutomotivePartsConversationService();
         this.startCleanupInterval();
     }
     /**
@@ -84,35 +86,101 @@ class ChatbotService {
         setInterval(() => this.cleanupExpiredSessions(), 5 * 60 * 1000); // Cada 5 minutos
     }
     /**
+     * Detectar si el mensaje es sobre piezas automotrices
+     */
+    isAutomotivePartsMessage(message) {
+        const normalizedMessage = message.toLowerCase();
+        // Palabras clave relacionadas con piezas automotrices
+        const automotiveKeywords = [
+            'funda', 'palanca', 'velocidades', 'transmision', 'estandar',
+            'pastillas', 'freno', 'discos', 'balatas',
+            'filtro', 'aceite', 'aire', 'combustible',
+            'embrague', 'clutch', 'amortiguador', 'bateria',
+            'llantas', 'neumaticos', 'aceite', 'refrigerante',
+            'bujias', 'correa', 'bomba', 'radiador',
+            'escape', 'silenciador', 'suspension', 'direccion'
+        ];
+        // Verificar si el mensaje contiene palabras clave automotrices
+        for (const keyword of automotiveKeywords) {
+            if (normalizedMessage.includes(keyword)) {
+                console.log(`[ChatbotService] Detectada palabra clave automotriz: "${keyword}"`);
+                return true;
+            }
+        }
+        // Verificar si el mensaje menciona marcas de autos
+        const carBrands = [
+            'toyota', 'honda', 'nissan', 'ford', 'chevrolet', 'volkswagen',
+            'mazda', 'hyundai', 'bmw', 'mercedes', 'audi', 'kia',
+            'subaru', 'mitsubishi', 'suzuki', 'isuzu', 'jeep', 'dodge',
+            'vw', 'volkswagen', 'sprinter', 'crafter'
+        ];
+        for (const brand of carBrands) {
+            if (normalizedMessage.includes(brand)) {
+                console.log(`[ChatbotService] Detectada marca de auto: "${brand}"`);
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Procesar mensaje entrante de WhatsApp y generar respuesta con IA
      */
     processWhatsAppMessage(phoneNumber, message) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`[ChatbotService] Procesando mensaje de ${phoneNumber}: ${message.substring(0, 50)}...`);
-                // NUEVO: Usar el motor de conversación avanzado
-                const request = {
-                    conversationId: `wa-${phoneNumber}`,
-                    userId: phoneNumber,
-                    phoneNumber: phoneNumber,
-                    message: message,
-                    pointOfSaleId: 'default'
-                };
-                const response = yield this.advancedEngine.processConversation(request);
-                console.log(`[ChatbotService] Respuesta generada: ${response.response.substring(0, 100)}...`);
-                return {
-                    response: response.response,
-                    shouldSend: true,
-                    conversationState: {
-                        conversationId: request.conversationId,
+                // Detectar si el mensaje es sobre piezas automotrices
+                const isAutomotivePartsRequest = this.isAutomotivePartsMessage(message);
+                if (isAutomotivePartsRequest) {
+                    console.log(`[ChatbotService] Detectado mensaje de piezas automotrices, usando servicio especializado`);
+                    const request = {
+                        conversationId: `wa-${phoneNumber}`,
+                        userId: phoneNumber,
                         phoneNumber: phoneNumber,
-                        status: 'greeting',
-                        clientInfo: {},
-                        messages: [],
-                        createdAt: new Date(),
-                        lastActivity: new Date()
-                    }
-                };
+                        message: message,
+                        pointOfSaleId: 'default'
+                    };
+                    const response = yield this.automotivePartsService.processAutomotivePartsConversation(request);
+                    console.log(`[ChatbotService] Respuesta de piezas automotrices: ${response.response.substring(0, 100)}...`);
+                    return {
+                        response: response.response,
+                        shouldSend: true,
+                        conversationState: {
+                            conversationId: request.conversationId,
+                            phoneNumber: phoneNumber,
+                            status: 'greeting',
+                            clientInfo: {},
+                            messages: [],
+                            createdAt: new Date(),
+                            lastActivity: new Date()
+                        }
+                    };
+                }
+                else {
+                    // Usar el motor de conversación general
+                    const request = {
+                        conversationId: `wa-${phoneNumber}`,
+                        userId: phoneNumber,
+                        phoneNumber: phoneNumber,
+                        message: message,
+                        pointOfSaleId: 'default'
+                    };
+                    const response = yield this.advancedEngine.processConversation(request);
+                    console.log(`[ChatbotService] Respuesta general: ${response.response.substring(0, 100)}...`);
+                    return {
+                        response: response.response,
+                        shouldSend: true,
+                        conversationState: {
+                            conversationId: request.conversationId,
+                            phoneNumber: phoneNumber,
+                            status: 'greeting',
+                            clientInfo: {},
+                            messages: [],
+                            createdAt: new Date(),
+                            lastActivity: new Date()
+                        }
+                    };
+                }
             }
             catch (error) {
                 console.error('[ChatbotService] Error procesando mensaje:', error);
