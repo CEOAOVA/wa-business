@@ -253,6 +253,14 @@ interface AppProviderOptimizedProps {
 export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducerOptimized, initialState);
 
+  // Formatear número de teléfono para mostrar
+  const formatPhoneForDisplay = (phone: string) => {
+    if (phone.startsWith('52') && phone.length === 12) {
+      return `+52 ${phone.slice(2, 4)} ${phone.slice(4, 8)} ${phone.slice(8)}`;
+    }
+    return `+${phone}`;
+  };
+
   // WebSocket optimizado
   const {
     isConnected: isWebSocketConnected,
@@ -358,15 +366,23 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
       const conversations = await dashboardApiService.getPublicConversations();
       
       console.log('🔍 [AppContextOptimized] Conversaciones recibidas:', conversations);
+      console.log('🔍 [AppContextOptimized] Tipo de datos:', typeof conversations);
+      console.log('🔍 [AppContextOptimized] Es array:', Array.isArray(conversations));
       
-      if (conversations.length > 0) {
+      if (conversations && conversations.length > 0) {
         console.log(`🔍 [AppContextOptimized] ${conversations.length} conversaciones encontradas`);
         
         // Convertir conversaciones a chats del frontend
-        conversations.forEach(conv => {
+        conversations.forEach((conv, index) => {
           const chatId = `conv-${conv.id}`;
           
-          console.log(`🔍 [AppContextOptimized] Procesando conversación ${chatId} (takeover_mode: ${conv.takeover_mode})`);
+          console.log(`🔍 [AppContextOptimized] Procesando conversación ${index + 1}/${conversations.length}:`, {
+            id: conv.id,
+            contact_phone: conv.contact_phone,
+            status: conv.status,
+            last_message_at: conv.last_message_at,
+            unread_count: conv.unread_count
+          });
           
           // Verificar si el chat ya existe en el estado actual
           const existingChat = state.chats.find(c => c.id === chatId);
@@ -378,11 +394,19 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
             const newChat: Chat = {
               id: chatId,
               clientId: conv.contact_phone,
-              clientName: conv.contact_phone, // Usar el número como nombre
+              clientName: formatPhoneForDisplay(conv.contact_phone), // Formatear el número para mostrar
               clientPhone: conv.contact_phone,
               clientAvatar: undefined,
               assignedAgentId: conv.assigned_agent_id || null,
-              lastMessage: null, // Se cargará cuando se carguen los mensajes
+              lastMessage: conv.last_message_at ? {
+                id: `last_${conv.id}`,
+                content: 'Último mensaje', // Placeholder - se actualizará cuando se carguen los mensajes
+                senderId: 'user',
+                chatId: chatId,
+                timestamp: new Date(conv.last_message_at),
+                type: 'text',
+                created_at: conv.last_message_at,
+              } : null,
               unreadCount: conv.unread_count || 0,
               isActive: conv.status === 'active',
               createdAt: new Date(conv.created_at),
@@ -393,7 +417,13 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
               takeoverMode: conv.takeover_mode || 'spectator' // Agregar takeover_mode
             };
             
-            console.log('🔍 [AppContextOptimized] Nuevo chat creado:', newChat);
+            console.log('🔍 [AppContextOptimized] Nuevo chat creado:', {
+              id: newChat.id,
+              clientName: newChat.clientName,
+              clientPhone: newChat.clientPhone,
+              lastMessage: newChat.lastMessage ? 'Sí' : 'No',
+              unreadCount: newChat.unreadCount
+            });
             dispatch({ type: 'ADD_CHAT', payload: newChat });
           } else {
             console.log(`🔍 [AppContextOptimized] Chat ${chatId} ya existe`);
