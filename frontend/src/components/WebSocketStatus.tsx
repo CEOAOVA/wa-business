@@ -1,8 +1,8 @@
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useAppOptimized } from '../context/AppContextOptimized';
 
 export const WebSocketStatus: React.FC = () => {
-  const { isWebSocketConnected, webSocketError } = useApp();
+  const { isWebSocketConnected, webSocketError } = useAppOptimized();
 
   if (webSocketError) {
     return (

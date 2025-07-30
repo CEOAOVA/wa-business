@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
-import { useApp } from '../context/AppContext';
+import { useAppOptimized } from '../context/AppContextOptimized';
 import type { Notification } from '../types';
 
 // Hook para manejar notificaciones de forma moderna
 export function useNotifications() {
-  const { state, addNotification, dispatch } = useApp();
+  const { state, addNotification, dispatch } = useAppOptimized();
 
   // Crear notificación con auto-dismiss opcional
   const notify = useCallback((

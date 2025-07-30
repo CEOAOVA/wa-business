@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useChat } from "../hooks/useChat";
-import { useApp } from "../context/AppContext";
+import { useAppOptimized } from "../context/AppContextOptimized";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
-import { useWebSocketOptimized } from "../hooks/useWebSocketOptimized";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
 import type { Message } from "../types";
@@ -160,7 +159,7 @@ ConnectionStatus.displayName = 'ConnectionStatus';
 
 const ChatPanelOptimized: React.FC = () => {
   const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
-  const { updateChatTakeoverMode } = useApp();
+  const { updateChatTakeoverMode } = useAppOptimized();
   const { 
     sendMessage: sendWhatsAppMessage
   } = useWhatsApp();
@@ -168,19 +167,8 @@ const ChatPanelOptimized: React.FC = () => {
     apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
   });
 
-  // WebSocket optimizado
-  const {
-    isConnected,
-    connectionQuality,
-    retryCount,
-    joinConversation,
-    leaveConversation
-  } = useWebSocketOptimized({
-    maxRetries: 10,
-    baseDelay: 300,
-    heartbeatInterval: 20000,
-    messageQueueSize: 50
-  });
+  // WebSocket manejado por el contexto optimizado
+  const { isWebSocketConnected } = useAppOptimized();
 
   // States existentes
   const [newMessage, setNewMessage] = useState("");
@@ -218,16 +206,8 @@ const ChatPanelOptimized: React.FC = () => {
     }
   }, [messages.length, scrollToBottom]);
 
-  // Unirse/salir de conversaciones cuando cambia el chat
-  useEffect(() => {
-    if (currentChat?.id) {
-      joinConversation(currentChat.id);
-      
-      return () => {
-        leaveConversation(currentChat.id);
-      };
-    }
-  }, [currentChat?.id, joinConversation, leaveConversation]);
+  // El contexto optimizado maneja automáticamente las conversaciones
+  // No necesitamos unirse/salir manualmente
 
   // Simular indicador de escritura cuando se reciben mensajes
   useEffect(() => {
@@ -420,9 +400,9 @@ const ChatPanelOptimized: React.FC = () => {
             <div>
               <h3 className="text-white font-semibold">{currentChat.clientName || 'Cliente'}</h3>
               <ConnectionStatus 
-                isConnected={isConnected}
-                connectionQuality={connectionQuality}
-                retryCount={retryCount}
+                isConnected={isWebSocketConnected}
+                connectionQuality="good"
+                retryCount={0}
               />
             </div>
           </div>

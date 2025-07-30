@@ -155,10 +155,11 @@ class WhatsAppService {
                                 toWaId: data.to,
                                 content: data.message,
                                 messageType: database_1.MessageType.TEXT,
-                                timestamp: new Date()
+                                timestamp: new Date(),
+                                clientId: data.clientId // NUEVO: Pasar clientId para deduplicación
                             });
-                            // Emitir evento de Socket.IO para mensaje enviado
-                            if (this.io && result) {
+                            // Emitir evento de Socket.IO para mensaje enviado DESPUÉS del procesamiento en BD
+                            if (this.io && result.success) {
                                 const sentMessage = {
                                     id: result.message.id,
                                     waMessageId: messageId,
@@ -178,12 +179,12 @@ class WhatsAppService {
                                     contactName: result.contact.name || result.contact.waId,
                                     unreadCount: result.conversation.unreadCount || 0
                                 });
-                                console.log('🌐 Evento Socket.IO emitido para mensaje enviado');
+                                console.log('🌐 Evento Socket.IO emitido para mensaje enviado (después de BD)');
                             }
                         }
                         else {
-                            // Mensaje del chatbot - solo emitir evento (la BD la maneja el chatbot)
-                            console.log('🤖 Mensaje del chatbot enviado - emitiendo evento WebSocket');
+                            // Mensaje del chatbot - emitir evento después del procesamiento
+                            console.log('🤖 Mensaje del chatbot enviado - emitiendo evento después del procesamiento');
                             // Obtener conversación para el evento
                             const conversation = yield database_service_1.databaseService.getOrCreateConversationByPhone(data.to);
                             if (conversation && this.io) {

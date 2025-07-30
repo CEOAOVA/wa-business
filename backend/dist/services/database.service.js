@@ -567,6 +567,7 @@ class DatabaseService {
                     content: data.content,
                     messageType: data.messageType,
                     whatsappMessageId: data.waMessageId,
+                    clientId: data.clientId, // NUEVO: Pasar clientId para deduplicación
                     metadata: {
                         mediaUrl: data.mediaUrl,
                         mediaCaption: data.mediaCaption,

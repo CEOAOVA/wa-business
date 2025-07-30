@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useChat } from "../hooks/useChat";
 import { useAuth } from "../context/AuthContext";
-import { useApp } from "../context/AppContext";
+import { useAppOptimized } from "../context/AppContextOptimized";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
 import { MESSAGES } from "../constants/messages";
@@ -66,7 +66,7 @@ const MessageBubble: React.FC<{
 const ChatPanel: React.FC = () => {
   const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
   const { state: authState, logout } = useAuth();
-  const { updateChatTakeoverMode } = useApp();
+  const { updateChatTakeoverMode } = useAppOptimized();
   const { 
     sendMessage: sendWhatsAppMessage, 
     checkConnection: checkWhatsAppConnection,

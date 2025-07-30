@@ -236,6 +236,7 @@ interface AppContextOptimizedType {
   toggleTheme: () => void;
   // Nuevas funciones para WhatsApp optimizadas
   loadWhatsAppMessages: () => Promise<void>;
+  loadNewSchemaConversations: () => Promise<void>;
   loadConversationMessages: (conversationId: string) => Promise<void>;
   addSentWhatsAppMessage: (to: string, message: string, messageId?: string) => void;
   // Funciones de testing manual optimizadas
@@ -347,6 +348,75 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
       dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, []);
+
+  // Cargar conversaciones del nuevo esquema (FUNCIÓN PRINCIPAL)
+  const loadNewSchemaConversations = useCallback(async () => {
+    console.log('🔍 [AppContextOptimized] Iniciando carga de conversaciones del nuevo esquema...');
+    
+    try {
+      console.log('🔍 [AppContextOptimized] Llamando a dashboardApiService.getPublicConversations...');
+      const conversations = await dashboardApiService.getPublicConversations();
+      
+      console.log('🔍 [AppContextOptimized] Conversaciones recibidas:', conversations);
+      
+      if (conversations.length > 0) {
+        console.log(`🔍 [AppContextOptimized] ${conversations.length} conversaciones encontradas`);
+        
+        // Convertir conversaciones a chats del frontend
+        conversations.forEach(conv => {
+          const chatId = `conv-${conv.id}`;
+          
+          console.log(`🔍 [AppContextOptimized] Procesando conversación ${chatId} (takeover_mode: ${conv.takeover_mode})`);
+          
+          // Verificar si el chat ya existe en el estado actual
+          const existingChat = state.chats.find(c => c.id === chatId);
+        
+          if (!existingChat) {
+            console.log(`🔍 [AppContextOptimized] Creando nuevo chat para conversación ${conv.id}`);
+            
+            // Crear nuevo chat
+            const newChat: Chat = {
+              id: chatId,
+              clientId: conv.contact_phone,
+              clientName: conv.contact_phone, // Usar el número como nombre
+              clientPhone: conv.contact_phone,
+              clientAvatar: undefined,
+              assignedAgentId: conv.assigned_agent_id || null,
+              lastMessage: null, // Se cargará cuando se carguen los mensajes
+              unreadCount: conv.unread_count || 0,
+              isActive: conv.status === 'active',
+              createdAt: new Date(conv.created_at),
+              updatedAt: new Date(conv.updated_at),
+              tags: ['conversation'],
+              priority: 'medium',
+              status: conv.status === 'active' ? 'open' : conv.status,
+              takeoverMode: conv.takeover_mode || 'spectator' // Agregar takeover_mode
+            };
+            
+            console.log('🔍 [AppContextOptimized] Nuevo chat creado:', newChat);
+            dispatch({ type: 'ADD_CHAT', payload: newChat });
+          } else {
+            console.log(`🔍 [AppContextOptimized] Chat ${chatId} ya existe`);
+            // Actualizar datos del chat existente si es necesario
+            if (existingChat.unreadCount !== conv.unread_count || 
+                existingChat.updatedAt.getTime() !== new Date(conv.updated_at).getTime()) {
+              const updatedChat = {
+                ...existingChat,
+                unreadCount: conv.unread_count || 0,
+                updatedAt: new Date(conv.updated_at),
+                status: conv.status === 'active' ? 'open' : (conv.status === 'closed' ? 'closed' : 'waiting') as 'open' | 'assigned' | 'waiting' | 'closed'
+              };
+              dispatch({ type: 'UPDATE_CHAT', payload: updatedChat });
+            }
+          }
+        });
+      } else {
+        console.log('🔍 [AppContextOptimized] No hay conversaciones en el nuevo esquema');
+      }
+    } catch (error) {
+      console.error('❌ [AppContextOptimized] Error cargando conversaciones del nuevo esquema:', error);
+    }
+  }, [state.chats]);
 
   const loadConversationMessages = useCallback(async (conversationId: string) => {
     try {
@@ -535,6 +605,9 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
   useEffect(() => {
     const handleNewMessage = (data: WebSocketMessage) => {
       console.log('📨 [WebSocket] Nuevo mensaje recibido:', data);
+      console.log('🔍 [WebSocket] Verificando si es mensaje enviado por nosotros...');
+      console.log('🔍 [WebSocket] data.message.from:', data.message.from);
+      console.log('🔍 [WebSocket] data.message.clientId:', data.message.clientId);
       
       // VERIFICAR: Si es un mensaje que nosotros enviamos (desde el frontend)
       if (data.message.from === 'us' && data.message.clientId) {
@@ -543,12 +616,16 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         // Buscar mensaje optimista existente por clientId
         const chatId = data.message.conversationId;
         const existingMessages = state.messages[chatId] || [];
+        console.log('🔍 [WebSocket] Mensajes existentes en chat:', existingMessages.length);
+        console.log('🔍 [WebSocket] Buscando clientId:', data.message.clientId);
+        
         const existingMessage = existingMessages.find(msg => 
           msg.clientId === data.message.clientId
         );
         
         if (existingMessage) {
-          console.log('🔄 [WebSocket] Actualizando mensaje optimista con datos del servidor');
+          console.log('🔄 [WebSocket] Mensaje optimista encontrado, actualizando...');
+          console.log('🔄 [WebSocket] Mensaje existente:', existingMessage);
           
           // Actualizar mensaje optimista con datos del servidor
           dispatch({
@@ -563,7 +640,10 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
               }
             }
           });
+          console.log('✅ [WebSocket] Mensaje actualizado, evitando duplicado');
           return; // NO agregar nuevo mensaje
+        } else {
+          console.log('⚠️ [WebSocket] Mensaje enviado sin optimista encontrado, agregando normalmente');
         }
       }
       
@@ -619,6 +699,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     addNotification,
     toggleTheme,
     loadWhatsAppMessages,
+    loadNewSchemaConversations,
     loadConversationMessages,
     addSentWhatsAppMessage,
     injectTestWhatsAppMessage,
@@ -636,6 +717,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     addNotification,
     toggleTheme,
     loadWhatsAppMessages,
+    loadNewSchemaConversations,
     loadConversationMessages,
     addSentWhatsAppMessage,
     injectTestWhatsAppMessage,

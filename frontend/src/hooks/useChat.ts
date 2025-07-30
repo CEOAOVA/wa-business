@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { useApp } from '../context/AppContext';
+import { useAppOptimized } from '../context/AppContextOptimized';
 import { useNotifications } from './useNotifications';
 import { MESSAGES } from '../constants/messages';
 import type { Chat, Message } from '../types';
 
 // Hook especializado para operaciones de chat
 export function useChat() {
-  const { state, selectChat, sendMessage, markChatAsRead, searchChats } = useApp();
+  const { state, selectChat, sendMessage, markChatAsRead, searchChats } = useAppOptimized();
   const { notifyMessage } = useNotifications();
 
   // Obtener mensajes del chat actual
