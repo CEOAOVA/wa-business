@@ -134,6 +134,26 @@ const appReducerOptimized = (state: AppState, action: AppAction): AppState => {
         },
         chats: updatedChats,
       };
+    case 'UPDATE_MESSAGE':
+      const { clientId, updates } = action.payload;
+      const chatIdToUpdate = Object.keys(state.messages).find(chatId => 
+        state.messages[chatId]?.some(msg => msg.clientId === clientId)
+      );
+      
+      if (chatIdToUpdate) {
+        const updatedMessages = state.messages[chatIdToUpdate].map(msg =>
+          msg.clientId === clientId ? { ...msg, ...updates } : msg
+        );
+        
+        return {
+          ...state,
+          messages: {
+            ...state.messages,
+            [chatIdToUpdate]: updatedMessages,
+          }
+        };
+      }
+      return state;
     case 'ADD_CHAT':
       // Verificar si el chat ya existe para evitar duplicados
       const existingChat = state.chats.find(c => c.id === action.payload.id);
@@ -403,21 +423,17 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         
         console.log('🔄 [sendMessage] Actualizando mensaje optimista con datos del servidor:', confirmedMessage);
         
-        // MEJORADO: Solo actualizar si el mensaje optimista aún existe
-        const chatId = state.currentChat?.id || '';
-        const existingMessages = state.messages[chatId] || [];
-        const optimisticMessageExists = existingMessages.some((msg: Message) => 
-          msg.clientId === clientId
-        );
-        
-        if (optimisticMessageExists) {
-          dispatch({
-            type: 'ADD_MESSAGE',
-            payload: confirmedMessage
-          });
-        } else {
-          console.log('🔍 [sendMessage] Mensaje optimista ya no existe, omitiendo actualización');
-        }
+        // MEJORADO: Actualizar mensaje optimista existente en lugar de agregar uno nuevo
+        dispatch({
+          type: 'UPDATE_MESSAGE',
+          payload: {
+            clientId: clientId,
+            updates: {
+              id: response.data?.messageId || optimisticMessage.id,
+              waMessageId: response.data?.waMessageId,
+            }
+          }
+        });
       } else {
         console.error('❌ [sendMessage] Error enviando mensaje:', response);
         // Remover mensaje optimista si falló
@@ -520,19 +536,51 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     const handleNewMessage = (data: WebSocketMessage) => {
       console.log('📨 [WebSocket] Nuevo mensaje recibido:', data);
       
+      // VERIFICAR: Si es un mensaje que nosotros enviamos (desde el frontend)
+      if (data.message.from === 'us' && data.message.clientId) {
+        console.log('🔍 [WebSocket] Mensaje enviado detectado, verificando duplicado...');
+        
+        // Buscar mensaje optimista existente por clientId
+        const chatId = data.message.conversationId;
+        const existingMessages = state.messages[chatId] || [];
+        const existingMessage = existingMessages.find(msg => 
+          msg.clientId === data.message.clientId
+        );
+        
+        if (existingMessage) {
+          console.log('🔄 [WebSocket] Actualizando mensaje optimista con datos del servidor');
+          
+          // Actualizar mensaje optimista con datos del servidor
+          dispatch({
+            type: 'UPDATE_MESSAGE',
+            payload: {
+              clientId: data.message.clientId,
+              updates: {
+                id: data.message.id,
+                waMessageId: data.message.waMessageId,
+                timestamp: new Date(data.message.timestamp),
+                created_at: data.message.timestamp.toISOString(),
+              }
+            }
+          });
+          return; // NO agregar nuevo mensaje
+        }
+      }
+      
+      // Para mensajes entrantes o mensajes sin clientId, agregar normalmente
       const message: Message = {
         id: data.message.id,
         waMessageId: data.message.waMessageId,
         content: data.message.message,
         senderId: data.message.from === 'us' ? 'agent' : 'user',
         chatId: data.message.conversationId,
-        conversation_id: data.message.conversationId, // NUEVO: Incluir conversation_id
+        conversation_id: data.message.conversationId,
         timestamp: new Date(data.message.timestamp),
         type: data.message.type as Message['type'],
         created_at: data.message.timestamp.toISOString(),
-        clientId: data.message.clientId, // NUEVO: Incluir client_id del servidor
-        sender_type: data.message.from === 'us' ? 'agent' : 'user', // NUEVO: Incluir sender_type
-        message_type: data.message.type === 'text' ? 'text' : data.message.type === 'image' ? 'image' : data.message.type === 'document' ? 'document' : 'text', // NUEVO: Incluir message_type
+        clientId: data.message.clientId,
+        sender_type: data.message.from === 'us' ? 'agent' : 'user',
+        message_type: data.message.type === 'text' ? 'text' : data.message.type === 'image' ? 'image' : data.message.type === 'document' ? 'document' : 'text',
       };
       
       console.log('📨 [WebSocket] Mensaje procesado para dispatch:', message);
@@ -555,7 +603,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     // Registrar los callbacks
     onNewMessage(handleNewMessage);
     onConversationUpdate(handleConversationUpdate);
-  }, [onNewMessage, onConversationUpdate]);
+  }, [onNewMessage, onConversationUpdate, state.messages]);
 
   // Memoizar el valor del contexto para evitar re-renders
   const contextValue = useMemo<AppContextOptimizedType>(() => ({

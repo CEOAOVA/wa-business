@@ -228,6 +228,7 @@ export type ChatEvent =
 export type AppAction =
   | { type: 'SET_CURRENT_CHAT'; payload: Chat | null }
   | { type: 'ADD_MESSAGE'; payload: Message }
+  | { type: 'UPDATE_MESSAGE'; payload: { clientId: string; updates: Partial<Message> } }
   | { type: 'ADD_CHAT'; payload: Chat }
   | { type: 'UPDATE_CHAT'; payload: Chat }
   | { type: 'SET_LOADING'; payload: boolean }
