@@ -88,6 +88,7 @@ const ChatPanel: React.FC = () => {
 
   // Estados para takeover
   const [takeoverMode, setTakeoverMode] = useState<'spectator' | 'takeover' | 'ai_only'>('spectator');
+  const [isLoadingTakeoverMode, setIsLoadingTakeoverMode] = useState(false);
   const [isChangingMode, setIsChangingMode] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [conversationSummary, setConversationSummary] = useState<any>(null);
@@ -160,6 +161,51 @@ const ChatPanel: React.FC = () => {
     return currentChat.id.replace('conv-', '');
   };
 
+  // MEJORADO: Cargar modo takeover cuando cambia la conversación
+  useEffect(() => {
+    const loadTakeoverMode = async () => {
+      if (!currentChat) {
+        setTakeoverMode('spectator');
+        setIsLoadingTakeoverMode(false);
+        return;
+      }
+
+      setIsLoadingTakeoverMode(true);
+      
+      try {
+        const conversationId = getCurrentConversationId();
+        if (conversationId) {
+          console.log(`🔍 [ChatPanel] Cargando modo takeover para conversación: ${conversationId}`);
+          
+          const response = await whatsappApi.getTakeoverMode(conversationId);
+          if (response.success && response.data) {
+            const actualMode = response.data.takeoverMode;
+            setTakeoverMode(actualMode);
+            console.log(`✅ [ChatPanel] Modo takeover cargado: ${actualMode}`);
+            
+            // Actualizar el chat en el contexto con el modo real
+            if (currentChat) {
+              updateChatTakeoverMode(currentChat.id, actualMode);
+            }
+          } else {
+            console.warn(`⚠️ [ChatPanel] No se pudo obtener modo takeover, usando valor por defecto`);
+            setTakeoverMode('spectator');
+          }
+        } else {
+          console.warn(`⚠️ [ChatPanel] No se pudo obtener conversationId`);
+          setTakeoverMode('spectator');
+        }
+      } catch (error) {
+        console.error('❌ [ChatPanel] Error cargando modo takeover:', error);
+        setTakeoverMode('spectator');
+      } finally {
+        setIsLoadingTakeoverMode(false);
+      }
+    };
+
+    loadTakeoverMode();
+  }, [currentChat]);
+
   // Determinar si el input debe estar deshabilitado
   const isInputDisabled = takeoverMode === 'spectator' || isTyping || isUploading;
 
@@ -169,37 +215,6 @@ const ChatPanel: React.FC = () => {
       setWhatsappNumber(currentChat.clientPhone.replace(/[^0-9]/g, ''));
     }
   }, [currentChat, whatsappNumber]);
-
-  // Cargar modo takeover cuando cambia la conversación
-  useEffect(() => {
-    const loadTakeoverMode = async () => {
-      if (!currentChat) {
-        setTakeoverMode('spectator');
-        return;
-      }
-
-      // Usar el takeover mode del chat actual como valor inicial
-      const initialTakeoverMode = currentChat.takeoverMode || 'spectator';
-      setTakeoverMode(initialTakeoverMode);
-
-      try {
-        const conversationId = getCurrentConversationId();
-        if (conversationId) {
-          const response = await whatsappApi.getTakeoverMode(conversationId);
-          if (response.success && response.data) {
-            setTakeoverMode(response.data.takeoverMode);
-            console.log(`📋 Modo takeover cargado: ${response.data.takeoverMode}`);
-          }
-        }
-      } catch (error) {
-        console.error('❌ Error cargando modo takeover:', error);
-        // Mantener el valor del chat actual como fallback
-        setTakeoverMode(initialTakeoverMode);
-      }
-    };
-
-    loadTakeoverMode();
-  }, [currentChat]);
 
   const handleSendMessage = useCallback(async () => {
     if (!currentChat && !whatsappMode) return;
@@ -414,7 +429,18 @@ const ChatPanel: React.FC = () => {
               </button>
 
               {/* Botón de Takeover - Solo se muestra uno según el estado */}
-              {takeoverMode === 'spectator' && (
+              {isLoadingTakeoverMode ? (
+                <button
+                  disabled
+                  className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-sm font-semibold rounded-md transition-all duration-200 shadow-lg border-2 border-gray-400 opacity-50 cursor-not-allowed"
+                  title="Cargando modo takeover..."
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Cargando...</span>
+                  </div>
+                </button>
+              ) : takeoverMode === 'spectator' ? (
                 <button
                   onClick={handleToggleTakeover}
                   disabled={isChangingMode}
@@ -433,9 +459,7 @@ const ChatPanel: React.FC = () => {
                     </div>
                   )}
                 </button>
-              )}
-
-              {takeoverMode === 'takeover' && (
+              ) : takeoverMode === 'takeover' ? (
                 <button
                   onClick={handleToggleTakeover}
                   disabled={isChangingMode}
@@ -454,7 +478,7 @@ const ChatPanel: React.FC = () => {
                     </div>
                   )}
                 </button>
-              )}
+              ) : null}
 
               {/* Botón de Resumen - Siempre visible */}
               <button
@@ -649,7 +673,7 @@ const ChatPanel: React.FC = () => {
         </div>
 
         {/* Mensaje cuando está en modo spectator */}
-        {takeoverMode === 'spectator' && (
+        {!isLoadingTakeoverMode && takeoverMode === 'spectator' && (
           <div className="mt-3 p-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-gray-600">
             <div className="text-center text-sm">
               <div className="flex items-center justify-center gap-2 mb-1">
@@ -664,7 +688,7 @@ const ChatPanel: React.FC = () => {
         )}
 
         {/* Mensaje cuando está en modo takeover */}
-        {takeoverMode === 'takeover' && (
+        {!isLoadingTakeoverMode && takeoverMode === 'takeover' && (
           <div className="mt-3 p-3 bg-gradient-to-r from-green-700 to-green-800 rounded-lg border-2 border-green-600">
             <div className="text-center text-sm">
               <div className="flex items-center justify-center gap-2 mb-1">
@@ -673,6 +697,21 @@ const ChatPanel: React.FC = () => {
               </div>
               <p className="text-green-400 text-xs">
                 {MESSAGES.TAKEOVER.TAKEOVER_MODE}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje de carga del modo takeover */}
+        {isLoadingTakeoverMode && (
+          <div className="mt-3 p-3 bg-gradient-to-r from-blue-700 to-blue-800 rounded-lg border-2 border-blue-600">
+            <div className="text-center text-sm">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-semibold text-blue-300">Cargando modo...</span>
+              </div>
+              <p className="text-blue-400 text-xs">
+                Verificando configuración de la conversación
               </p>
             </div>
           </div>
