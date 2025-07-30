@@ -33,26 +33,53 @@ const appReducerOptimized = (state: AppState, action: AppAction): AppState => {
       const chatId = message.chatId || message.conversation_id || '';
       const existingMessages = state.messages[chatId] || [];
       
-      // NUEVO: Verificar duplicados por client_id, id, o waMessageId
-      const messageExists = existingMessages.some((existing: Message) => 
-        existing.id === message.id || 
-        (existing.waMessageId && existing.waMessageId === message.waMessageId) ||
-        (existing.clientId && existing.clientId === message.clientId)
-      );
+      // MEJORADO: Verificar duplicados por client_id, id, o waMessageId con mejor lógica
+      const messageExists = existingMessages.some((existing: Message) => {
+        // Verificar por ID exacto
+        if (existing.id === message.id && message.id) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por ID: ${message.id}`);
+          return true;
+        }
+        
+        // Verificar por WhatsApp Message ID
+        if (existing.waMessageId && existing.waMessageId === message.waMessageId && message.waMessageId) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por waMessageId: ${message.waMessageId}`);
+          return true;
+        }
+        
+        // Verificar por client_id
+        if (existing.clientId && existing.clientId === message.clientId && message.clientId) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por clientId: ${message.clientId}`);
+          return true;
+        }
+        
+        // Verificar por contenido y timestamp (fallback)
+        if (existing.content === message.content && 
+            existing.timestamp && message.timestamp &&
+            Math.abs(new Date(existing.timestamp).getTime() - new Date(message.timestamp).getTime()) < 5000) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por contenido y timestamp`);
+          return true;
+        }
+        
+        return false;
+      });
       
       if (messageExists) {
         console.log(`🔍 [Reducer] Mensaje ya existe, verificando actualización:`, {
           id: message.id,
           waMessageId: message.waMessageId,
-          clientId: message.clientId
+          clientId: message.clientId,
+          content: message.content.substring(0, 50)
         });
         
-        // NUEVO: Si existe por client_id y tenemos datos del servidor, actualizar
+        // MEJORADO: Buscar mensaje existente para actualizar
         const existingMessageIndex = existingMessages.findIndex((existing: Message) => 
-          existing.clientId && existing.clientId === message.clientId
+          (existing.clientId && existing.clientId === message.clientId) ||
+          (existing.waMessageId && existing.waMessageId === message.waMessageId) ||
+          (existing.id === message.id && message.id)
         );
         
-        if (existingMessageIndex !== -1 && (message.waMessageId || message.id)) {
+        if (existingMessageIndex !== -1) {
           console.log(`🔄 [Reducer] Actualizando mensaje existente con datos del servidor`);
           // Actualizar mensaje existente con datos del servidor
           const updatedMessages = [...existingMessages];
@@ -375,10 +402,22 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         };
         
         console.log('🔄 [sendMessage] Actualizando mensaje optimista con datos del servidor:', confirmedMessage);
-        dispatch({
-          type: 'ADD_MESSAGE',
-          payload: confirmedMessage
-        });
+        
+        // MEJORADO: Solo actualizar si el mensaje optimista aún existe
+        const chatId = state.currentChat?.id || '';
+        const existingMessages = state.messages[chatId] || [];
+        const optimisticMessageExists = existingMessages.some((msg: Message) => 
+          msg.clientId === clientId
+        );
+        
+        if (optimisticMessageExists) {
+          dispatch({
+            type: 'ADD_MESSAGE',
+            payload: confirmedMessage
+          });
+        } else {
+          console.log('🔍 [sendMessage] Mensaje optimista ya no existe, omitiendo actualización');
+        }
       } else {
         console.error('❌ [sendMessage] Error enviando mensaje:', response);
         // Remover mensaje optimista si falló

@@ -197,11 +197,12 @@ export class WhatsAppService {
               toWaId: data.to,
               content: data.message,
               messageType: MessageType.TEXT,
-              timestamp: new Date()
+              timestamp: new Date(),
+              clientId: data.clientId // NUEVO: Pasar clientId para deduplicación
             });
 
-            // Emitir evento de Socket.IO para mensaje enviado
-            if (this.io && result) {
+            // Emitir evento de Socket.IO para mensaje enviado DESPUÉS del procesamiento en BD
+            if (this.io && result.success) {
               const sentMessage = {
                 id: result.message.id,
                 waMessageId: messageId,
@@ -223,39 +224,39 @@ export class WhatsAppService {
                 unreadCount: result.conversation.unreadCount || 0
               });
 
-              console.log('🌐 Evento Socket.IO emitido para mensaje enviado');
+              console.log('🌐 Evento Socket.IO emitido para mensaje enviado (después de BD)');
             }
-          } else {
-            // Mensaje del chatbot - solo emitir evento (la BD la maneja el chatbot)
-            console.log('🤖 Mensaje del chatbot enviado - emitiendo evento WebSocket');
-            
-            // Obtener conversación para el evento
-            const conversation = await databaseService.getOrCreateConversationByPhone(data.to);
-            if (conversation && this.io) {
-              const chatbotMessage = {
-                id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
-                waMessageId: messageId,
-                from: 'us',
-                to: data.to,
-                message: data.message,
-                timestamp: new Date(),
-                type: 'text',
-                read: false,
-                conversationId: conversation.id,
-                contactId: conversation.contact_phone,
-                clientId: data.clientId // Incluir client_id en el evento
-              };
+                      } else {
+              // Mensaje del chatbot - emitir evento después del procesamiento
+              console.log('🤖 Mensaje del chatbot enviado - emitiendo evento después del procesamiento');
+              
+              // Obtener conversación para el evento
+              const conversation = await databaseService.getOrCreateConversationByPhone(data.to);
+              if (conversation && this.io) {
+                const chatbotMessage = {
+                  id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
+                  waMessageId: messageId,
+                  from: 'us',
+                  to: data.to,
+                  message: data.message,
+                  timestamp: new Date(),
+                  type: 'text',
+                  read: false,
+                  conversationId: conversation.id,
+                  contactId: conversation.contact_phone,
+                  clientId: data.clientId // Incluir client_id en el evento
+                };
 
-              this.emitNewMessage(chatbotMessage, {
-                id: conversation.id,
-                contactId: conversation.contact_phone,
-                contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
-                unreadCount: conversation.unread_count || 0
-              });
+                this.emitNewMessage(chatbotMessage, {
+                  id: conversation.id,
+                  contactId: conversation.contact_phone,
+                  contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
+                  unreadCount: conversation.unread_count || 0
+                });
 
-              console.log('🌐 Evento Socket.IO emitido para mensaje del chatbot');
+                console.log('🌐 Evento Socket.IO emitido para mensaje del chatbot');
+              }
             }
-          }
         } catch (dbError) {
           console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
           // No fallar el envío por error de BD

@@ -570,6 +570,7 @@ export class DatabaseService {
     timestamp: Date;
     mediaUrl?: string;
     mediaCaption?: string;
+    clientId?: string; // NUEVO: Incluir clientId para deduplicación
   }): Promise<{
     success: boolean;
     message: {
@@ -607,6 +608,7 @@ export class DatabaseService {
         content: data.content,
         messageType: data.messageType,
         whatsappMessageId: data.waMessageId,
+        clientId: data.clientId, // NUEVO: Pasar clientId para deduplicación
         metadata: {
           mediaUrl: data.mediaUrl,
           mediaCaption: data.mediaCaption,
