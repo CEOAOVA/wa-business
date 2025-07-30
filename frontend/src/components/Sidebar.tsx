@@ -5,7 +5,7 @@ import { useChat } from "../hooks/useChat";
 import { useDebounce } from "../hooks/useDebounce";
 import { useNotifications } from "../hooks/useNotifications";
 import { useAuth } from "../context/AuthContext";
-import { useAppOptimized } from "../context/AppContextOptimized";
+import { useApp } from "../context/AppContext";
 import { MESSAGES } from "../constants/messages";
 import { WebSocketStatus } from "./WebSocketStatus";
 import SearchBar from "./SearchBar";
@@ -142,7 +142,7 @@ const Sidebar: React.FC = () => {
   
   const { unreadCount } = useNotifications();
   const { state: authState, logout } = useAuth();
-  const { loadNewSchemaConversations } = useAppOptimized();
+  const { loadNewSchemaConversations } = useApp();
 
   // Filtrar chats según la búsqueda y filtros
   const filteredChats = useMemo(() => {

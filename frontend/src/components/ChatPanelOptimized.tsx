@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useChat } from "../hooks/useChat";
-import { useAppOptimized } from "../context/AppContextOptimized";
+import { useApp } from "../context/AppContext";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
 import MediaMessage from "./MediaMessage";
@@ -159,7 +159,7 @@ ConnectionStatus.displayName = 'ConnectionStatus';
 
 const ChatPanelOptimized: React.FC = () => {
   const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
-  const { updateChatTakeoverMode } = useAppOptimized();
+  const { updateChatTakeoverMode } = useApp();
   const { 
     sendMessage: sendWhatsAppMessage
   } = useWhatsApp();
@@ -167,8 +167,8 @@ const ChatPanelOptimized: React.FC = () => {
     apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
   });
 
-  // WebSocket manejado por el contexto optimizado
-  const { isWebSocketConnected } = useAppOptimized();
+  // WebSocket manejado por el contexto
+  const { isWebSocketConnected } = useApp();
 
   // States existentes
   const [newMessage, setNewMessage] = useState("");

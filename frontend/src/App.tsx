@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { AppProviderOptimized } from "./context/AppContextOptimized";
+import { AppProvider } from "./context/AppContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRedirect from "./components/RoleRedirect";
 import { ToastNotifications } from "./components/NotificationCenter";
@@ -13,7 +13,7 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <AppProviderOptimized>
+      <AppProvider>
         <div className="min-h-screen bg-gradient-dark particles-bg relative overflow-hidden">
           {/* Elementos decorativos de fondo */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -63,7 +63,7 @@ function App() {
           {/* Notificaciones toast globales */}
           <ToastNotifications />
         </div>
-      </AppProviderOptimized>
+      </AppProvider>
     </AuthProvider>
   );
 }

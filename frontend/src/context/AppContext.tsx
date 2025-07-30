@@ -32,10 +32,76 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       // Verificar si el mensaje ya existe para evitar duplicados
       const chatId = message.chatId || message.conversation_id || '';
       const existingMessages = state.messages[chatId] || [];
-      const messageExists = existingMessages.some((existing: Message) => existing.id === message.id);
+      
+      // MEJORADO: Verificar duplicados por client_id, id, o waMessageId con mejor lógica
+      const messageExists = existingMessages.some((existing: Message) => {
+        // Verificar por ID exacto
+        if (existing.id === message.id && message.id) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por ID: ${message.id}`);
+          return true;
+        }
+        
+        // Verificar por WhatsApp Message ID
+        if (existing.waMessageId && existing.waMessageId === message.waMessageId && message.waMessageId) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por waMessageId: ${message.waMessageId}`);
+          return true;
+        }
+        
+        // Verificar por client_id (solo para mensajes enviados)
+        if (existing.clientId && existing.clientId === message.clientId && message.clientId) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por clientId: ${message.clientId}`);
+          return true;
+        }
+        
+        // Verificar por contenido y timestamp (fallback)
+        if (existing.content === message.content && 
+            existing.timestamp && message.timestamp &&
+            Math.abs(new Date(existing.timestamp).getTime() - new Date(message.timestamp).getTime()) < 5000) {
+          console.log(`🔍 [Reducer] Mensaje duplicado por contenido y timestamp`);
+          return true;
+        }
+        
+        return false;
+      });
       
       if (messageExists) {
-        console.log(`🔍 [Reducer] Mensaje ${message.id} ya existe, omitiendo`);
+        console.log(`🔍 [Reducer] Mensaje ya existe, verificando actualización:`, {
+          id: message.id,
+          waMessageId: message.waMessageId,
+          clientId: message.clientId,
+          content: message.content.substring(0, 50)
+        });
+        
+        // MEJORADO: Buscar mensaje existente para actualizar
+        const existingMessageIndex = existingMessages.findIndex((existing: Message) => 
+          (existing.clientId && existing.clientId === message.clientId) ||
+          (existing.waMessageId && existing.waMessageId === message.waMessageId) ||
+          (existing.id === message.id && message.id)
+        );
+        
+        if (existingMessageIndex !== -1) {
+          console.log(`🔄 [Reducer] Actualizando mensaje existente con datos del servidor`);
+          // Actualizar mensaje existente con datos del servidor
+          const updatedMessages = [...existingMessages];
+          updatedMessages[existingMessageIndex] = {
+            ...updatedMessages[existingMessageIndex],
+            id: message.id || updatedMessages[existingMessageIndex].id,
+            waMessageId: message.waMessageId || updatedMessages[existingMessageIndex].waMessageId,
+            // Mantener client_id para futuras verificaciones
+            clientId: message.clientId || updatedMessages[existingMessageIndex].clientId
+          };
+          
+          return {
+            ...state,
+            messages: {
+              ...state.messages,
+              [chatId]: updatedMessages,
+            }
+          };
+        }
+        
+        // Si no hay datos del servidor para actualizar, mantener el estado actual
+        console.log(`🔍 [Reducer] Mensaje duplicado sin datos del servidor, omitiendo`);
         return state;
       }
       
@@ -46,25 +112,48 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         return timeA - timeB; // Orden ascendente: más antiguo primero
       });
       
+      // Actualizar chat con el nuevo mensaje
+      const updatedChats = state.chats.map(chat =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              lastMessage: message,
+              unreadCount: message.senderId !== state.currentChat?.assignedAgentId
+                ? chat.unreadCount + 1
+                : chat.unreadCount,
+              updatedAt: message.timestamp || new Date(message.created_at || Date.now()),
+            }
+          : chat
+      );
+      
       return {
         ...state,
         messages: {
           ...state.messages,
           [chatId]: updatedMessages,
         },
-        chats: state.chats.map(chat =>
-          chat.id === chatId
-            ? {
-                ...chat,
-                lastMessage: message,
-                unreadCount: message.senderId !== state.currentChat?.assignedAgentId
-                  ? chat.unreadCount + 1
-                  : chat.unreadCount,
-                updatedAt: message.timestamp || new Date(message.created_at || Date.now()),
-              }
-            : chat
-        ),
+        chats: updatedChats,
       };
+    case 'UPDATE_MESSAGE':
+      const { clientId, updates } = action.payload;
+      const chatIdToUpdate = Object.keys(state.messages).find(chatId => 
+        state.messages[chatId]?.some(msg => msg.clientId === clientId)
+      );
+      
+      if (chatIdToUpdate) {
+        const updatedMessages = state.messages[chatIdToUpdate].map(msg =>
+          msg.clientId === clientId ? { ...msg, ...updates } : msg
+        );
+        
+        return {
+          ...state,
+          messages: {
+            ...state.messages,
+            [chatIdToUpdate]: updatedMessages,
+          }
+        };
+      }
+      return state;
     case 'ADD_CHAT':
       // Verificar si el chat ya existe para evitar duplicados
       const existingChat = state.chats.find(c => c.id === action.payload.id);
@@ -176,6 +265,47 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Manejar nuevos mensajes en tiempo real
     webSocket.onNewMessage((data: WebSocketMessage) => {
       console.log('📨 [WebSocket] Nuevo mensaje recibido:', data);
+      console.log('🔍 [WebSocket] Verificando si es mensaje enviado por nosotros...');
+      console.log('🔍 [WebSocket] data.message.from:', data.message.from);
+      console.log('🔍 [WebSocket] data.message.clientId:', data.message.clientId);
+      
+      // VERIFICAR: Si es un mensaje que nosotros enviamos (desde el frontend)
+      if (data.message.from === 'us' && data.message.clientId) {
+        console.log('🔍 [WebSocket] Mensaje enviado detectado, verificando duplicado...');
+        
+        // Buscar mensaje optimista existente por clientId
+        const chatId = data.conversation.id ? `conv-${data.conversation.id}` : `whatsapp-${data.message.to}`;
+        const existingMessages = state.messages[chatId] || [];
+        console.log('🔍 [WebSocket] Mensajes existentes en chat:', existingMessages.length);
+        console.log('🔍 [WebSocket] Buscando clientId:', data.message.clientId);
+        
+        const existingMessage = existingMessages.find(msg => 
+          msg.clientId === data.message.clientId
+        );
+        
+        if (existingMessage) {
+          console.log('🔄 [WebSocket] Mensaje optimista encontrado, actualizando...');
+          console.log('🔄 [WebSocket] Mensaje existente:', existingMessage);
+          
+          // Actualizar mensaje optimista con datos del servidor
+          dispatch({
+            type: 'UPDATE_MESSAGE',
+            payload: {
+              clientId: data.message.clientId,
+              updates: {
+                id: data.message.id,
+                waMessageId: data.message.waMessageId,
+                timestamp: new Date(data.message.timestamp),
+                created_at: data.message.timestamp.toISOString(),
+              }
+            }
+          });
+          console.log('✅ [WebSocket] Mensaje actualizado, evitando duplicado');
+          return; // NO agregar nuevo mensaje
+        } else {
+          console.log('⚠️ [WebSocket] Mensaje enviado sin optimista encontrado, agregando normalmente');
+        }
+      }
       
       // Determinar el tipo de conversación basado en el conversationId
       let chatId: string;
@@ -260,6 +390,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         type: 'text' as 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker',
         timestamp: new Date(data.message.timestamp),
         is_read: data.message.read,
+        clientId: data.message.clientId, // NUEVO: Incluir clientId para deduplicación
         metadata: { 
           source: isNewSchema ? 'new_schema' : 'whatsapp', 
           waMessageId: data.message.waMessageId,
@@ -518,19 +649,24 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         // Usar el endpoint correcto para el nuevo esquema
         const result = await whatsappApi.sendMessage({
           to: formattedPhone,
-          message: content
+          message: content,
+          clientId: clientId // NUEVO: Enviar clientId al backend
         });
 
         if (result.success) {
-          // Agregar mensaje al historial local
-          const sentMessage: Message = {
-            id: result.data?.messageId || `sent-${Date.now()}`,
+          // NUEVO: Generar client_id único para este mensaje enviado
+          const clientId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
+          // Crear mensaje optimista con client_id
+          const optimisticMessage: Message = {
+            id: `temp_${Date.now()}`,
             chatId: state.currentChat.id,
             senderId: 'agent', // Usar el tipo correcto del backend
             content: content,
             type: type,
             timestamp: new Date(),
             is_read: true,
+            clientId: clientId, // NUEVO: Incluir client_id para deduplicación
             metadata: { 
               source: 'new_schema', 
               direction: 'outgoing',
@@ -538,7 +674,32 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             }
           };
           
-          dispatch({ type: 'ADD_MESSAGE', payload: sentMessage });
+          console.log('📤 [sendMessage] Agregando mensaje optimista:', optimisticMessage);
+          // Agregar mensaje optimista inmediatamente
+          dispatch({ type: 'ADD_MESSAGE', payload: optimisticMessage });
+          
+          // NUEVO: Actualizar mensaje optimista con datos del servidor
+          const confirmedMessage: Message = {
+            ...optimisticMessage,
+            id: result.data?.messageId || optimisticMessage.id,
+            waMessageId: result.data?.waMessageId,
+            clientId: clientId // Mantener client_id para deduplicación
+          };
+          
+          console.log('🔄 [sendMessage] Actualizando mensaje optimista con datos del servidor:', confirmedMessage);
+          
+          // MEJORADO: Actualizar mensaje optimista existente en lugar de agregar uno nuevo
+          dispatch({
+            type: 'UPDATE_MESSAGE',
+            payload: {
+              clientId: clientId,
+              updates: {
+                id: result.data?.messageId || optimisticMessage.id,
+                waMessageId: result.data?.waMessageId,
+              }
+            }
+          });
+          
           console.log(`✅ [AppContext] Mensaje enviado exitosamente a conversación ${conversationId}`);
         } else {
           console.error(`❌ [AppContext] Error enviando mensaje:`, result.error);
