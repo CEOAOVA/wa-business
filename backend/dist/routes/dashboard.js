@@ -169,32 +169,43 @@ router.get('/conversations/public', auth_1.authMiddleware, (req, res) => __await
             throw new Error('Servicio de base de datos no disponible');
         }
         // Obtener conversaciones únicas por número de teléfono
+        console.log('🔍 [Dashboard] Consultando tabla conversations...');
         const { data: conversations, error: convError } = yield supabase_1.supabaseAdmin
             .from('conversations')
             .select('*')
             .order('last_message_at', { ascending: false })
             .order('created_at', { ascending: false });
         if (convError) {
+            console.error('❌ [Dashboard] Error consultando conversaciones:', convError);
             throw convError;
         }
+        console.log('🔍 [Dashboard] Conversaciones encontradas:', (conversations === null || conversations === void 0 ? void 0 : conversations.length) || 0);
+        if (conversations && conversations.length > 0) {
+            console.log('🔍 [Dashboard] Primera conversación:', conversations[0]);
+        }
         // Transformar los datos para que sean compatibles con el frontend
-        const transformedConversations = (conversations || []).map(conv => ({
-            id: conv.id,
-            contact_phone: conv.contact_phone,
-            status: conv.status,
-            ai_mode: conv.ai_mode,
-            takeover_mode: conv.takeover_mode || 'spectator', // Agregar takeover_mode con valor por defecto
-            assigned_agent_id: conv.assigned_agent_id,
-            unread_count: conv.unread_count,
-            last_message_at: conv.last_message_at,
-            created_at: conv.created_at,
-            updated_at: conv.updated_at,
-            contact: {
-                id: conv.contact_phone, // Usar el número como ID
-                name: conv.contact_phone, // Usar el número como nombre
-                phone: conv.contact_phone
-            }
-        }));
+        const transformedConversations = (conversations || []).map(conv => {
+            const transformed = {
+                id: conv.id,
+                contact_phone: conv.contact_phone,
+                status: conv.status,
+                ai_mode: conv.ai_mode,
+                takeover_mode: conv.takeover_mode || 'spectator', // Agregar takeover_mode con valor por defecto
+                assigned_agent_id: conv.assigned_agent_id,
+                unread_count: conv.unread_count,
+                last_message_at: conv.last_message_at,
+                created_at: conv.created_at,
+                updated_at: conv.updated_at,
+                contact: {
+                    id: conv.contact_phone, // Usar el número como ID
+                    name: conv.contact_phone, // Usar el número como nombre
+                    phone: conv.contact_phone
+                }
+            };
+            console.log('🔍 [Dashboard] Conversación transformada:', transformed);
+            return transformed;
+        });
+        console.log('🔍 [Dashboard] Enviando respuesta con', transformedConversations.length, 'conversaciones');
         res.json({
             success: true,
             data: transformedConversations

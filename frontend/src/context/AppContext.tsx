@@ -647,6 +647,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         console.log(`📱 [AppContext] Número original: ${phoneNumber}, formateado: ${formattedPhone}`);
         
         // Usar el endpoint correcto para el nuevo esquema
+        // NUEVO: Generar client_id único para este mensaje enviado
+        const clientId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
         const result = await whatsappApi.sendMessage({
           to: formattedPhone,
           message: content,
@@ -654,8 +657,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         });
 
         if (result.success) {
-          // NUEVO: Generar client_id único para este mensaje enviado
-          const clientId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           
           // Crear mensaje optimista con client_id
           const optimisticMessage: Message = {

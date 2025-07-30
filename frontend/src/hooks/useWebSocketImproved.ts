@@ -17,6 +17,7 @@ export interface WebSocketMessage {
     read: boolean;
     conversationId: string;
     contactId: string;
+    clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
   };
   conversation: {
     id: string;
