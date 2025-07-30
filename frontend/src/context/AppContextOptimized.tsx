@@ -41,20 +41,25 @@ const appReducerOptimized = (state: AppState, action: AppAction): AppState => {
       );
       
       if (messageExists) {
-        console.log(`🔍 [Reducer] Mensaje ya existe, omitiendo duplicado`);
+        console.log(`🔍 [Reducer] Mensaje ya existe, verificando actualización:`, {
+          id: message.id,
+          waMessageId: message.waMessageId,
+          clientId: message.clientId
+        });
         
-        // NUEVO: Si existe por client_id, actualizar con datos del servidor
+        // NUEVO: Si existe por client_id y tenemos datos del servidor, actualizar
         const existingMessageIndex = existingMessages.findIndex((existing: Message) => 
           existing.clientId && existing.clientId === message.clientId
         );
         
-        if (existingMessageIndex !== -1 && message.waMessageId) {
+        if (existingMessageIndex !== -1 && (message.waMessageId || message.id)) {
+          console.log(`🔄 [Reducer] Actualizando mensaje existente con datos del servidor`);
           // Actualizar mensaje existente con datos del servidor
           const updatedMessages = [...existingMessages];
           updatedMessages[existingMessageIndex] = {
             ...updatedMessages[existingMessageIndex],
             id: message.id || updatedMessages[existingMessageIndex].id,
-            waMessageId: message.waMessageId,
+            waMessageId: message.waMessageId || updatedMessages[existingMessageIndex].waMessageId,
             // Mantener client_id para futuras verificaciones
             clientId: message.clientId || updatedMessages[existingMessageIndex].clientId
           };
@@ -68,6 +73,8 @@ const appReducerOptimized = (state: AppState, action: AppAction): AppState => {
           };
         }
         
+        // Si no hay datos del servidor para actualizar, mantener el estado actual
+        console.log(`🔍 [Reducer] Mensaje duplicado sin datos del servidor, omitiendo`);
         return state;
       }
       
@@ -336,12 +343,16 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         content,
         senderId: 'agent',
         chatId: state.currentChat.id,
+        conversation_id: state.currentChat.id, // NUEVO: Incluir conversation_id
         timestamp: new Date(),
         type,
         created_at: new Date().toISOString(),
         clientId: clientId, // NUEVO: Incluir client_id
+        sender_type: 'agent', // NUEVO: Incluir sender_type
+        message_type: type === 'text' ? 'text' : type === 'image' ? 'image' : type === 'document' ? 'document' : 'text', // NUEVO: Incluir message_type
       };
       
+      console.log('📤 [sendMessage] Agregando mensaje optimista:', optimisticMessage);
       // Agregar mensaje optimista inmediatamente
       dispatch({ type: 'ADD_MESSAGE', payload: optimisticMessage });
       
@@ -353,17 +364,23 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
       });
       
       if (response.success) {
-        // Actualizar mensaje con ID real y mantener client_id
+        console.log('✅ [sendMessage] Mensaje enviado exitosamente:', response);
+        
+        // NUEVO: Actualizar mensaje optimista con datos del servidor
+        const confirmedMessage: Message = {
+          ...optimisticMessage,
+          id: response.data?.messageId || optimisticMessage.id,
+          waMessageId: response.data?.waMessageId,
+          clientId: clientId // Mantener client_id para deduplicación
+        };
+        
+        console.log('🔄 [sendMessage] Actualizando mensaje optimista con datos del servidor:', confirmedMessage);
         dispatch({
           type: 'ADD_MESSAGE',
-          payload: {
-            ...optimisticMessage,
-            id: response.data?.messageId || optimisticMessage.id,
-            waMessageId: response.data?.waMessageId,
-            clientId: clientId // NUEVO: Mantener client_id
-          }
+          payload: confirmedMessage
         });
       } else {
+        console.error('❌ [sendMessage] Error enviando mensaje:', response);
         // Remover mensaje optimista si falló
         dispatch({
           type: 'SET_ERROR',
@@ -371,7 +388,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
         });
       }
     } catch (error) {
-      console.error('Error enviando mensaje:', error);
+      console.error('❌ [sendMessage] Error enviando mensaje:', error);
       dispatch({ type: 'SET_ERROR', payload: 'Error enviando mensaje' });
     }
   }, [state.currentChat]);
@@ -462,22 +479,29 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
   // Configurar listeners de WebSocket optimizados
   useEffect(() => {
     const handleNewMessage = (data: WebSocketMessage) => {
+      console.log('📨 [WebSocket] Nuevo mensaje recibido:', data);
+      
       const message: Message = {
         id: data.message.id,
         waMessageId: data.message.waMessageId,
         content: data.message.message,
         senderId: data.message.from === 'us' ? 'agent' : 'user',
         chatId: data.message.conversationId,
+        conversation_id: data.message.conversationId, // NUEVO: Incluir conversation_id
         timestamp: new Date(data.message.timestamp),
         type: data.message.type as Message['type'],
         created_at: data.message.timestamp.toISOString(),
         clientId: data.message.clientId, // NUEVO: Incluir client_id del servidor
+        sender_type: data.message.from === 'us' ? 'agent' : 'user', // NUEVO: Incluir sender_type
+        message_type: data.message.type === 'text' ? 'text' : data.message.type === 'image' ? 'image' : data.message.type === 'document' ? 'document' : 'text', // NUEVO: Incluir message_type
       };
       
+      console.log('📨 [WebSocket] Mensaje procesado para dispatch:', message);
       dispatch({ type: 'ADD_MESSAGE', payload: message });
     };
 
     const handleConversationUpdate = (data: ConversationUpdateEvent) => {
+      console.log('📝 [WebSocket] Conversación actualizada:', data);
       dispatch({
         type: 'UPDATE_CHAT',
         payload: {

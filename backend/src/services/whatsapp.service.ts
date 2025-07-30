@@ -188,47 +188,78 @@ export class WhatsAppService {
 
       // Guardar mensaje enviado en la base de datos (SOLO si NO es respuesta del chatbot)
       const messageId = response.data.messages?.[0]?.id;
-      if (messageId && !data.isChatbotResponse) {
+      if (messageId) {
         try {
-          const result = await databaseService.processOutgoingMessage({
-            waMessageId: messageId,
-            toWaId: data.to,
-            content: data.message,
-            messageType: MessageType.TEXT,
-            timestamp: new Date()
-          });
-
-          // Emitir evento de Socket.IO para mensaje enviado
-          if (this.io && result) {
-            const sentMessage = {
-              id: result.message.id,
+          if (!data.isChatbotResponse) {
+            // Mensaje regular - guardar en BD y emitir evento
+            const result = await databaseService.processOutgoingMessage({
               waMessageId: messageId,
-              from: 'us',
-              to: data.to,
-              message: data.message,
-              timestamp: result.message.timestamp,
-              type: 'text',
-              read: false,
-              conversationId: result.conversation.id,
-              contactId: result.contact.id,
-              clientId: data.clientId // Incluir client_id en el evento
-            };
-
-            this.emitNewMessage(sentMessage, {
-              id: result.conversation.id,
-              contactId: result.contact.id,
-              contactName: result.contact.name || result.contact.waId,
-              unreadCount: result.conversation.unreadCount || 0
+              toWaId: data.to,
+              content: data.message,
+              messageType: MessageType.TEXT,
+              timestamp: new Date()
             });
 
-            console.log('🌐 Evento Socket.IO emitido para mensaje enviado');
+            // Emitir evento de Socket.IO para mensaje enviado
+            if (this.io && result) {
+              const sentMessage = {
+                id: result.message.id,
+                waMessageId: messageId,
+                from: 'us',
+                to: data.to,
+                message: data.message,
+                timestamp: result.message.timestamp,
+                type: 'text',
+                read: false,
+                conversationId: result.conversation.id,
+                contactId: result.contact.id,
+                clientId: data.clientId // Incluir client_id en el evento
+              };
+
+              this.emitNewMessage(sentMessage, {
+                id: result.conversation.id,
+                contactId: result.contact.id,
+                contactName: result.contact.name || result.contact.waId,
+                unreadCount: result.conversation.unreadCount || 0
+              });
+
+              console.log('🌐 Evento Socket.IO emitido para mensaje enviado');
+            }
+          } else {
+            // Mensaje del chatbot - solo emitir evento (la BD la maneja el chatbot)
+            console.log('🤖 Mensaje del chatbot enviado - emitiendo evento WebSocket');
+            
+            // Obtener conversación para el evento
+            const conversation = await databaseService.getOrCreateConversationByPhone(data.to);
+            if (conversation && this.io) {
+              const chatbotMessage = {
+                id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
+                waMessageId: messageId,
+                from: 'us',
+                to: data.to,
+                message: data.message,
+                timestamp: new Date(),
+                type: 'text',
+                read: false,
+                conversationId: conversation.id,
+                contactId: conversation.contact_phone,
+                clientId: data.clientId // Incluir client_id en el evento
+              };
+
+              this.emitNewMessage(chatbotMessage, {
+                id: conversation.id,
+                contactId: conversation.contact_phone,
+                contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
+                unreadCount: conversation.unread_count || 0
+              });
+
+              console.log('🌐 Evento Socket.IO emitido para mensaje del chatbot');
+            }
           }
         } catch (dbError) {
           console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
           // No fallar el envío por error de BD
         }
-      } else if (data.isChatbotResponse) {
-        console.log('🤖 Mensaje del chatbot enviado - NO guardando en BD (lo hará el chatbot después)');
       }
 
       return {
@@ -498,14 +529,17 @@ export class WhatsAppService {
 
         // Notificar a agentes conectados
         this.emitNewMessage({
-          conversationId: conversation.id,
+          id: `msg_${Date.now()}`, // NUEVO: ID temporal para el mensaje
+          waMessageId: messageId,
           from: from,
-          content: content,
-          timestamp: timestamp,
-          contactName: contactName,
-          requiresAgentAction: true,
+          to: 'us', // NUEVO: Destinatario
+          message: content, // NUEVO: Contenido del mensaje
+          timestamp: timestamp, // NUEVO: Timestamp
+          type: 'text', // NUEVO: Tipo de mensaje
+          read: false, // NUEVO: Estado de lectura
+          conversationId: conversation.id, // NUEVO: ID de conversación
+          contactId: conversation.contact_phone, // NUEVO: ID del contacto
           clientId: clientId, // NUEVO: Incluir client_id en el evento
-          whatsappMessageId: messageId
         }, {
           id: conversation.id,
           contactId: conversation.contact_phone,
@@ -580,14 +614,22 @@ export class WhatsAppService {
 
       // Notificar a agentes conectados
       this.emitNewMessage({
-        conversationId: conversation.id,
+        id: `media_${Date.now()}`, // NUEVO: ID temporal para el mensaje multimedia
+        waMessageId: messageId,
         from: from,
-        content: content,
-        timestamp: timestamp,
-        contactName: contactName,
+        to: 'us', // NUEVO: Destinatario
+        message: content, // NUEVO: Contenido del mensaje
+        timestamp: timestamp, // NUEVO: Timestamp
+        type: mediaType, // NUEVO: Tipo de mensaje
+        read: false, // NUEVO: Estado de lectura
+        conversationId: conversation.id, // NUEVO: ID de conversación
+        contactId: conversation.contact_phone, // NUEVO: ID del contacto
+        // NUEVO: Metadata adicional para multimedia
+        mediaId: mediaData.id,
         mediaType: mediaType,
-        mediaData: mediaData,
-        requiresAgentAction: true
+        caption: caption,
+        filename: mediaData.filename,
+        mimeType: mediaData.mime_type
       }, {
         id: conversation.id,
         contactId: conversation.contact_phone,
