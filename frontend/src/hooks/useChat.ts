@@ -19,10 +19,22 @@ export function useChat() {
     const messages = state.messages[state.currentChat.id] || [];
     console.log(`📨 [useChat] Chat actual: ${state.currentChat.id}`);
     console.log(`📨 [useChat] Mensajes en estado: ${messages.length}`);
-    console.log(`📨 [useChat] Mensajes raw:`, messages);
+    
+    // OPTIMIZACIÓN: Filtrar mensajes válidos antes de ordenar
+    const validMessages = messages.filter(msg => msg && msg.content && msg.id);
+    console.log(`📨 [useChat] Mensajes válidos: ${validMessages.length}`);
+    
+    // DEBUG: Contar mensajes por tipo de remitente
+    if (validMessages.length > 0) {
+      const userMessages = validMessages.filter(m => m.senderId === 'user').length;
+      const botMessages = validMessages.filter(m => m.senderId === 'bot').length;
+      const agentMessages = validMessages.filter(m => m.senderId === 'agent').length;
+      
+      console.log(`📨 [useChat] Desglose de mensajes: User=${userMessages}, Bot=${botMessages}, Agent=${agentMessages}`);
+    }
     
     // Asegurar orden cronológico (más antiguo primero)
-    const sortedMessages = messages.sort((a, b) => {
+    const sortedMessages = validMessages.sort((a, b) => {
       const timeA = new Date(a.timestamp || a.created_at || 0).getTime();
       const timeB = new Date(b.timestamp || b.created_at || 0).getTime();
       return timeA - timeB;

@@ -350,8 +350,21 @@ export class DatabaseService {
    */
   async getChatbotConversationMessages(conversationId: string, limit: number = 50): Promise<SupabaseMessage[]> {
     try {
+      console.log(`📨 [DatabaseService] Obteniendo mensajes para conversación: ${conversationId} (límite: ${limit})`);
+      
       const messages = await supabaseDatabaseService.getConversationMessages(conversationId, limit);
-      console.log(`✅ Mensajes obtenidos para conversación ${conversationId}: ${messages.length}`);
+      
+      console.log(`📨 [DatabaseService] ${messages.length} mensajes obtenidos para ${conversationId}`);
+      
+      // DEBUG: Contar mensajes por tipo de remitente
+      if (messages.length > 0) {
+        const userMessages = messages.filter(m => m.sender_type === 'user').length;
+        const botMessages = messages.filter(m => m.sender_type === 'bot').length;
+        const agentMessages = messages.filter(m => m.sender_type === 'agent').length;
+        
+        console.log(`📨 [DatabaseService] Desglose de mensajes: User=${userMessages}, Bot=${botMessages}, Agent=${agentMessages}`);
+      }
+      
       return messages;
     } catch (error) {
       console.error('❌ Error en getChatbotConversationMessages:', error);

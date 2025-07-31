@@ -311,10 +311,21 @@ router.get('/conversations/:id/messages', async (req: any, res: any) => {
     const { id: conversationId } = req.params;
     const { limit, offset } = req.query;
 
-    console.log(`📨 [Messages] Obteniendo historial para: ${conversationId}`);
+    console.log(`📨 [Messages] Obteniendo historial para: ${conversationId} (límite: ${limit || 50})`);
 
-    // Usar el servicio de base de datos
+    // Usar el servicio de base de datos con límite optimizado
     const messages = await databaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
+    
+    console.log(`📨 [Messages] ${messages.length} mensajes obtenidos para ${conversationId}`);
+    
+    // DEBUG: Contar mensajes por tipo de remitente
+    if (messages.length > 0) {
+      const userMessages = messages.filter(m => m.sender_type === 'user').length;
+      const botMessages = messages.filter(m => m.sender_type === 'bot').length;
+      const agentMessages = messages.filter(m => m.sender_type === 'agent').length;
+      
+      console.log(`📨 [Messages] Desglose de mensajes: User=${userMessages}, Bot=${botMessages}, Agent=${agentMessages}`);
+    }
     
     res.json({
       success: true,
