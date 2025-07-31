@@ -226,7 +226,7 @@ const ChatPanel: React.FC = () => {
         if (!whatsappNumber) return;
         const phoneValidation = validatePhone(whatsappNumber);
         if (!phoneValidation.isValid) {
-          alert(`Número inválido: ${phoneValidation.error}`);
+          console.error(`❌ Número inválido: ${phoneValidation.error}`);
           return;
         }
 
@@ -262,7 +262,7 @@ const ChatPanel: React.FC = () => {
     try {
       const conversationId = getCurrentConversationId();
       if (!conversationId) {
-        alert('❌ No hay conversación activa para cambiar el modo takeover');
+        console.error('❌ No hay conversación activa para cambiar el modo takeover');
         return;
       }
 
@@ -286,18 +286,18 @@ const ChatPanel: React.FC = () => {
         
         console.log(`✅ Takeover cambiado a: ${newMode}`, response.data);
         
-        // Mostrar notificación de éxito
+        // Mostrar notificación de éxito en consola
         const message = newMode === 'takeover' 
           ? `✅ Control tomado por ${authState.user?.name?.split(' ')[0] || 'Usuario'}`
           : '✅ IA reactivada';
-        alert(message);
+        console.log(message);
       } else {
         throw new Error(response.error || 'Error desconocido');
       }
       
     } catch (error) {
       console.error('❌ Error en takeover:', error);
-      alert('Error cambiando modo takeover. Inténtalo de nuevo.');
+      console.error('Error cambiando modo takeover. Inténtalo de nuevo.');
     } finally {
       setIsChangingMode(false);
     }
@@ -337,7 +337,7 @@ const ChatPanel: React.FC = () => {
       
     } catch (error) {
       console.error('❌ Error generando resumen:', error);
-      alert('Error generando resumen. Inténtalo de nuevo.');
+      console.error('Error generando resumen. Inténtalo de nuevo.');
     } finally {
       setIsGeneratingSummary(false);
     }
@@ -874,7 +874,7 @@ const ChatPanel: React.FC = () => {
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(JSON.stringify(conversationSummary, null, 2));
-                    alert('Resumen copiado al portapapeles');
+                    console.log('✅ Resumen copiado al portapapeles');
                   }}
                   className="px-4 py-2 bg-embler-yellow hover:bg-yellow-400 text-embler-dark rounded-lg transition-colors"
                 >
