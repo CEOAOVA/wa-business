@@ -11,14 +11,25 @@ export function useChat() {
 
   // Obtener mensajes del chat actual
   const currentMessages = useMemo(() => {
-    if (!state.currentChat) return [];
+    if (!state.currentChat) {
+      console.log('📨 [useChat] No hay chat actual');
+      return [];
+    }
+    
     const messages = state.messages[state.currentChat.id] || [];
+    console.log(`📨 [useChat] Chat actual: ${state.currentChat.id}`);
+    console.log(`📨 [useChat] Mensajes en estado: ${messages.length}`);
+    console.log(`📨 [useChat] Mensajes raw:`, messages);
+    
     // Asegurar orden cronológico (más antiguo primero)
-    return messages.sort((a, b) => {
+    const sortedMessages = messages.sort((a, b) => {
       const timeA = new Date(a.timestamp || a.created_at || 0).getTime();
       const timeB = new Date(b.timestamp || b.created_at || 0).getTime();
       return timeA - timeB;
     });
+    
+    console.log(`📨 [useChat] Mensajes ordenados: ${sortedMessages.length}`);
+    return sortedMessages;
   }, [state.currentChat, state.messages]);
 
   // Enviar mensaje con notificación

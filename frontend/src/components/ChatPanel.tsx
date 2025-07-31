@@ -76,6 +76,11 @@ const ChatPanel: React.FC = () => {
     apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
   });
 
+  // DEBUG: Logging para mensajes
+  console.log(`📨 [ChatPanel] Chat actual:`, currentChat);
+  console.log(`📨 [ChatPanel] Mensajes recibidos: ${messages.length}`);
+  console.log(`📨 [ChatPanel] Mensajes:`, messages);
+
   // States existentes
   const [newMessage, setNewMessage] = useState("");
   const [isTyping] = useState(false);

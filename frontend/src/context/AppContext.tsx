@@ -546,33 +546,53 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         console.log(`📨 [AppContext] Cargando mensajes del nuevo esquema para: ${actualConversationId}`);
         
         const response = await whatsappApi.getConversationMessages(actualConversationId);
+        console.log(`📨 [AppContext] Respuesta del API:`, response);
         
         if (response.success && response.data?.messages) {
-          console.log(`📨 [AppContext] ${response.data.messages.length} mensajes cargados`);
+          console.log(`📨 [AppContext] ${response.data.messages.length} mensajes cargados del backend`);
+          console.log(`📨 [AppContext] Mensajes raw:`, response.data.messages);
           
           // Convertir mensajes al formato del frontend
-          const frontendMessages: Message[] = response.data.messages.map((msg: any) => ({
-            id: msg.id.toString(),
-            chatId: conversationId,
-            senderId: msg.sender_type, // Mantener el tipo original del backend
-            content: msg.content,
-            type: msg.message_type || 'text',
-            timestamp: new Date(msg.created_at),
-            is_read: msg.is_read,
-            metadata: {
-              whatsapp_message_id: msg.whatsapp_message_id,
-              source: 'new_schema'
-            }
-          }));
+          const frontendMessages: Message[] = response.data.messages.map((msg: any, index: number) => {
+            const convertedMessage = {
+              id: msg.id.toString(),
+              chatId: conversationId,
+              senderId: msg.sender_type, // Mantener el tipo original del backend
+              content: msg.content,
+              type: msg.message_type || 'text',
+              timestamp: new Date(msg.created_at),
+              is_read: msg.is_read,
+              metadata: {
+                whatsapp_message_id: msg.whatsapp_message_id,
+                source: 'new_schema'
+              }
+            };
+            
+            console.log(`📨 [AppContext] Mensaje ${index + 1} convertido:`, convertedMessage);
+            return convertedMessage;
+          });
+          
+          console.log(`📨 [AppContext] ${frontendMessages.length} mensajes convertidos al formato frontend`);
           
           // Agregar mensajes al estado
-          frontendMessages.forEach(msg => {
+          frontendMessages.forEach((msg, index) => {
+            console.log(`📨 [AppContext] Agregando mensaje ${index + 1} al estado:`, msg);
             dispatch({ type: 'ADD_MESSAGE', payload: msg });
           });
           
           console.log(`📨 [AppContext] Mensajes agregados al estado para ${conversationId}`);
+          
+          // Verificar que los mensajes se agregaron correctamente
+          setTimeout(() => {
+            const currentMessages = state.messages[conversationId] || [];
+            console.log(`📨 [AppContext] Verificación: ${currentMessages.length} mensajes en estado para ${conversationId}`);
+          }, 100);
+          
         } else {
           console.log('📨 [AppContext] No hay mensajes o respuesta fallida:', response);
+          console.log('📨 [AppContext] response.success:', response.success);
+          console.log('📨 [AppContext] response.data:', response.data);
+          console.log('📨 [AppContext] response.data?.messages:', response.data?.messages);
         }
       } else if (conversationId.startsWith('whatsapp-')) {
         // Conversación de WhatsApp legacy - los mensajes ya se cargan en loadNewSchemaConversations
