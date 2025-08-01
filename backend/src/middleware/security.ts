@@ -5,6 +5,7 @@
 import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import { logger } from '../config/logger';
 import { Request, Response, NextFunction } from 'express';
 
 /**
@@ -193,11 +194,11 @@ export const generalRateLimit = rateLimit({
  * Rate limiting para autenticación
  */
 export const authRateLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: process.env.NODE_ENV === 'production' ? 20 : 5, // Más permisivo en producción
+  windowMs: 5 * 60 * 1000, // 5 minutos (aumentar de 15 min)
+  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más permisivo
   message: {
     success: false,
-    error: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
+    error: 'Demasiados intentos de login. Intenta de nuevo en 5 minutos.',
     code: 'RATE_LIMIT_EXCEEDED'
   },
   standardHeaders: true,
@@ -222,11 +223,33 @@ export const authRateLimit = rateLimit({
     return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
   },
   handler: (req, res) => {
-    console.warn(`[Security] ⚠️ Auth rate limit excedido para IP: ${req.ip}`);
+    logger.warn('Auth rate limit excedido', { ip: req.ip, path: req.path });
     res.status(429).json({
       success: false,
-      error: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
+      error: 'Demasiados intentos de login. Intenta de nuevo en 5 minutos.',
       code: 'RATE_LIMIT_EXCEEDED'
+    });
+  }
+});
+
+// NUEVO: Rate limit específico para WhatsApp API
+export const whatsappRateLimit = rateLimit({
+  windowMs: 60 * 1000,      // 1 minuto
+  max: 30,                   // 30 requests por minuto
+  message: {
+    success: false,
+    error: 'Límite de WhatsApp API excedido',
+    code: 'WHATSAPP_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + req.path,
+  handler: (req, res) => {
+    logger.warn('WhatsApp API rate limit excedido', { ip: req.ip, path: req.path });
+    res.status(429).json({
+      success: false,
+      error: 'Límite de WhatsApp API excedido',
+      code: 'WHATSAPP_RATE_LIMIT_EXCEEDED'
     });
   }
 });

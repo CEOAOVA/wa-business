@@ -49,23 +49,27 @@ exports.io = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
+const logger_1 = require("./config/logger");
+const memory_monitor_1 = require("./services/monitoring/memory-monitor");
+const performance_metrics_1 = require("./services/monitoring/performance-metrics");
+const env_loader_1 = require("./config/env-loader");
+const whatsapp_1 = require("./config/whatsapp");
+const security_1 = require("./config/security");
+const rate_limits_1 = require("./config/rate-limits");
+const whatsapp_service_1 = require("./services/whatsapp.service");
+const session_cleanup_service_1 = require("./services/session-cleanup.service");
+// Importar rutas
 const chat_1 = __importDefault(require("./routes/chat"));
 const contacts_1 = __importDefault(require("./routes/contacts"));
-const media_upload_1 = __importDefault(require("./routes/media-upload"));
+const media_1 = __importDefault(require("./routes/media"));
 const chatbot_1 = __importDefault(require("./routes/chatbot"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const monitoring_1 = __importDefault(require("./routes/monitoring"));
-const env_loader_1 = require("./config/env-loader");
-const whatsapp_1 = require("./config/whatsapp");
-const whatsapp_service_1 = require("./services/whatsapp.service");
-const security_1 = require("./middleware/security");
-const security_2 = require("./middleware/security");
-const session_cleanup_service_1 = require("./services/session-cleanup.service");
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 // Debug de variables de entorno
-console.log('🔍 Estado de variables de entorno:', (0, env_loader_1.getEnvDebugInfo)());
+logger_1.logger.debug('Estado de variables de entorno');
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 const PORT = whatsapp_1.whatsappConfig.server.port;
@@ -81,14 +85,14 @@ const io = new socket_io_1.Server(httpServer, {
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"]
     },
-    // Configuraciones optimizadas para tiempo real - CORREGIDO
-    transports: ['websocket', 'polling'],
-    allowEIO3: true,
-    pingTimeout: 10000, // 10 segundos - REDUCIDO de 60s
-    pingInterval: 5000, // 5 segundos - REDUCIDO de 25s
-    upgradeTimeout: 10000, // 10 segundos
-    maxHttpBufferSize: 1e6, // 1MB
-    connectTimeout: 15000, // 15 segundos - REDUCIDO de 45s
+    // OPTIMIZACIONES DE MEMORIA Y RENDIMIENTO
+    transports: ['websocket'], // Eliminar polling para reducir overhead
+    allowEIO3: false, // Deshabilitar versión antigua
+    pingTimeout: 30000, // 30 segundos - AUMENTADO para reducir frecuencia
+    pingInterval: 25000, // 25 segundos - AUMENTADO para reducir frecuencia
+    upgradeTimeout: 20000, // 20 segundos
+    maxHttpBufferSize: 5e5, // 500KB - REDUCIDO de 1MB
+    connectTimeout: 45000, // 45 segundos - AUMENTADO
     allowRequest: (req, callback) => {
         // Permitir todas las conexiones por ahora
         callback(null, true);
@@ -104,16 +108,16 @@ app.use((req, res, next) => {
 });
 // Configurar eventos de Socket.IO optimizados para tiempo real
 io.on('connection', (socket) => {
-    console.log(`🌐 Cliente conectado: ${socket.id}`);
+    logger_1.logHelper.socketConnection(socket.id);
     // Unirse a una conversación específica
     socket.on('join_conversation', (conversationId) => {
-        console.log(`📨 Cliente ${socket.id} uniéndose a conversación: ${conversationId}`);
+        logger_1.logger.debug('Cliente uniéndose a conversación', { socketId: socket.id, conversationId });
         socket.join(conversationId);
         socket.emit('joined_conversation', { conversationId });
     });
     // Salir de una conversación
     socket.on('leave_conversation', (conversationId) => {
-        console.log(`📤 Cliente ${socket.id} saliendo de conversación: ${conversationId}`);
+        logger_1.logger.debug('Cliente saliendo de conversación', { socketId: socket.id, conversationId });
         socket.leave(conversationId);
         socket.emit('left_conversation', { conversationId });
     });
@@ -121,24 +125,36 @@ io.on('connection', (socket) => {
     socket.on('ping', (data) => {
         const now = Date.now();
         const latency = now - data.timestamp;
-        // Log de latencia para monitoreo
-        console.log(`💓 Heartbeat recibido - Latencia: ${latency}ms - Socket: ${socket.id}`);
+        // SOLO log si latencia es alta (> 2 segundos)
+        if (latency > 2000) {
+            logger_1.logger.warn('Latencia alta detectada', { latency: `${latency}ms`, socketId: socket.id });
+        }
         // Emitir respuesta con timestamp actual
         socket.emit('pong', { timestamp: now });
-        // Métricas de latencia (para futura implementación de dashboard)
-        if (latency > 1000) {
-            console.warn(`⚠️ Latencia alta detectada: ${latency}ms en socket ${socket.id}`);
-        }
     });
     // Manejar desconexión
     socket.on('disconnect', (reason) => {
-        console.log(`❌ Cliente desconectado: ${socket.id}, razón: ${reason}`);
+        logger_1.logHelper.socketDisconnection(socket.id, reason);
     });
     // Manejar errores de socket
     socket.on('error', (error) => {
-        console.error(`❌ Error en socket ${socket.id}:`, error);
+        logger_1.logger.error('Error en socket', { socketId: socket.id, error: error.message });
     });
 });
+// NUEVO: Limpieza periódica de conexiones inactivas
+setInterval(() => {
+    const rooms = io.sockets.adapter.rooms;
+    let inactiveCount = 0;
+    rooms.forEach((room, roomId) => {
+        if (room.size === 0) {
+            io.in(roomId).disconnectSockets();
+            inactiveCount++;
+        }
+    });
+    if (inactiveCount > 0) {
+        logger_1.logHelper.memoryCleanup('socket_rooms', inactiveCount);
+    }
+}, 300000); // Cada 5 minutos
 // Rutas principales
 app.get('/health', (_req, res) => {
     res.json({
@@ -148,13 +164,13 @@ app.get('/health', (_req, res) => {
     });
 });
 // Rutas de autenticación (con rate limiting específico)
-app.use('/api/auth', security_2.authRateLimit, auth_1.default);
+app.use('/api/auth', rate_limits_1.authRateLimit, auth_1.default);
 // Rutas de WhatsApp Chat
-app.use('/api/chat', chat_1.default);
+app.use('/api/chat', rate_limits_1.whatsappRateLimit, chat_1.default);
 // Rutas de gestión de contactos
 app.use('/api/contacts', contacts_1.default);
 // Rutas de multimedia
-app.use('/api/media', media_upload_1.default);
+app.use('/api/media', media_1.default);
 // Rutas del chatbot con IA
 app.use('/api/chatbot', chatbot_1.default);
 // Rutas del dashboard
@@ -227,45 +243,45 @@ app.get('/api', (_req, res) => {
 function cleanupSessionsOnStartup() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log('🧹 Iniciando limpieza de sesiones al arranque...');
+            logger_1.logger.info('Iniciando limpieza de sesiones al arranque');
             // Importar servicios que necesitan limpieza
             const { rateLimiter } = yield Promise.resolve().then(() => __importStar(require('./services/rate-limiter/rate-limiter')));
             const { cacheService } = yield Promise.resolve().then(() => __importStar(require('./services/cache/cache-service')));
             // Limpiar rate limiter
             if (rateLimiter) {
                 rateLimiter.destroy();
-                console.log('✅ Rate limiter limpiado');
+                logger_1.logger.info('Rate limiter limpiado');
             }
             // Limpiar caché
             if (cacheService) {
                 cacheService.destroy();
-                console.log('✅ Cache service limpiado');
+                logger_1.logger.info('Cache service limpiado');
             }
             // Limpiar conversaciones del chatbot
             const { ChatbotService } = yield Promise.resolve().then(() => __importStar(require('./services/chatbot.service')));
             const chatbotService = new ChatbotService();
             if (chatbotService && typeof chatbotService['cleanupExpiredSessions'] === 'function') {
                 chatbotService['cleanupExpiredSessions']();
-                console.log('✅ Chatbot sessions limpiadas');
+                logger_1.logger.info('Chatbot sessions limpiadas');
             }
             // Limpiar conversaciones generales
             const { ConversationService } = yield Promise.resolve().then(() => __importStar(require('./services/conversation/conversation-service')));
             const conversationService = new ConversationService();
             if (conversationService && typeof conversationService['cleanupInactiveSessions'] === 'function') {
                 const removedCount = conversationService['cleanupInactiveSessions'](0); // Limpiar todas las sesiones
-                console.log(`✅ ${removedCount} conversaciones inactivas limpiadas`);
+                logger_1.logger.info(`${removedCount} conversaciones inactivas limpiadas`);
             }
             // Limpiar caché de inventario
             const { InventoryCache } = yield Promise.resolve().then(() => __importStar(require('./services/soap/inventory-cache')));
             const inventoryCache = new InventoryCache();
             if (inventoryCache && typeof inventoryCache.clear === 'function') {
                 inventoryCache.clear();
-                console.log('✅ Inventory cache limpiado');
+                logger_1.logger.info('Inventory cache limpiado');
             }
-            console.log('🎉 Limpieza de sesiones completada al arranque');
+            logger_1.logger.info('Limpieza de sesiones completada al arranque');
         }
         catch (error) {
-            console.error('⚠️ Error durante la limpieza de sesiones:', error);
+            logger_1.logger.error('Error durante la limpieza de sesiones', { error: String(error) });
             // No fallar el arranque por errores de limpieza
         }
     });
@@ -279,45 +295,90 @@ function startServer() {
             // Inicializar servicios con Socket.IO
             yield whatsapp_service_1.whatsappService.initialize(io);
             // Inicializar servicios al arrancar la aplicación
-            console.log('🚀 Inicializando servicios...');
+            logger_1.logger.info('Inicializando servicios');
             // Inicializar servicio de limpieza de sesiones
             try {
                 const stats = session_cleanup_service_1.sessionCleanupService.getServiceStats();
-                console.log('✅ Servicio de limpieza de sesiones inicializado:', {
-                    isRunning: stats.isRunning,
-                    intervalMinutes: stats.interval / 1000 / 60,
-                    timeoutHours: stats.timeout / 1000 / 60 / 60
+                logger_1.logger.info('Servicio de limpieza de sesiones inicializado', {
+                    isRunning: stats.isRunning
                 });
             }
             catch (error) {
-                console.error('❌ Error inicializando servicio de limpieza de sesiones:', error);
+                logger_1.logger.error('Error inicializando servicio de limpieza de sesiones', { error: String(error) });
+            }
+            // Inicializar performance monitor
+            try {
+                performance_metrics_1.performanceMonitor.startMonitoring(parseInt(process.env.PERFORMANCE_MONITOR_INTERVAL || '60000'));
+                // Configurar event listeners para alerts
+                performance_metrics_1.performanceMonitor.on('critical_threshold_exceeded', (data) => {
+                    logger_1.logger.error('🚨 CRÍTICO: Threshold excedido', data);
+                    // Aquí se podría implementar notificaciones urgentes
+                });
+                performance_metrics_1.performanceMonitor.on('warning_threshold_exceeded', (data) => {
+                    logger_1.logger.warn('⚠️ ADVERTENCIA: Threshold excedido', data);
+                });
+                performance_metrics_1.performanceMonitor.on('alert', (data) => {
+                    logger_1.logger.warn('🚨 ALERTA: Métrica crítica', data);
+                    // Aquí se podría implementar notificaciones
+                });
+                logger_1.logger.info('Performance monitor inicializado correctamente');
+            }
+            catch (error) {
+                logger_1.logger.error('Error inicializando performance monitor', { error: String(error) });
+            }
+            // Inicializar memory monitor
+            try {
+                const memoryStats = memory_monitor_1.memoryMonitor.getMemoryStats();
+                logger_1.logger.info('Memory monitor inicializado', {
+                    isMonitoring: memoryStats.isMonitoring,
+                    warningThreshold: `${memoryStats.warningThreshold}%`,
+                    criticalThreshold: `${memoryStats.criticalThreshold}%`
+                });
+            }
+            catch (error) {
+                logger_1.logger.error('Error inicializando memory monitor', { error: String(error) });
             }
             // Iniciar servidor
             httpServer.listen(PORT, () => {
-                console.log(`🚀 Backend running on http://localhost:${PORT}`);
-                console.log(`📱 WhatsApp API ready at http://localhost:${PORT}/api/chat`);
-                console.log(`💾 Base de datos SQLite conectada`);
-                console.log(`🔧 Variables de entorno cargadas desde .env`);
-                console.log(`🌐 WebSocket server ready for real-time messaging`);
-                console.log(`🧹 Sesiones limpiadas automáticamente al arranque`);
+                logger_1.logHelper.appStart(PORT);
+                logger_1.logger.info('Backend iniciado correctamente', {
+                    port: PORT,
+                    environment: process.env.NODE_ENV,
+                    memoryMonitoring: memory_monitor_1.memoryMonitor.getMemoryStats().isMonitoring
+                });
             });
         }
         catch (error) {
-            console.error('❌ Error iniciando el servidor:', error);
+            logger_1.logger.error('Error iniciando el servidor', { error: String(error) });
             process.exit(1);
         }
     });
 }
 // Manejar cierre graceful
 process.on('SIGINT', () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('\n🛑 Cerrando servidor...');
-    httpServer.close();
+    logger_1.logger.info('Cerrando servidor (SIGINT)');
+    try {
+        performance_metrics_1.performanceMonitor.destroy();
+        memory_monitor_1.memoryMonitor.destroy();
+        httpServer.close();
+    }
+    catch (error) {
+        logger_1.logger.error('Error durante cleanup', { error: String(error) });
+    }
     process.exit(0);
 }));
 process.on('SIGTERM', () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('\n🛑 Cerrando servidor...');
-    httpServer.close();
+    logger_1.logger.info('Cerrando servidor (SIGTERM)');
+    try {
+        performance_metrics_1.performanceMonitor.destroy();
+        memory_monitor_1.memoryMonitor.destroy();
+        httpServer.close();
+    }
+    catch (error) {
+        logger_1.logger.error('Error durante cleanup', { error: String(error) });
+    }
     process.exit(0);
 }));
 // Iniciar servidor
+startServer();
 startServer();

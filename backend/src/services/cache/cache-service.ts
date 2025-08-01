@@ -24,6 +24,7 @@ export interface CacheItem<T = any> {
   accessCount: number;
   lastAccessed: Date;
   size: number;
+  timestamp: number;
 }
 
 export interface CacheStats {
@@ -44,497 +45,198 @@ export interface CacheStats {
   };
 }
 
+/**
+ * Servicio de Cache con LRU (Least Recently Used) para optimizar memoria
+ */
 export class CacheService extends EventEmitter {
-  private config: CacheConfig;
-  private memoryCache = new Map<string, CacheItem>();
-  private memoryCacheSize = 0;
+  private cache: Map<string, CacheItem<any>> = new Map();
+  private maxSize: number;
+  private cleanupInterval: NodeJS.Timeout;
   private stats = {
-    requests: 0,
     hits: 0,
-    memoryHits: 0,
-    distributedHits: 0,
-    evictions: 0
+    misses: 0,
+    sets: 0,
+    deletes: 0
   };
-  private cleanupTimer?: NodeJS.Timeout;
 
-  constructor(config?: Partial<CacheConfig>) {
+  constructor(maxSize: number = 1000) {
     super();
     
-    this.config = {
-      enableMemoryCache: true,
-      enableDistributedCache: false, // Redis será agregado después
-      memoryMaxSize: 100, // 100 MB
-      defaultTTL: 300, // 5 minutos
-      cleanupInterval: 60, // 1 minuto
-      compressionThreshold: 1024, // 1KB
-      ...config
-    };
-
-    this.startCleanupProcess();
+    this.maxSize = maxSize;
     
-    logger.info('Cache service initialized', {
-      service: 'cache',
-      config: this.config
-    });
+    // Limpieza automática cada 5 minutos
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupExpiredItems();
+    }, 300000);
   }
 
   /**
-   * Inicia proceso de limpieza automática
+   * Establecer un valor en el cache
    */
-  private startCleanupProcess(): void {
-    this.cleanupTimer = setInterval(() => {
-      this.cleanup();
-    }, this.config.cleanupInterval * 1000);
-  }
-
-  /**
-   * Obtiene un item del cache
-   */
-  async get<T = any>(key: string): Promise<T | null> {
-    this.stats.requests++;
-    const start = Date.now();
-
-    try {
-      // 1. Intentar memory cache primero
-      if (this.config.enableMemoryCache) {
-        const memoryResult = this.getFromMemory<T>(key);
-        if (memoryResult !== null) {
-          this.stats.hits++;
-          this.stats.memoryHits++;
-          
-          const duration = Date.now() - start;
-          
-          logger.debug('Cache hit (memory)', {
-            service: 'cache',
-            key: this.maskKey(key),
-            responseTime: duration
-          });
-          
-          return memoryResult;
-        }
-      }
-
-      // 2. Intentar distributed cache (Redis simulado)
-      if (this.config.enableDistributedCache) {
-        const distributedResult = await this.getFromDistributed<T>(key);
-        if (distributedResult !== null) {
-          this.stats.hits++;
-          this.stats.distributedHits++;
-          
-          // Guardar en memory cache para próximas consultas
-          if (this.config.enableMemoryCache) {
-            await this.setInMemory(key, distributedResult, this.config.defaultTTL);
-          }
-          
-          const duration = Date.now() - start;
-          
-          logger.debug('Cache hit (distributed)', {
-            service: 'cache',
-            key: this.maskKey(key),
-            responseTime: duration
-          });
-          
-          return distributedResult;
-        }
-      }
-
-      // 3. Cache miss
-      const duration = Date.now() - start;
-      logger.debug('Cache miss', {
-        service: 'cache',
-        key: this.maskKey(key),
-        responseTime: duration
-      });
-      
-      return null;
-      
-    } catch (error) {
-      logger.error('Cache get error', error, {
-        service: 'cache',
-        key: this.maskKey(key)
-      });
-      return null;
-    }
-  }
-
-  /**
-   * Guarda un item en el cache
-   */
-  async set<T = any>(key: string, value: T, ttl?: number): Promise<boolean> {
-    const actualTTL = ttl || this.config.defaultTTL;
-    
-    try {
-      // 1. Guardar en memory cache
-      if (this.config.enableMemoryCache) {
-        await this.setInMemory(key, value, actualTTL);
-      }
-
-      // 2. Guardar en distributed cache
-      if (this.config.enableDistributedCache) {
-        await this.setInDistributed(key, value, actualTTL);
-      }
-
-      logger.debug('Cache set', {
-        service: 'cache',
-        key: this.maskKey(key),
-        ttl: actualTTL
-      });
-      
-      return true;
-      
-    } catch (error) {
-      logger.error('Cache set error', error, {
-        service: 'cache',
-        key: this.maskKey(key)
-      });
-      return false;
-    }
-  }
-
-  /**
-   * Elimina un item del cache
-   */
-  async delete(key: string): Promise<boolean> {
-    try {
-      let deleted = false;
-
-      // Eliminar de memory cache
-      if (this.config.enableMemoryCache) {
-        const item = this.memoryCache.get(key);
-        if (item) {
-          this.memoryCacheSize -= item.size;
-          this.memoryCache.delete(key);
-          deleted = true;
-        }
-      }
-
-      // Eliminar de distributed cache
-      if (this.config.enableDistributedCache) {
-        await this.deleteFromDistributed(key);
-        deleted = true;
-      }
-
-      if (deleted) {
-        logger.debug('Cache delete', {
-          service: 'cache',
-          key: this.maskKey(key)
-        });
-      }
-      
-      return deleted;
-      
-    } catch (error) {
-      logger.error('Cache delete error', error, {
-        service: 'cache',
-        key: this.maskKey(key)
-      });
-      return false;
-    }
-  }
-
-  /**
-   * Invalida cache por patrón
-   */
-  async invalidate(pattern: string): Promise<number> {
-    let invalidatedCount = 0;
-    
-    try {
-      // Invalidar en memory cache
-      if (this.config.enableMemoryCache) {
-        const keysToDelete: string[] = [];
-        
-        for (const [key] of this.memoryCache) {
-          if (this.matchesPattern(key, pattern)) {
-            keysToDelete.push(key);
-          }
-        }
-        
-        for (const key of keysToDelete) {
-          const item = this.memoryCache.get(key);
-          if (item) {
-            this.memoryCacheSize -= item.size;
-            this.memoryCache.delete(key);
-            invalidatedCount++;
-          }
-        }
-      }
-
-      // Invalidar en distributed cache
-      if (this.config.enableDistributedCache) {
-        // En Redis real, usaríamos SCAN + DEL
-        // Por ahora solo simulamos
-      }
-
-      logger.info('Cache invalidation completed', {
-        service: 'cache',
-        pattern,
-        invalidatedCount
-      });
-      
-      return invalidatedCount;
-      
-    } catch (error) {
-      logger.error('Cache invalidation error', error, {
-        service: 'cache',
-        pattern
-      });
-      return 0;
-    }
-  }
-
-  /**
-   * MEMORY CACHE METHODS
-   */
-
-  private getFromMemory<T>(key: string): T | null {
-    const item = this.memoryCache.get(key);
-    
-    if (!item) {
-      return null;
+  set<T>(key: string, value: T, ttl: number = 300000): void {
+    // Verificar límite de tamaño
+    if (this.cache.size >= this.maxSize) {
+      this.evictOldest();
     }
 
-    // Verificar TTL
-    const now = Date.now();
-    const expireTime = item.createdAt.getTime() + (item.ttl * 1000);
-    
-    if (now > expireTime) {
-      // Item expirado
-      this.memoryCacheSize -= item.size;
-      this.memoryCache.delete(key);
-      return null;
-    }
-
-    // Actualizar estadísticas de acceso
-    item.accessCount++;
-    item.lastAccessed = new Date();
-    
-    return item.value as T;
-  }
-
-  private async setInMemory<T>(key: string, value: T, ttl: number): Promise<void> {
-    const serialized = JSON.stringify(value);
-    const size = new Blob([serialized]).size;
-    
-    // Verificar límite de memoria
-    const maxSizeBytes = this.config.memoryMaxSize * 1024 * 1024;
-    if (this.memoryCacheSize + size > maxSizeBytes) {
-      await this.evictLeastUsed(size);
-    }
-
-    const item: CacheItem<T> = {
+    this.cache.set(key, {
       key,
       value,
       ttl,
       createdAt: new Date(),
       accessCount: 0,
       lastAccessed: new Date(),
-      size
-    };
-
-    // Eliminar item existente si existe
-    const existingItem = this.memoryCache.get(key);
-    if (existingItem) {
-      this.memoryCacheSize -= existingItem.size;
-    }
-
-    this.memoryCache.set(key, item);
-    this.memoryCacheSize += size;
-  }
-
-  /**
-   * DISTRIBUTED CACHE METHODS (Redis simulado)
-   */
-
-  private async getFromDistributed<T>(key: string): Promise<T | null> {
-    // Simulación de Redis
-    // En implementación real: await redis.get(key)
-    return null;
-  }
-
-  private async setInDistributed<T>(key: string, value: T, ttl: number): Promise<void> {
-    // Simulación de Redis
-    // En implementación real: await redis.setex(key, ttl, JSON.stringify(value))
-  }
-
-  private async deleteFromDistributed(key: string): Promise<void> {
-    // Simulación de Redis
-    // En implementación real: await redis.del(key)
-  }
-
-  /**
-   * CACHE MANAGEMENT
-   */
-
-  private async evictLeastUsed(requiredSize: number): Promise<void> {
-    // Obtener items ordenados por menor uso
-    const items = Array.from(this.memoryCache.entries())
-      .map(([key, item]) => ({ key, item }))
-      .sort((a, b) => {
-        // Ordenar por: menor acceso, más antiguo
-        if (a.item.accessCount !== b.item.accessCount) {
-          return a.item.accessCount - b.item.accessCount;
-        }
-        return a.item.createdAt.getTime() - b.item.createdAt.getTime();
-      });
-
-    let freedSpace = 0;
-    let evictedCount = 0;
-
-    for (const { key, item } of items) {
-      this.memoryCache.delete(key);
-      this.memoryCacheSize -= item.size;
-      freedSpace += item.size;
-      evictedCount++;
-      
-      if (freedSpace >= requiredSize) {
-        break;
-      }
-    }
-
-    this.stats.evictions += evictedCount;
-    
-    logger.debug('Cache eviction completed', {
-      service: 'cache',
-      evictedCount,
-      freedSpace,
-      requiredSize
+      size: 0,
+      timestamp: Date.now()
     });
-  }
 
-  private cleanup(): void {
-    const now = Date.now();
-    let cleanedCount = 0;
-    let freedSpace = 0;
-
-    for (const [key, item] of this.memoryCache.entries()) {
-      const expireTime = item.createdAt.getTime() + (item.ttl * 1000);
-      
-      if (now > expireTime) {
-        this.memoryCache.delete(key);
-        this.memoryCacheSize -= item.size;
-        freedSpace += item.size;
-        cleanedCount++;
-      }
-    }
-
-    if (cleanedCount > 0) {
-      logger.debug('Cache cleanup completed', {
-        service: 'cache',
-        cleanedCount,
-        freedSpace,
-        remainingItems: this.memoryCache.size
-      });
-    }
+    this.stats.sets++;
+    logger.debug('Cache item set', { key, ttl });
   }
 
   /**
-   * UTILITY METHODS
+   * Obtener un valor del cache
    */
-
-  private matchesPattern(key: string, pattern: string): boolean {
-    // Convertir patrón a regex simple (* = .*)
-    const regexPattern = pattern.replace(/\*/g, '.*');
-    const regex = new RegExp(`^${regexPattern}$`);
-    return regex.test(key);
-  }
-
-  private maskKey(key: string): string {
-    if (key.length <= 8) return key;
-    return key.substring(0, 4) + '***' + key.substring(key.length - 4);
-  }
-
-  /**
-   * PUBLIC API
-   */
-
-  getStats(): CacheStats {
-    const totalRequests = this.stats.requests || 1; // Evitar división por cero
+  get<T>(key: string): T | null {
+    const item = this.cache.get(key);
     
-    return {
-      memoryCache: {
-        size: Math.round(this.memoryCacheSize / 1024 / 1024 * 100) / 100, // MB
-        items: this.memoryCache.size,
-        hitRate: Math.round(this.stats.memoryHits / totalRequests * 100),
-        maxSize: this.config.memoryMaxSize
-      },
-      distributedCache: {
-        connected: this.config.enableDistributedCache,
-        hitRate: Math.round(this.stats.distributedHits / totalRequests * 100)
-      },
-      overall: {
-        totalRequests: this.stats.requests,
-        totalHits: this.stats.hits,
-        hitRate: Math.round(this.stats.hits / totalRequests * 100)
+    if (!item) {
+      this.stats.misses++;
+      return null;
+    }
+
+    // Verificar si ha expirado
+    const now = Date.now();
+    if (now - item.timestamp > item.ttl) {
+      this.cache.delete(key);
+      this.stats.misses++;
+      return null;
+    }
+
+    // Actualizar último acceso (LRU)
+    item.lastAccessed = new Date(now);
+    this.stats.hits++;
+    
+    return item.value;
+  }
+
+  /**
+   * Verificar si existe una clave en el cache
+   */
+  has(key: string): boolean {
+    const item = this.cache.get(key);
+    if (!item) return false;
+    
+    // Verificar expiración
+    const now = Date.now();
+    if (now - item.timestamp > item.ttl) {
+      this.cache.delete(key);
+      return false;
+    }
+    
+    return true;
+  }
+
+  /**
+   * Eliminar un item del cache
+   */
+  delete(key: string): boolean {
+    const deleted = this.cache.delete(key);
+    if (deleted) {
+      this.stats.deletes++;
+    }
+    return deleted;
+  }
+
+  /**
+   * Limpiar todo el cache
+   */
+  clear(): void {
+    const size = this.cache.size;
+    this.cache.clear();
+    logger.info('Cache limpiado');
+  }
+
+  /**
+   * Obtener estadísticas del cache
+   */
+  getStats(): any {
+    const now = Date.now();
+    let expiredCount = 0;
+    let totalSize = 0;
+
+    // Calcular items expirados y tamaño total
+    for (const [key, item] of this.cache.entries()) {
+      if (now - item.timestamp > item.ttl) {
+        expiredCount++;
       }
+      totalSize += JSON.stringify(item.value).length;
+    }
+
+    return {
+      size: this.cache.size,
+      maxSize: this.maxSize,
+      expiredItems: expiredCount,
+      totalSizeBytes: totalSize,
+      hitRate: this.stats.hits / (this.stats.hits + this.stats.misses) || 0,
+      ...this.stats
     };
   }
 
   /**
-   * Métodos de conveniencia para casos específicos
+   * Evict el item más antiguo (LRU)
    */
+  private evictOldest(): void {
+    let oldestKey: string | null = null;
+    let oldestTime = Date.now();
 
-  // Cache para conversaciones
-  async cacheConversation(conversationId: string, data: any): Promise<void> {
-    await this.set(`conversation:${conversationId}`, data, 3600); // 1 hora
-  }
+    for (const [key, item] of this.cache.entries()) {
+      if (item.lastAccessed.getTime() < oldestTime) {
+        oldestTime = item.lastAccessed.getTime();
+        oldestKey = key;
+      }
+    }
 
-  async getCachedConversation(conversationId: string): Promise<any> {
-    return await this.get(`conversation:${conversationId}`);
-  }
-
-  // Cache para inventario SOAP
-  async cacheInventory(productCode: string, posId: string, data: any): Promise<void> {
-    await this.set(`inventory:${posId}:${productCode}`, data, 300); // 5 minutos
-  }
-
-  async getCachedInventory(productCode: string, posId: string): Promise<any> {
-    return await this.get(`inventory:${posId}:${productCode}`);
-  }
-
-  // Cache para resultados de funciones LLM
-  async cacheFunctionResult(functionName: string, args: any, result: any): Promise<void> {
-    const argsHash = this.hashObject(args);
-    await this.set(`function:${functionName}:${argsHash}`, result, 600); // 10 minutos
-  }
-
-  async getCachedFunctionResult(functionName: string, args: any): Promise<any> {
-    const argsHash = this.hashObject(args);
-    return await this.get(`function:${functionName}:${argsHash}`);
-  }
-
-  private hashObject(obj: any): string {
-    return Buffer.from(JSON.stringify(obj)).toString('base64').substring(0, 16);
-  }
-
-  // Invalidación específica
-  async invalidateConversations(): Promise<number> {
-    return await this.invalidate('conversation:*');
-  }
-
-  async invalidateInventory(): Promise<number> {
-    return await this.invalidate('inventory:*');
-  }
-
-  async invalidateFunctionResults(): Promise<number> {
-    return await this.invalidate('function:*');
+    if (oldestKey) {
+      this.cache.delete(oldestKey);
+      logger.debug('Cache item evicted (LRU)', { key: oldestKey });
+    }
   }
 
   /**
-   * Cleanup al cerrar la aplicación
+   * Limpiar items expirados
+   */
+  private cleanupExpiredItems(): void {
+    const now = Date.now();
+    let removedCount = 0;
+
+    for (const [key, item] of this.cache.entries()) {
+      if (now - item.timestamp > item.ttl) {
+        this.cache.delete(key);
+        removedCount++;
+      }
+    }
+
+    if (removedCount > 0) {
+      logger.info('Cache cleanup completado');
+    }
+  }
+
+  /**
+   * Destruir el servicio y limpiar recursos
    */
   destroy(): void {
-    if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
     }
-    
-    this.memoryCache.clear();
-    this.memoryCacheSize = 0;
-    
-    logger.info('Cache service destroyed', {
-      service: 'cache'
-    });
+    this.clear();
+    logger.info('Cache service destruido');
   }
 }
 
-// Exportar instancia singleton
-export const cacheService = new CacheService(); 
+// Instancia singleton
+export const cacheService = new CacheService(
+  parseInt(process.env.CACHE_MAX_SIZE || '1000')
+);
+
+export default cacheService; 

@@ -57,6 +57,7 @@ const database_service_1 = require("./database.service");
 const config_1 = require("../config");
 const advanced_conversation_engine_1 = require("./conversation/advanced-conversation-engine");
 const automotive_parts_conversation_service_1 = require("./conversation/automotive-parts-conversation.service");
+const logger_1 = require("../config/logger");
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 class ChatbotService {
@@ -78,12 +79,13 @@ class ChatbotService {
         this.advancedEngine = new advanced_conversation_engine_1.AdvancedConversationEngine();
         this.automotivePartsService = new automotive_parts_conversation_service_1.AutomotivePartsConversationService();
         this.startCleanupInterval();
+        logger_1.logger.info('ChatbotService inicializado');
     }
     /**
      * Limpiar sesiones expiradas - OPTIMIZADO
      */
     startCleanupInterval() {
-        setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // REDUCIDO a cada 3 minutos
+        this.cleanupInterval = setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // REDUCIDO a cada 3 minutos
     }
     /**
      * Detectar si el mensaje es sobre piezas automotrices
@@ -103,7 +105,7 @@ class ChatbotService {
         // Verificar si el mensaje contiene palabras clave automotrices
         for (const keyword of automotiveKeywords) {
             if (normalizedMessage.includes(keyword)) {
-                console.log(`[ChatbotService] Detectada palabra clave automotriz: "${keyword}"`);
+                logger_1.logger.debug('Detectada palabra clave automotriz', { keyword });
                 return true;
             }
         }
@@ -116,7 +118,7 @@ class ChatbotService {
         ];
         for (const brand of carBrands) {
             if (normalizedMessage.includes(brand)) {
-                console.log(`[ChatbotService] Detectada marca de auto: "${brand}"`);
+                logger_1.logger.debug('Detectada marca de auto', { brand });
                 return true;
             }
         }
@@ -128,11 +130,14 @@ class ChatbotService {
     processWhatsAppMessage(phoneNumber, message) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(`[ChatbotService] Procesando mensaje de ${phoneNumber}: ${message.substring(0, 50)}...`);
+                logger_1.logger.debug('Procesando mensaje de WhatsApp', {
+                    phoneNumber,
+                    messagePreview: message.substring(0, 50)
+                });
                 // Detectar si el mensaje es sobre piezas automotrices
                 const isAutomotivePartsRequest = this.isAutomotivePartsMessage(message);
                 if (isAutomotivePartsRequest) {
-                    console.log(`[ChatbotService] Detectado mensaje de piezas automotrices, usando servicio especializado`);
+                    logger_1.logger.info('Detectado mensaje de piezas automotrices, usando servicio especializado', { phoneNumber });
                     const request = {
                         conversationId: `wa-${phoneNumber}`,
                         userId: phoneNumber,
@@ -141,7 +146,10 @@ class ChatbotService {
                         pointOfSaleId: 'default'
                     };
                     const response = yield this.automotivePartsService.processAutomotivePartsConversation(request);
-                    console.log(`[ChatbotService] Respuesta de piezas automotrices: ${response.response.substring(0, 100)}...`);
+                    logger_1.logger.debug('Respuesta de piezas automotrices generada', {
+                        phoneNumber,
+                        responsePreview: response.response.substring(0, 100)
+                    });
                     return {
                         response: response.response,
                         shouldSend: true,
@@ -748,9 +756,6 @@ Recuerda: ¡SOLO busca productos cuando tengas pieza Y datos del auto! 🚀`
             return 'collecting_part';
         }
     }
-    /**
-     * Limpiar sesiones expiradas
-     */
     /**
      * OPTIMIZADO: Cleanup selectivo de sesiones expiradas
      */

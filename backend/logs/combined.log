@@ -49422,3 +49422,69 @@
   message: 'System metrics',
   timestamp: '2025-08-01 11:25:45.857'
 }
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-01T19:00:28.599Z","warningThreshold":"80%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 13:00:30.845'
+}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-01T19:00:30.086Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-01T19:00:30.113Z"}
+{"level":"debug","message":"Estado de variables de entorno","timestamp":"2025-08-01T19:00:30.795Z"}
+{"level":"info","message":"Iniciando limpieza de sesiones al arranque","timestamp":"2025-08-01T19:00:30.801Z"}
+{"level":"info","message":"Rate limiter limpiado","timestamp":"2025-08-01T19:00:30.865Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-01T19:00:30.867Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-01T19:00:30.869Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-01T19:00:30.870Z"}
+{"level":"info","message":"0 conversaciones inactivas limpiadas","timestamp":"2025-08-01T19:00:30.894Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-01T19:00:30.895Z"}
+{"level":"info","message":"Limpieza de sesiones completada al arranque","timestamp":"2025-08-01T19:00:30.895Z"}
+{"level":"info","message":"WhatsApp Service inicializado con base de datos","timestamp":"2025-08-01T19:00:30.896Z"}
+{"level":"info","message":"Socket.IO integrado con WhatsApp Service","timestamp":"2025-08-01T19:00:30.896Z"}
+{"level":"info","message":"Inicializando servicios","timestamp":"2025-08-01T19:00:30.896Z"}
+{"isRunning":false,"level":"info","message":"Servicio de limpieza de sesiones inicializado","timestamp":"2025-08-01T19:00:30.896Z"}
+{"intervalMs":60000,"level":"info","message":"Performance monitor iniciado","timestamp":"2025-08-01T19:00:30.897Z"}
+{"level":"info","message":"Performance monitor inicializado correctamente","timestamp":"2025-08-01T19:00:30.897Z"}
+{"criticalThreshold":"95%","isMonitoring":true,"level":"info","message":"Memory monitor inicializado","timestamp":"2025-08-01T19:00:30.897Z","warningThreshold":"80%"}
+{"environment":"development","level":"info","message":"🚀 Aplicación iniciada","port":3002,"timestamp":"2025-08-01T19:00:30.963Z"}
+{"environment":"development","level":"info","memoryMonitoring":true,"message":"Backend iniciado correctamente","port":3002,"timestamp":"2025-08-01T19:00:30.964Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 13:00:30.865'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-01 13:00:30.866'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-01 13:00:30.867'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 13:00:36.188'
+}
+{"data":{"conversation":{"contactId":"08a163e3-e551-4564-817f-783211a20cfa","contactName":"Karol Alexis","id":"3da4d470-b877-48e9-bfae-64674d332c47","unreadCount":0},"message":{"clientId":"msg_1754074844811_zewv27y7m","contactId":"08a163e3-e551-4564-817f-783211a20cfa","conversationId":"3da4d470-b877-48e9-bfae-64674d332c47","from":"us","id":310,"message":"llegan?","read":false,"timestamp":"2025-08-01T19:00:46.543Z","to":"5215549679734","type":"text","waMessageId":"wamid.HBgNNTIxNTU0OTY3OTczNBUCABEYEjFGN0M0RjVFQTg0NDU3ODQxNQA="},"timestamp":"2025-08-01T19:00:48.212Z"},"event":"new_message","level":"debug","message":"Evento WebSocket emitido","timestamp":"2025-08-01T19:00:48.213Z"}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 210, heapTotal: 220 },
+    uptime: 34,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 13:01:00.362'
+}
+{"level":"info","message":"Cerrando servidor (SIGINT)","timestamp":"2025-08-01T19:01:03.459Z"}

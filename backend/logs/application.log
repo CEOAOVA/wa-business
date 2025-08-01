@@ -50662,3 +50662,46 @@
   message: 'System metrics',
   timestamp: '2025-08-01 11:25:45.857'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 13:00:30.845'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 13:00:30.865'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-01 13:00:30.866'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-01 13:00:30.867'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 13:00:36.188'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 210, heapTotal: 220 },
+    uptime: 34,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 13:01:00.362'
+}

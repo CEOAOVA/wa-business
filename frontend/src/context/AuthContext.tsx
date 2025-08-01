@@ -2,7 +2,8 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
 import { authApiService } from '../services/auth-api';
-import { cleanupInvalidAuth, clearAllAuthData, refreshTokenIfNeeded } from '../utils/auth-cleanup';
+import { cleanupInvalidAuth, clearAllAuthData, refreshTokenIfNeeded, getRefreshStats } from '../utils/auth-cleanup';
+import logger from '../services/logger';
 
 // Estado inicial
 const initialState: AuthState = {
@@ -77,6 +78,7 @@ interface AuthContextType {
   updateUser: (data: Partial<User>) => void;
   clearError: () => void;
   checkAuth: () => Promise<void>;
+  getRefreshStats: () => any;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -98,132 +100,59 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // @ts-ignore - Hacer funciones disponibles globalmente para debug
     window.authDebug = {
-      checkAuthStatus: () => {
-        const token = localStorage.getItem('authToken');
-        const rememberAuth = localStorage.getItem('rememberAuth');
-        const sessionData = sessionStorage.length;
-        
-        console.log('🔍 Estado de autenticación:');
-        console.log('  • Token:', token ? '✅ Presente' : '❌ No encontrado');
-        console.log('  • Remember Auth:', rememberAuth ? '✅ Activado' : '❌ No activado');
-        console.log('  • Session Storage:', sessionData > 0 ? `⚠️ ${sessionData} elementos` : '✅ Vacío');
-        
-        if (token) {
-          try {
-            const parts = token.split('.');
-            if (parts.length === 3) {
-              const payload = JSON.parse(atob(parts[1]));
-              const currentTime = Math.floor(Date.now() / 1000);
-              const isExpired = payload.exp && payload.exp < currentTime;
-              console.log('  • Token expirado:', isExpired ? '❌ Sí' : '✅ No');
-            }
-          } catch (error) {
-            console.log('  • Error al decodificar token:', error);
-          }
-        }
-        
-        return { hasToken: !!token, hasRememberAuth: !!rememberAuth, sessionDataCount: sessionData };
-      },
-      clearAuthSession: () => {
-        console.log('🗑️ Limpiando sesión...');
-        clearAllAuthData();
-        dispatch({ type: 'LOGOUT' });
-        console.log('✅ Sesión limpiada');
-      },
-      forceLogout: () => {
-        console.log('🚪 Forzando logout...');
-        clearAllAuthData();
-        dispatch({ type: 'LOGOUT' });
-        window.location.href = '/login';
-      },
-      reloadPage: () => {
-        console.log('🔄 Recargando página...');
-        window.location.reload();
-      },
-      goToLogin: () => {
-        console.log('🚀 Navegando al login...');
-        window.location.href = '/login';
-      },
-      getAuthState: () => {
-        console.log('📊 Estado del contexto:', state);
-        return state;
-      }
+      checkAuth,
+      getRefreshStats,
+      getAuthState: () => state,
     };
-    
-    console.log('🔧 Debug de autenticación disponible. Usa: window.authDebug.functionName()');
-    console.log('📋 Funciones disponibles:');
-    console.log('  • window.authDebug.checkAuthStatus()');
-    console.log('  • window.authDebug.clearAuthSession()');
-    console.log('  • window.authDebug.forceLogout()');
-    console.log('  • window.authDebug.reloadPage()');
-    console.log('  • window.authDebug.goToLogin()');
-    console.log('  • window.authDebug.getAuthState()');
   }, [state]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      console.log('🔐 [AuthContext] Iniciando login...');
       dispatch({ type: 'AUTH_START' });
+      logger.debug('Iniciando login', { email: credentials.email }, 'AuthContext');
+
+      const response = await authApiService.login(credentials);
       
-      const response = await authApiService.login({
-        email: credentials.email,
-        password: credentials.password,
-      });
-      
-      console.log('✅ [AuthContext] Login exitoso, guardando token...');
-      console.log('✅ [AuthContext] Respuesta completa:', response);
-      
-      // Guardar token inmediatamente después del login exitoso
-      if (response.session?.access_token) {
-        localStorage.setItem('authToken', response.session.access_token);
-        console.log('✅ [AuthContext] Token guardado:', response.session.access_token.substring(0, 20) + '...');
-        console.log('✅ [AuthContext] Verificando que se guardó correctamente...');
-        const savedToken = localStorage.getItem('authToken');
-        console.log('✅ [AuthContext] Token recuperado después de guardar:', savedToken ? 'SÍ' : 'NO');
-        if (savedToken) {
-          console.log('✅ [AuthContext] Token recuperado length:', savedToken.length);
-          console.log('✅ [AuthContext] Token recuperado preview:', savedToken.substring(0, 20) + '...');
+      // El response ya contiene user y session directamente
+      if (response.user && response.session) {
+        // Guardar token en localStorage
+        if (response.session.access_token) {
+          localStorage.setItem('authToken', response.session.access_token);
+          localStorage.setItem('rememberAuth', 'true');
         }
+        
+        // Convertir el usuario al formato esperado
+        const user = authApiService.convertToUser(response.user);
+        
+        logger.info('Login exitoso', { userId: user.id, email: user.email }, 'AuthContext');
+        dispatch({ type: 'AUTH_SUCCESS', payload: user });
       } else {
-        console.warn('⚠️ [AuthContext] No se recibió token en la respuesta');
+        throw new Error('Respuesta inválida del servidor');
       }
-      
-      // El response.user ya es del tipo correcto, solo necesitamos convertirlo al formato del frontend
-      console.log('✅ [AuthContext] Convirtiendo usuario:', response.user);
-      const user = authApiService.convertToUser(response.user);
-      console.log('✅ [AuthContext] Usuario convertido:', user);
-      dispatch({ type: 'AUTH_SUCCESS', payload: user });
-      
-      // Guardar preferencia de recordar sesión
-      if (credentials.rememberMe) {
-        localStorage.setItem('rememberAuth', 'true');
-      }
-      
-      console.log('✅ [AuthContext] Login completado exitosamente');
     } catch (error) {
-      console.error('❌ [AuthContext] Error en login:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error de autenticación';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido en login';
+      logger.error('Error en login', { error: errorMessage }, 'AuthContext');
       dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
-      throw error;
     }
   };
 
   const logout = async () => {
     try {
-      console.log('🔐 [AuthContext] Iniciando logout...');
+      logger.debug('Iniciando logout', {}, 'AuthContext');
       
-      // Solo intentar logout en el servidor si hay token
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        await authApiService.logout();
-      }
+      // Llamar al endpoint de logout del backend
+      await authApiService.logout();
+      
+      // Limpiar datos locales
+      clearAllAuthData();
+      
+      logger.info('Logout exitoso', {}, 'AuthContext');
+      dispatch({ type: 'LOGOUT' });
     } catch (error) {
-      console.error('❌ [AuthContext] Error durante logout:', error);
-    } finally {
-      // Limpiar todos los datos de autenticación
+      logger.error('Error en logout', { error: error instanceof Error ? error.message : String(error) }, 'AuthContext');
+      // Aún limpiar datos locales aunque falle el logout del backend
       clearAllAuthData();
       dispatch({ type: 'LOGOUT' });
-      console.log('✅ [AuthContext] Logout completado');
     }
   };
 
@@ -237,26 +166,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      console.log('🔐 [AuthContext] Verificando autenticación...');
+      logger.debug('Verificando autenticación', {}, 'AuthContext');
       
       // Limpiar datos de autenticación inválidos antes de verificar
-      console.log('🔐 [AuthContext] Antes de cleanupInvalidAuth - Token:', localStorage.getItem('authToken') ? 'EXISTE' : 'NO EXISTE');
+      logger.debug('Antes de cleanupInvalidAuth', { 
+        hasToken: !!localStorage.getItem('authToken') 
+      }, 'AuthContext');
+      
       cleanupInvalidAuth();
-      console.log('🔐 [AuthContext] Después de cleanupInvalidAuth - Token:', localStorage.getItem('authToken') ? 'EXISTE' : 'NO EXISTE');
+      
+      logger.debug('Después de cleanupInvalidAuth', { 
+        hasToken: !!localStorage.getItem('authToken') 
+      }, 'AuthContext');
       
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.log('🔐 [AuthContext] No hay token, usuario no autenticado');
+        logger.debug('No hay token, usuario no autenticado', {}, 'AuthContext');
         dispatch({ type: 'LOGOUT' });
         return;
       }
 
-      console.log('🔐 [AuthContext] Token encontrado, verificando validez...');
+      logger.debug('Token encontrado, verificando validez', {}, 'AuthContext');
 
       // Intentar refrescar el token si es necesario
       const tokenRefreshed = await refreshTokenIfNeeded();
       if (!tokenRefreshed) {
-        console.log('🔐 [AuthContext] Token no válido, limpiando sesión');
+        logger.warn('Token no válido, limpiando sesión', {}, 'AuthContext');
         dispatch({ type: 'LOGOUT' });
         return;
       }
@@ -264,13 +199,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: 'AUTH_START' });
       
       try {
-        console.log('🔐 [AuthContext] Obteniendo perfil de usuario...');
+        logger.debug('Obteniendo perfil de usuario', {}, 'AuthContext');
         const profile = await authApiService.getProfile();
         // El perfil ya es un User, no necesitamos convertirlo
         dispatch({ type: 'AUTH_SUCCESS', payload: profile });
-        console.log('✅ [AuthContext] Usuario autenticado:', profile.name);
+        logger.info('Usuario autenticado', { name: profile.name }, 'AuthContext');
       } catch (profileError) {
-        console.warn('⚠️ [AuthContext] Error obteniendo perfil, intentando verificar estado...');
+        logger.warn('Error obteniendo perfil, intentando verificar estado', { 
+          error: profileError instanceof Error ? profileError.message : String(profileError) 
+        }, 'AuthContext');
         
         // Intentar verificar estado de autenticación de forma más simple
         try {
@@ -286,19 +223,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (statusData.data?.isAuthenticated && statusData.data?.user) {
               // El usuario del status ya es un User, no necesitamos convertirlo
               dispatch({ type: 'AUTH_SUCCESS', payload: statusData.data.user });
-              console.log('✅ [AuthContext] Usuario autenticado via status check');
+              logger.info('Usuario autenticado via status check', {}, 'AuthContext');
               return;
             }
           }
         } catch (statusError) {
-          console.warn('⚠️ [AuthContext] Error en status check:', statusError);
+          logger.warn('Error en status check', { 
+            error: statusError instanceof Error ? statusError.message : String(statusError) 
+          }, 'AuthContext');
         }
         
         // Si todo falla, limpiar sesión
         throw profileError;
       }
     } catch (error) {
-      console.error('❌ [AuthContext] Error verificando autenticación:', error);
+      logger.error('Error verificando autenticación', { 
+        error: error instanceof Error ? error.message : String(error) 
+      }, 'AuthContext');
       // Limpiar token inválido y estado
       clearAllAuthData();
       dispatch({ type: 'LOGOUT' });
@@ -312,6 +253,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateUser,
     clearError,
     checkAuth,
+    getRefreshStats,
   };
 
   return (

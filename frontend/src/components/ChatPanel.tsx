@@ -10,6 +10,7 @@ import MediaUpload from "./MediaUpload";
 import ContactInfoComponent from "./ContactInfo";
 import whatsappApi from "../services/whatsapp-api";
 import type { Message } from "../types";
+import logger from "../services/logger";
 
 // Componente para una burbuja de mensaje individual
 const MessageBubble: React.FC<{
@@ -77,9 +78,9 @@ const ChatPanel: React.FC = () => {
   });
 
   // DEBUG: Logging para mensajes
-  console.log(`📨 [ChatPanel] Chat actual:`, currentChat);
-  console.log(`📨 [ChatPanel] Mensajes recibidos: ${messages.length}`);
-  console.log(`📨 [ChatPanel] Mensajes:`, messages);
+  logger.debug('Chat actual', { currentChat }, 'ChatPanel');
+  logger.debug('Mensajes recibidos', { count: messages.length }, 'ChatPanel');
+  logger.debug('Mensajes', { messages }, 'ChatPanel');
 
   // States existentes
   const [newMessage, setNewMessage] = useState("");

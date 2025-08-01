@@ -18,6 +18,7 @@ const whatsapp_1 = require("../config/whatsapp");
 const database_service_1 = require("./database.service");
 const database_1 = require("../types/database");
 const chatbot_service_1 = require("./chatbot.service"); // NUEVO: Import del chatbot
+const logger_1 = require("../config/logger");
 class WhatsAppService {
     constructor() {
         this.lastMessages = new Map(); // Almacenar últimos mensajes temporalmente
@@ -28,13 +29,13 @@ class WhatsAppService {
             try {
                 this.io = socketIo;
                 yield database_service_1.databaseService.connect();
-                console.log('✅ WhatsApp Service inicializado con base de datos');
+                logger_1.logger.info('WhatsApp Service inicializado con base de datos');
                 if (socketIo) {
-                    console.log('🌐 Socket.IO integrado con WhatsApp Service');
+                    logger_1.logger.info('Socket.IO integrado con WhatsApp Service');
                 }
             }
             catch (error) {
-                console.error('❌ Error inicializando WhatsApp Service:', error);
+                logger_1.logger.error('Error inicializando WhatsApp Service', { error: error instanceof Error ? error.message : String(error) });
                 throw error;
             }
         });
@@ -50,10 +51,10 @@ class WhatsAppService {
                 volatile: false, // Asegurar entrega
                 timeout: 5000 // Timeout de 5 segundos
             });
-            console.log(`🌐 [Socket] Evento '${event}' emitido:`, data);
+            logger_1.logger.debug('Evento WebSocket emitido', { event, data });
         }
         else {
-            console.log(`⚠️ [Socket] No hay conexión WebSocket para emitir evento '${event}'`);
+            logger_1.logger.warn('No hay conexión WebSocket para emitir evento', { event });
         }
     }
     /**

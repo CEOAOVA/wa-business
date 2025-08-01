@@ -8,212 +8,184 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const monitoring_service_1 = require("../services/monitoring/monitoring-service");
-const bulkhead_service_1 = require("../services/resilience/bulkhead.service");
-const circuit_breaker_service_1 = require("../services/circuit-breaker/circuit-breaker.service");
-const router = (0, express_1.Router)();
-/**
- * GET /api/monitoring/health
- * Health check del sistema
- */
-router.get('/health', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const healthReport = monitoring_service_1.monitoringService.generateHealthReport();
-        res.json(Object.assign({ success: true, timestamp: new Date().toISOString() }, healthReport));
-    }
-    catch (error) {
-        res.status(500).json({
-            success: false,
-            error: 'Error generando health report',
-            timestamp: new Date().toISOString()
-        });
-    }
-}));
-/**
- * GET /api/monitoring/metrics
- * Métricas actuales del sistema
- */
+const express_1 = __importDefault(require("express"));
+const performance_metrics_1 = require("../services/monitoring/performance-metrics");
+const memory_monitor_1 = require("../services/monitoring/memory-monitor");
+const logger_1 = require("../config/logger");
+const router = express_1.default.Router();
+// Endpoint para obtener métricas de rendimiento
 router.get('/metrics', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const metrics = monitoring_service_1.monitoringService.getMetrics();
-        const bulkheadMetrics = bulkhead_service_1.bulkheadService.getAllMetrics();
-        const bulkheadStatus = bulkhead_service_1.bulkheadService.getAllStatus();
+        const metrics = performance_metrics_1.performanceMonitor.getMetricsSummary();
+        const memoryStats = memory_monitor_1.memoryMonitor.getMemoryStats();
         res.json({
             success: true,
-            timestamp: new Date().toISOString(),
-            metrics: Object.assign(Object.assign({}, metrics), { bulkhead: {
-                    metrics: bulkheadMetrics,
-                    status: bulkheadStatus
-                }, circuitBreakers: {
-                    supabase: circuit_breaker_service_1.supabaseCircuitBreaker.getMetrics(),
-                    soap: circuit_breaker_service_1.soapCircuitBreaker.getMetrics(),
-                    whatsapp: circuit_breaker_service_1.whatsappCircuitBreaker.getMetrics()
-                } })
-        });
-    }
-    catch (error) {
-        res.status(500).json({
-            success: false,
-            error: 'Error obteniendo métricas',
-            timestamp: new Date().toISOString()
-        });
-    }
-}));
-/**
- * GET /api/monitoring/alerts
- * Alertas activas del sistema
- */
-router.get('/alerts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const metrics = monitoring_service_1.monitoringService.getMetrics();
-        const alerts = metrics.alerts;
-        res.json({
-            success: true,
-            timestamp: new Date().toISOString(),
-            alerts: {
-                total: alerts.length,
-                critical: alerts.filter((a) => a.type === 'critical').length,
-                error: alerts.filter((a) => a.type === 'error').length,
-                warning: alerts.filter((a) => a.type === 'warning').length,
-                list: alerts
+            data: {
+                performance: metrics,
+                memory: memoryStats,
+                timestamp: new Date().toISOString()
             }
         });
     }
     catch (error) {
+        logger_1.logger.error('Error obteniendo métricas', { error: error instanceof Error ? error.message : String(error) });
         res.status(500).json({
             success: false,
-            error: 'Error obteniendo alertas',
-            timestamp: new Date().toISOString()
+            error: 'Error obteniendo métricas del sistema'
         });
     }
 }));
-/**
- * POST /api/monitoring/alerts/:alertId/resolve
- * Resolver una alerta específica
- */
-router.post('/alerts/:alertId/resolve', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint para obtener métricas específicas
+router.get('/metrics/:name', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { alertId } = req.params;
-        monitoring_service_1.monitoringService.resolveAlert(alertId);
+        const { name } = req.params;
+        const { limit = 100 } = req.query;
+        const metrics = performance_metrics_1.performanceMonitor.getMetrics(name, parseInt(limit));
         res.json({
             success: true,
-            message: 'Alerta resuelta correctamente',
-            timestamp: new Date().toISOString()
+            data: {
+                name,
+                metrics,
+                count: metrics.length
+            }
         });
     }
     catch (error) {
+        logger_1.logger.error('Error obteniendo métricas específicas', {
+            name: req.params.name,
+            error: error instanceof Error ? error.message : String(error)
+        });
         res.status(500).json({
             success: false,
-            error: 'Error resolviendo alerta',
-            timestamp: new Date().toISOString()
+            error: 'Error obteniendo métricas específicas'
         });
     }
 }));
-/**
- * GET /api/monitoring/history
- * Historial de métricas
- */
-router.get('/history', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Endpoint para obtener thresholds
+router.get('/thresholds', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { hours = 1 } = req.query;
-        const history = monitoring_service_1.monitoringService.getMetricsHistory();
-        // Filtrar por horas si se especifica
-        const cutoffTime = Date.now() - (parseInt(hours) * 60 * 60 * 1000);
-        const filteredHistory = {
-            webSocket: history.webSocket.filter((entry) => entry.lastHeartbeat.getTime() > cutoffTime),
-            supabase: history.supabase.filter((entry) => entry.lastHealthCheck.getTime() > cutoffTime),
-            system: history.system.filter((entry) => entry.uptime > (process.uptime() - parseInt(hours) * 3600))
-        };
+        const thresholds = performance_metrics_1.performanceMonitor.getThresholds();
+        const thresholdData = {};
+        for (const [name, threshold] of thresholds) {
+            thresholdData[name] = threshold;
+        }
         res.json({
             success: true,
-            timestamp: new Date().toISOString(),
-            hours: parseInt(hours),
-            history: filteredHistory
+            data: thresholdData
         });
     }
     catch (error) {
+        logger_1.logger.error('Error obteniendo thresholds', { error: error instanceof Error ? error.message : String(error) });
         res.status(500).json({
             success: false,
-            error: 'Error obteniendo historial',
-            timestamp: new Date().toISOString()
+            error: 'Error obteniendo thresholds'
         });
     }
 }));
-/**
- * GET /api/monitoring/status
- * Estado general del sistema
- */
+// Endpoint para actualizar thresholds
+router.put('/thresholds/:name', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name } = req.params;
+        const { warning, critical, action } = req.body;
+        if (!warning || !critical || !action) {
+            return res.status(400).json({
+                success: false,
+                error: 'Se requieren warning, critical y action'
+            });
+        }
+        performance_metrics_1.performanceMonitor.setThreshold(name, { warning, critical, action });
+        res.json({
+            success: true,
+            message: `Threshold ${name} actualizado correctamente`
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Error actualizando threshold', {
+            name: req.params.name,
+            error: error instanceof Error ? error.message : String(error)
+        });
+        res.status(500).json({
+            success: false,
+            error: 'Error actualizando threshold'
+        });
+    }
+}));
+// Endpoint para limpiar métricas
+router.delete('/metrics', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name } = req.query;
+        if (name) {
+            performance_metrics_1.performanceMonitor.clearMetrics(name);
+        }
+        else {
+            performance_metrics_1.performanceMonitor.clearMetrics();
+        }
+        res.json({
+            success: true,
+            message: name ? `Métricas ${name} limpiadas` : 'Todas las métricas limpiadas'
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Error limpiando métricas', { error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({
+            success: false,
+            error: 'Error limpiando métricas'
+        });
+    }
+}));
+// Endpoint para obtener estado del sistema
 router.get('/status', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
     try {
-        const healthReport = monitoring_service_1.monitoringService.generateHealthReport();
-        const metrics = monitoring_service_1.monitoringService.getMetrics();
-        const bulkheadStatus = bulkhead_service_1.bulkheadService.getAllStatus();
-        // Calcular uptime
-        const uptime = process.uptime();
-        const uptimeFormatted = {
-            seconds: Math.floor(uptime),
-            minutes: Math.floor(uptime / 60),
-            hours: Math.floor(uptime / 3600),
-            days: Math.floor(uptime / 86400)
+        const memoryStats = memory_monitor_1.memoryMonitor.getMemoryStats();
+        const latestMetrics = performance_metrics_1.performanceMonitor.getMetricsSummary();
+        // Obtener métricas críticas
+        const criticalMetrics = {
+            memory_usage: ((_a = latestMetrics.memory_usage) === null || _a === void 0 ? void 0 : _a.latest) || 0,
+            cpu_usage: ((_b = latestMetrics.cpu_usage) === null || _b === void 0 ? void 0 : _b.latest) || 0,
+            network_connections: ((_c = latestMetrics.network_connections) === null || _c === void 0 ? void 0 : _c.latest) || 0,
+            websocket_connections: ((_d = latestMetrics.websocket_connections) === null || _d === void 0 ? void 0 : _d.latest) || 0
         };
+        // Determinar estado general del sistema
+        let systemStatus = 'healthy';
+        let issues = [];
+        if (criticalMetrics.memory_usage > 90) {
+            systemStatus = 'critical';
+            issues.push('Uso de memoria crítico');
+        }
+        else if (criticalMetrics.memory_usage > 80) {
+            systemStatus = 'warning';
+            issues.push('Uso de memoria alto');
+        }
+        if (criticalMetrics.cpu_usage > 90) {
+            systemStatus = 'critical';
+            issues.push('Uso de CPU crítico');
+        }
+        else if (criticalMetrics.cpu_usage > 70) {
+            if (systemStatus === 'healthy')
+                systemStatus = 'warning';
+            issues.push('Uso de CPU alto');
+        }
         res.json({
             success: true,
-            timestamp: new Date().toISOString(),
-            status: {
-                health: healthReport.status,
-                uptime: uptimeFormatted,
-                memory: {
-                    used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-                    total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-                    external: Math.round(process.memoryUsage().external / 1024 / 1024)
-                },
-                websocket: {
-                    activeConnections: metrics.webSocket.activeConnections,
-                    averageLatency: metrics.webSocket.averageLatency,
-                    heartbeatSuccessRate: metrics.webSocket.heartbeatSuccessRate
-                },
-                supabase: {
-                    poolUtilization: metrics.supabase.poolUtilization,
-                    activeConnections: metrics.supabase.activeConnections,
-                    errorRate: metrics.supabase.errorRate
-                },
-                bulkhead: bulkheadStatus,
-                alerts: {
-                    total: metrics.alerts.length,
-                    critical: metrics.alerts.filter((a) => a.type === 'critical').length
-                }
+            data: {
+                status: systemStatus,
+                issues,
+                memory: memoryStats,
+                metrics: criticalMetrics,
+                timestamp: new Date().toISOString()
             }
         });
     }
     catch (error) {
+        logger_1.logger.error('Error obteniendo estado del sistema', { error: error instanceof Error ? error.message : String(error) });
         res.status(500).json({
             success: false,
-            error: 'Error obteniendo estado del sistema',
-            timestamp: new Date().toISOString()
-        });
-    }
-}));
-/**
- * POST /api/monitoring/cleanup
- * Limpiar datos antiguos y bulkheads inactivos
- */
-router.post('/cleanup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // Limpiar bulkheads inactivos
-        bulkhead_service_1.bulkheadService.cleanup();
-        res.json({
-            success: true,
-            message: 'Cleanup completado',
-            timestamp: new Date().toISOString()
-        });
-    }
-    catch (error) {
-        res.status(500).json({
-            success: false,
-            error: 'Error durante cleanup',
-            timestamp: new Date().toISOString()
+            error: 'Error obteniendo estado del sistema'
         });
     }
 }));

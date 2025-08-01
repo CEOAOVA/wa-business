@@ -4,6 +4,7 @@ import { whatsappConfig, buildApiUrl, getHeaders } from '../config/whatsapp';
 import { databaseService } from './database.service';
 import { MessageType } from '../types/database';
 import { chatbotService } from './chatbot.service'; // NUEVO: Import del chatbot
+import { logger, logHelper } from '../config/logger';
 
 export interface SendMessageRequest {
   to: string;
@@ -60,12 +61,12 @@ export class WhatsAppService {
     try {
       this.io = socketIo;
       await databaseService.connect();
-      console.log('✅ WhatsApp Service inicializado con base de datos');
+      logger.info('WhatsApp Service inicializado con base de datos');
       if (socketIo) {
-        console.log('🌐 Socket.IO integrado con WhatsApp Service');
+        logger.info('Socket.IO integrado con WhatsApp Service');
       }
     } catch (error) {
-      console.error('❌ Error inicializando WhatsApp Service:', error);
+      logger.error('Error inicializando WhatsApp Service', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
@@ -81,9 +82,9 @@ export class WhatsAppService {
         volatile: false, // Asegurar entrega
         timeout: 5000 // Timeout de 5 segundos
       });
-      console.log(`🌐 [Socket] Evento '${event}' emitido:`, data);
+      logger.debug('Evento WebSocket emitido', { event, data });
     } else {
-      console.log(`⚠️ [Socket] No hay conexión WebSocket para emitir evento '${event}'`);
+      logger.warn('No hay conexión WebSocket para emitir evento', { event });
     }
   }
 

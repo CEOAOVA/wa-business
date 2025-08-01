@@ -19,6 +19,7 @@ export interface SendTemplateRequest {
 }
 
 import type { ApiResponse } from '../types';
+import logger from './logger';
 
 export interface WhatsAppStatus {
   configured: boolean;
@@ -51,11 +52,28 @@ export interface MessagesResponse {
 
 class WhatsAppApiService {
   private baseUrl: string = `${BACKEND_URL}/api`;
+  
+  // NUEVO: Configuración de connection check optimizado
+  private connectionCheckConfig = {
+    COOLDOWN_MS: 30000, // 30 segundos de cooldown entre checks
+    CACHE_DURATION_MS: 60000, // 1 minuto de cache para resultados exitosos
+    MAX_RETRIES: 2,
+    RETRY_DELAY_MS: 1000,
+  };
+  
+  // NUEVO: Estado del connection check
+  private connectionState = {
+    lastCheck: 0,
+    lastSuccessfulCheck: 0,
+    isChecking: false,
+    retryCount: 0,
+    lastResult: true, // Asumir conectado por defecto
+  };
+
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     
-    console.log(`🌐 [WhatsAppApi] Haciendo petición a: ${url}`);
-    console.log(`🌐 [WhatsAppApi] Opciones:`, options);
+    logger.debug('Haciendo petición WhatsApp API', { url, options }, 'whatsapp-api');
     
     // Agregar token de autenticación del usuario si existe
     const authToken = localStorage.getItem('authToken');
@@ -74,9 +92,9 @@ class WhatsAppApiService {
     
     if (authToken) {
       headers['Authorization'] = `Bearer ${authToken}`;
-      console.log('🔐 [WhatsAppApi] Token de autenticación incluido en request');
+      logger.debug('Token de autenticación incluido en request', {}, 'whatsapp-api');
     } else {
-      console.warn('⚠️ [WhatsAppApi] No hay token de autenticación disponible');
+      logger.warn('No hay token de autenticación disponible', {}, 'whatsapp-api');
     }
     
     try {
@@ -85,15 +103,19 @@ class WhatsAppApiService {
         headers,
       });
 
-      console.log(`🌐 [WhatsAppApi] Status de respuesta: ${response.status}`);
+      logger.debug('Status de respuesta recibido', { status: response.status }, 'whatsapp-api');
       
       if (!response.ok) {
-        console.error(`❌ [WhatsAppApi] Error HTTP: ${response.status} ${response.statusText}`);
+        logger.error('Error HTTP en petición', { 
+          status: response.status, 
+          statusText: response.statusText,
+          url 
+        }, 'whatsapp-api');
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log(`🌐 [WhatsAppApi] Datos recibidos:`, data);
+      logger.debug('Datos recibidos de API', { data }, 'whatsapp-api');
       
       // Asegurar que la respuesta tenga la estructura esperada
       return {
@@ -334,12 +356,96 @@ class WhatsAppApiService {
    * Obtener estado de conexión
    */
   async checkConnection(): Promise<boolean> {
-    try {
-      const response = await fetch(`${BACKEND_URL}/health`);
-      return response.ok;
-    } catch {
-      return false;
+    const now = Date.now();
+    
+    // Verificar si ya está haciendo check
+    if (this.connectionState.isChecking) {
+      logger.debug('Connection check ya en progreso, retornando último resultado', { 
+        lastResult: this.connectionState.lastResult 
+      }, 'whatsapp-api');
+      return this.connectionState.lastResult;
     }
+    
+    // Verificar cooldown
+    const timeSinceLastCheck = now - this.connectionState.lastCheck;
+    if (timeSinceLastCheck < this.connectionCheckConfig.COOLDOWN_MS) {
+      logger.debug('Connection check en cooldown, retornando último resultado', { 
+        timeSinceLastCheck,
+        lastResult: this.connectionState.lastResult 
+      }, 'whatsapp-api');
+      return this.connectionState.lastResult;
+    }
+    
+    // Verificar cache para resultados exitosos recientes
+    const timeSinceLastSuccessful = now - this.connectionState.lastSuccessfulCheck;
+    if (this.connectionState.lastResult && timeSinceLastSuccessful < this.connectionCheckConfig.CACHE_DURATION_MS) {
+      logger.debug('Usando resultado cacheado de connection check', { 
+        timeSinceLastSuccessful,
+        lastResult: this.connectionState.lastResult 
+      }, 'whatsapp-api');
+      return this.connectionState.lastResult;
+    }
+    
+    this.connectionState.isChecking = true;
+    this.connectionState.lastCheck = now;
+    
+    try {
+      logger.debug('Iniciando connection check', {}, 'whatsapp-api');
+      
+      const response = await fetch(`${BACKEND_URL}/health`);
+      const isConnected = response.ok;
+      
+      this.connectionState.lastResult = isConnected;
+      this.connectionState.isChecking = false;
+      this.connectionState.retryCount = 0;
+      
+      if (isConnected) {
+        this.connectionState.lastSuccessfulCheck = now;
+        logger.debug('Connection check exitoso', {}, 'whatsapp-api');
+      } else {
+        logger.warn('Connection check fallido', { status: response.status }, 'whatsapp-api');
+      }
+      
+      return isConnected;
+    } catch (error) {
+      this.connectionState.isChecking = false;
+      this.connectionState.retryCount++;
+      
+      logger.error('Error en connection check', { 
+        error: error instanceof Error ? error.message : String(error),
+        retryCount: this.connectionState.retryCount 
+      }, 'whatsapp-api');
+      
+      // Intentar retry si no se han agotado los intentos
+      if (this.connectionState.retryCount < this.connectionCheckConfig.MAX_RETRIES) {
+        logger.debug('Reintentando connection check', { 
+          retryCount: this.connectionState.retryCount 
+        }, 'whatsapp-api');
+        
+        setTimeout(() => {
+          this.checkConnection();
+        }, this.connectionCheckConfig.RETRY_DELAY_MS);
+        
+        return this.connectionState.lastResult; // Retornar último resultado conocido
+      } else {
+        this.connectionState.lastResult = false;
+        logger.error('Máximo de reintentos alcanzado para connection check', {}, 'whatsapp-api');
+        return false;
+      }
+    }
+  }
+
+  // NUEVO: Método para obtener estadísticas del connection check
+  getConnectionStats() {
+    return {
+      lastCheck: this.connectionState.lastCheck,
+      lastSuccessfulCheck: this.connectionState.lastSuccessfulCheck,
+      isChecking: this.connectionState.isChecking,
+      retryCount: this.connectionState.retryCount,
+      lastResult: this.connectionState.lastResult,
+      timeSinceLastCheck: Date.now() - this.connectionState.lastCheck,
+      timeSinceLastSuccessful: Date.now() - this.connectionState.lastSuccessfulCheck,
+    };
   }
 
   /**

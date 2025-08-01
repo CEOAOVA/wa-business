@@ -10,6 +10,7 @@ import { getConfig } from '../config';
 import { openRouterClient } from '../config/openai-client';
 import { AdvancedConversationEngine } from './conversation/advanced-conversation-engine';
 import { AutomotivePartsConversationService } from './conversation/automotive-parts-conversation.service';
+import { logger, logHelper } from '../config/logger';
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -98,6 +99,7 @@ interface OpenRouterTool {
 export class ChatbotService {
   private conversations = new Map<string, ConversationState>();
   private readonly SESSION_TIMEOUT_MS = 15 * 60 * 1000; // REDUCIDO de 30 a 15 minutos
+  private cleanupInterval!: NodeJS.Timeout;
   
   // NUEVO: Usar configuración centralizada
   private readonly config = getConfig();
@@ -120,13 +122,15 @@ export class ChatbotService {
     this.advancedEngine = new AdvancedConversationEngine();
     this.automotivePartsService = new AutomotivePartsConversationService();
     this.startCleanupInterval();
+    
+    logger.info('ChatbotService inicializado');
   }
 
   /**
    * Limpiar sesiones expiradas - OPTIMIZADO
    */
   private startCleanupInterval(): void {
-    setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // REDUCIDO a cada 3 minutos
+    this.cleanupInterval = setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // REDUCIDO a cada 3 minutos
   }
 
   /**
@@ -149,7 +153,7 @@ export class ChatbotService {
     // Verificar si el mensaje contiene palabras clave automotrices
     for (const keyword of automotiveKeywords) {
       if (normalizedMessage.includes(keyword)) {
-        console.log(`[ChatbotService] Detectada palabra clave automotriz: "${keyword}"`);
+        logger.debug('Detectada palabra clave automotriz', { keyword });
         return true;
       }
     }
@@ -164,7 +168,7 @@ export class ChatbotService {
 
     for (const brand of carBrands) {
       if (normalizedMessage.includes(brand)) {
-        console.log(`[ChatbotService] Detectada marca de auto: "${brand}"`);
+        logger.debug('Detectada marca de auto', { brand });
         return true;
       }
     }
@@ -182,13 +186,16 @@ export class ChatbotService {
     error?: string;
   }> {
     try {
-      console.log(`[ChatbotService] Procesando mensaje de ${phoneNumber}: ${message.substring(0, 50)}...`);
+      logger.debug('Procesando mensaje de WhatsApp', { 
+        phoneNumber, 
+        messagePreview: message.substring(0, 50) 
+      });
 
       // Detectar si el mensaje es sobre piezas automotrices
       const isAutomotivePartsRequest = this.isAutomotivePartsMessage(message);
       
       if (isAutomotivePartsRequest) {
-        console.log(`[ChatbotService] Detectado mensaje de piezas automotrices, usando servicio especializado`);
+        logger.info('Detectado mensaje de piezas automotrices, usando servicio especializado', { phoneNumber });
         
         const request = {
           conversationId: `wa-${phoneNumber}`,
@@ -200,7 +207,10 @@ export class ChatbotService {
 
         const response = await this.automotivePartsService.processAutomotivePartsConversation(request);
         
-        console.log(`[ChatbotService] Respuesta de piezas automotrices: ${response.response.substring(0, 100)}...`);
+        logger.debug('Respuesta de piezas automotrices generada', { 
+          phoneNumber,
+          responsePreview: response.response.substring(0, 100) 
+        });
 
         return {
           response: response.response,
@@ -862,9 +872,6 @@ Recuerda: ¡SOLO busca productos cuando tengas pieza Y datos del auto! 🚀`
   }
 
   /**
-   * Limpiar sesiones expiradas
-   */
-  /**
    * OPTIMIZADO: Cleanup selectivo de sesiones expiradas
    */
   private cleanupExpiredSessions(): void {
@@ -1221,7 +1228,7 @@ EJEMPLO:
        console.error('[ChatbotService] Error guardando resumen en DB:', error);
      }
    }
- }
+}
 
 // Instancia singleton
 export const chatbotService = new ChatbotService(); 
