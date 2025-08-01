@@ -367,8 +367,16 @@ class DatabaseService {
     getChatbotConversationMessages(conversationId_1) {
         return __awaiter(this, arguments, void 0, function* (conversationId, limit = 50) {
             try {
+                console.log(`📨 [DatabaseService] Obteniendo mensajes para conversación: ${conversationId} (límite: ${limit})`);
                 const messages = yield supabase_database_service_1.supabaseDatabaseService.getConversationMessages(conversationId, limit);
-                console.log(`✅ Mensajes obtenidos para conversación ${conversationId}: ${messages.length}`);
+                console.log(`📨 [DatabaseService] ${messages.length} mensajes obtenidos para ${conversationId}`);
+                // DEBUG: Contar mensajes por tipo de remitente
+                if (messages.length > 0) {
+                    const userMessages = messages.filter(m => m.sender_type === 'user').length;
+                    const botMessages = messages.filter(m => m.sender_type === 'bot').length;
+                    const agentMessages = messages.filter(m => m.sender_type === 'agent').length;
+                    console.log(`📨 [DatabaseService] Desglose de mensajes: User=${userMessages}, Bot=${botMessages}, Agent=${agentMessages}`);
+                }
                 return messages;
             }
             catch (error) {

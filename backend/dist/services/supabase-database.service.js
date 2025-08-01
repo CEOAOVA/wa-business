@@ -617,15 +617,25 @@ class SupabaseDatabaseService {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
+                console.log(`📨 [Supabase] Obteniendo mensajes para conversación: ${conversationId} (límite: ${limit})`);
+                // OPTIMIZACIÓN: Usar índices específicos y consulta más eficiente
                 const { data: messages, error } = yield supabase_1.supabase
                     .from('messages')
-                    .select('*')
+                    .select('id, conversation_id, sender_type, content, message_type, whatsapp_message_id, client_id, is_read, metadata, created_at')
                     .eq('conversation_id', conversationId)
                     .order('created_at', { ascending: true }) // Ordenar por timestamp ascendente (más antiguo primero)
                     .limit(limit);
                 if (error) {
                     console.error('❌ Error obteniendo mensajes:', error);
                     return [];
+                }
+                console.log(`📨 [Supabase] ${(messages === null || messages === void 0 ? void 0 : messages.length) || 0} mensajes obtenidos para ${conversationId}`);
+                // DEBUG: Contar mensajes por tipo de remitente
+                if (messages && messages.length > 0) {
+                    const userMessages = messages.filter(m => m.sender_type === 'user').length;
+                    const botMessages = messages.filter(m => m.sender_type === 'bot').length;
+                    const agentMessages = messages.filter(m => m.sender_type === 'agent').length;
+                    console.log(`📨 [Supabase] Desglose de mensajes: User=${userMessages}, Bot=${botMessages}, Agent=${agentMessages}`);
                 }
                 return messages || [];
             }
