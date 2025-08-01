@@ -121,9 +121,18 @@ export function useChat() {
   }, []);
 
   // Formatear tiempo relativo
-  const getRelativeTime = useCallback((date: Date): string => {
+  const getRelativeTime = useCallback((date: Date | string): string => {
+    // Asegurar que tenemos un objeto Date válido
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    // Verificar si la fecha es válida
+    if (isNaN(dateObj.getTime())) {
+      console.warn('⚠️ [useChat] Fecha inválida recibida:', date);
+      return MESSAGES.TIME.NOW;
+    }
+    
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const diffInMinutes = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60));
     
     if (diffInMinutes < 1) return MESSAGES.TIME.NOW;
     if (diffInMinutes < 60) return `${diffInMinutes}${MESSAGES.TIME.MINUTES_SHORT}`;
@@ -134,7 +143,7 @@ export function useChat() {
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays}${MESSAGES.TIME.DAYS_SHORT}`;
     
-    return date.toLocaleDateString();
+    return dateObj.toLocaleDateString();
   }, []);
 
   // Verificar si el usuario actual es el remitente

@@ -16,11 +16,14 @@ const express_1 = __importDefault(require("express"));
 const whatsapp_service_1 = require("../services/whatsapp.service");
 const database_service_1 = require("../services/database.service");
 const whatsapp_utils_1 = require("../utils/whatsapp-utils");
+const auth_1 = require("../middleware/auth");
 const router = express_1.default.Router();
 // POST /api/chat/send - Enviar mensaje de texto
-router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/send', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
+        console.log('📤 [ChatRouter] Headers:', req.headers);
+        console.log('📤 [ChatRouter] User:', req.user);
         const { to, message, clientId } = req.body; // NUEVO: Incluir clientId
         if (!to || !message) {
             console.log('❌ [ChatRouter] Campos faltantes:', { to, message });
@@ -39,12 +42,15 @@ router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 error: phoneValidation.error
             });
         }
+        console.log('📤 [ChatRouter] Llamando a whatsappService.sendMessage...');
         const result = yield whatsapp_service_1.whatsappService.sendMessage({
             to: phoneValidation.formatted,
             message: message.toString(),
             clientId: clientId // NUEVO: Pasar clientId
         });
+        console.log('📤 [ChatRouter] Resultado de sendMessage:', result);
         if (result.success) {
+            console.log('✅ [ChatRouter] Mensaje enviado exitosamente');
             res.json({
                 success: true,
                 message: 'Mensaje enviado exitosamente',
@@ -54,6 +60,7 @@ router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* (
             });
         }
         else {
+            console.error('❌ [ChatRouter] Error enviando mensaje:', result.error);
             res.status(500).json({
                 success: false,
                 error: 'Error enviando mensaje',
@@ -62,6 +69,8 @@ router.post('/send', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
     }
     catch (error) {
+        console.error('❌ [ChatRouter] Error interno del servidor:', error);
+        console.error('❌ [ChatRouter] Stack trace:', error.stack);
         res.status(500).json({
             success: false,
             error: 'Error interno del servidor',

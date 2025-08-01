@@ -110,13 +110,15 @@ class DashboardApiService {
   /**
    * Método privado para hacer peticiones HTTP
    */
-  private async request<T>(endpoint: string): Promise<ApiResponse<T>> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...options.headers,
       },
+      ...options,
     };
 
     // Agregar token de autenticación si existe
@@ -126,18 +128,33 @@ class DashboardApiService {
         ...config.headers,
         'Authorization': `Bearer ${token}`,
       };
+      console.log('🔐 [DashboardApi] Token incluido en request:', token.substring(0, 20) + '...');
+    } else {
+      console.warn('⚠️ [DashboardApi] No hay token disponible para request');
     }
+
+    console.log('🌐 [DashboardApi] Haciendo request a:', url);
+    console.log('🌐 [DashboardApi] Método:', config.method || 'GET');
 
     try {
       const response = await fetch(url, config);
+      console.log('🌐 [DashboardApi] Status de respuesta:', response.status);
+      
       const data = await response.json();
+      console.log('🌐 [DashboardApi] Datos recibidos:', data);
 
       if (!response.ok) {
+        console.error('❌ [DashboardApi] Error en respuesta:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data
+        });
         throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
       }
 
       return data;
     } catch (error) {
+      console.error('❌ [DashboardApi] Error en request:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -187,14 +204,24 @@ class DashboardApiService {
   /**
    * Obtener conversaciones públicas (para agentes)
    */
-  async getPublicConversations(): Promise<Conversation[]> {
-    const response = await this.request<Conversation[]>('/conversations/public');
-
-    if (!response.success) {
-      throw new Error(response.message || 'Error al obtener conversaciones');
+  async getPublicConversations(): Promise<any[]> {
+    console.log('📊 [DashboardApi] Obteniendo conversaciones públicas...');
+    
+    try {
+      const response = await this.request<any[]>('/conversations/public');
+      console.log('✅ [DashboardApi] Conversaciones públicas obtenidas:', response.data.length);
+      return response.data;
+    } catch (error) {
+      console.error('❌ [DashboardApi] Error obteniendo conversaciones públicas:', error);
+      
+      // Si es un error de autenticación, limpiar token
+      if (error instanceof Error && error.message.includes('401')) {
+        console.warn('⚠️ [DashboardApi] Error de autenticación, limpiando token...');
+        localStorage.removeItem('authToken');
+      }
+      
+      throw error;
     }
-
-    return response.data as Conversation[];
   }
 
   /**

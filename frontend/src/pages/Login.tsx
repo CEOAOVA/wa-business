@@ -17,7 +17,14 @@ const Login: React.FC = () => {
 
   // Redirigir si ya está autenticado
   useEffect(() => {
+    console.log('🔍 [Login] Estado de autenticación:', {
+      isAuthenticated: state.isAuthenticated,
+      user: state.user,
+      isLoading: state.isLoading
+    });
+    
     if (state.isAuthenticated && state.user) {
+      console.log('✅ [Login] Usuario autenticado, redirigiendo...');
       // La redirección se manejará automáticamente por RoleRedirect
       navigate("/", { replace: true });
     }
@@ -33,16 +40,21 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔍 [Login] Iniciando submit con credenciales:', { email: email.trim(), password: password ? '***' : 'vacía' });
+    
     if (!email.trim() || !password.trim()) {
+      console.warn('⚠️ [Login] Credenciales incompletas');
       return;
     }
 
     try {
+      console.log('🔍 [Login] Llamando a login...');
       await login({ email: email.trim(), password, rememberMe: remember });
+      console.log('✅ [Login] Login completado exitosamente');
       // La navegación se manejará automáticamente por el useEffect
     } catch (error) {
       // El error se maneja en el contexto
-      console.error('Error en login:', error);
+      console.error('❌ [Login] Error en login:', error);
     }
   };
 

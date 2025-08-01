@@ -105,7 +105,7 @@ export const useWhatsApp = () => {
     });
 
     try {
-      const response = await whatsappApi.sendMessage(data);
+      const response = await whatsappApi.sendMessage(data.to, data.message);
 
       if (response.success) {
         // Actualizar mensaje como enviado

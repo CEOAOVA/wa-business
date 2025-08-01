@@ -19,66 +19,93 @@ const auth_service_1 = require("../services/auth.service");
  */
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('🔐 [AuthMiddleware] Iniciando verificación de autenticación');
+        console.log('🔐 [AuthMiddleware] Ruta:', req.path);
+        console.log('🔐 [AuthMiddleware] Método:', req.method);
+        console.log('🔐 [AuthMiddleware] Headers recibidos:', {
+            authorization: req.headers.authorization ? 'Presente' : 'Ausente',
+            'content-type': req.headers['content-type'],
+            'user-agent': req.headers['user-agent']
+        });
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.log('❌ [AuthMiddleware] No se encontró header Authorization válido');
             return res.status(401).json({
                 success: false,
                 message: 'Token de autenticación requerido'
             });
         }
         const token = authHeader.substring(7); // Remover 'Bearer ' del token
+        console.log('🔐 [AuthMiddleware] Token extraído:', token.substring(0, 20) + '...');
         // Verificar token con Supabase de forma más simple
         if (!supabase_1.supabase) {
-            logger_1.logger.warn('Supabase client no disponible');
+            console.error('❌ [AuthMiddleware] Supabase client no disponible');
             return res.status(500).json({
                 success: false,
                 message: 'Servicio de autenticación no disponible'
             });
         }
+        console.log('🔐 [AuthMiddleware] Verificando token con Supabase...');
         const { data: { user }, error } = yield supabase_1.supabase.auth.getUser(token);
         if (error || !user) {
-            logger_1.logger.warn('Token inválido o expirado', { error: (error === null || error === void 0 ? void 0 : error.message) || 'No user data' });
+            console.warn('❌ [AuthMiddleware] Token inválido o expirado', {
+                error: (error === null || error === void 0 ? void 0 : error.message) || 'No user data',
+                hasUser: !!user,
+                userId: user === null || user === void 0 ? void 0 : user.id
+            });
             return res.status(401).json({
                 success: false,
                 message: 'Token inválido o expirado'
             });
         }
+        console.log('✅ [AuthMiddleware] Token válido, usuario encontrado:', {
+            userId: user.id,
+            email: user.email
+        });
         // Obtener perfil del usuario de forma más eficiente
         try {
+            console.log('🔐 [AuthMiddleware] Obteniendo perfil de usuario...');
             const userProfile = yield auth_service_1.AuthService.getUserById(user.id);
             if (!userProfile) {
-                logger_1.logger.warn('Perfil de usuario no encontrado', { userId: user.id });
+                console.warn('❌ [AuthMiddleware] Perfil de usuario no encontrado', { userId: user.id });
                 return res.status(401).json({
                     success: false,
                     message: 'Perfil de usuario no encontrado'
                 });
             }
-            // Verificación más flexible de estado activo
+            console.log('✅ [AuthMiddleware] Perfil de usuario obtenido:', {
+                userId: userProfile.id,
+                username: userProfile.username,
+                role: userProfile.role,
+                isActive: userProfile.is_active
+            });
+            // Verificar que el usuario esté activo
             if (!userProfile.is_active) {
-                logger_1.logger.warn('Usuario inactivo intentando acceder', { userId: userProfile.id });
+                console.warn('❌ [AuthMiddleware] Usuario inactivo intentando acceder', { userId: userProfile.id });
                 return res.status(401).json({
                     success: false,
-                    message: 'Cuenta de usuario desactivada'
+                    message: 'Usuario inactivo'
                 });
             }
-            // Agregar usuario a la request
+            // Asignar usuario al request
             req.user = userProfile;
             req.isAuthenticated = true;
+            console.log('✅ [AuthMiddleware] Autenticación exitosa, continuando...');
             next();
         }
         catch (profileError) {
-            logger_1.logger.error('Error obteniendo perfil de usuario:', profileError);
+            console.error('❌ [AuthMiddleware] Error obteniendo perfil de usuario:', profileError);
             return res.status(401).json({
                 success: false,
-                message: 'Error al verificar perfil de usuario'
+                message: 'Error obteniendo perfil de usuario'
             });
         }
     }
     catch (error) {
-        logger_1.logger.error('Auth middleware error:', error);
+        console.error('❌ [AuthMiddleware] Error general en middleware:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error de autenticación'
+            message: 'Error interno de autenticación'
         });
     }
 });

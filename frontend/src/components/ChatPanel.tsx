@@ -12,10 +12,10 @@ import whatsappApi from "../services/whatsapp-api";
 import type { Message } from "../types";
 
 // Componente para una burbuja de mensaje individual
-const MessageBubble: React.FC<{ 
-  message: Message; 
+const MessageBubble: React.FC<{
+  message: Message;
   isOwn: boolean;
-  getRelativeTime: (date: Date) => string;
+  getRelativeTime: (date: Date | string) => string;
 }> = ({ message, isOwn, getRelativeTime }) => {
   const bubbleClass = isOwn 
     ? "self-end bg-embler-yellow text-embler-dark" 

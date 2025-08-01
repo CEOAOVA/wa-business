@@ -136,11 +136,23 @@ export class WhatsAppService {
   }
 
   /**
-   * Enviar mensaje de texto
+   * Enviar mensaje de texto a WhatsApp
    */
   async sendMessage(data: SendMessageRequest) {
     try {
+      console.log('📤 [WhatsAppService] Iniciando envío de mensaje:', {
+        to: data.to,
+        messageLength: data.message.length,
+        clientId: data.clientId,
+        isChatbotResponse: data.isChatbotResponse
+      });
+
       // Validar configuración de WhatsApp
+      console.log('📤 [WhatsAppService] Verificando configuración...');
+      console.log('📤 [WhatsAppService] isConfigured:', whatsappConfig.isConfigured);
+      console.log('📤 [WhatsAppService] accessToken length:', whatsappConfig.accessToken?.length || 0);
+      console.log('📤 [WhatsAppService] phoneNumberId:', whatsappConfig.phoneNumberId);
+      
       if (!whatsappConfig.isConfigured) {
         console.warn('⚠️ WhatsApp no está configurado - simulando envío');
         return {
@@ -160,7 +172,9 @@ export class WhatsAppService {
         };
       }
 
+      console.log('📤 [WhatsAppService] Construyendo URL de API...');
       const url = buildApiUrl(`${whatsappConfig.phoneNumberId}/messages`);
+      console.log('📤 [WhatsAppService] URL construida:', url);
       
       const payload = {
         messaging_product: 'whatsapp',
@@ -172,7 +186,7 @@ export class WhatsAppService {
         client_id: data.clientId // Incluir client_id en el payload
       };
 
-      console.log('📤 Enviando mensaje WhatsApp:', {
+      console.log('📤 [WhatsAppService] Payload preparado:', {
         to: data.to,
         message: data.message.substring(0, 50) + '...',
         url,
@@ -180,17 +194,23 @@ export class WhatsAppService {
         tokenLength: whatsappConfig.accessToken?.length || 0
       });
 
+      console.log('📤 [WhatsAppService] Headers:', getHeaders());
+      console.log('📤 [WhatsAppService] Haciendo petición a WhatsApp API...');
+
       const response = await axios.post(url, payload, {
         headers: getHeaders()
       });
 
-      console.log('✅ Mensaje enviado exitosamente:', response.data);
+      console.log('✅ [WhatsAppService] Mensaje enviado exitosamente:', response.data);
 
       // Guardar mensaje enviado en la base de datos (SOLO si NO es respuesta del chatbot)
       const messageId = response.data.messages?.[0]?.id;
+      console.log('📤 [WhatsAppService] Message ID recibido:', messageId);
+      
       if (messageId) {
         try {
           if (!data.isChatbotResponse) {
+            console.log('📤 [WhatsAppService] Procesando mensaje regular en BD...');
             // Mensaje regular - guardar en BD y emitir evento
             const result = await databaseService.processOutgoingMessage({
               waMessageId: messageId,
@@ -201,8 +221,11 @@ export class WhatsAppService {
               clientId: data.clientId // NUEVO: Pasar clientId para deduplicación
             });
 
+            console.log('📤 [WhatsAppService] Resultado procesamiento BD:', result);
+
             // Emitir evento de Socket.IO para mensaje enviado DESPUÉS del procesamiento en BD
             if (this.io && result.success) {
+              console.log('📤 [WhatsAppService] Emitiendo evento Socket.IO...');
               const sentMessage = {
                 id: result.message.id,
                 waMessageId: messageId,
@@ -224,39 +247,39 @@ export class WhatsAppService {
                 unreadCount: result.conversation.unreadCount || 0
               });
 
-              console.log('🌐 Evento Socket.IO emitido para mensaje enviado (después de BD)');
+              console.log('🌐 [WhatsAppService] Evento Socket.IO emitido para mensaje enviado (después de BD)');
             }
-                      } else {
-              // Mensaje del chatbot - emitir evento después del procesamiento
-              console.log('🤖 Mensaje del chatbot enviado - emitiendo evento después del procesamiento');
-              
-              // Obtener conversación para el evento
-              const conversation = await databaseService.getOrCreateConversationByPhone(data.to);
-              if (conversation && this.io) {
-                const chatbotMessage = {
-                  id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
-                  waMessageId: messageId,
-                  from: 'us',
-                  to: data.to,
-                  message: data.message,
-                  timestamp: new Date(),
-                  type: 'text',
-                  read: false,
-                  conversationId: conversation.id,
-                  contactId: conversation.contact_phone,
-                  clientId: data.clientId // Incluir client_id en el evento
-                };
+          } else {
+            // Mensaje del chatbot - emitir evento después del procesamiento
+            console.log('🤖 [WhatsAppService] Mensaje del chatbot enviado - emitiendo evento después del procesamiento');
+            
+            // Obtener conversación para el evento
+            const conversation = await databaseService.getOrCreateConversationByPhone(data.to);
+            if (conversation && this.io) {
+              const chatbotMessage = {
+                id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
+                waMessageId: messageId,
+                from: 'us',
+                to: data.to,
+                message: data.message,
+                timestamp: new Date(),
+                type: 'text',
+                read: false,
+                conversationId: conversation.id,
+                contactId: conversation.contact_phone,
+                clientId: data.clientId // Incluir client_id en el evento
+              };
 
-                this.emitNewMessage(chatbotMessage, {
-                  id: conversation.id,
-                  contactId: conversation.contact_phone,
-                  contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
-                  unreadCount: conversation.unread_count || 0
-                });
+              this.emitNewMessage(chatbotMessage, {
+                id: conversation.id,
+                contactId: conversation.contact_phone,
+                contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
+                unreadCount: conversation.unread_count || 0
+              });
 
-                console.log('🌐 Evento Socket.IO emitido para mensaje del chatbot');
-              }
+              console.log('🌐 [WhatsAppService] Evento Socket.IO emitido para mensaje del chatbot');
             }
+          }
         } catch (dbError) {
           console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
           // No fallar el envío por error de BD

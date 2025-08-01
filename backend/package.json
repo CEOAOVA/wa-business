@@ -9,7 +9,8 @@
     "migrate:postal-code": "node scripts/migrate-postal-code.js",
     "webhook:check": "node src/scripts/webhook-setup.js",
     "security:test": "node src/scripts/test-webhook-security.js",
-    "cleanup:duplicates": "node cleanup-duplicate-messages.js"
+    "cleanup:duplicates": "node cleanup-duplicate-messages.js",
+    "diagnostic": "node src/scripts/diagnostic.js"
   },
   "keywords": [],
   "author": "",

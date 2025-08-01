@@ -555,25 +555,25 @@ router.post('/refresh', auth_1.tempAuth, (req, res) => __awaiter(void 0, void 0,
 }));
 /**
  * @route GET /api/auth/status
- * @desc Verificar estado de autenticación (opcional)
- * @access Public
+ * @desc Verificar estado de autenticación
+ * @access Private
  */
-router.get('/status', auth_1.optionalAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/status', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.json({
             success: true,
+            message: 'Usuario autenticado',
             data: {
-                isAuthenticated: req.isAuthenticated || false,
-                user: req.user || null,
-                sessionStats: session_cleanup_service_1.sessionCleanupService.getServiceStats()
+                isAuthenticated: true,
+                user: req.user
             }
         });
     }
     catch (error) {
-        logger_1.logger.error('Auth status error:', error);
+        logger_1.logger.error('Status check error:', error);
         res.status(500).json({
             success: false,
-            message: 'Error al verificar estado de autenticación'
+            message: 'Error verificando estado de autenticación'
         });
     }
 }));

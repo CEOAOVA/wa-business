@@ -466,8 +466,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const loadNewSchemaConversations = useCallback(async () => {
     console.log('🔍 [AppContext] Iniciando carga de conversaciones del nuevo esquema...');
     
+    // Verificar si hay token antes de hacer la llamada
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.warn('⚠️ [AppContext] No hay token disponible, saltando carga de conversaciones');
+      return;
+    }
+    
     try {
+      dispatch({ type: 'SET_LOADING', payload: true });
       console.log('🔍 [AppContext] Llamando a dashboardApiService.getPublicConversations...');
+      
       const conversations = await dashboardApiService.getPublicConversations();
       
       console.log('🔍 [AppContext] Conversaciones recibidas:', conversations);
@@ -475,59 +484,72 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       if (conversations.length > 0) {
         console.log(`🔍 [AppContext] ${conversations.length} conversaciones encontradas`);
         
-                  // Convertir conversaciones a chats del frontend
-          conversations.forEach(conv => {
-            const chatId = `conv-${conv.id}`;
-            
-            console.log(`🔍 [AppContext] Procesando conversación ${chatId} (takeover_mode: ${conv.takeover_mode})`);
-            
-            // Verificar si el chat ya existe en el estado actual
-            const existingChat = state.chats.find(c => c.id === chatId);
+        // Convertir conversaciones a chats del frontend
+        conversations.forEach(conv => {
+          const chatId = `conv-${conv.id}`;
           
-          if (!existingChat) {
-            console.log(`🔍 [AppContext] Creando nuevo chat para conversación ${conv.id}`);
-            
-            // Crear nuevo chat
-            const newChat: Chat = {
-              id: chatId,
-              clientId: conv.contact_phone,
-              clientName: conv.contact_phone, // Usar el número como nombre
-              clientPhone: conv.contact_phone,
-              clientAvatar: undefined,
-              assignedAgentId: conv.assigned_agent_id || null,
-              lastMessage: null, // Se cargará cuando se carguen los mensajes
-              unreadCount: conv.unread_count || 0,
-              isActive: conv.status === 'active',
-              createdAt: new Date(conv.created_at),
-              updatedAt: new Date(conv.updated_at),
-              tags: ['conversation'],
-              priority: 'medium',
-              status: conv.status === 'active' ? 'open' : conv.status,
-              takeoverMode: conv.takeover_mode || 'spectator' // Agregar takeover_mode
-            };
-            
-            console.log('🔍 [AppContext] Nuevo chat creado:', newChat);
-            dispatch({ type: 'ADD_CHAT', payload: newChat });
-          } else {
-            console.log(`🔍 [AppContext] Chat ${chatId} ya existe`);
-            // Actualizar datos del chat existente si es necesario
-            if (existingChat.unreadCount !== conv.unread_count || 
-                existingChat.updatedAt.getTime() !== new Date(conv.updated_at).getTime()) {
-              const updatedChat = {
-                ...existingChat,
-                unreadCount: conv.unread_count || 0,
-                updatedAt: new Date(conv.updated_at),
-                status: conv.status === 'active' ? 'open' : (conv.status === 'closed' ? 'closed' : 'waiting') as 'open' | 'assigned' | 'waiting' | 'closed'
-              };
-              dispatch({ type: 'UPDATE_CHAT', payload: updatedChat });
-            }
-          }
+          console.log(`🔍 [AppContext] Procesando conversación ${chatId} (takeover_mode: ${conv.takeover_mode})`);
+          
+          // Verificar si el chat ya existe en el estado actual
+          const existingChat = state.chats.find(c => c.id === chatId);
+        
+        if (!existingChat) {
+          console.log(`🔍 [AppContext] Creando nuevo chat para conversación ${conv.id}`);
+          
+          // Crear nuevo chat
+          const newChat: Chat = {
+            id: chatId,
+            clientId: conv.contact_phone,
+            clientName: conv.contact_phone, // Usar el número como nombre
+            clientPhone: conv.contact_phone,
+            clientAvatar: undefined,
+            assignedAgentId: conv.assigned_agent_id || null,
+            lastMessage: null, // Se cargará cuando se carguen los mensajes
+            unreadCount: conv.unread_count || 0,
+            isActive: conv.status === 'active',
+            createdAt: conv.created_at,
+            updatedAt: conv.updated_at,
+            tags: ['whatsapp'],
+            priority: 'medium',
+            status: 'open',
+            takeoverMode: conv.takeover_mode || 'spectator'
+          };
+          
+          dispatch({ type: 'ADD_CHAT', payload: newChat });
+          console.log(`✅ [AppContext] Chat creado: ${chatId}`);
+        } else {
+          console.log(`🔄 [AppContext] Chat ya existe: ${chatId}, actualizando...`);
+          
+          // Actualizar chat existente
+          const updatedChat: Chat = {
+            ...existingChat,
+            unreadCount: conv.unread_count || 0,
+            isActive: conv.status === 'active',
+            updatedAt: conv.updated_at,
+            takeoverMode: conv.takeover_mode || 'spectator'
+          };
+          
+          dispatch({ type: 'UPDATE_CHAT', payload: updatedChat });
+        }
         });
+        
+        console.log('✅ [AppContext] Conversaciones cargadas exitosamente');
       } else {
-        console.log('🔍 [AppContext] No hay conversaciones en el nuevo esquema');
+        console.log('ℹ️ [AppContext] No hay conversaciones disponibles');
       }
     } catch (error) {
       console.error('❌ [AppContext] Error cargando conversaciones del nuevo esquema:', error);
+      
+      // Si es un error de autenticación, no mostrar error al usuario
+      if (error instanceof Error && error.message.includes('401')) {
+        console.warn('⚠️ [AppContext] Error de autenticación, limpiando token...');
+        localStorage.removeItem('authToken');
+        return;
+      }
+      
+      dispatch({ type: 'SET_ERROR', payload: 'Error cargando conversaciones del nuevo esquema' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, [state.chats]);
 
@@ -682,11 +704,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         // NUEVO: Generar client_id único para este mensaje enviado
         const clientId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
-        const result = await whatsappApi.sendMessage({
-          to: formattedPhone,
-          message: content,
-          clientId: clientId // NUEVO: Enviar clientId al backend
-        });
+        const result = await whatsappApi.sendMessage(
+          formattedPhone,
+          content
+        );
 
         if (result.success) {
           
@@ -763,10 +784,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         const formattedPhone = whatsappApi.formatPhoneForSending(phoneNumber);
         console.log(`📱 [AppContext] Número original: ${phoneNumber}, formateado: ${formattedPhone}`);
         
-        const result = await whatsappApi.sendMessage({
-          to: formattedPhone,
-          message: content
-        });
+        const result = await whatsappApi.sendMessage(
+          formattedPhone,
+          content
+        );
 
         if (result.success) {
           addSentWhatsAppMessage(phoneNumber, content, result.data?.messageId);

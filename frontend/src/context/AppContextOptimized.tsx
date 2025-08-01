@@ -504,11 +504,11 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
       dispatch({ type: 'ADD_MESSAGE', payload: optimisticMessage });
       
       // Enviar mensaje al servidor con client_id
-      const response = await whatsappApi.sendMessage({
-        to: state.currentChat.clientPhone || '',
-        message: content,
-        clientId: clientId // NUEVO: Incluir client_id
-      });
+      const response = await whatsappApi.sendMessage(
+        state.currentChat.clientPhone || '',
+        content,
+        clientId
+      );
       
       if (response.success) {
         console.log('✅ [sendMessage] Mensaje enviado exitosamente:', response);

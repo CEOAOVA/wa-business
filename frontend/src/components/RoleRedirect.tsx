@@ -11,19 +11,29 @@ const RoleRedirect: React.FC<RoleRedirectProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('🔍 [RoleRedirect] Estado actual:', {
+      isLoading: state.isLoading,
+      isAuthenticated: state.isAuthenticated,
+      user: state.user
+    });
+    
     // Solo redirigir si no está cargando y está autenticado
     if (!state.isLoading && state.isAuthenticated && state.user) {
       const userRole = state.user.role;
+      console.log('✅ [RoleRedirect] Usuario autenticado, redirigiendo según rol:', userRole);
       
       // Redirigir según el rol del usuario
       switch (userRole) {
         case 'admin':
+          console.log('✅ [RoleRedirect] Redirigiendo a dashboard de admin');
           navigate('/admin/dashboard', { replace: true });
           break;
         case 'agent':
+          console.log('✅ [RoleRedirect] Redirigiendo a chats');
           navigate('/chats', { replace: true });
           break;
         default:
+          console.log('✅ [RoleRedirect] Redirigiendo a chats (rol por defecto)');
           navigate('/chats', { replace: true });
       }
     }

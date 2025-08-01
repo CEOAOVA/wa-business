@@ -555,24 +555,24 @@ router.post('/refresh', tempAuth, async (req, res) => {
 
 /**
  * @route GET /api/auth/status
- * @desc Verificar estado de autenticación (opcional)
- * @access Public
+ * @desc Verificar estado de autenticación
+ * @access Private
  */
-router.get('/status', optionalAuth, async (req, res) => {
+router.get('/status', authMiddleware, async (req, res) => {
   try {
     res.json({
       success: true,
+      message: 'Usuario autenticado',
       data: {
-        isAuthenticated: req.isAuthenticated || false,
-        user: req.user || null,
-        sessionStats: sessionCleanupService.getServiceStats()
+        isAuthenticated: true,
+        user: req.user
       }
     });
   } catch (error) {
-    logger.error('Auth status error:', error);
+    logger.error('Status check error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al verificar estado de autenticación'
+      message: 'Error verificando estado de autenticación'
     });
   }
 });

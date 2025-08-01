@@ -91,13 +91,39 @@ class WhatsAppApiService {
   /**
    * Enviar mensaje de texto
    */
-  async sendMessage(data: SendMessageRequest): Promise<ApiResponse<any>> {
-    console.log('📤 Enviando mensaje:', data);
+  async sendMessage(to: string, message: string, clientId?: string): Promise<any> {
+    console.log('📤 [WhatsAppApi] Enviando mensaje...', { to, messageLength: message.length, clientId });
     
-    return this.request('/chat/send', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    try {
+      // Verificar si hay token antes de hacer la llamada
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('❌ [WhatsAppApi] No hay token disponible para enviar mensaje');
+        throw new Error('No hay token de autenticación');
+      }
+      
+      const response = await this.request('/send', {
+        method: 'POST',
+        body: JSON.stringify({
+          to,
+          message,
+          clientId: clientId || `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        }),
+      });
+
+      console.log('✅ [WhatsAppApi] Mensaje enviado exitosamente');
+      return response.data;
+    } catch (error) {
+      console.error('❌ [WhatsAppApi] Error enviando mensaje:', error);
+      
+      // Si es un error de autenticación, limpiar token
+      if (error instanceof Error && error.message.includes('401')) {
+        console.warn('⚠️ [WhatsAppApi] Error de autenticación, limpiando token...');
+        localStorage.removeItem('authToken');
+      }
+      
+      throw error;
+    }
   }
 
   /**

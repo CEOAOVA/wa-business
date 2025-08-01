@@ -17,7 +17,7 @@ const ChatItem: React.FC<{
   chat: Chat; 
   isSelected: boolean; 
   onClick: () => void;
-  getRelativeTime: (date: Date) => string;
+  getRelativeTime: (date: Date | string) => string;
   getLastMessagePreview: (chat: Chat) => string;
 }> = ({ chat, isSelected, onClick, getRelativeTime, getLastMessagePreview }) => {
   // Generar iniciales del nombre del cliente

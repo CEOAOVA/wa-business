@@ -3,13 +3,17 @@ import { whatsappService } from '../services/whatsapp.service';
 import { databaseService } from '../services/database.service';
 import { validatePhoneNumber, verifyWebhook, getWebhookDebugInfo, setWebhookUrl, getStats } from '../utils/whatsapp-utils';
 import { webhookSecurity, securityLogger, SecureRequest } from '../middleware/webhook-security';
+import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
 
 // POST /api/chat/send - Enviar mensaje de texto
-router.post('/send', async (req: any, res: any) => {
+router.post('/send', authMiddleware, async (req: any, res: any) => {
   try {
     console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
+    console.log('📤 [ChatRouter] Headers:', req.headers);
+    console.log('📤 [ChatRouter] User:', req.user);
+    
     const { to, message, clientId } = req.body; // NUEVO: Incluir clientId
     
     if (!to || !message) {
@@ -32,13 +36,17 @@ router.post('/send', async (req: any, res: any) => {
       });
     }
 
+    console.log('📤 [ChatRouter] Llamando a whatsappService.sendMessage...');
     const result = await whatsappService.sendMessage({
       to: phoneValidation.formatted,
       message: message.toString(),
       clientId: clientId // NUEVO: Pasar clientId
     });
 
+    console.log('📤 [ChatRouter] Resultado de sendMessage:', result);
+
     if (result.success) {
+      console.log('✅ [ChatRouter] Mensaje enviado exitosamente');
       res.json({
         success: true,
         message: 'Mensaje enviado exitosamente',
@@ -47,6 +55,7 @@ router.post('/send', async (req: any, res: any) => {
         to: phoneValidation.formatted
       });
     } else {
+      console.error('❌ [ChatRouter] Error enviando mensaje:', result.error);
       res.status(500).json({
         success: false,
         error: 'Error enviando mensaje',
@@ -54,6 +63,8 @@ router.post('/send', async (req: any, res: any) => {
       });
     }
   } catch (error: any) {
+    console.error('❌ [ChatRouter] Error interno del servidor:', error);
+    console.error('❌ [ChatRouter] Stack trace:', error.stack);
     res.status(500).json({
       success: false,
       error: 'Error interno del servidor',

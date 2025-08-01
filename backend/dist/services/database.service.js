@@ -558,37 +558,53 @@ class DatabaseService {
     processOutgoingMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log('🗄️ [DatabaseService] Procesando mensaje saliente:', {
+                    waMessageId: data.waMessageId,
+                    toWaId: data.toWaId,
+                    contentLength: data.content.length,
+                    messageType: data.messageType,
+                    clientId: data.clientId
+                });
                 // Obtener o crear contacto
+                console.log('🗄️ [DatabaseService] Obteniendo/creando contacto...');
                 const contact = yield this.getOrCreateContact(data.toWaId);
                 if (!contact) {
-                    throw new Error('No se pudo crear/obtener contacto');
+                    console.error('❌ [DatabaseService] No se pudo obtener/crear contacto');
+                    throw new Error('No se pudo obtener/crear contacto');
                 }
+                console.log('✅ [DatabaseService] Contacto obtenido:', contact.id);
                 // Obtener o crear conversación
+                console.log('🗄️ [DatabaseService] Obteniendo/creando conversación...');
                 const conversation = yield this.getOrCreateConversationByPhone(data.toWaId);
                 if (!conversation) {
-                    throw new Error('No se pudo crear/obtener conversación');
+                    console.error('❌ [DatabaseService] No se pudo obtener/crear conversación');
+                    throw new Error('No se pudo obtener/crear conversación');
                 }
+                console.log('✅ [DatabaseService] Conversación obtenida:', conversation.id);
                 // Crear mensaje
+                console.log('🗄️ [DatabaseService] Creando mensaje en BD...');
                 const messageResult = yield this.createChatbotMessage({
                     conversationId: conversation.id,
+                    contactPhone: data.toWaId,
                     senderType: 'agent',
                     content: data.content,
                     messageType: data.messageType,
                     whatsappMessageId: data.waMessageId,
-                    clientId: data.clientId, // NUEVO: Pasar clientId para deduplicación
+                    clientId: data.clientId,
                     metadata: {
                         mediaUrl: data.mediaUrl,
-                        mediaCaption: data.mediaCaption,
-                        timestamp: data.timestamp
+                        mediaCaption: data.mediaCaption
                     }
                 });
                 if (!messageResult.success) {
-                    throw new Error('No se pudo crear mensaje');
+                    console.error('❌ [DatabaseService] Error creando mensaje:', messageResult);
+                    throw new Error('Error creando mensaje');
                 }
+                console.log('✅ [DatabaseService] Mensaje creado:', messageResult.messageId);
                 // Actualizar conversación
-                yield supabase_database_service_1.supabaseDatabaseService.updateConversationLastMessage(conversation.id, data.timestamp);
-                console.log(`✅ Mensaje saliente procesado: ${data.waMessageId}`);
-                return {
+                console.log('🗄️ [DatabaseService] Actualizando conversación...');
+                yield this.updateConversationLastMessage(conversation.id, data.timestamp);
+                const result = {
                     success: true,
                     message: {
                         id: messageResult.messageId,
@@ -601,19 +617,20 @@ class DatabaseService {
                     },
                     contact: {
                         id: contact.id,
-                        name: contact.name || 'Sin nombre',
+                        name: contact.name || contact.phone,
                         waId: contact.phone
                     }
                 };
+                console.log('✅ [DatabaseService] Mensaje saliente procesado exitosamente:', {
+                    messageId: result.message.id,
+                    conversationId: result.conversation.id,
+                    contactId: result.contact.id
+                });
+                return result;
             }
             catch (error) {
-                console.error('❌ Error procesando mensaje saliente:', error);
-                return {
-                    success: false,
-                    message: { id: 0, timestamp: new Date(), content: '' },
-                    conversation: { id: '', unreadCount: 0 },
-                    contact: { id: '', name: '', waId: '' }
-                };
+                console.error('❌ [DatabaseService] Error procesando mensaje saliente:', error);
+                throw error;
             }
         });
     }
@@ -621,6 +638,28 @@ class DatabaseService {
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('🔌 DatabaseService conectado (nuevo esquema)');
+        });
+    }
+    /**
+     * Actualizar la fecha del último mensaje de una conversación
+     */
+    updateConversationLastMessage(conversationId, timestamp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log('🗄️ [DatabaseService] Actualizando último mensaje de conversación:', conversationId);
+                const success = yield supabase_database_service_1.supabaseDatabaseService.updateConversationLastMessage(conversationId, timestamp);
+                if (success) {
+                    console.log('✅ [DatabaseService] Último mensaje actualizado exitosamente');
+                }
+                else {
+                    console.warn('⚠️ [DatabaseService] No se pudo actualizar último mensaje');
+                }
+                return success;
+            }
+            catch (error) {
+                console.error('❌ [DatabaseService] Error actualizando último mensaje:', error);
+                return false;
+            }
         });
     }
     /**

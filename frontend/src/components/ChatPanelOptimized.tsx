@@ -11,7 +11,7 @@ import type { Message } from "../types";
 const MessageBubbleOptimized: React.FC<{ 
   message: Message; 
   isOwn: boolean;
-  getRelativeTime: (date: Date) => string;
+  getRelativeTime: (date: Date | string) => string;
   isNew?: boolean;
 }> = React.memo(({ message, isOwn, getRelativeTime, isNew = false }) => {
   const bubbleClass = isOwn 
@@ -68,7 +68,7 @@ MessageBubbleOptimized.displayName = 'MessageBubbleOptimized';
 // Componente optimizado para la lista de mensajes
 const MessagesListOptimized: React.FC<{
   messages: Message[];
-  getRelativeTime: (date: Date) => string;
+  getRelativeTime: (date: Date | string) => string;
   isOwnMessage: (message: Message) => boolean;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
 }> = React.memo(({ messages, getRelativeTime, isOwnMessage, messagesEndRef }) => {

@@ -162,19 +162,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
+      console.log('🔐 [AuthContext] Iniciando login...');
       dispatch({ type: 'AUTH_START' });
+      
       const response = await authApiService.login({
         email: credentials.email,
         password: credentials.password,
       });
+      
+      console.log('✅ [AuthContext] Login exitoso, guardando token...');
+      console.log('✅ [AuthContext] Respuesta completa:', response);
+      
+      // Guardar token inmediatamente después del login exitoso
+      if (response.session?.access_token) {
+        localStorage.setItem('authToken', response.session.access_token);
+        console.log('✅ [AuthContext] Token guardado:', response.session.access_token.substring(0, 20) + '...');
+      } else {
+        console.warn('⚠️ [AuthContext] No se recibió token en la respuesta');
+      }
+      
+      // El response.user ya es del tipo correcto, solo necesitamos convertirlo al formato del frontend
+      console.log('✅ [AuthContext] Convirtiendo usuario:', response.user);
       const user = authApiService.convertToUser(response.user);
+      console.log('✅ [AuthContext] Usuario convertido:', user);
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
       
-      // Guardar token si es necesario
+      // Guardar preferencia de recordar sesión
       if (credentials.rememberMe) {
         localStorage.setItem('rememberAuth', 'true');
       }
+      
+      console.log('✅ [AuthContext] Login completado exitosamente');
     } catch (error) {
+      console.error('❌ [AuthContext] Error en login:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error de autenticación';
       dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
       throw error;
@@ -183,13 +203,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await authApiService.logout();
+      console.log('🔐 [AuthContext] Iniciando logout...');
+      
+      // Solo intentar logout en el servidor si hay token
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        await authApiService.logout();
+      }
     } catch (error) {
-      console.error('Error durante logout:', error);
+      console.error('❌ [AuthContext] Error durante logout:', error);
     } finally {
       // Limpiar todos los datos de autenticación
       clearAllAuthData();
       dispatch({ type: 'LOGOUT' });
+      console.log('✅ [AuthContext] Logout completado');
     }
   };
 
@@ -203,19 +230,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuth = async () => {
     try {
+      console.log('🔐 [AuthContext] Verificando autenticación...');
+      
       // Limpiar datos de autenticación inválidos antes de verificar
       cleanupInvalidAuth();
       
       const token = localStorage.getItem('authToken');
       if (!token) {
-        // Limpiar estado si no hay token
+        console.log('🔐 [AuthContext] No hay token, usuario no autenticado');
         dispatch({ type: 'LOGOUT' });
         return;
       }
 
+      console.log('🔐 [AuthContext] Token encontrado, verificando validez...');
+
       // Intentar refrescar el token si es necesario
       const tokenRefreshed = await refreshTokenIfNeeded();
       if (!tokenRefreshed) {
+        console.log('🔐 [AuthContext] Token no válido, limpiando sesión');
         dispatch({ type: 'LOGOUT' });
         return;
       }
@@ -223,34 +255,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: 'AUTH_START' });
       
       try {
+        console.log('🔐 [AuthContext] Obteniendo perfil de usuario...');
         const profile = await authApiService.getProfile();
-        const user = authApiService.convertToUser(profile);
-        dispatch({ type: 'AUTH_SUCCESS', payload: user });
+        // El perfil ya es un User, no necesitamos convertirlo
+        dispatch({ type: 'AUTH_SUCCESS', payload: profile });
+        console.log('✅ [AuthContext] Usuario autenticado:', profile.name);
       } catch (profileError) {
-        console.warn('Error obteniendo perfil, intentando verificar estado de autenticación...');
+        console.warn('⚠️ [AuthContext] Error obteniendo perfil, intentando verificar estado...');
         
         // Intentar verificar estado de autenticación de forma más simple
-        const statusResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/status`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+        try {
+          const statusResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/status`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
+            if (statusData.data?.isAuthenticated && statusData.data?.user) {
+              // El usuario del status ya es un User, no necesitamos convertirlo
+              dispatch({ type: 'AUTH_SUCCESS', payload: statusData.data.user });
+              console.log('✅ [AuthContext] Usuario autenticado via status check');
+              return;
+            }
           }
-        });
-        
-        if (statusResponse.ok) {
-          const statusData = await statusResponse.json();
-          if (statusData.data?.isAuthenticated && statusData.data?.user) {
-            const user = authApiService.convertToUser(statusData.data.user);
-            dispatch({ type: 'AUTH_SUCCESS', payload: user });
-            return;
-          }
+        } catch (statusError) {
+          console.warn('⚠️ [AuthContext] Error en status check:', statusError);
         }
         
         // Si todo falla, limpiar sesión
         throw profileError;
       }
     } catch (error) {
-      console.error('Error checking auth:', error);
+      console.error('❌ [AuthContext] Error verificando autenticación:', error);
       // Limpiar token inválido y estado
       clearAllAuthData();
       dispatch({ type: 'LOGOUT' });

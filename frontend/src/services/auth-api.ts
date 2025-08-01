@@ -73,53 +73,150 @@ class AuthApiService {
         ...config.headers,
         'Authorization': `Bearer ${token}`,
       };
+      console.log('🔐 [AuthApi] Token incluido en request:', token.substring(0, 20) + '...');
+    } else {
+      console.log('⚠️ [AuthApi] No hay token disponible para request');
     }
+
+    console.log('🌐 [AuthApi] Haciendo request a:', url);
+    console.log('🌐 [AuthApi] Método:', config.method || 'GET');
+    console.log('🌐 [AuthApi] Headers:', config.headers);
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
-
+      
+      console.log('🌐 [AuthApi] Status de respuesta:', response.status);
+      
       if (!response.ok) {
-        throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
+        console.error('❌ [AuthApi] Error HTTP:', response.status);
+        
+        // Si es un error de autenticación, limpiar token
+        if (response.status === 401) {
+          console.warn('⚠️ [AuthApi] Token inválido, limpiando...');
+          localStorage.removeItem('authToken');
+        }
+        
+        const errorText = await response.text();
+        console.error('❌ [AuthApi] Error en request a', url, ':', errorText);
+        
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
-      return data;
+      const data = await response.json();
+      console.log('✅ [AuthApi] Request exitoso');
+      
+      return {
+        success: true,
+        data,
+      };
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Error de conexión');
+      console.error('❌ [AuthApi] Error en request a', url, ':', error);
+      throw error;
     }
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await this.request<LoginResponse>('/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
+    console.log('🔐 [AuthApi] Iniciando login...');
+    
+    try {
+      const response = await this.request<LoginResponse>('/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      });
 
-    // Guardar token de sesión
-    if (response.data.session?.access_token) {
-      localStorage.setItem('authToken', response.data.session.access_token);
+      console.log('✅ [AuthApi] Login exitoso, procesando respuesta...');
+      console.log('📊 [AuthApi] Respuesta completa:', response);
+      console.log('📊 [AuthApi] response.data:', response.data);
+      console.log('📊 [AuthApi] response.data.user:', response.data.user);
+      console.log('📊 [AuthApi] response.data.session:', response.data.session);
+      console.log('📊 [AuthApi] Tipo de response.data:', typeof response.data);
+      console.log('📊 [AuthApi] response.data keys:', Object.keys(response.data || {}));
+
+      // Verificar que la respuesta tenga la estructura esperada
+      if (!response.data) {
+        console.error('❌ [AuthApi] response.data es undefined o null');
+        throw new Error('Respuesta inválida del servidor: response.data es undefined');
+      }
+
+      // El backend devuelve { success: true, data: { user: ..., session: ... } }
+      const actualData = (response.data as any)?.data;
+      console.log('📊 [AuthApi] Datos reales:', actualData);
+      console.log('📊 [AuthApi] actualData.user:', actualData?.user);
+      console.log('📊 [AuthApi] actualData.session:', actualData?.session);
+
+      if (!actualData || !actualData.user) {
+        console.error('❌ [AuthApi] Respuesta inválida del servidor - no hay user en los datos');
+        console.error('❌ [AuthApi] actualData:', actualData);
+        throw new Error('Respuesta inválida del servidor: no hay datos de usuario');
+      }
+
+      // Guardar token de sesión con validación
+      if (actualData.session?.access_token) {
+        const token = actualData.session.access_token;
+        localStorage.setItem('authToken', token);
+        console.log('✅ [AuthApi] Token guardado exitosamente:', token.substring(0, 20) + '...');
+        
+        // Verificar que el token se guardó correctamente
+        const savedToken = localStorage.getItem('authToken');
+        if (savedToken !== token) {
+          console.error('❌ [AuthApi] Error: Token no se guardó correctamente');
+        } else {
+          console.log('✅ [AuthApi] Token verificado en localStorage');
+        }
+      } else {
+        console.warn('⚠️ [AuthApi] No se recibió token en la respuesta de login');
+      }
+
+      return actualData;
+    } catch (error) {
+      console.error('❌ [AuthApi] Error en login:', error);
+      throw error;
     }
-
-    return response.data;
   }
 
   async logout(): Promise<void> {
+    console.log('🔐 [AuthApi] Iniciando logout...');
+    
     try {
+      // Solo intentar logout en el servidor si hay token
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.log('⚠️ [AuthApi] No hay token para logout, limpiando local');
+        this.clearAuthData();
+        return;
+      }
+
       await this.request('/logout', {
         method: 'POST',
       });
+
+      console.log('✅ [AuthApi] Logout exitoso en servidor');
+    } catch (error) {
+      console.error('❌ [AuthApi] Error en logout:', error);
+      // Aún así limpiar datos locales
     } finally {
-      // Limpiar token local sin importar si la API falla
-      localStorage.removeItem('authToken');
+      this.clearAuthData();
     }
   }
 
-  async getProfile(): Promise<UserProfile> {
-    const response = await this.request<UserProfile>('/profile');
-    return response.data;
+  async getProfile(): Promise<User> {
+    console.log('🔐 [AuthApi] Obteniendo perfil...');
+    
+    try {
+      const response = await this.request<User>('/profile');
+      console.log('✅ [AuthApi] Perfil obtenido exitosamente');
+      return response.data;
+    } catch (error) {
+      console.error('❌ [AuthApi] Error obteniendo perfil:', error);
+      throw error;
+    }
+  }
+
+  private clearAuthData(): void {
+    console.log('🧹 [AuthApi] Limpiando datos de autenticación...');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('rememberAuth');
+    console.log('✅ [AuthApi] Datos de autenticación limpiados');
   }
 
   async updateProfile(updates: Partial<UserProfile>): Promise<UserProfile> {
@@ -171,7 +268,24 @@ class AuthApiService {
   }
 
   // Convertir UserProfile del backend a User del frontend
-  convertToUser(profile: UserProfile): User {
+  convertToUser(profile: UserProfile | undefined): User {
+    console.log('🔍 [AuthApi] Convirtiendo perfil:', profile);
+    
+    if (!profile) {
+      console.error('❌ [AuthApi] Perfil es undefined, creando usuario por defecto');
+      return {
+        id: 'unknown',
+        name: 'Usuario Desconocido',
+        email: 'unknown@example.com',
+        whatsappNumber: '',
+        role: 'agent',
+        isOnline: false,
+        lastSeen: new Date(),
+        status: 'inactive',
+      };
+    }
+    
+    console.log('✅ [AuthApi] Perfil válido, convirtiendo...');
     return {
       id: profile.id,
       name: profile.full_name,
