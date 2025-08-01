@@ -177,6 +177,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.session?.access_token) {
         localStorage.setItem('authToken', response.session.access_token);
         console.log('✅ [AuthContext] Token guardado:', response.session.access_token.substring(0, 20) + '...');
+        console.log('✅ [AuthContext] Verificando que se guardó correctamente...');
+        const savedToken = localStorage.getItem('authToken');
+        console.log('✅ [AuthContext] Token recuperado después de guardar:', savedToken ? 'SÍ' : 'NO');
+        if (savedToken) {
+          console.log('✅ [AuthContext] Token recuperado length:', savedToken.length);
+          console.log('✅ [AuthContext] Token recuperado preview:', savedToken.substring(0, 20) + '...');
+        }
       } else {
         console.warn('⚠️ [AuthContext] No se recibió token en la respuesta');
       }
@@ -233,7 +240,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('🔐 [AuthContext] Verificando autenticación...');
       
       // Limpiar datos de autenticación inválidos antes de verificar
+      console.log('🔐 [AuthContext] Antes de cleanupInvalidAuth - Token:', localStorage.getItem('authToken') ? 'EXISTE' : 'NO EXISTE');
       cleanupInvalidAuth();
+      console.log('🔐 [AuthContext] Después de cleanupInvalidAuth - Token:', localStorage.getItem('authToken') ? 'EXISTE' : 'NO EXISTE');
       
       const token = localStorage.getItem('authToken');
       if (!token) {

@@ -3869,3 +3869,593 @@
   message: 'Refresh token error:',
   timestamp: '2025-08-01 10:12:07.123'
 }
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:19:53.754'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:19:53.754'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:19:53.754'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:19:53.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:19:53.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:19:53.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:36:29.327'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:36:29.327'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:36:29.327'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:36:29.738'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:36:29.738'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:36:29.739'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:01:55.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:01:55.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:01:55.806'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:01:55.808'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:01:55.809'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:01:55.810'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:13:57.661'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:13:57.665'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:13:57.666'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:54.345'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:54.346'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:54.346'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:54.533'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:54.534'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:54.534'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:54.841'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:54.842'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:54.842'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:55.045'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:55.046'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:55.046'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:19:07.804'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:19:07.804'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:19:07.804'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:19:07.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:19:07.806'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:19:07.806'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:25:19.339'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:25:19.339'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:25:19.340'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:25:19.346'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:25:19.347'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:25:19.347'
+}

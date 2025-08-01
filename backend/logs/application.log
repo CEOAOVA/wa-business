@@ -48551,3 +48551,2114 @@
   message: 'User logged in successfully: k.alvarado@aova.mx',
   timestamp: '2025-08-01 10:12:09.263'
 }
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 334,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:12:26.571'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 364,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:12:56.572'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 394,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:13:26.584'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 424,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:13:56.599'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 454,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:14:26.605'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 484,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:14:56.608'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 514,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:15:26.611'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 544,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:15:56.615'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 574,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:16:26.616'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 604,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:16:56.623'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 634,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:17:26.631'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 664,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:17:56.644'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:18:24.994'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:18:25.210'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:18:25.244'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:18:25.244'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:18:25.245'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 264, heapUsed: 208, heapTotal: 215 },
+    uptime: 33,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:18:54.706'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:19:52.567'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:19:52.829'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:19:52.873'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:19:52.874'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:19:52.875'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:19:53.754'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:19:53.754'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:19:53.754'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:19:53.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:19:53.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:19:53.805'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:19:54.763'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 268, heapUsed: 210, heapTotal: 216 },
+    uptime: 34,
+    requests: 6,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:20:22.207'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:22:06.173'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:22:06.392'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:22:06.430'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:22:06.431'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:22:06.432'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 209, heapTotal: 215 },
+    uptime: 34,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:22:35.858'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 209, heapTotal: 215 },
+    uptime: 64,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:23:05.869'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 209, heapTotal: 216 },
+    uptime: 94,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:23:35.871'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 209, heapTotal: 216 },
+    uptime: 124,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:24:05.883'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 209, heapTotal: 215 },
+    uptime: 154,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:24:35.881'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:25:01.661'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 274, heapUsed: 210, heapTotal: 216 },
+    uptime: 184,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:25:05.881'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 213, heapTotal: 221 },
+    uptime: 214,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:25:35.887'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:26:08.464'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:26:08.664'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:26:08.697'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:26:08.697'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:26:08.698'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:26:14.898'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 212, heapTotal: 221 },
+    uptime: 33,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:26:38.174'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:28:58.488'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:28:58.707'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:28:58.742'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:28:58.742'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:28:58.743'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:29:01.626'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 270, heapUsed: 211, heapTotal: 218 },
+    uptime: 34,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:29:28.218'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 211, heapTotal: 217 },
+    uptime: 64,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:29:58.225'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 271, heapUsed: 211, heapTotal: 218 },
+    uptime: 94,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:30:28.228'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:30:34.514'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:30:34.725'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:30:34.759'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:30:34.760'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:30:34.761'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 218 },
+    uptime: 124,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:30:58.228'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 266, heapUsed: 209, heapTotal: 215 },
+    uptime: 34,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:31:04.217'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 219 },
+    uptime: 154,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:31:28.242'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 64,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:31:34.225'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 218 },
+    uptime: 184,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:31:58.249'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 266, heapUsed: 209, heapTotal: 215 },
+    uptime: 94,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:32:04.232'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 218 },
+    uptime: 214,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:32:28.261'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 218 },
+    uptime: 244,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:32:58.271'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 218 },
+    uptime: 274,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:33:28.281'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 212, heapTotal: 218 },
+    uptime: 304,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:33:58.295'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 212, heapTotal: 218 },
+    uptime: 334,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:34:28.301'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 213, heapTotal: 218 },
+    uptime: 364,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:34:58.309'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 213, heapTotal: 218 },
+    uptime: 394,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:35:28.311'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 212, heapTotal: 218 },
+    uptime: 424,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:35:58.319'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:36:05.480'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 284, heapUsed: 219, heapTotal: 240 },
+    uptime: 454,
+    requests: 7,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:36:28.333'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:36:29.327'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:36:29.327'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:36:29.327'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 10:36:29.738'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 10:36:29.738'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 10:36:29.739'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:36:32.688'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:38:41.652'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:38:41.852'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:38:41.886'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:38:41.886'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:38:41.887'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:38:44.093'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 210, heapTotal: 217 },
+    uptime: 34,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:39:11.367'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:40:17.581'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:40:17.803'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:40:17.844'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:40:17.844'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:40:17.845'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 10:40:20.795'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 277, heapUsed: 215, heapTotal: 225 },
+    uptime: 34,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 10:40:47.176'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 10:59:57.171'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 10:59:57.436'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 10:59:57.478'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 10:59:57.478'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 10:59:57.479'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:00:00.468'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 278, heapUsed: 216, heapTotal: 227 },
+    uptime: 35,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:00:26.751'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 11:01:50.046'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 11:01:50.245'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 11:01:50.280'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 11:01:50.281'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 11:01:50.281'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:01:55.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:01:55.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:01:55.806'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:01:55.809'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:01:55.809'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:01:55.810'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:02:05.719'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 277, heapUsed: 216, heapTotal: 227 },
+    uptime: 33,
+    requests: 6,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:02:19.782'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 292, heapUsed: 218, heapTotal: 258 },
+    uptime: 63,
+    requests: 6,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:02:49.784'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 11:06:39.361'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 11:06:39.573'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 11:06:39.603'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 11:06:39.604'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 11:06:39.604'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 33,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:07:09.002'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 63,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:07:39.008'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 208, heapTotal: 215 },
+    uptime: 93,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:08:09.013'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 123,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:08:39.024'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 153,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:09:09.024'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 208, heapTotal: 215 },
+    uptime: 183,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:09:39.028'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 213,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:10:09.040'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 243,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:10:39.051'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 267, heapUsed: 209, heapTotal: 215 },
+    uptime: 273,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:11:09.059'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 208, heapTotal: 215 },
+    uptime: 303,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:11:39.063'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 209, heapTotal: 215 },
+    uptime: 333,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:12:09.066'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 209, heapTotal: 215 },
+    uptime: 363,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:12:39.073'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 209, heapTotal: 215 },
+    uptime: 393,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:13:09.076'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 209, heapTotal: 215 },
+    uptime: 423,
+    requests: 5,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:13:39.084'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:13:57.661'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:13:57.665'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:13:57.666'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 211, heapTotal: 218 },
+    uptime: 453,
+    requests: 5,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:14:09.092'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 272, heapUsed: 212, heapTotal: 218 },
+    uptime: 483,
+    requests: 5,
+    errors: 3,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:14:39.094'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:54.345'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:54.346'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:54.346'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:54.533'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:54.534'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:54.534'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:54.842'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:54.842'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:54.844'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-01 11:14:55.045'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-01 11:14:55.046'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-01 11:14:55.046'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 213, heapTotal: 219 },
+    uptime: 513,
+    requests: 5,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:15:09.100'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 212, heapTotal: 218 },
+    uptime: 543,
+    requests: 5,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:15:39.107'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 273, heapUsed: 213, heapTotal: 218 },
+    uptime: 573,
+    requests: 5,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:16:09.117'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:16:17.216'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 278, heapUsed: 217, heapTotal: 224 },
+    uptime: 603,
+    requests: 6,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:16:39.122'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 278, heapUsed: 217, heapTotal: 224 },
+    uptime: 633,
+    requests: 6,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:17:09.127'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:17:28.747'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 279, heapUsed: 218, heapTotal: 225 },
+    uptime: 663,
+    requests: 7,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:17:39.134'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 279, heapUsed: 219, heapTotal: 225 },
+    uptime: 693,
+    requests: 7,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:18:09.135'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 279, heapUsed: 219, heapTotal: 225 },
+    uptime: 723,
+    requests: 7,
+    errors: 15,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:18:39.135'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:19:07.804'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:19:07.804'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:19:07.804'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:19:07.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:19:07.806'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:19:07.806'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 280, heapUsed: 220, heapTotal: 226 },
+    uptime: 753,
+    requests: 7,
+    errors: 21,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:19:09.140'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:19:10.462'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 289, heapUsed: 221, heapTotal: 236 },
+    uptime: 783,
+    requests: 8,
+    errors: 21,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:19:39.156'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 297, heapUsed: 218, heapTotal: 259 },
+    uptime: 813,
+    requests: 8,
+    errors: 21,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:20:09.170'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:20:19.129'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 311, heapUsed: 226, heapTotal: 260 },
+    uptime: 843,
+    requests: 9,
+    errors: 21,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:20:39.182'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 318, heapUsed: 235, heapTotal: 262 },
+    uptime: 873,
+    requests: 9,
+    errors: 21,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:21:09.186'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Servicio de limpieza de sesiones iniciado',
+  timestamp: '2025-08-01 11:25:16.320'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-01 11:25:16.623'
+}
+{
+  service: 'cache',
+  config: {
+    enableMemoryCache: true,
+    enableDistributedCache: false,
+    memoryMaxSize: 100,
+    defaultTTL: 300,
+    cleanupInterval: 60,
+    compressionThreshold: 1024
+  },
+  level: 'info',
+  message: 'Cache service initialized',
+  timestamp: '2025-08-01 11:25:16.665'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-01 11:25:16.666'
+}
+{
+  service: 'cache',
+  level: 'info',
+  message: 'Cache service destroyed',
+  timestamp: '2025-08-01 11:25:16.667'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:25:19.339'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:25:19.339'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:25:19.340'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error updating user profile:',
+  timestamp: '2025-08-01 11:25:19.346'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Error in updateUserProfile:',
+  timestamp: '2025-08-01 11:25:19.347'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    code: 'PGRST204',
+    details: null,
+    hint: null,
+    message: "Could not find the 'last_login' column of 'agents' in the schema cache"
+  },
+  level: 'error',
+  message: 'Refresh token error:',
+  timestamp: '2025-08-01 11:25:19.347'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'User logged in successfully: k.alvarado@aova.mx',
+  timestamp: '2025-08-01 11:25:21.821'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 277, heapUsed: 214, heapTotal: 220 },
+    uptime: 34,
+    requests: 6,
+    errors: 6,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-01 11:25:45.857'
+}

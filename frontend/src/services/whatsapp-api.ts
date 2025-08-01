@@ -57,13 +57,32 @@ class WhatsAppApiService {
     console.log(`🌐 [WhatsAppApi] Haciendo petición a: ${url}`);
     console.log(`🌐 [WhatsAppApi] Opciones:`, options);
     
+    // Agregar token de autenticación del usuario si existe
+    const authToken = localStorage.getItem('authToken');
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Agregar headers adicionales si existen
+    if (options.headers) {
+      Object.entries(options.headers).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          headers[key] = value;
+        }
+      });
+    }
+    
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+      console.log('🔐 [WhatsAppApi] Token de autenticación incluido en request');
+    } else {
+      console.warn('⚠️ [WhatsAppApi] No hay token de autenticación disponible');
+    }
+    
     try {
       const response = await fetch(url, {
         ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
       });
 
       console.log(`🌐 [WhatsAppApi] Status de respuesta: ${response.status}`);
@@ -76,7 +95,13 @@ class WhatsAppApiService {
       const data = await response.json();
       console.log(`🌐 [WhatsAppApi] Datos recibidos:`, data);
       
-      return data;
+      // Asegurar que la respuesta tenga la estructura esperada
+      return {
+        success: data.success || true,
+        data: data.data || data,
+        message: data.message,
+        error: data.error
+      };
     } catch (error) {
       console.error(`❌ [WhatsAppApi] Error en request a ${url}:`, error);
       
@@ -95,14 +120,16 @@ class WhatsAppApiService {
     console.log('📤 [WhatsAppApi] Enviando mensaje...', { to, messageLength: message.length, clientId });
     
     try {
-      // Verificar si hay token antes de hacer la llamada
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        console.error('❌ [WhatsAppApi] No hay token disponible para enviar mensaje');
-        throw new Error('No hay token de autenticación');
+      // Verificar si hay token de autenticación del usuario
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        console.error('❌ [WhatsAppApi] No hay token de autenticación del usuario');
+        throw new Error('No hay token de autenticación del usuario');
       }
       
-      const response = await this.request('/send', {
+      console.log('✅ [WhatsAppApi] Token de autenticación encontrado, enviando mensaje...');
+      
+      const response = await this.request('/chat/send', {
         method: 'POST',
         body: JSON.stringify({
           to,

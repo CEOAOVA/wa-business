@@ -131,6 +131,16 @@ class AuthApiService {
       console.log('📊 [AuthApi] response.data.session:', response.data.session);
       console.log('📊 [AuthApi] Tipo de response.data:', typeof response.data);
       console.log('📊 [AuthApi] response.data keys:', Object.keys(response.data || {}));
+      
+      // Log detallado de la estructura de datos
+      console.log('🔍 [AuthApi] Estructura detallada:');
+      const responseData = response.data as any;
+      console.log('  - response.data.success:', responseData?.success);
+      console.log('  - response.data.message:', responseData?.message);
+      console.log('  - response.data.data:', responseData?.data);
+      console.log('  - response.data.data?.user:', responseData?.data?.user);
+      console.log('  - response.data.data?.session:', responseData?.data?.session);
+      console.log('  - response.data.data?.session?.access_token:', responseData?.data?.session?.access_token);
 
       // Verificar que la respuesta tenga la estructura esperada
       if (!response.data) {
