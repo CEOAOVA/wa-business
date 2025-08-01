@@ -16,7 +16,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cacheService = exports.CacheService = void 0;
 const events_1 = require("events");
 const logger_1 = require("../../utils/logger");
-const monitoring_service_1 = require("../monitoring/monitoring-service");
 class CacheService extends events_1.EventEmitter {
     constructor(config) {
         super();
@@ -59,7 +58,6 @@ class CacheService extends events_1.EventEmitter {
                         this.stats.hits++;
                         this.stats.memoryHits++;
                         const duration = Date.now() - start;
-                        monitoring_service_1.monitoringService.recordResponseTime(duration, 'cache-memory');
                         logger_1.logger.debug('Cache hit (memory)', {
                             service: 'cache',
                             key: this.maskKey(key),
@@ -79,7 +77,6 @@ class CacheService extends events_1.EventEmitter {
                             yield this.setInMemory(key, distributedResult, this.config.defaultTTL);
                         }
                         const duration = Date.now() - start;
-                        monitoring_service_1.monitoringService.recordResponseTime(duration, 'cache-distributed');
                         logger_1.logger.debug('Cache hit (distributed)', {
                             service: 'cache',
                             key: this.maskKey(key),

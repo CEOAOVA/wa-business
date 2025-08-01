@@ -7,9 +7,10 @@ import * as Sentry from '../../utils/sentry-stub';
 import { getConfig } from '../../config';
 import { tokenManager } from './token-manager';
 import { inventoryCache } from './inventory-cache';
+import { soapCircuitBreaker } from '../circuit-breaker/circuit-breaker.service';
 
-// Tiempo de espera para peticiones SOAP (ms)
-const SOAP_TIMEOUT = 30000;
+// Tiempo de espera para peticiones SOAP (ms) - OPTIMIZADO
+const SOAP_TIMEOUT = 10000; // REDUCIDO de 30s a 10s
 
 /**
  * Cliente SOAP para servicios web
@@ -19,7 +20,7 @@ export class SoapService {
   private initialized = false;
   private initPromise: Promise<void> | null = null;
   private lastInit = 0;
-  private readonly connectionRetries = 3;
+  private readonly connectionRetries = 5; // AUMENTADO de 3 a 5
 
   /**
    * Inicializa el cliente SOAP cargando el WSDL y fijando el endpoint
@@ -176,55 +177,77 @@ export class SoapService {
     productCode: string,
     pointOfSaleId: string
   ): Promise<any> {
-    console.log(`[SOAP] consultarInventarioPorPunto - Código: ${productCode}, POS: ${pointOfSaleId}`);
-    
-    const cacheKey = { productCode, pointOfSaleId, type: 'local' as const };
-    const cached = inventoryCache.get(cacheKey);
-    if (cached) {
-      console.log(`[SOAP] Usando inventario en caché para ${productCode}`);
-      return cached;
-    }
+    return await soapCircuitBreaker.execute(
+      async () => {
+        console.log(`[SOAP] consultarInventarioPorPunto - Código: ${productCode}, POS: ${pointOfSaleId}`);
+        
+        const cacheKey = { productCode, pointOfSaleId, type: 'local' as const };
+        const cached = inventoryCache.get(cacheKey);
+        if (cached) {
+          console.log(`[SOAP] Usando inventario en caché para ${productCode}`);
+          return cached;
+        }
 
-    console.log(`[SOAP] Inventario no en caché, consultando API SOAP`);
-    await this.initialize();
-    console.log(`[SOAP] Inicialización completa, obteniendo token`);
-    
-    const token = await this.getAuthToken(pointOfSaleId);
-    console.log(`[SOAP] Token obtenido, preparando consulta de inventario`);
-    
-    this.client.wsdl.options.wsdl_options.headers = {
-      ...this.client.wsdl.options.wsdl_options.headers,
-      'SOAPAction': 'http://tempuri.org/EmblerWs/ConsultarInventarioPorPunto'
-    };
-    
-    const params = {
-      CodigoPieza: productCode,
-      IdPuntoVenta: pointOfSaleId,
-      TokenAutenticacion: token
-    };
-    
-    console.log(`[SOAP] Enviando parámetros de consulta:`, 
-      JSON.stringify({...params, TokenAutenticacion: token.substring(0, 10) + '...'})
-    );
-    
-    try {
-      console.log(`[SOAP] Ejecutando ConsultarInventarioPorPuntoAsync`);
-      const [response] = await this.client.ConsultarInventarioPorPuntoAsync(params);
-      console.log(`[SOAP] Respuesta recibida:`, response);
-      
-      const result = response.ConsultarInventarioPorPuntoResult;
-      if (result.Estatus !== 0) {
-        console.error(`[SOAP] Error en consulta de inventario: ${result.Mensaje} (Estatus: ${result.Estatus})`);
-        throw new Error(`Error SOAP InventarioPorPunto: ${result.Mensaje}`);
+        console.log(`[SOAP] Inventario no en caché, consultando API SOAP`);
+        await this.initialize();
+        console.log(`[SOAP] Inicialización completa, obteniendo token`);
+        
+        const token = await this.getAuthToken(pointOfSaleId);
+        console.log(`[SOAP] Token obtenido, preparando consulta de inventario`);
+        
+        this.client.wsdl.options.wsdl_options.headers = {
+          ...this.client.wsdl.options.wsdl_options.headers,
+          'SOAPAction': 'http://tempuri.org/EmblerWs/ConsultarInventarioPorPunto'
+        };
+        
+        const params = {
+          CodigoPieza: productCode,
+          IdPuntoVenta: pointOfSaleId,
+          TokenAutenticacion: token
+        };
+        
+        console.log(`[SOAP] Enviando parámetros de consulta:`, 
+          JSON.stringify({...params, TokenAutenticacion: token.substring(0, 10) + '...'})
+        );
+        
+        try {
+          console.log(`[SOAP] Ejecutando ConsultarInventarioPorPuntoAsync`);
+          const [response] = await this.client.ConsultarInventarioPorPuntoAsync(params);
+          console.log(`[SOAP] Respuesta recibida:`, response);
+          
+          const result = response.ConsultarInventarioPorPuntoResult;
+          if (result.Estatus !== 0) {
+            console.error(`[SOAP] Error en consulta de inventario: ${result.Mensaje} (Estatus: ${result.Estatus})`);
+            throw new Error(`Error SOAP InventarioPorPunto: ${result.Mensaje}`);
+          }
+          
+          console.log(`[SOAP] Consulta exitosa - Disponible: ${result.CantidadDisponible}, Precio: ${result.Precio}`);
+          inventoryCache.set(cacheKey, result);
+          return result;
+        } catch (error) {
+          console.error(`[SOAP] Error en consultarInventarioPorPunto:`, error);
+          throw error;
+        }
+      },
+      // Fallback: retornar datos de caché o datos por defecto
+      async () => {
+        console.warn(`[SOAP] Usando fallback para consultarInventarioPorPunto - Código: ${productCode}`);
+        const cacheKey = { productCode, pointOfSaleId, type: 'local' as const };
+        const cached = inventoryCache.get(cacheKey);
+        
+        if (cached) {
+          return cached;
+        }
+        
+        // Retornar datos por defecto si no hay caché
+        return {
+          CantidadDisponible: 0,
+          Precio: 0,
+          Estatus: 0,
+          Mensaje: 'Servicio temporalmente no disponible'
+        };
       }
-      
-      console.log(`[SOAP] Consulta exitosa - Disponible: ${result.CantidadDisponible}, Precio: ${result.Precio}`);
-      inventoryCache.set(cacheKey, result);
-      return result;
-    } catch (error) {
-      console.error(`[SOAP] Error en consultarInventarioPorPunto:`, error);
-      throw error;
-    }
+    );
   }
 
   /**

@@ -1,0 +1,9 @@
+Procesar los webhooks de WhatsApp mas rápido
+Investigar Supabase Realtime para recibir notificaciones inmediatas de nuevos mensajes o cambios
+Etiquetar adecuadamente las tablas para mantener el rendimiento con volúmenes altos de mensajes
+Optimizar las consultas de historial de mensajes mediante carga progresiva o en bloques para no saturarse
+Revisar los tiempos de respuesta y métricas de uso 
+Implementacón de mensajes con contenido multimedia, envío y recepción
+
+Revisar porque no se muestran los mensajes recibidos en modo IA (no urge porque de todos modos el modo IA no le importa a EMBLER)
+

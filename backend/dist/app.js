@@ -55,6 +55,7 @@ const media_upload_1 = __importDefault(require("./routes/media-upload"));
 const chatbot_1 = __importDefault(require("./routes/chatbot"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
+const monitoring_1 = __importDefault(require("./routes/monitoring"));
 const env_loader_1 = require("./config/env-loader");
 const whatsapp_1 = require("./config/whatsapp");
 const whatsapp_service_1 = require("./services/whatsapp.service");
@@ -80,14 +81,14 @@ const io = new socket_io_1.Server(httpServer, {
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"]
     },
-    // Configuraciones optimizadas para tiempo real
+    // Configuraciones optimizadas para tiempo real - CORREGIDO
     transports: ['websocket', 'polling'],
     allowEIO3: true,
-    pingTimeout: 60000, // 60 segundos
-    pingInterval: 25000, // 25 segundos
+    pingTimeout: 10000, // 10 segundos - REDUCIDO de 60s
+    pingInterval: 5000, // 5 segundos - REDUCIDO de 25s
     upgradeTimeout: 10000, // 10 segundos
     maxHttpBufferSize: 1e6, // 1MB
-    connectTimeout: 45000,
+    connectTimeout: 15000, // 15 segundos - REDUCIDO de 45s
     allowRequest: (req, callback) => {
         // Permitir todas las conexiones por ahora
         callback(null, true);
@@ -116,9 +117,18 @@ io.on('connection', (socket) => {
         socket.leave(conversationId);
         socket.emit('left_conversation', { conversationId });
     });
-    // Heartbeat optimizado
+    // Heartbeat optimizado con métricas de latencia
     socket.on('ping', (data) => {
-        socket.emit('pong', { timestamp: data.timestamp });
+        const now = Date.now();
+        const latency = now - data.timestamp;
+        // Log de latencia para monitoreo
+        console.log(`💓 Heartbeat recibido - Latencia: ${latency}ms - Socket: ${socket.id}`);
+        // Emitir respuesta con timestamp actual
+        socket.emit('pong', { timestamp: now });
+        // Métricas de latencia (para futura implementación de dashboard)
+        if (latency > 1000) {
+            console.warn(`⚠️ Latencia alta detectada: ${latency}ms en socket ${socket.id}`);
+        }
     });
     // Manejar desconexión
     socket.on('disconnect', (reason) => {
@@ -149,6 +159,8 @@ app.use('/api/media', media_upload_1.default);
 app.use('/api/chatbot', chatbot_1.default);
 // Rutas del dashboard
 app.use('/api/dashboard', dashboard_1.default);
+// Rutas de monitoreo
+app.use('/api/monitoring', monitoring_1.default);
 // Información de la API
 app.get('/api', (_req, res) => {
     res.json({

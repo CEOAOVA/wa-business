@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { AppState, Chat, Message, Notification, AppAction } from '../types';
 import { whatsappApi } from '../services/whatsapp-api';
 import { dashboardApiService } from '../services/dashboard-api';
-import { useWebSocketSimple, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocketSimple';
+import { useWebSocket, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocket';
 
 // Estado inicial
 const initialState: AppState = {
@@ -29,99 +29,102 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'ADD_MESSAGE':
       const message = action.payload;
       
-      // Verificar si el mensaje ya existe para evitar duplicados
+      // OPTIMIZADO: Sistema de idempotencia mejorado
       const chatId = message.chatId || message.conversation_id || '';
       const existingMessages = state.messages[chatId] || [];
       
-      // MEJORADO: Verificar duplicados por client_id, id, o waMessageId con mejor lógica
-      const messageExists = existingMessages.some((existing: Message) => {
-        // Verificar por ID exacto
-        if (existing.id === message.id && message.id) {
-          console.log(`🔍 [Reducer] Mensaje duplicado por ID: ${message.id}`);
-          return true;
+             // Generar UUID único si no existe
+       const messageWithId = {
+         ...message,
+         clientId: message.clientId || `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+         timestamp: message.timestamp ? new Date(message.timestamp) : new Date()
+       };
+      
+      // OPTIMIZADO: Verificación de duplicados mejorada con múltiples criterios
+      const duplicateCheck = existingMessages.find((existing: Message) => {
+        // 1. Verificar por ID exacto (más confiable)
+        if (existing.id === messageWithId.id && messageWithId.id) {
+          console.log(`🔍 [Reducer] Duplicado detectado por ID: ${messageWithId.id}`);
+          return existing;
         }
         
-        // Verificar por WhatsApp Message ID
-        if (existing.waMessageId && existing.waMessageId === message.waMessageId && message.waMessageId) {
-          console.log(`🔍 [Reducer] Mensaje duplicado por waMessageId: ${message.waMessageId}`);
-          return true;
+        // 2. Verificar por WhatsApp Message ID
+        if (existing.waMessageId && existing.waMessageId === messageWithId.waMessageId && messageWithId.waMessageId) {
+          console.log(`🔍 [Reducer] Duplicado detectado por waMessageId: ${messageWithId.waMessageId}`);
+          return existing;
         }
         
-        // Verificar por client_id (solo para mensajes enviados)
-        if (existing.clientId && existing.clientId === message.clientId && message.clientId) {
-          console.log(`🔍 [Reducer] Mensaje duplicado por clientId: ${message.clientId}`);
-          return true;
+        // 3. Verificar por client_id (para mensajes enviados)
+        if (existing.clientId && existing.clientId === messageWithId.clientId && messageWithId.clientId) {
+          console.log(`🔍 [Reducer] Duplicado detectado por clientId: ${messageWithId.clientId}`);
+          return existing;
         }
         
-        // Verificar por contenido y timestamp (fallback)
-        if (existing.content === message.content && 
-            existing.timestamp && message.timestamp &&
-            Math.abs(new Date(existing.timestamp).getTime() - new Date(message.timestamp).getTime()) < 5000) {
-          console.log(`🔍 [Reducer] Mensaje duplicado por contenido y timestamp`);
-          return true;
+                 // 4. Verificar por contenido + timestamp (fallback más estricto)
+         if (existing.content === messageWithId.content && 
+             existing.timestamp && messageWithId.timestamp &&
+             Math.abs((existing.timestamp instanceof Date ? existing.timestamp : new Date(existing.timestamp)).getTime() - messageWithId.timestamp.getTime()) < 3000) {
+          console.log(`🔍 [Reducer] Duplicado detectado por contenido + timestamp`);
+          return existing;
         }
         
-        return false;
+        return null;
       });
       
-      if (messageExists) {
-        console.log(`🔍 [Reducer] Mensaje ya existe, verificando actualización:`, {
-          id: message.id,
-          waMessageId: message.waMessageId,
-          clientId: message.clientId,
-          content: message.content.substring(0, 50)
+      if (duplicateCheck) {
+        console.log(`🔄 [Reducer] Actualizando mensaje existente con datos del servidor:`, {
+          id: messageWithId.id,
+          waMessageId: messageWithId.waMessageId,
+          clientId: messageWithId.clientId,
+          content: messageWithId.content.substring(0, 50)
         });
         
-        // MEJORADO: Buscar mensaje existente para actualizar
-        const existingMessageIndex = existingMessages.findIndex((existing: Message) => 
-          (existing.clientId && existing.clientId === message.clientId) ||
-          (existing.waMessageId && existing.waMessageId === message.waMessageId) ||
-          (existing.id === message.id && message.id)
-        );
+        // OPTIMIZADO: Actualización inteligente preservando datos locales
+        const updatedMessages = existingMessages.map((existing: Message) => {
+          if (existing.id === messageWithId.id || 
+              existing.waMessageId === messageWithId.waMessageId ||
+              existing.clientId === messageWithId.clientId) {
+            return {
+              ...existing,
+                             // Preservar datos del servidor pero mantener estado local
+               id: messageWithId.id || existing.id,
+               waMessageId: messageWithId.waMessageId || existing.waMessageId,
+               // Mantener clientId para futuras verificaciones
+               clientId: messageWithId.clientId || existing.clientId,
+               // Actualizar timestamp solo si es más reciente
+               timestamp: new Date(messageWithId.timestamp) > new Date(existing.timestamp || 0) 
+                 ? new Date(messageWithId.timestamp) 
+                 : existing.timestamp
+            };
+          }
+          return existing;
+        });
         
-        if (existingMessageIndex !== -1) {
-          console.log(`🔄 [Reducer] Actualizando mensaje existente con datos del servidor`);
-          // Actualizar mensaje existente con datos del servidor
-          const updatedMessages = [...existingMessages];
-          updatedMessages[existingMessageIndex] = {
-            ...updatedMessages[existingMessageIndex],
-            id: message.id || updatedMessages[existingMessageIndex].id,
-            waMessageId: message.waMessageId || updatedMessages[existingMessageIndex].waMessageId,
-            // Mantener client_id para futuras verificaciones
-            clientId: message.clientId || updatedMessages[existingMessageIndex].clientId
-          };
-          
-          return {
-            ...state,
-            messages: {
-              ...state.messages,
-              [chatId]: updatedMessages,
-            }
-          };
-        }
-        
-        // Si no hay datos del servidor para actualizar, mantener el estado actual
-        console.log(`🔍 [Reducer] Mensaje duplicado sin datos del servidor, omitiendo`);
-        return state;
-      }
-      
-      // Agregar el nuevo mensaje y ordenar cronológicamente
-      const updatedMessages = [...existingMessages, message].sort((a, b) => {
-        const timeA = new Date(a.timestamp || a.created_at || 0).getTime();
-        const timeB = new Date(b.timestamp || b.created_at || 0).getTime();
-        return timeA - timeB; // Orden ascendente: más antiguo primero
-      });
+        return {
+          ...state,
+          messages: {
+            ...state.messages,
+            [chatId]: updatedMessages,
+          }
+        };
+      } else {
+                 // Agregar el nuevo mensaje y ordenar cronológicamente
+         const updatedMessages = [...existingMessages, messageWithId].sort((a, b) => {
+           const timeA = (a.timestamp instanceof Date ? a.timestamp : new Date(a.timestamp || a.created_at || 0)).getTime();
+           const timeB = (b.timestamp instanceof Date ? b.timestamp : new Date(b.timestamp || b.created_at || 0)).getTime();
+           return timeA - timeB; // Orden ascendente: más antiguo primero
+         });
       
       // Actualizar chat con el nuevo mensaje
       const updatedChats = state.chats.map(chat =>
         chat.id === chatId
           ? {
               ...chat,
-              lastMessage: message,
-              unreadCount: message.senderId !== state.currentChat?.assignedAgentId
+              lastMessage: messageWithId,
+              unreadCount: messageWithId.senderId !== state.currentChat?.assignedAgentId
                 ? chat.unreadCount + 1
                 : chat.unreadCount,
-              updatedAt: message.timestamp || new Date(message.created_at || Date.now()),
+              updatedAt: messageWithId.timestamp || new Date(messageWithId.created_at || Date.now()),
             }
           : chat
       );
@@ -134,6 +137,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         },
         chats: updatedChats,
       };
+      }
     case 'UPDATE_MESSAGE':
       const { clientId, updates } = action.payload;
       const chatIdToUpdate = Object.keys(state.messages).find(chatId => 
@@ -258,7 +262,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Integración WebSocket para mensajería en tiempo real
-  const webSocket = useWebSocketSimple();
+  const webSocket = useWebSocket();
 
   // Configurar manejadores de eventos WebSocket
   useEffect(() => {

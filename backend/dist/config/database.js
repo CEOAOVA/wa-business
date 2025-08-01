@@ -16,19 +16,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.databaseService = exports.DatabaseService = void 0;
 const supabase_js_1 = require("@supabase/supabase-js");
 const index_1 = require("./index");
+const circuit_breaker_service_1 = require("../services/circuit-breaker/circuit-breaker.service");
 class DatabaseService {
     constructor() {
         this.connectionPool = new Map();
         this.isConnected = false;
+        this.poolMetrics = {
+            totalConnections: 0,
+            activeConnections: 0,
+            failedConnections: 0,
+            lastHealthCheck: Date.now()
+        };
         // NUEVO: Caché en memoria para resúmenes (más barato que Redis)
         this.summaryCache = new Map();
         const appConfig = (0, index_1.getConfig)();
         this.config = {
             supabaseUrl: appConfig.database.supabaseUrl,
             supabaseKey: appConfig.database.supabaseKey,
-            connectionPoolSize: 10,
-            queryTimeout: 30000,
-            retryAttempts: 3,
+            connectionPoolSize: 50, // AUMENTADO de 10 a 50 para alta concurrencia
+            queryTimeout: 10000, // REDUCIDO de 30000ms a 10000ms
+            retryAttempts: 5, // AUMENTADO de 3 a 5
             enableWAL: true
         };
         this.supabase = (0, supabase_js_1.createClient)(this.config.supabaseUrl, this.config.supabaseKey, {
@@ -41,6 +48,14 @@ class DatabaseService {
             global: {
                 headers: {
                     'X-Client-Name': 'whatsapp-business-llm'
+                },
+                // Configuración optimizada para timeouts y keep-alive
+                fetch: (url, options = {}) => {
+                    return fetch(url, Object.assign(Object.assign({}, options), { 
+                        // Timeout específico para operaciones de Supabase
+                        signal: AbortSignal.timeout(this.config.queryTimeout), 
+                        // Keep-alive para conexiones persistentes
+                        keepalive: true }));
                 }
             }
         });
@@ -174,16 +189,32 @@ class DatabaseService {
     isHealthy() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { error } = yield this.supabase
+                const startTime = Date.now();
+                const { data, error } = yield this.supabase
                     .from('conversations')
                     .select('count')
                     .limit(1);
+                const responseTime = Date.now() - startTime;
+                // Actualizar métricas
+                this.poolMetrics.activeConnections++;
+                this.poolMetrics.lastHealthCheck = Date.now();
+                if (responseTime > 1000) {
+                    console.warn(`[DatabaseService] ⚠️ Health check lento: ${responseTime}ms`);
+                }
                 return !error;
             }
-            catch (_a) {
+            catch (error) {
+                console.error('[DatabaseService] Health check failed:', error);
+                this.poolMetrics.failedConnections++;
                 return false;
             }
         });
+    }
+    /**
+     * Obtener métricas del pool de conexiones
+     */
+    getPoolMetrics() {
+        return Object.assign(Object.assign({}, this.poolMetrics), { utilization: this.poolMetrics.activeConnections / this.config.connectionPoolSize * 100, isHealthy: this.isConnected });
     }
     /**
      * Ejecuta una consulta con retry automático
@@ -217,19 +248,26 @@ class DatabaseService {
      */
     createConversation(conversation) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { data, error } = yield this.executeWithRetry(() => __awaiter(this, void 0, void 0, function* () {
-                const result = yield this.supabase
-                    .from('conversations')
-                    .insert(conversation)
-                    .select()
-                    .single();
-                return result;
-            }));
-            if (error) {
-                console.error('[DatabaseService] Error creando conversación:', error);
+            return yield circuit_breaker_service_1.supabaseCircuitBreaker.execute(() => __awaiter(this, void 0, void 0, function* () {
+                const { data, error } = yield this.executeWithRetry(() => __awaiter(this, void 0, void 0, function* () {
+                    const result = yield this.supabase
+                        .from('conversations')
+                        .insert(conversation)
+                        .select()
+                        .single();
+                    return result;
+                }));
+                if (error) {
+                    console.error('[DatabaseService] Error creando conversación:', error);
+                    return null;
+                }
+                return data;
+            }), 
+            // Fallback: retornar null si Supabase falla
+            () => __awaiter(this, void 0, void 0, function* () {
+                console.warn('[DatabaseService] Usando fallback para createConversation');
                 return null;
-            }
-            return data;
+            }));
         });
     }
     getConversation(conversationId) {

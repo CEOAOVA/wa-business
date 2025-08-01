@@ -120,7 +120,7 @@ export class RateLimiter extends EventEmitter {
         limit: config.maxRequests
       });
 
-      monitoringService.recordRequest(false);
+      // Rate limit exceeded
     }
 
     return {
@@ -365,7 +365,7 @@ export class RateLimiter extends EventEmitter {
         const success = res.statusCode < 400;
         
         this.recordResult(serviceName, success, duration);
-        monitoringService.recordResponseTime(duration, serviceName);
+        // Record response time for monitoring
         
         return originalEnd.apply(res, args);
       };

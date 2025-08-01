@@ -4,583 +4,378 @@
  */
 
 import { EventEmitter } from 'events';
-import { logger } from '../../utils/logger';
-import { databaseService } from '../database.service';
-import { soapService } from '../soap/soap-service';
 
-export interface HealthCheckResult {
-  service: string;
-  status: 'healthy' | 'unhealthy' | 'degraded';
-  responseTime: number;
-  error?: string;
-  metadata?: any;
+export interface WebSocketMetrics {
+  activeConnections: number;
+  totalConnections: number;
+  disconnectedConnections: number;
+  averageLatency: number;
+  heartbeatSuccessRate: number;
+  reconnectAttempts: number;
+  failedReconnects: number;
+  lastHeartbeat: Date;
 }
 
-export interface SystemHealth {
-  overall: 'healthy' | 'unhealthy' | 'degraded';
-  services: HealthCheckResult[];
-  timestamp: Date;
+export interface SupabaseMetrics {
+  poolUtilization: number;
+  activeConnections: number;
+  totalConnections: number;
+  failedConnections: number;
+  averageQueryTime: number;
+  slowQueries: number;
+  errorRate: number;
+  lastHealthCheck: Date;
+}
+
+export interface CircuitBreakerMetrics {
+  supabaseTrips: number;
+  soapTrips: number;
+  whatsappTrips: number;
+  totalTrips: number;
+  recoveryTime: number;
+  lastTrip: Date;
+}
+
+export interface SystemMetrics {
+  memoryUsage: NodeJS.MemoryUsage;
+  cpuUsage: number;
   uptime: number;
-}
-
-export interface PerformanceMetrics {
-  requests: {
-    total: number;
-    successful: number;
-    failed: number;
-    rate: number; // requests per second
-  };
-  responses: {
-    averageTime: number;
-    p95Time: number;
-    p99Time: number;
-    slowestEndpoints: Array<{ endpoint: string; averageTime: number }>;
-  };
-  functions: {
-    totalCalls: number;
-    successRate: number;
-    averageTime: number;
-    functionStats: Map<string, { calls: number; successRate: number; averageTime: number }>;
-  };
-  conversations: {
-    active: number;
-    total: number;
-    averageLength: number;
-    completionRate: number;
-  };
-  system: {
-    memoryUsage: NodeJS.MemoryUsage;
-    cpuUsage: number;
-    uptime: number;
-    errors: number;
-  };
+  activeSessions: number;
+  totalRequests: number;
+  errorRate: number;
 }
 
 export interface Alert {
   id: string;
-  type: 'critical' | 'warning' | 'info';
-  service: string;
+  type: 'warning' | 'error' | 'critical';
   message: string;
   timestamp: Date;
   resolved: boolean;
-  metadata?: any;
-}
-
-export interface MonitoringConfig {
-  healthCheckInterval: number;
-  metricsRetentionHours: number;
-  alertThresholds: {
-    responseTime: number;
-    errorRate: number;
-    memoryUsage: number;
-    diskUsage: number;
-  };
-  enableAlerts: boolean;
-  enableDashboard: boolean;
+  resolvedAt?: Date;
 }
 
 export class MonitoringService extends EventEmitter {
-  private config: MonitoringConfig;
-  private healthChecks: Map<string, () => Promise<HealthCheckResult>> = new Map();
-  private metrics!: PerformanceMetrics;
+  private static instance: MonitoringService;
+  
+  // Métricas en tiempo real
+  private webSocketMetrics: WebSocketMetrics = {
+    activeConnections: 0,
+    totalConnections: 0,
+    disconnectedConnections: 0,
+    averageLatency: 0,
+    heartbeatSuccessRate: 100,
+    reconnectAttempts: 0,
+    failedReconnects: 0,
+    lastHeartbeat: new Date()
+  };
+  
+  private supabaseMetrics: SupabaseMetrics = {
+    poolUtilization: 0,
+    activeConnections: 0,
+    totalConnections: 0,
+    failedConnections: 0,
+    averageQueryTime: 0,
+    slowQueries: 0,
+    errorRate: 0,
+    lastHealthCheck: new Date()
+  };
+  
+  private circuitBreakerMetrics: CircuitBreakerMetrics = {
+    supabaseTrips: 0,
+    soapTrips: 0,
+    whatsappTrips: 0,
+    totalTrips: 0,
+    recoveryTime: 0,
+    lastTrip: new Date()
+  };
+  
+  private systemMetrics: SystemMetrics = {
+    memoryUsage: process.memoryUsage(),
+    cpuUsage: 0,
+    uptime: process.uptime(),
+    activeSessions: 0,
+    totalRequests: 0,
+    errorRate: 0
+  };
+  
   private alerts: Alert[] = [];
-  private responseTimes: number[] = [];
-  private isRunning: boolean = false;
-  private metricsHistory: any[] = [];
-
-  constructor(config?: Partial<MonitoringConfig>) {
+  private metricsHistory: {
+    webSocket: WebSocketMetrics[];
+    supabase: SupabaseMetrics[];
+    system: SystemMetrics[];
+  } = {
+    webSocket: [],
+    supabase: [],
+    system: []
+  };
+  
+  private readonly MAX_HISTORY_SIZE = 1000;
+  private readonly ALERT_THRESHOLDS = {
+    webSocketLatency: 1000, // 1 segundo
+    webSocketErrorRate: 10, // 10%
+    supabaseUtilization: 80, // 80%
+    supabaseErrorRate: 5, // 5%
+    memoryUsage: 85, // 85%
+    circuitBreakerTrips: 5 // 5 trips por hora
+  };
+  
+  private constructor() {
     super();
-    
-    this.config = {
-      healthCheckInterval: 30000, // 30 segundos
-      metricsRetentionHours: 24,
-      alertThresholds: {
-        responseTime: 5000, // 5 segundos
-        errorRate: 5, // 5%
-        memoryUsage: 85, // 85%
-        diskUsage: 90 // 90%
-      },
-      enableAlerts: true,
-      enableDashboard: true,
-      ...config
-    };
-
-    this.initializeMetrics();
-    this.registerHealthChecks();
-    this.startMonitoring();
+    this.startMetricsCollection();
+    this.startAlertMonitoring();
   }
-
-  /**
-   * Inicializa métricas del sistema
-   */
-  private initializeMetrics(): void {
-    this.metrics = {
-      requests: {
-        total: 0,
-        successful: 0,
-        failed: 0,
-        rate: 0
-      },
-      responses: {
-        averageTime: 0,
-        p95Time: 0,
-        p99Time: 0,
-        slowestEndpoints: []
-      },
-      functions: {
-        totalCalls: 0,
-        successRate: 0,
-        averageTime: 0,
-        functionStats: new Map()
-      },
-      conversations: {
-        active: 0,
-        total: 0,
-        averageLength: 0,
-        completionRate: 0
-      },
-      system: {
-        memoryUsage: process.memoryUsage(),
-        cpuUsage: 0,
-        uptime: process.uptime(),
-        errors: 0
-      }
-    };
-  }
-
-  /**
-   * Registra health checks para servicios críticos
-   */
-  private registerHealthChecks(): void {
-    // Health check para base de datos
-    this.healthChecks.set('database', async (): Promise<HealthCheckResult> => {
-      const start = Date.now();
-      try {
-        const isHealthy = await databaseService.isHealthy();
-        const responseTime = Date.now() - start;
-        
-        return {
-          service: 'database',
-          status: isHealthy ? 'healthy' : 'unhealthy',
-          responseTime,
-          metadata: await databaseService.getStats()
-        };
-      } catch (error) {
-        return {
-          service: 'database',
-          status: 'unhealthy',
-          responseTime: Date.now() - start,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        };
-      }
-    });
-
-    // Health check para SOAP services
-    this.healthChecks.set('soap', async (): Promise<HealthCheckResult> => {
-      const start = Date.now();
-      try {
-        const isHealthy = await soapService.testConnection();
-        const responseTime = Date.now() - start;
-        
-        return {
-          service: 'soap',
-          status: isHealthy ? 'healthy' : 'unhealthy',
-          responseTime
-        };
-      } catch (error) {
-        return {
-          service: 'soap',
-          status: 'unhealthy',
-          responseTime: Date.now() - start,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        };
-      }
-    });
-
-    // Health check para memoria del sistema
-    this.healthChecks.set('memory', async (): Promise<HealthCheckResult> => {
-      const start = Date.now();
-      const memoryUsage = process.memoryUsage();
-      const totalMemory = memoryUsage.heapTotal;
-      const usedMemory = memoryUsage.heapUsed;
-      const memoryPercent = (usedMemory / totalMemory) * 100;
-      
-      let status: 'healthy' | 'unhealthy' | 'degraded' = 'healthy';
-      if (memoryPercent > this.config.alertThresholds.memoryUsage) {
-        status = 'unhealthy';
-      } else if (memoryPercent > 70) {
-        status = 'degraded';
-      }
-      
-      return {
-        service: 'memory',
-        status,
-        responseTime: Date.now() - start,
-        metadata: {
-          memoryPercent: Math.round(memoryPercent),
-          heapUsed: Math.round(usedMemory / 1024 / 1024),
-          heapTotal: Math.round(totalMemory / 1024 / 1024),
-          external: Math.round(memoryUsage.external / 1024 / 1024)
-        }
-      };
-    });
-
-    // Health check para APIs externas (OpenRouter)
-    this.healthChecks.set('llm', async (): Promise<HealthCheckResult> => {
-      const start = Date.now();
-      try {
-        // Simulamos un health check básico
-        // En un entorno real, haríamos una llamada de prueba a la API
-        const responseTime = Date.now() - start + Math.random() * 100;
-        
-        return {
-          service: 'llm',
-          status: 'healthy',
-          responseTime: Math.round(responseTime)
-        };
-      } catch (error) {
-        return {
-          service: 'llm',
-          status: 'unhealthy',
-          responseTime: Date.now() - start,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        };
-      }
-    });
-  }
-
-  /**
-   * Inicia el sistema de monitoreo
-   */
-  private startMonitoring(): void {
-    if (this.isRunning) return;
-    
-    this.isRunning = true;
-    logger.info('Starting monitoring service', { service: 'monitoring' });
-
-    // Ejecutar health checks periódicamente
-    setInterval(async () => {
-      await this.runHealthChecks();
-    }, this.config.healthCheckInterval);
-
-    // Actualizar métricas cada 60 segundos
-    setInterval(() => {
-      this.updateMetrics();
-    }, 60000);
-
-    // Limpiar datos antiguos cada hora
-    setInterval(() => {
-      this.cleanupOldData();
-    }, 3600000);
-
-    // Ejecutar health check inicial
-    this.runHealthChecks();
-  }
-
-  /**
-   * Ejecuta todos los health checks
-   */
-  private async runHealthChecks(): Promise<SystemHealth> {
-    const results: HealthCheckResult[] = [];
-    
-    for (const [name, healthCheck] of this.healthChecks.entries()) {
-      try {
-        const result = await healthCheck();
-        results.push(result);
-        
-        // Generar alertas si es necesario
-        if (result.status === 'unhealthy') {
-          this.createAlert('critical', name, `Service ${name} is unhealthy: ${result.error || 'Unknown error'}`, result);
-        } else if (result.status === 'degraded') {
-          this.createAlert('warning', name, `Service ${name} is degraded`, result);
-        }
-        
-      } catch (error) {
-        const result: HealthCheckResult = {
-          service: name,
-          status: 'unhealthy',
-          responseTime: 0,
-          error: error instanceof Error ? error.message : 'Health check failed'
-        };
-        results.push(result);
-        this.createAlert('critical', name, `Health check failed for ${name}`, result);
-      }
+  
+  static getInstance(): MonitoringService {
+    if (!MonitoringService.instance) {
+      MonitoringService.instance = new MonitoringService();
     }
-
-    // Determinar estado general del sistema
-    let overall: 'healthy' | 'unhealthy' | 'degraded' = 'healthy';
-    const unhealthyCount = results.filter(r => r.status === 'unhealthy').length;
-    const degradedCount = results.filter(r => r.status === 'degraded').length;
-    
-    if (unhealthyCount > 0) {
-      overall = 'unhealthy';
-    } else if (degradedCount > 0) {
-      overall = 'degraded';
-    }
-
-    const systemHealth: SystemHealth = {
-      overall,
-      services: results,
-      timestamp: new Date(),
-      uptime: process.uptime()
-    };
-
-    // Emitir evento de health check
-    this.emit('healthCheck', systemHealth);
-    
-    // Log si hay problemas
-    if (overall !== 'healthy') {
-      logger.warn(`System health is ${overall}`, {
-        service: 'monitoring',
-        healthCheck: systemHealth
-      });
-    }
-
-    return systemHealth;
+    return MonitoringService.instance;
   }
-
+  
   /**
-   * Actualiza métricas del sistema
+   * Actualizar métricas de WebSocket
    */
-  private updateMetrics(): void {
-    // Actualizar métricas del sistema
-    this.metrics.system.memoryUsage = process.memoryUsage();
-    this.metrics.system.uptime = process.uptime();
+  updateWebSocketMetrics(metrics: Partial<WebSocketMetrics>): void {
+    this.webSocketMetrics = { ...this.webSocketMetrics, ...metrics };
+    this.webSocketMetrics.lastHeartbeat = new Date();
     
-    // Calcular estadísticas de tiempo de respuesta
-    if (this.responseTimes.length > 0) {
-      this.responseTimes.sort((a, b) => a - b);
-      this.metrics.responses.averageTime = this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length;
-      this.metrics.responses.p95Time = this.responseTimes[Math.floor(this.responseTimes.length * 0.95)];
-      this.metrics.responses.p99Time = this.responseTimes[Math.floor(this.responseTimes.length * 0.99)];
+    // Guardar en historial
+    this.metricsHistory.webSocket.push({ ...this.webSocketMetrics });
+    if (this.metricsHistory.webSocket.length > this.MAX_HISTORY_SIZE) {
+      this.metricsHistory.webSocket.shift();
     }
-
-    // Calcular rate de requests
-    this.metrics.requests.rate = this.metrics.requests.total / (this.metrics.system.uptime || 1);
-
-    // Guardar métricas en historial
-    this.metricsHistory.push({
-      timestamp: new Date(),
-      metrics: JSON.parse(JSON.stringify(this.metrics))
-    });
-
-    // Emitir evento de métricas
-    this.emit('metricsUpdate', this.metrics);
     
-    logger.debug('Metrics updated', {
-      service: 'monitoring',
-      metrics: {
-        requests: this.metrics.requests.total,
-        averageResponseTime: Math.round(this.metrics.responses.averageTime),
-        memoryUsage: Math.round(this.metrics.system.memoryUsage.heapUsed / 1024 / 1024)
-      }
-    });
+    // Verificar alertas
+    this.checkWebSocketAlerts();
+    
+    // Emitir evento
+    this.emit('websocket-metrics-updated', this.webSocketMetrics);
   }
-
+  
   /**
-   * Crea una nueva alerta
+   * Actualizar métricas de Supabase
    */
-  private createAlert(type: Alert['type'], service: string, message: string, metadata?: any): void {
-    if (!this.config.enableAlerts) return;
-
-    // Verificar si ya existe una alerta similar no resuelta
-    const existingAlert = this.alerts.find(alert => 
-      !alert.resolved && 
-      alert.service === service && 
-      alert.type === type &&
-      alert.message === message
-    );
-
-    if (existingAlert) return; // No crear alertas duplicadas
-
+  updateSupabaseMetrics(metrics: Partial<SupabaseMetrics>): void {
+    this.supabaseMetrics = { ...this.supabaseMetrics, ...metrics };
+    this.supabaseMetrics.lastHealthCheck = new Date();
+    
+    // Guardar en historial
+    this.metricsHistory.supabase.push({ ...this.supabaseMetrics });
+    if (this.metricsHistory.supabase.length > this.MAX_HISTORY_SIZE) {
+      this.metricsHistory.supabase.shift();
+    }
+    
+    // Verificar alertas
+    this.checkSupabaseAlerts();
+    
+    // Emitir evento
+    this.emit('supabase-metrics-updated', this.supabaseMetrics);
+  }
+  
+  /**
+   * Actualizar métricas del Circuit Breaker
+   */
+  updateCircuitBreakerMetrics(metrics: Partial<CircuitBreakerMetrics>): void {
+    this.circuitBreakerMetrics = { ...this.circuitBreakerMetrics, ...metrics };
+    
+    // Verificar alertas
+    this.checkCircuitBreakerAlerts();
+    
+    // Emitir evento
+    this.emit('circuit-breaker-metrics-updated', this.circuitBreakerMetrics);
+  }
+  
+  /**
+   * Registrar alerta
+   */
+  createAlert(type: Alert['type'], message: string): void {
     const alert: Alert = {
-      id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
-      service,
       message,
       timestamp: new Date(),
-      resolved: false,
-      metadata
+      resolved: false
     };
-
+    
     this.alerts.push(alert);
-    this.emit('alert', alert);
     
-    logger.warn(`Alert created: ${message}`, {
-      service: 'monitoring',
-      alert: {
-        id: alert.id,
-        type: alert.type,
-        service: alert.service
-      }
-    });
+    // Mantener solo las últimas 100 alertas
+    if (this.alerts.length > 100) {
+      this.alerts = this.alerts.slice(-100);
+    }
+    
+    console.log(`🚨 [Monitoring] Alerta ${type.toUpperCase()}: ${message}`);
+    this.emit('alert-created', alert);
   }
-
+  
   /**
-   * Resuelve una alerta
+   * Resolver alerta
    */
-  resolveAlert(alertId: string): boolean {
+  resolveAlert(alertId: string): void {
     const alert = this.alerts.find(a => a.id === alertId);
-    if (alert && !alert.resolved) {
+    if (alert) {
       alert.resolved = true;
-      this.emit('alertResolved', alert);
-      
-      logger.info(`Alert resolved: ${alert.message}`, {
-        service: 'monitoring',
-        alertId
-      });
-      
-      return true;
+      alert.resolvedAt = new Date();
+      this.emit('alert-resolved', alert);
     }
-    return false;
   }
-
+  
   /**
-   * Limpia datos antiguos
+   * Obtener métricas actuales
    */
-  private cleanupOldData(): void {
-    const cutoffTime = new Date(Date.now() - this.config.metricsRetentionHours * 60 * 60 * 1000);
-    
-    // Limpiar historial de métricas
-    this.metricsHistory = this.metricsHistory.filter(entry => entry.timestamp > cutoffTime);
-    
-    // Limpiar alertas resueltas antiguas
-    this.alerts = this.alerts.filter(alert => 
-      !alert.resolved || alert.timestamp > cutoffTime
-    );
-    
-    // Limpiar datos de tiempo de respuesta
-    if (this.responseTimes.length > 1000) {
-      this.responseTimes = this.responseTimes.slice(-500);
-    }
-    
-    logger.debug('Cleanup completed', {
-      service: 'monitoring',
-      metricsHistorySize: this.metricsHistory.length,
-      activeAlerts: this.alerts.filter(a => !a.resolved).length
-    });
-  }
-
-  /**
-   * MÉTODOS PÚBLICOS PARA REGISTRAR EVENTOS
-   */
-
-  recordRequest(success: boolean): void {
-    this.metrics.requests.total++;
-    if (success) {
-      this.metrics.requests.successful++;
-    } else {
-      this.metrics.requests.failed++;
-      this.metrics.system.errors++;
-    }
-  }
-
-  recordResponseTime(time: number, endpoint?: string): void {
-    this.responseTimes.push(time);
-    
-    // Generar alerta si es muy lento
-    if (time > this.config.alertThresholds.responseTime) {
-      this.createAlert('warning', 'performance', 
-        `Slow response detected: ${time}ms for ${endpoint || 'unknown endpoint'}`,
-        { responseTime: time, endpoint }
-      );
-    }
-  }
-
-  recordFunctionCall(functionName: string, success: boolean, duration: number): void {
-    this.metrics.functions.totalCalls++;
-    
-    let stats = this.metrics.functions.functionStats.get(functionName);
-    if (!stats) {
-      stats = { calls: 0, successRate: 0, averageTime: 0 };
-      this.metrics.functions.functionStats.set(functionName, stats);
-    }
-    
-    stats.calls++;
-    stats.averageTime = ((stats.averageTime * (stats.calls - 1)) + duration) / stats.calls;
-    stats.successRate = success ? 
-      ((stats.successRate * (stats.calls - 1)) + 1) / stats.calls :
-      (stats.successRate * (stats.calls - 1)) / stats.calls;
-    
-    // Actualizar métricas globales
-    this.metrics.functions.averageTime = Array.from(this.metrics.functions.functionStats.values())
-      .reduce((acc, stat) => acc + stat.averageTime, 0) / this.metrics.functions.functionStats.size;
-    
-    this.metrics.functions.successRate = Array.from(this.metrics.functions.functionStats.values())
-      .reduce((acc, stat) => acc + stat.successRate, 0) / this.metrics.functions.functionStats.size;
-  }
-
-  recordConversationStart(): void {
-    this.metrics.conversations.active++;
-    this.metrics.conversations.total++;
-  }
-
-  recordConversationEnd(duration: number, completed: boolean): void {
-    this.metrics.conversations.active = Math.max(0, this.metrics.conversations.active - 1);
-    
-    if (completed) {
-      const currentCompletions = this.metrics.conversations.completionRate * (this.metrics.conversations.total - 1);
-      this.metrics.conversations.completionRate = (currentCompletions + 1) / this.metrics.conversations.total;
-    }
-  }
-
-  /**
-   * MÉTODOS PÚBLICOS PARA OBTENER DATOS
-   */
-
-  async getCurrentHealth(): Promise<SystemHealth> {
-    return await this.runHealthChecks();
-  }
-
-  getCurrentMetrics(): PerformanceMetrics {
-    this.updateMetrics();
-    return { ...this.metrics };
-  }
-
-  getActiveAlerts(): Alert[] {
-    return this.alerts.filter(alert => !alert.resolved);
-  }
-
-  getAllAlerts(): Alert[] {
-    return [...this.alerts];
-  }
-
-  getMetricsHistory(hours: number = 1): any[] {
-    const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
-    return this.metricsHistory.filter(entry => entry.timestamp > cutoffTime);
-  }
-
-  /**
-   * Genera dashboard de monitoreo
-   */
-  generateDashboard(): any {
+  getMetrics() {
     return {
-      health: this.getCurrentHealth(),
-      metrics: this.getCurrentMetrics(),
-      alerts: {
-        active: this.getActiveAlerts().length,
-        critical: this.alerts.filter(a => !a.resolved && a.type === 'critical').length,
-        warnings: this.alerts.filter(a => !a.resolved && a.type === 'warning').length
-      },
-      uptime: process.uptime(),
-      version: process.version,
-      memory: {
-        usage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        limit: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
-      }
+      webSocket: this.webSocketMetrics,
+      supabase: this.supabaseMetrics,
+      circuitBreaker: this.circuitBreakerMetrics,
+      system: this.systemMetrics,
+      alerts: this.alerts.filter(a => !a.resolved)
     };
   }
-
+  
   /**
-   * Detiene el servicio de monitoreo
+   * Obtener historial de métricas
    */
-  stop(): void {
-    if (this.isRunning) {
-      this.isRunning = false;
-      logger.info('Monitoring service stopped', { service: 'monitoring' });
+  getMetricsHistory() {
+    return this.metricsHistory;
+  }
+  
+  /**
+   * Verificar alertas de WebSocket
+   */
+  private checkWebSocketAlerts(): void {
+    const { averageLatency, heartbeatSuccessRate, failedReconnects } = this.webSocketMetrics;
+    
+    if (averageLatency > this.ALERT_THRESHOLDS.webSocketLatency) {
+      this.createAlert('warning', `Latencia de WebSocket alta: ${averageLatency}ms`);
     }
+    
+    if (heartbeatSuccessRate < (100 - this.ALERT_THRESHOLDS.webSocketErrorRate)) {
+      this.createAlert('error', `Tasa de éxito de heartbeat baja: ${heartbeatSuccessRate}%`);
+    }
+    
+    if (failedReconnects > 10) {
+      this.createAlert('critical', `Muchos reintentos fallidos de WebSocket: ${failedReconnects}`);
+    }
+  }
+  
+  /**
+   * Verificar alertas de Supabase
+   */
+  private checkSupabaseAlerts(): void {
+    const { poolUtilization, errorRate, averageQueryTime } = this.supabaseMetrics;
+    
+    if (poolUtilization > this.ALERT_THRESHOLDS.supabaseUtilization) {
+      this.createAlert('warning', `Utilización del pool de Supabase alta: ${poolUtilization}%`);
+    }
+    
+    if (errorRate > this.ALERT_THRESHOLDS.supabaseErrorRate) {
+      this.createAlert('error', `Tasa de error de Supabase alta: ${errorRate}%`);
+    }
+    
+    if (averageQueryTime > 5000) {
+      this.createAlert('warning', `Tiempo promedio de consulta lento: ${averageQueryTime}ms`);
+    }
+  }
+  
+  /**
+   * Verificar alertas del Circuit Breaker
+   */
+  private checkCircuitBreakerAlerts(): void {
+    const { totalTrips } = this.circuitBreakerMetrics;
+    
+    if (totalTrips > this.ALERT_THRESHOLDS.circuitBreakerTrips) {
+      this.createAlert('critical', `Muchos trips del Circuit Breaker: ${totalTrips}`);
+    }
+  }
+  
+  /**
+   * Recolectar métricas del sistema
+   */
+  private startMetricsCollection(): void {
+    setInterval(() => {
+      // Actualizar métricas del sistema
+      this.systemMetrics = {
+        memoryUsage: process.memoryUsage(),
+        cpuUsage: process.cpuUsage().user / 1000000, // Convertir a segundos
+        uptime: process.uptime(),
+        activeSessions: this.webSocketMetrics.activeConnections,
+        totalRequests: this.systemMetrics.totalRequests + 1,
+        errorRate: this.systemMetrics.errorRate
+      };
+      
+      // Verificar uso de memoria
+      const memoryUsagePercent = (this.systemMetrics.memoryUsage.heapUsed / this.systemMetrics.memoryUsage.heapTotal) * 100;
+      if (memoryUsagePercent > this.ALERT_THRESHOLDS.memoryUsage) {
+        this.createAlert('warning', `Uso de memoria alto: ${memoryUsagePercent.toFixed(2)}%`);
+      }
+      
+      // Guardar en historial
+      this.metricsHistory.system.push({ ...this.systemMetrics });
+      if (this.metricsHistory.system.length > this.MAX_HISTORY_SIZE) {
+        this.metricsHistory.system.shift();
+      }
+      
+      this.emit('system-metrics-updated', this.systemMetrics);
+    }, 30000); // Cada 30 segundos
+  }
+  
+  /**
+   * Monitoreo continuo de alertas
+   */
+  private startAlertMonitoring(): void {
+    setInterval(() => {
+      // Verificar alertas antiguas no resueltas
+      const oldAlerts = this.alerts.filter(
+        alert => !alert.resolved && 
+        Date.now() - alert.timestamp.getTime() > 300000 // 5 minutos
+      );
+      
+      oldAlerts.forEach(alert => {
+        if (alert.type === 'critical') {
+          console.error(`🚨 [Monitoring] Alerta crítica sin resolver: ${alert.message}`);
+        }
+      });
+    }, 60000); // Cada minuto
+  }
+  
+  /**
+   * Generar reporte de salud del sistema
+   */
+  generateHealthReport(): {
+    status: 'healthy' | 'warning' | 'critical';
+    summary: string;
+    details: any;
+  } {
+    const alerts = this.alerts.filter(a => !a.resolved);
+    const criticalAlerts = alerts.filter(a => a.type === 'critical');
+    const warningAlerts = alerts.filter(a => a.type === 'warning');
+    
+    let status: 'healthy' | 'warning' | 'critical' = 'healthy';
+    let summary = 'Sistema funcionando correctamente';
+    
+    if (criticalAlerts.length > 0) {
+      status = 'critical';
+      summary = `${criticalAlerts.length} alertas críticas activas`;
+    } else if (warningAlerts.length > 0) {
+      status = 'warning';
+      summary = `${warningAlerts.length} alertas de advertencia activas`;
+    }
+    
+    return {
+      status,
+      summary,
+      details: {
+        alerts: alerts.length,
+        criticalAlerts: criticalAlerts.length,
+        warningAlerts: warningAlerts.length,
+        webSocket: this.webSocketMetrics,
+        supabase: this.supabaseMetrics,
+        system: this.systemMetrics
+      }
+    };
   }
 }
 
 // Exportar instancia singleton
-export const monitoringService = new MonitoringService(); 
+export const monitoringService = MonitoringService.getInstance(); 

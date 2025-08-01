@@ -103,7 +103,6 @@ export class CacheService extends EventEmitter {
           this.stats.memoryHits++;
           
           const duration = Date.now() - start;
-          monitoringService.recordResponseTime(duration, 'cache-memory');
           
           logger.debug('Cache hit (memory)', {
             service: 'cache',
@@ -128,7 +127,6 @@ export class CacheService extends EventEmitter {
           }
           
           const duration = Date.now() - start;
-          monitoringService.recordResponseTime(duration, 'cache-distributed');
           
           logger.debug('Cache hit (distributed)', {
             service: 'cache',

@@ -8,7 +8,7 @@ import rateLimit from 'express-rate-limit';
 import { Request, Response, NextFunction } from 'express';
 
 /**
- * Configurar CORS restrictivo
+ * OPTIMIZADO: Configuración CORS dinámica por ambiente
  */
 export const configureCORS = () => {
   const corsOptions: cors.CorsOptions = {
@@ -16,17 +16,50 @@ export const configureCORS = () => {
       // Permitir requests sin origin (como Postman, apps móviles)
       if (!origin) return callback(null, true);
       
+      // Configuración dinámica por ambiente
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const isProduction = process.env.NODE_ENV === 'production';
+      
       // Obtener orígenes permitidos desde variables de entorno
       const allowedOrigins = process.env.CORS_ORIGINS?.split(',').map(o => o.trim()) || [
         'http://localhost:5173',
         'http://localhost:3002',
-        'https://dev-waprueba.aova.mx'  // Frontend en dominio separado
+        'http://localhost:3000',
+        'https://dev-waprueba.aova.mx'
       ];
       
-      if (allowedOrigins.includes(origin)) {
+      // Agregar orígenes adicionales según ambiente
+      const additionalOrigins = [];
+      if (isDevelopment) {
+        additionalOrigins.push(
+          'http://localhost:*',
+          'http://127.0.0.1:*',
+          'https://localhost:*'
+        );
+      }
+      
+      if (isProduction) {
+        // En producción, solo orígenes específicos
+        const productionOrigins = process.env.PRODUCTION_CORS_ORIGINS?.split(',').map(o => o.trim()) || [];
+        additionalOrigins.push(...productionOrigins);
+      }
+      
+      const allAllowedOrigins = [...allowedOrigins, ...additionalOrigins];
+      
+      // Verificar si el origen está permitido
+      const isAllowed = allAllowedOrigins.some(allowed => {
+        // Soporte para wildcards en desarrollo
+        if (isDevelopment && allowed.includes('*')) {
+          const baseUrl = allowed.replace('*', '');
+          return origin.startsWith(baseUrl);
+        }
+        return allowed === origin;
+      });
+      
+      if (isAllowed) {
         callback(null, true);
       } else {
-        console.warn(`🚫 [CORS] Origen bloqueado: ${origin}`);
+        console.warn(`🚫 [CORS] Origen bloqueado: ${origin} (Ambiente: ${process.env.NODE_ENV})`);
         callback(new Error('Acceso bloqueado por política CORS'));
       }
     },
@@ -36,10 +69,14 @@ export const configureCORS = () => {
       'Authorization', 
       'X-Requested-With',
       'Accept',
-      'Origin'
+      'Origin',
+      'X-Client-Name'
     ],
     credentials: true,
-    maxAge: 86400 // 24 horas
+    maxAge: 86400, // 24 horas
+    // OPTIMIZADO: Configuración específica para WebSocket
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   };
 
   return cors(corsOptions);
@@ -73,20 +110,48 @@ export const configureSecurityHeaders = () => {
 };
 
 /**
- * Rate limiting general
+ * Rate limiting inteligente por tipo de endpoint
  */
 export const generalRateLimit = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'), // 1 minuto
-  max: process.env.NODE_ENV === 'production' ? 300 : 100, // Más permisivo en producción
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '30000'), // REDUCIDO a 30 segundos
+  max: (req) => {
+    // Rate limiting diferenciado por tipo de endpoint
+    const path = req.path;
+    
+    if (path.startsWith('/api/auth')) {
+      return process.env.NODE_ENV === 'production' ? 10 : 5; // Auth: 10 requests/minuto
+    }
+    
+    if (path.startsWith('/api/chat')) {
+      return process.env.NODE_ENV === 'production' ? 100 : 50; // Chat: 100 requests/minuto
+    }
+    
+    if (path.startsWith('/api/media')) {
+      return process.env.NODE_ENV === 'production' ? 50 : 20; // Media: 50 requests/minuto
+    }
+    
+    if (path.startsWith('/socket.io/')) {
+      return 0; // Sin límites para WebSocket
+    }
+    
+    // Rate limiting general para otros endpoints
+    return process.env.NODE_ENV === 'production' ? 200 : 80;
+  },
   message: {
     success: false,
-    error: 'Demasiadas peticiones. Intenta de nuevo en un minuto.',
+    error: 'Demasiadas peticiones. Intenta de nuevo en 30 segundos.',
     code: 'RATE_LIMIT_EXCEEDED'
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Configuración específica para Docker/proxy (igual que authRateLimit)
+  // Configuración mejorada para rate limiting por usuario autenticado
   keyGenerator: (req) => {
+    // Priorizar usuario autenticado sobre IP
+    const userId = (req as any).user?.id;
+    if (userId) {
+      return `user:${userId}`;
+    }
+    
     // Usar X-Forwarded-For si está disponible, sino usar req.ip
     const forwarded = req.headers['x-forwarded-for'];
     const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
@@ -102,14 +167,24 @@ export const generalRateLimit = rateLimit({
   skip: (req) => {
     // Saltar rate limiting para IPs locales en desarrollo
     const ip = req.ip || '';
-    return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
+    const isLocalDev = process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
+    
+    // Saltar para WebSocket connections
+    const isWebSocket = req.path.startsWith('/socket.io/');
+    
+    // Saltar para health checks
+    const isHealthCheck = req.path === '/health';
+    
+    return isLocalDev || isWebSocket || isHealthCheck;
   },
   handler: (req, res) => {
-    console.warn(`[Security] ⚠️ Rate limit excedido para IP: ${req.ip}`);
+    const path = req.path;
+    console.warn(`[Security] ⚠️ Rate limit excedido para ${path} - IP: ${req.ip}`);
     res.status(429).json({
       success: false,
-      error: 'Demasiadas peticiones. Intenta de nuevo en un minuto.',
-      code: 'RATE_LIMIT_EXCEEDED'
+      error: 'Demasiadas peticiones. Intenta de nuevo en 30 segundos.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: 30
     });
   }
 });

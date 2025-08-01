@@ -1,4 +1,6 @@
 import { supabase } from '../config/supabase';
+import { retryService } from './resilience/retry.service';
+import { bulkheadService, BULKHEAD_CONFIGS } from './resilience/bulkhead.service';
 
 // Interfaces que coinciden con las tablas de Supabase
 export interface SupabaseAgent {
@@ -83,12 +85,15 @@ export interface SupabaseOrder {
 
 export class SupabaseDatabaseService {
   private isEnabled: boolean;
+  private supabaseBulkhead: ReturnType<typeof bulkheadService.getBulkhead>;
 
   constructor() {
     // FORZAR Supabase como única opción - NO más fallbacks
     this.isEnabled = !!supabase;
     if (this.isEnabled) {
       console.log('🚀 Supabase Database Service activado (NUEVO ESQUEMA)');
+      // Inicializar bulkhead para Supabase
+      this.supabaseBulkhead = bulkheadService.getBulkhead('supabase', BULKHEAD_CONFIGS.supabase);
     } else {
       console.error('❌ CRÍTICO: Supabase no configurado. Sistema NO puede funcionar.');
       throw new Error('Supabase es requerido. Verificar SUPABASE_URL y SUPABASE_ANON_KEY');

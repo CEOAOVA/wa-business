@@ -97,7 +97,7 @@ interface OpenRouterTool {
 
 export class ChatbotService {
   private conversations = new Map<string, ConversationState>();
-  private readonly SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
+  private readonly SESSION_TIMEOUT_MS = 15 * 60 * 1000; // REDUCIDO de 30 a 15 minutos
   
   // NUEVO: Usar configuración centralizada
   private readonly config = getConfig();
@@ -123,10 +123,10 @@ export class ChatbotService {
   }
 
   /**
-   * Limpiar sesiones expiradas
+   * Limpiar sesiones expiradas - OPTIMIZADO
    */
   private startCleanupInterval(): void {
-    setInterval(() => this.cleanupExpiredSessions(), 5 * 60 * 1000); // Cada 5 minutos
+    setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // REDUCIDO a cada 3 minutos
   }
 
   /**
@@ -864,19 +864,39 @@ Recuerda: ¡SOLO busca productos cuando tengas pieza Y datos del auto! 🚀`
   /**
    * Limpiar sesiones expiradas
    */
+  /**
+   * OPTIMIZADO: Cleanup selectivo de sesiones expiradas
+   */
   private cleanupExpiredSessions(): void {
     const now = new Date().getTime();
     let cleaned = 0;
+    let activeSessions = 0;
 
     for (const [id, conversation] of this.conversations.entries()) {
-      if (now - conversation.lastActivity.getTime() > this.SESSION_TIMEOUT_MS) {
+      const timeSinceLastActivity = now - conversation.lastActivity.getTime();
+      
+      // Cleanup más agresivo para sesiones muy antiguas
+      if (timeSinceLastActivity > this.SESSION_TIMEOUT_MS) {
         this.conversations.delete(id);
         cleaned++;
+        console.log(`[ChatbotService] 🗑️ Sesión expirada eliminada: ${id} (${Math.round(timeSinceLastActivity / 60000)}min inactiva)`);
+      } else if (timeSinceLastActivity > this.SESSION_TIMEOUT_MS * 0.8) {
+        // Advertencia para sesiones próximas a expirar
+        console.log(`[ChatbotService] ⚠️ Sesión próxima a expirar: ${id} (${Math.round(timeSinceLastActivity / 60000)}min inactiva)`);
+        activeSessions++;
+      } else {
+        activeSessions++;
       }
     }
 
     if (cleaned > 0) {
-      console.log(`[ChatbotService] Limpiadas ${cleaned} sesiones expiradas`);
+      console.log(`[ChatbotService] 🧹 Cleanup completado: ${cleaned} sesiones eliminadas, ${activeSessions} activas`);
+    }
+    
+    // Métricas de memoria
+    const totalSessions = this.conversations.size;
+    if (totalSessions > 100) {
+      console.warn(`[ChatbotService] ⚠️ Alto uso de memoria: ${totalSessions} sesiones activas`);
     }
   }
 

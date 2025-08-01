@@ -5,6 +5,7 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getConfig } from './index';
+import { supabaseCircuitBreaker } from '../services/circuit-breaker/circuit-breaker.service';
 
 export interface DatabaseConfig {
   supabaseUrl: string;
@@ -80,6 +81,12 @@ export class DatabaseService {
   private config: DatabaseConfig;
   private connectionPool: Map<string, any> = new Map();
   private isConnected: boolean = false;
+  private poolMetrics = {
+    totalConnections: 0,
+    activeConnections: 0,
+    failedConnections: 0,
+    lastHealthCheck: Date.now()
+  };
   
   // NUEVO: Caché en memoria para resúmenes (más barato que Redis)
   private summaryCache = new Map<string, {
@@ -96,9 +103,9 @@ export class DatabaseService {
     this.config = {
       supabaseUrl: appConfig.database.supabaseUrl,
       supabaseKey: appConfig.database.supabaseKey,
-      connectionPoolSize: 10,
-      queryTimeout: 30000,
-      retryAttempts: 3,
+      connectionPoolSize: 50, // AUMENTADO de 10 a 50 para alta concurrencia
+      queryTimeout: 10000, // REDUCIDO de 30000ms a 10000ms
+      retryAttempts: 5, // AUMENTADO de 3 a 5
       enableWAL: true
     };
 
@@ -112,6 +119,16 @@ export class DatabaseService {
       global: {
         headers: {
           'X-Client-Name': 'whatsapp-business-llm'
+        },
+        // Configuración optimizada para timeouts y keep-alive
+        fetch: (url, options = {}) => {
+          return fetch(url, {
+            ...options,
+            // Timeout específico para operaciones de Supabase
+            signal: AbortSignal.timeout(this.config.queryTimeout),
+            // Keep-alive para conexiones persistentes
+            keepalive: true
+          });
         }
       }
     });
@@ -254,15 +271,39 @@ export class DatabaseService {
    */
   async isHealthy(): Promise<boolean> {
     try {
-      const { error } = await this.supabase
+      const startTime = Date.now();
+      const { data, error } = await this.supabase
         .from('conversations')
         .select('count')
         .limit(1);
       
+      const responseTime = Date.now() - startTime;
+      
+      // Actualizar métricas
+      this.poolMetrics.activeConnections++;
+      this.poolMetrics.lastHealthCheck = Date.now();
+      
+      if (responseTime > 1000) {
+        console.warn(`[DatabaseService] ⚠️ Health check lento: ${responseTime}ms`);
+      }
+      
       return !error;
-    } catch {
+    } catch (error) {
+      console.error('[DatabaseService] Health check failed:', error);
+      this.poolMetrics.failedConnections++;
       return false;
     }
+  }
+
+  /**
+   * Obtener métricas del pool de conexiones
+   */
+  getPoolMetrics() {
+    return {
+      ...this.poolMetrics,
+      utilization: this.poolMetrics.activeConnections / this.config.connectionPoolSize * 100,
+      isHealthy: this.isConnected
+    };
   }
 
   /**
@@ -304,21 +345,30 @@ export class DatabaseService {
    */
   
   async createConversation(conversation: Omit<ConversationRecord, 'created_at' | 'updated_at'>): Promise<ConversationRecord | null> {
-    const { data, error } = await this.executeWithRetry(async () => {
-      const result = await this.supabase
-        .from('conversations')
-        .insert(conversation)
-        .select()
-        .single();
-      return result;
-    });
+    return await supabaseCircuitBreaker.execute(
+      async () => {
+        const { data, error } = await this.executeWithRetry(async () => {
+          const result = await this.supabase
+            .from('conversations')
+            .insert(conversation)
+            .select()
+            .single();
+          return result;
+        });
 
-    if (error) {
-      console.error('[DatabaseService] Error creando conversación:', error);
-      return null;
-    }
+        if (error) {
+          console.error('[DatabaseService] Error creando conversación:', error);
+          return null;
+        }
 
-    return data;
+        return data;
+      },
+      // Fallback: retornar null si Supabase falla
+      async () => {
+        console.warn('[DatabaseService] Usando fallback para createConversation');
+        return null;
+      }
+    );
   }
 
   async getConversation(conversationId: string): Promise<ConversationRecord | null> {

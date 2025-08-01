@@ -48,8 +48,8 @@ const DEFAULT_CONFIG: WebSocketConfig = {
   maxRetries: 15,
   baseDelay: 500, // 0.5 segundos
   maxDelay: 30000, // 30 segundos
-  heartbeatInterval: 25000, // 25 segundos
-  heartbeatTimeout: 3000, // 3 segundos
+  heartbeatInterval: 5000, // 5 segundos - SINCRONIZADO con backend
+  heartbeatTimeout: 8000, // 8 segundos - SINCRONIZADO con backend
   reconnectOnClose: true,
   autoReconnect: true,
   messageQueueSize: 100,

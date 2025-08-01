@@ -7,6 +7,7 @@ import mediaRoutes from './routes/media-upload';
 import chatbotRoutes from './routes/chatbot';
 import authRoutes from './routes/auth';
 import dashboardRoutes from './routes/dashboard';
+import monitoringRoutes from './routes/monitoring';
 import { loadEnvWithUnicodeSupport, getEnvDebugInfo } from './config/env-loader';
 import { whatsappConfig } from './config/whatsapp';
 import { whatsappService } from './services/whatsapp.service';
@@ -38,14 +39,14 @@ const io = new Server(httpServer, {
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
   },
-  // Configuraciones optimizadas para tiempo real
+  // Configuraciones optimizadas para tiempo real - CORREGIDO
   transports: ['websocket', 'polling'],
   allowEIO3: true,
-  pingTimeout: 60000, // 60 segundos
-  pingInterval: 25000, // 25 segundos
+  pingTimeout: 10000, // 10 segundos - REDUCIDO de 60s
+  pingInterval: 5000, // 5 segundos - REDUCIDO de 25s
   upgradeTimeout: 10000, // 10 segundos
   maxHttpBufferSize: 1e6, // 1MB
-  connectTimeout: 45000,
+  connectTimeout: 15000, // 15 segundos - REDUCIDO de 45s
   allowRequest: (req, callback) => {
     // Permitir todas las conexiones por ahora
     callback(null, true);
@@ -79,9 +80,21 @@ io.on('connection', (socket) => {
     socket.emit('left_conversation', { conversationId });
   });
 
-  // Heartbeat optimizado
+  // Heartbeat optimizado con métricas de latencia
   socket.on('ping', (data: { timestamp: number }) => {
-    socket.emit('pong', { timestamp: data.timestamp });
+    const now = Date.now();
+    const latency = now - data.timestamp;
+    
+    // Log de latencia para monitoreo
+    console.log(`💓 Heartbeat recibido - Latencia: ${latency}ms - Socket: ${socket.id}`);
+    
+    // Emitir respuesta con timestamp actual
+    socket.emit('pong', { timestamp: now });
+    
+    // Métricas de latencia (para futura implementación de dashboard)
+    if (latency > 1000) {
+      console.warn(`⚠️ Latencia alta detectada: ${latency}ms en socket ${socket.id}`);
+    }
   });
 
   // Manejar desconexión
@@ -121,6 +134,9 @@ app.use('/api/chatbot', chatbotRoutes);
 
 // Rutas del dashboard
 app.use('/api/dashboard', dashboardRoutes);
+
+// Rutas de monitoreo
+app.use('/api/monitoring', monitoringRoutes);
 
 // Información de la API
 app.get('/api', (_req, res) => {

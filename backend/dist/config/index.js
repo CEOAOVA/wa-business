@@ -104,7 +104,7 @@ function getConfig() {
             wsdlUrl: getEnv('EMBLER_WSDL_URL'),
             endpointUrl: getEnv('EMBLER_ENDPOINT_URL'),
             tokenCacheDuration: parseInt(getEnv('TOKEN_CACHE_DURATION', '10'), 10),
-            inventoryCacheTtl: parseInt(getEnv('INVENTORY_CACHE_TTL', '300000'), 10),
+            inventoryCacheTtl: parseInt(getEnv('INVENTORY_CACHE_TTL', '60000'), 10), // REDUCIDO de 300000ms a 60000ms
             connectionRetries: parseInt(getEnv('SOAP_CONNECTION_RETRIES', '3'), 10),
         },
         // POS Configuration
@@ -134,63 +134,80 @@ function getConfig() {
         soapWsdlUrl: getEnv('EMBLER_WSDL_URL'),
         soapEndpoint: getEnv('EMBLER_ENDPOINT_URL'),
         tokenCacheDuration: parseInt(getEnv('TOKEN_CACHE_DURATION', '10'), 10),
-        inventoryCacheTtl: parseInt(getEnv('INVENTORY_CACHE_TTL', '300000'), 10),
+        inventoryCacheTtl: parseInt(getEnv('INVENTORY_CACHE_TTL', '60000'), 10), // REDUCIDO de 300000ms a 60000ms
         posCredentials: parsePosCredentials(),
         apiNinjasKey: getEnv('API_NINJAS_KEY', ''),
     };
 }
 /**
- * Valida que las variables críticas existan en producción
+ * OPTIMIZADO: Validación completa de configuración con health checks
  */
 function validateCriticalConfig() {
     const config = getConfig();
     const missing = [];
+    const warnings = [];
+    // Validación crítica para todos los entornos
+    const criticalVars = [
+        { key: 'OPEN_ROUTER_API_KEY', value: config.llm.openRouterApiKey, name: 'OpenRouter API Key' },
+        { key: 'WHATSAPP_ACCESS_TOKEN', value: config.whatsapp.accessToken, name: 'WhatsApp Access Token' },
+        { key: 'WHATSAPP_PHONE_NUMBER_ID', value: config.whatsapp.phoneNumberId, name: 'WhatsApp Phone Number ID' },
+        { key: 'WEBHOOK_VERIFY_TOKEN', value: config.whatsapp.webhook.verifyToken, name: 'Webhook Verify Token' },
+        { key: 'EMBLER_WSDL_URL', value: config.soap.wsdlUrl, name: 'SOAP WSDL URL' },
+        { key: 'EMBLER_ENDPOINT_URL', value: config.soap.endpointUrl, name: 'SOAP Endpoint URL' },
+        { key: 'SUPABASE_URL', value: config.database.supabaseUrl, name: 'Supabase URL' },
+        { key: 'SUPABASE_ANON_KEY', value: config.database.supabaseKey, name: 'Supabase Anon Key' }
+    ];
+    // Verificar variables críticas
+    for (const { key, value, name } of criticalVars) {
+        if (!value) {
+            missing.push(key);
+            console.error(`❌ ${name} no configurado`);
+        }
+        else if (value.length < 10) {
+            warnings.push(`${name} parece ser muy corto`);
+        }
+    }
+    // Validación específica para producción
     if (config.nodeEnv === 'production') {
-        // LLM crítico
-        if (!config.llm.openRouterApiKey) {
-            missing.push('OPEN_ROUTER_API_KEY');
-        }
-        // WhatsApp crítico
-        if (!config.whatsapp.accessToken) {
-            missing.push('WHATSAPP_ACCESS_TOKEN');
-        }
-        if (!config.whatsapp.phoneNumberId) {
-            missing.push('WHATSAPP_PHONE_NUMBER_ID');
-        }
-        if (!config.whatsapp.webhook.verifyToken) {
-            missing.push('WEBHOOK_VERIFY_TOKEN');
-        }
-        // SOAP crítico
-        if (!config.soap.wsdlUrl) {
-            missing.push('EMBLER_WSDL_URL');
-        }
-        if (!config.soap.endpointUrl) {
-            missing.push('EMBLER_ENDPOINT_URL');
-        }
-        // Supabase crítico
-        if (!config.database.supabaseUrl) {
-            missing.push('SUPABASE_URL');
-        }
-        if (!config.database.supabaseKey) {
-            missing.push('SUPABASE_ANON_KEY');
-        }
         // Verificar credenciales POS
         for (const posId of config.pos.validPosIds) {
             if (!config.pos.credentials[posId]) {
                 missing.push(`POS_CREDENTIALS para "${posId}"`);
+                console.error(`❌ Credenciales POS faltantes para: ${posId}`);
             }
         }
+        // Validar URLs
+        try {
+            new URL(config.database.supabaseUrl);
+        }
+        catch (_a) {
+            missing.push('SUPABASE_URL (formato inválido)');
+        }
+        try {
+            new URL(config.soap.wsdlUrl);
+        }
+        catch (_b) {
+            missing.push('EMBLER_WSDL_URL (formato inválido)');
+        }
     }
-    if (missing.length) {
-        const msg = `❌ Variables críticas faltantes: ${missing.join(', ')}`;
-        console.error(msg);
+    // Validación de configuración de logs
+    if (config.system.enableDetailedLogs && config.nodeEnv === 'production') {
+        warnings.push('Logs detallados habilitados en producción (puede afectar rendimiento)');
+    }
+    // Reporte de validación
+    if (missing.length > 0) {
+        console.error(`❌ Variables críticas faltantes (${missing.length}): ${missing.join(', ')}`);
         if (config.nodeEnv === 'production') {
             console.error('🚨 ADVERTENCIA: El servicio arrancará pero algunas funciones no estarán disponibles');
             console.error('📋 Configurar estas variables para funcionalidad completa:', missing.join(', '));
         }
     }
     else {
-        console.log('✅ Configuración validada correctamente');
+        console.log('✅ Configuración crítica validada correctamente');
+    }
+    if (warnings.length > 0) {
+        console.warn(`⚠️ Advertencias de configuración (${warnings.length}):`);
+        warnings.forEach(warning => console.warn(`   - ${warning}`));
     }
 }
 /**

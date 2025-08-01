@@ -11,12 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.supabaseDatabaseService = exports.SupabaseDatabaseService = void 0;
 const supabase_1 = require("../config/supabase");
+const bulkhead_service_1 = require("./resilience/bulkhead.service");
 class SupabaseDatabaseService {
     constructor() {
         // FORZAR Supabase como única opción - NO más fallbacks
         this.isEnabled = !!supabase_1.supabase;
         if (this.isEnabled) {
             console.log('🚀 Supabase Database Service activado (NUEVO ESQUEMA)');
+            // Inicializar bulkhead para Supabase
+            this.supabaseBulkhead = bulkhead_service_1.bulkheadService.getBulkhead('supabase', bulkhead_service_1.BULKHEAD_CONFIGS.supabase);
         }
         else {
             console.error('❌ CRÍTICO: Supabase no configurado. Sistema NO puede funcionar.');

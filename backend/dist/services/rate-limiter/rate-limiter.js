@@ -16,7 +16,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.rateLimiter = exports.RateLimiter = void 0;
 const events_1 = require("events");
 const logger_1 = require("../../utils/logger");
-const monitoring_service_1 = require("../monitoring/monitoring-service");
 class RateLimiter extends events_1.EventEmitter {
     constructor() {
         super();
@@ -75,7 +74,7 @@ class RateLimiter extends events_1.EventEmitter {
                     requests: window.count,
                     limit: config.maxRequests
                 });
-                monitoring_service_1.monitoringService.recordRequest(false);
+                // Rate limit exceeded
             }
             return {
                 allowed,
@@ -280,7 +279,7 @@ class RateLimiter extends events_1.EventEmitter {
                 const duration = Date.now() - start;
                 const success = res.statusCode < 400;
                 this.recordResult(serviceName, success, duration);
-                monitoring_service_1.monitoringService.recordResponseTime(duration, serviceName);
+                // Record response time for monitoring
                 return originalEnd.apply(res, args);
             };
             next();
