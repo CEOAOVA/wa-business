@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useApp } from "../context/AppContext";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
+import { useRealtimeMessages } from "../hooks/useRealtimeMessages";
 import { MESSAGES } from "../constants/messages";
 import MediaMessage from "./MediaMessage";
 import MediaUpload from "./MediaUpload";
@@ -103,6 +104,66 @@ const ChatPanel: React.FC = () => {
   // NUEVO: Estado para información de contacto
   const [showContactInfo, setShowContactInfo] = useState(false);
 
+  // Funciones para takeover (movidas aquí para evitar errores de orden)
+  const getCurrentConversationId = (): string | null => {
+    if (!currentChat?.id) return null;
+    
+    // Si el ID ya es un UUID (sin prefijo conv-), usarlo directamente
+    if (!currentChat.id.startsWith('conv-')) {
+      return currentChat.id;
+    }
+    
+    // Si tiene prefijo conv-, extraer el ID real
+    return currentChat.id.replace('conv-', '');
+  };
+
+  // NUEVO: Integración de Supabase Realtime para mensajes en tiempo real
+  const conversationId = getCurrentConversationId() || undefined;
+  const realtimeHookResult = useRealtimeMessages(conversationId, {
+    enabled: true, // Habilitar Realtime por defecto
+    fallbackToWebSocket: true, // Mantener WebSocket como fallback
+    autoReconnect: true, // Reconexión automática
+    maxReconnectAttempts: 3, // Máximo 3 intentos
+    onMessage: (realtimeMessage) => {
+      console.log('🔔 [ChatPanel] Mensaje recibido via Realtime:', realtimeMessage);
+      
+      // Solo procesar mensajes de la conversación actual
+      if (realtimeMessage.conversation_id === conversationId) {
+        console.log('✅ [ChatPanel] Mensaje procesado para conversación actual');
+        // El hook ya actualiza automáticamente el estado global via dispatch
+        // No necesitamos lógica adicional aquí
+      }
+    }
+  });
+
+  // Log de estadísticas de Realtime para debugging y monitoreo
+  useEffect(() => {
+    if (realtimeHookResult.stats.isEnabled) {
+      console.log('📊 [ChatPanel] Estadísticas Realtime:', {
+        isSubscribed: realtimeHookResult.stats.isSubscribed,
+        messagesReceived: realtimeHookResult.stats.messagesReceived,
+        errors: realtimeHookResult.stats.errors,
+        lastMessageReceived: realtimeHookResult.stats.lastMessageReceived,
+        connectionStatus: realtimeHookResult.stats.connectionStatus,
+        reconnectAttempts: realtimeHookResult.stats.reconnectAttempts
+      });
+    }
+  }, [realtimeHookResult.stats]);
+
+  // Mostrar indicador de estado de conexión Realtime en desarrollo
+  useEffect(() => {
+    if (import.meta.env.DEV && realtimeHookResult.stats.isEnabled) {
+      const status = realtimeHookResult.stats.connectionStatus;
+      if (status === 'disconnected' && realtimeHookResult.stats.errors > 0) {
+        console.warn('⚠️ [ChatPanel] Realtime desconectado, usando WebSocket como fallback');
+      } else if (status === 'reconnecting') {
+        console.log('🔄 [ChatPanel] Realtime reintentando conexión...');
+      } else if (status === 'connected') {
+        console.log('✅ [ChatPanel] Realtime conectado correctamente');
+      }
+    }
+  }, [realtimeHookResult.stats.connectionStatus, realtimeHookResult.stats.errors, realtimeHookResult.stats.isEnabled]);
+
   // Auto-scroll a mensajes más recientes
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -154,18 +215,7 @@ const ChatPanel: React.FC = () => {
     return phone;
   };
 
-  // Funciones para takeover
-  const getCurrentConversationId = (): string | null => {
-    if (!currentChat?.id) return null;
-    
-    // Si el ID ya es un UUID (sin prefijo conv-), usarlo directamente
-    if (!currentChat.id.startsWith('conv-')) {
-      return currentChat.id;
-    }
-    
-    // Si tiene prefijo conv-, extraer el ID real
-    return currentChat.id.replace('conv-', '');
-  };
+  // Funciones para takeover (función duplicada eliminada)
 
   // MEJORADO: Cargar modo takeover cuando cambia la conversación
   useEffect(() => {

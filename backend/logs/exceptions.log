@@ -3016,3 +3016,118 @@
   ],
   timestamp: '2025-08-01 10:30:34.833'
 }
+{
+  error: Error: listen EADDRINUSE: address already in use :::3003
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at D:\Emprendimiento\AOVA\EMBLER\whatsapp\wa-business1\backend\src\app.ts:336:16
+      at Generator.next (<anonymous>)
+      at fulfilled (D:\Emprendimiento\AOVA\EMBLER\whatsapp\wa-business1\backend\src\app.ts:38:58)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+    code: 'EADDRINUSE',
+    errno: -4091,
+    syscall: 'listen',
+    address: '::',
+    port: 3003
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::3003\n' +
+    'Error: listen EADDRINUSE: address already in use :::3003\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts:336:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts:38:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3003\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts:336:16\n' +
+    '    at Generator.next (<anonymous>)\n' +
+    '    at fulfilled (D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts:38:58)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  exception: true,
+  date: 'Mon Aug 04 2025 12:37:47 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 14448,
+    uid: null,
+    gid: null,
+    cwd: 'D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.18.0',
+    argv: [
+      'D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 333221888,
+      heapTotal: 279523328,
+      heapUsed: 254071624,
+      external: 6707918,
+      arrayBuffers: 2598941
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 55506.25 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 16,
+      file: 'D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts',
+      function: null,
+      line: 336,
+      method: null,
+      native: false
+    },
+    {
+      column: null,
+      file: null,
+      function: 'Generator.next',
+      line: null,
+      method: 'next',
+      native: false
+    },
+    {
+      column: 58,
+      file: 'D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\app.ts',
+      function: 'fulfilled',
+      line: 38,
+      method: null,
+      native: false
+    },
+    {
+      column: 5,
+      file: 'node:internal/process/task_queues',
+      function: 'processTicksAndRejections',
+      line: 105,
+      method: null,
+      native: false
+    }
+  ],
+  timestamp: '2025-08-04 12:37:47.478'
+}

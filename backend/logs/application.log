@@ -50705,3 +50705,1405 @@
   message: 'System metrics',
   timestamp: '2025-08-01 13:01:00.362'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 12:37:47.333'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 12:37:47.339'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:37:47.361'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:37:47.363'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 12:37:47.363'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:37:47.364'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:37:47.366'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 12:37:47.366'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 268, heapUsed: 206, heapTotal: 213 },
+    uptime: 42,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:38:16.842'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 264, heapUsed: 207, heapTotal: 213 },
+    uptime: 47,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:38:16.860'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:38:43.644'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:38:43.644'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:38:43.649'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:38:43.651'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 269, heapUsed: 206, heapTotal: 214 },
+    uptime: 72,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:38:46.852'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 262, heapUsed: 207, heapTotal: 214 },
+    uptime: 77,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:38:46.868'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 12:44:59.700'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:44:59.721'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:44:59.724'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 12:44:59.726'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 265, heapUsed: 206, heapTotal: 213 },
+    uptime: 40,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:45:29.109'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:45:55.407'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:45:55.413'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 265, heapUsed: 206, heapTotal: 213 },
+    uptime: 70,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:45:59.113'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 266, heapUsed: 206, heapTotal: 214 },
+    uptime: 100,
+    requests: 6,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:46:29.125'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:46:55.417'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:46:55.427'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 266, heapUsed: 206, heapTotal: 213 },
+    uptime: 130,
+    requests: 8,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:46:59.140'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 266, heapUsed: 206, heapTotal: 214 },
+    uptime: 160,
+    requests: 8,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:47:29.151'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:47:55.420'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:47:55.424'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 256, heapUsed: 206, heapTotal: 213 },
+    uptime: 190,
+    requests: 10,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:47:59.163'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 256, heapUsed: 206, heapTotal: 214 },
+    uptime: 220,
+    requests: 10,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:48:29.174'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:48:55.429'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:48:55.433'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 256, heapUsed: 207, heapTotal: 214 },
+    uptime: 250,
+    requests: 12,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:48:59.190'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 256, heapUsed: 207, heapTotal: 214 },
+    uptime: 280,
+    requests: 12,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:49:29.202'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:49:55.436'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:49:55.440'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 258, heapUsed: 207, heapTotal: 213 },
+    uptime: 310,
+    requests: 14,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:49:59.203'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 76, heapUsed: 207, heapTotal: 214 },
+    uptime: 340,
+    requests: 14,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:50:29.211'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:50:55.452'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:50:55.456'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 77, heapUsed: 207, heapTotal: 213 },
+    uptime: 370,
+    requests: 16,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:50:59.225'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 77, heapUsed: 207, heapTotal: 214 },
+    uptime: 400,
+    requests: 16,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:51:29.233'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:51:55.456'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:51:55.461'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 77, heapUsed: 208, heapTotal: 214 },
+    uptime: 430,
+    requests: 18,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:51:59.239'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 207, heapTotal: 214 },
+    uptime: 460,
+    requests: 18,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:52:29.247'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:52:55.462'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:52:55.465'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 208, heapTotal: 214 },
+    uptime: 490,
+    requests: 20,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:52:59.254'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 208, heapTotal: 214 },
+    uptime: 520,
+    requests: 20,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:53:29.256'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:53:55.477'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:53:55.482'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 207, heapTotal: 213 },
+    uptime: 550,
+    requests: 22,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:53:59.271'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 207, heapTotal: 214 },
+    uptime: 580,
+    requests: 22,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:54:29.270'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:54:55.492'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:54:55.504'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 207, heapTotal: 213 },
+    uptime: 610,
+    requests: 24,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:54:59.286'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 207, heapTotal: 214 },
+    uptime: 640,
+    requests: 24,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:55:29.295'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:55:55.502'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:55:55.505'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 208, heapTotal: 214 },
+    uptime: 670,
+    requests: 26,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:55:59.308'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 207, heapTotal: 214 },
+    uptime: 700,
+    requests: 26,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:56:29.314'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:56:55.510'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:56:55.514'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 208, heapTotal: 215 },
+    uptime: 730,
+    requests: 28,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:56:59.328'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 208, heapTotal: 215 },
+    uptime: 760,
+    requests: 28,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:57:29.332'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:57:55.528'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:57:55.545'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 207, heapTotal: 214 },
+    uptime: 790,
+    requests: 30,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:57:59.342'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 78, heapUsed: 208, heapTotal: 215 },
+    uptime: 820,
+    requests: 30,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:58:29.355'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:58:55.542'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:58:55.554'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 850,
+    requests: 32,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:58:59.371'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 207, heapTotal: 215 },
+    uptime: 880,
+    requests: 32,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:59:29.371'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 12:59:55.542'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 12:59:55.546'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 910,
+    requests: 34,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 12:59:59.374'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 940,
+    requests: 34,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:00:29.383'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:00:55.554'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:00:55.561'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 214 },
+    uptime: 970,
+    requests: 36,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:00:59.395'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 1000,
+    requests: 36,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:01:29.400'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:01:55.562'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:01:55.568'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 1030,
+    requests: 38,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:01:59.407'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 1060,
+    requests: 38,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:02:29.419'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:02:55.567'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:02:55.572'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 214 },
+    uptime: 1090,
+    requests: 40,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:02:59.432'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 1120,
+    requests: 40,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:03:29.434'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:03:55.577'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:03:55.585'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 79, heapUsed: 208, heapTotal: 215 },
+    uptime: 1150,
+    requests: 42,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:03:59.439'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 80, heapUsed: 208, heapTotal: 215 },
+    uptime: 1180,
+    requests: 42,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:04:29.444'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:04:55.588'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:04:55.594'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 80, heapUsed: 208, heapTotal: 214 },
+    uptime: 1210,
+    requests: 44,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:04:59.451'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1240,
+    requests: 44,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:05:29.461'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:05:55.593'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:05:55.598'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1270,
+    requests: 46,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:05:59.464'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1300,
+    requests: 46,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:06:29.479'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:06:55.596'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:06:55.611'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 214 },
+    uptime: 1330,
+    requests: 48,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:06:59.494'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1360,
+    requests: 48,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:07:29.496'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:07:55.608'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:07:55.614'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1390,
+    requests: 50,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:07:59.499'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1420,
+    requests: 50,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:08:29.511'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:08:55.624'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:08:55.638'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 214 },
+    uptime: 1450,
+    requests: 52,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:08:59.513'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1480,
+    requests: 52,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:09:29.522'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:09:55.632'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:09:55.645'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 209, heapTotal: 215 },
+    uptime: 1510,
+    requests: 54,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:09:59.525'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1540,
+    requests: 54,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:10:29.531'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:10:55.639'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:10:55.644'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 69, heapUsed: 208, heapTotal: 215 },
+    uptime: 1570,
+    requests: 56,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:10:59.533'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 72, heapUsed: 209, heapTotal: 215 },
+    uptime: 1600,
+    requests: 56,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:11:29.533'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:11:55.646'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:11:55.658'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 72, heapUsed: 208, heapTotal: 214 },
+    uptime: 1630,
+    requests: 58,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:11:59.545'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 208, heapTotal: 215 },
+    uptime: 1660,
+    requests: 58,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:12:29.555'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:12:55.659'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:12:55.665'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 59, heapUsed: 209, heapTotal: 215 },
+    uptime: 1690,
+    requests: 60,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:12:59.561'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 49, heapUsed: 209, heapTotal: 215 },
+    uptime: 1720,
+    requests: 60,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:13:29.570'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:13:55.673'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:13:55.692'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 49, heapUsed: 208, heapTotal: 214 },
+    uptime: 1750,
+    requests: 62,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:13:59.577'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 29, heapUsed: 208, heapTotal: 215 },
+    uptime: 1780,
+    requests: 62,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:14:29.588'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:14:55.684'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:14:55.699'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 31, heapUsed: 209, heapTotal: 215 },
+    uptime: 1810,
+    requests: 64,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:14:59.594'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 29, heapUsed: 209, heapTotal: 215 },
+    uptime: 1840,
+    requests: 64,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:15:29.628'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:15:55.685'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:15:55.688'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 29, heapUsed: 209, heapTotal: 214 },
+    uptime: 1870,
+    requests: 66,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:15:59.613'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 30, heapUsed: 209, heapTotal: 215 },
+    uptime: 1900,
+    requests: 66,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:16:29.627'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:16:55.694'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:16:55.698'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 30, heapUsed: 208, heapTotal: 214 },
+    uptime: 1930,
+    requests: 68,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:16:59.641'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 30, heapUsed: 208, heapTotal: 215 },
+    uptime: 1960,
+    requests: 68,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:17:29.659'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 13:17:55.709'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 13:17:55.723'
+}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 33, heapUsed: 209, heapTotal: 215 },
+    uptime: 1990,
+    requests: 70,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 13:17:59.653'
+}
