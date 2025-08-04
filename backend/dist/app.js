@@ -381,4 +381,3 @@ process.on('SIGTERM', () => __awaiter(void 0, void 0, void 0, function* () {
 }));
 // Iniciar servidor
 startServer();
-startServer();
