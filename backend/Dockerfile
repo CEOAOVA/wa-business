@@ -1,5 +1,5 @@
-# Usar Node.js 22 LTS como imagen base
-FROM node:22.16.0-alpine AS base
+# Usar Node.js 18 LTS como imagen base
+FROM node:18-alpine AS base
 
 # Instalar dependencias del sistema necesarias
 RUN apk add --no-cache \

@@ -4,6 +4,7 @@
  */
 
 import { createClient, SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 export interface RealtimeMessage {
   id: number;
@@ -84,7 +85,7 @@ export class RealtimeService {
             table: 'messages',
             filter: `conversation_id=eq.${conversationId}`
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<RealtimeMessage>) => {
             console.log('📨 [RealtimeService] Nuevo mensaje recibido:', payload);
             if (callbacks.onMessageInsert) {
               callbacks.onMessageInsert(payload.new as RealtimeMessage);
@@ -99,7 +100,7 @@ export class RealtimeService {
             table: 'messages',
             filter: `conversation_id=eq.${conversationId}`
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<RealtimeMessage>) => {
             console.log('📝 [RealtimeService] Mensaje actualizado:', payload);
             if (callbacks.onMessageUpdate) {
               callbacks.onMessageUpdate(payload.new as RealtimeMessage);
@@ -114,14 +115,14 @@ export class RealtimeService {
             table: 'conversations',
             filter: `id=eq.${conversationId}`
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<any>) => {
             console.log('🔄 [RealtimeService] Conversación actualizada:', payload);
             if (callbacks.onConversationUpdate) {
               callbacks.onConversationUpdate(payload.new);
             }
           }
         )
-        .subscribe((status) => {
+        .subscribe((status: string) => {
           console.log(`🔌 [RealtimeService] Estado de suscripción para ${conversationId}:`, status);
           
           if (status === 'SUBSCRIBED') {
