@@ -25,7 +25,7 @@ export interface RealtimeCallbacks {
 }
 
 export class RealtimeService {
-  private supabase: SupabaseClient;
+  private supabase!: SupabaseClient; // Definite assignment assertion
   private channels = new Map<string, RealtimeChannel>();
   private isEnabled = false;
 

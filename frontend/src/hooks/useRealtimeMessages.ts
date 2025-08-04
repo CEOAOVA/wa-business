@@ -50,9 +50,9 @@ export const useRealtimeMessages = (
   } = options;
 
   // Referencias para evitar re-suscripciones innecesarias
-  const currentConversationId = useRef<string | undefined>();
-  const isSubscribed = useRef(false);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const currentConversationId = useRef<string | undefined>(undefined);
+  const isSubscribed = useRef<boolean>(false);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Función para convertir mensaje de Realtime al formato del contexto
   const convertRealtimeMessage = useCallback((realtimeMessage: RealtimeMessage): Message => {
