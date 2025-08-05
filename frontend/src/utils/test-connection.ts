@@ -56,10 +56,10 @@ export function testWebSocket() {
   });
   
   testSocket.on('connect_error', (error: any) => {
-    console.error('   ❌ ERROR DE CONEXIÓN:', error.message);
+    console.error('   ❌ ERROR DE CONEXIÓN:', error.message || 'Connection failed');
     console.error('   📝 Detalles:', {
-      type: error.type,
-      data: error.data
+      type: error.type || 'unknown',
+      data: error.data || null
     });
     
     // Diagnóstico del error

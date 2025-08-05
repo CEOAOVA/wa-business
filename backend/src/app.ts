@@ -56,10 +56,11 @@ const io = new Server(httpServer, {
   upgradeTimeout: 20000, // 20 segundos
   maxHttpBufferSize: 5e5, // 500KB - REDUCIDO de 1MB
   connectTimeout: 45000, // 45 segundos - AUMENTADO
-  allowRequest: async (req, callback) => {
+  allowRequest: async (req: any, callback) => {
     try {
       // Obtener token del handshake auth o headers
-      const token = req._query?.token || 
+      const token = req.handshake?.auth?.token ||
+                    req.handshake?.query?.token ||
                     req.headers?.authorization?.replace('Bearer ', '') ||
                     req.headers?.token;
       

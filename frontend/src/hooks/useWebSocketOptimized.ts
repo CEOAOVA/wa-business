@@ -270,11 +270,11 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       }
     });
 
-    socket.on('connect_error', (error) => {
+    socket.on('connect_error', (error: any) => {
       console.error('❌ Error de conexión WebSocket:', {
-        type: error.type,
-        message: error.message,
-        data: error.data
+        type: error.type || 'unknown',
+        message: error.message || 'Connection failed',
+        data: error.data || null
       });
       
       // Si es error de autenticación
