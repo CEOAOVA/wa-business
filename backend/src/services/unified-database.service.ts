@@ -7,7 +7,7 @@ import { StructuredLogger } from '../utils/structured-logger';
 import { supabaseDatabaseService, SupabaseMessage, SupabaseConversation } from './supabase-database.service';
 import { databaseService } from './database.service';
 import { whatsappCircuitBreaker, databaseCircuitBreaker } from './circuit-breaker.service';
-import { supabase } from '../config/supabase';
+import { supabaseAdmin as supabase } from '../config/supabase';
 
 export interface UnifiedDatabaseConfig {
   useDirectSupabase: boolean;

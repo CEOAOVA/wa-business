@@ -225,10 +225,10 @@ export class Logger {
    * Configura métricas periódicas
    */
   private setupPeriodicMetrics(): void {
-    // Actualizar métricas cada 30 segundos
+    // Actualizar métricas cada 30 segundos (SIN LOG para reducir ruido)
     setInterval(() => {
       this.updateSystemMetrics();
-      this.logSystemMetrics();
+      // this.logSystemMetrics(); // DESHABILITADO: logs muy verbosos que saturan los logs importantes
     }, 30000);
 
     // Limpiar estadísticas cada hora

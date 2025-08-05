@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { supabaseAdmin as supabase } from '../config/supabase';
 import { retryService } from './resilience/retry.service';
 import { bulkheadService, BULKHEAD_CONFIGS } from './resilience/bulkhead.service';
 

@@ -642,7 +642,7 @@ export class WhatsAppService {
         console.log(`🤖 Chatbot procesará mensaje de ${from} (modo: ${conversation.takeover_mode || 'spectator'})`);
         
         // GUARDAR MENSAJE DEL USUARIO EN LA BASE DE DATOS ANTES DE PROCESAR CON CHATBOT
-        await databaseService.createChatbotMessage({
+        const userMessageResult = await databaseService.createChatbotMessage({
           conversationId: conversation.id,
           contactPhone: from,
           senderType: 'user',
@@ -655,6 +655,28 @@ export class WhatsAppService {
             timestamp: timestamp.toISOString()
           }
         });
+
+        // Emitir evento para mensaje del usuario si se guardó exitosamente
+        if (userMessageResult.success) {
+          this.emitNewMessage({
+            id: userMessageResult.messageId || `msg_${Date.now()}`,
+            waMessageId: messageId,
+            from: from,
+            to: 'us',
+            message: content,
+            timestamp: timestamp,
+            type: 'text',
+            read: false,
+            conversationId: conversation.id,
+            contactId: conversation.contact_phone,
+            clientId: clientId,
+          }, {
+            id: conversation.id,
+            contactId: conversation.contact_phone,
+            contactName: contactName,
+            unreadCount: conversation.unread_count || 0
+          });
+        }
         
         // Procesar con chatbot
         const chatbotResponse = await chatbotService.processWhatsAppMessage(from, content);
@@ -683,7 +705,7 @@ export class WhatsAppService {
         console.log(`👤 Agente debe procesar mensaje de ${from} (modo: ${conversation.takeover_mode})`);
         
         // Solo guardar el mensaje en la base de datos, sin procesar con chatbot
-        await databaseService.createChatbotMessage({
+        const messageResult = await databaseService.createChatbotMessage({
           conversationId: conversation.id,
           contactPhone: from,
           senderType: 'user',
@@ -697,25 +719,32 @@ export class WhatsAppService {
           }
         });
 
-        // Notificar a agentes conectados
-        this.emitNewMessage({
-          id: `msg_${Date.now()}`, // NUEVO: ID temporal para el mensaje
-          waMessageId: messageId,
-          from: from,
-          to: 'us', // NUEVO: Destinatario
-          message: content, // NUEVO: Contenido del mensaje
-          timestamp: timestamp, // NUEVO: Timestamp
-          type: 'text', // NUEVO: Tipo de mensaje
-          read: false, // NUEVO: Estado de lectura
-          conversationId: conversation.id, // NUEVO: ID de conversación
-          contactId: conversation.contact_phone, // NUEVO: ID del contacto
-          clientId: clientId, // NUEVO: Incluir client_id en el evento
-        }, {
-          id: conversation.id,
-          contactId: conversation.contact_phone,
-          contactName: contactName,
-          unreadCount: conversation.unread_count || 0
-        });
+        // Solo emitir evento si el mensaje se guardó exitosamente
+        if (messageResult.success) {
+          console.log(`✅ Mensaje guardado exitosamente, emitiendo evento Socket.IO`);
+          
+          // Notificar a agentes conectados
+          this.emitNewMessage({
+            id: messageResult.messageId || `msg_${Date.now()}`, // Usar ID real del mensaje
+            waMessageId: messageId,
+            from: from,
+            to: 'us', // NUEVO: Destinatario
+            message: content, // NUEVO: Contenido del mensaje
+            timestamp: timestamp, // NUEVO: Timestamp
+            type: 'text', // NUEVO: Tipo de mensaje
+            read: false, // NUEVO: Estado de lectura
+            conversationId: conversation.id, // NUEVO: ID de conversación
+            contactId: conversation.contact_phone, // NUEVO: ID del contacto
+            clientId: clientId, // NUEVO: Incluir client_id en el evento
+          }, {
+            id: conversation.id,
+            contactId: conversation.contact_phone,
+            contactName: contactName,
+            unreadCount: conversation.unread_count || 0
+          });
+        } else {
+          console.error(`❌ No se pudo guardar mensaje, no se emitirá evento Socket.IO`);
+        }
       }
 
       // Actualizar conversación

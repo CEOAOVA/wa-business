@@ -304,10 +304,11 @@ export class MonitoringService extends EventEmitter {
         errorRate: this.systemMetrics.errorRate
       };
       
-      // Verificar uso de memoria
+      // Verificar uso de memoria (DESHABILITADO para reducir ruido en logs)
       const memoryUsagePercent = (this.systemMetrics.memoryUsage.heapUsed / this.systemMetrics.memoryUsage.heapTotal) * 100;
-      if (memoryUsagePercent > this.ALERT_THRESHOLDS.memoryUsage) {
-        this.createAlert('warning', `Uso de memoria alto: ${memoryUsagePercent.toFixed(2)}%`);
+      // Solo alertas críticas, no warnings normales
+      if (memoryUsagePercent > 90) { // Solo si es realmente crítico (>90%)
+        this.createAlert('error', `Uso de memoria CRÍTICO: ${memoryUsagePercent.toFixed(2)}%`);
       }
       
       // Guardar en historial
