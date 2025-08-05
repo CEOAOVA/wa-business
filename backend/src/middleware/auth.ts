@@ -37,7 +37,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     console.log('🔐 [AuthMiddleware] Headers recibidos:', {
       authorization: req.headers.authorization ? 'Presente' : 'Ausente',
       'content-type': req.headers['content-type'],
-      'user-agent': req.headers['user-agent']
+      'user-agent': req.headers['user-agent'],
+      origin: req.headers.origin,
+      host: req.headers.host
     });
     
     const authHeader = req.headers.authorization;

@@ -159,6 +159,27 @@ app.use('/api/dashboard', dashboardRoutes);
 // Rutas de monitoreo
 app.use('/api/monitoring', monitoringRoutes);
 
+// NUEVO: Rutas de logging para el frontend
+app.post('/api/logging/batch', (req, res) => {
+  try {
+    const logs = req.body;
+    if (Array.isArray(logs)) {
+      logs.forEach(log => {
+        logger.info('Frontend Log', {
+          level: log.level,
+          message: log.message,
+          timestamp: log.timestamp,
+          data: log.data
+        });
+      });
+    }
+    res.json({ success: true, message: 'Logs received' });
+  } catch (error) {
+    logger.error('Error processing frontend logs:', error);
+    res.status(500).json({ success: false, error: 'Failed to process logs' });
+  }
+});
+
 // Información de la API
 app.get('/api', (_req, res) => {
   res.json({ 

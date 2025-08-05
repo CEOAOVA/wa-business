@@ -11,6 +11,20 @@ interface ApiResponse<T> {
 // Use relative path to leverage Vite proxy in development
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'https://dev-apiwaprueba.aova.mx');
 
+// Debug logging for URL resolution
+console.log('🔧 [AuthApi] Environment variables:', {
+  VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+  DEV: import.meta.env.DEV,
+  MODE: import.meta.env.MODE,
+  RESOLVED_BASE_URL: API_BASE_URL
+});
+
+// PRODUCTION FIX: Ensure we're using the correct backend URL
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 
+  (import.meta.env.PROD ? 'https://dev-apiwaprueba.aova.mx' : 
+   import.meta.env.DEV ? 'http://localhost:3002' : 
+   'https://dev-apiwaprueba.aova.mx');
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -49,7 +63,8 @@ class AuthApiService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = `${API_BASE_URL}/api/auth`;
+    this.baseUrl = `${BACKEND_URL}/api/auth`;
+    console.log('🔧 [AuthApi] Constructor - Base URL set to:', this.baseUrl);
   }
 
   private async request<T>(
