@@ -207,10 +207,27 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       socketRef.current = null;
     }
 
+    // Obtener token antes de conectar
+    const authToken = localStorage.getItem('authToken');
+    
+    if (!authToken) {
+      console.error('❌ No hay token de autenticación en localStorage');
+      console.log('🔑 Necesitas iniciar sesión primero');
+      setConnectionError('No hay token de autenticación');
+      isConnectingRef.current = false;
+      return;
+    }
+    
+    console.log('🔐 Token encontrado:', authToken.substring(0, 30) + '...');
+    console.log('🌐 Conectando a:', BACKEND_URL);
+    
     const socket = io(BACKEND_URL, {
       transports: ['websocket'], // Solo websocket como el backend requiere
       auth: {
-        token: localStorage.getItem('authToken') || '' // ENVÍAR TOKEN DE AUTENTICACIÓN
+        token: authToken // ENVÍAR TOKEN DE AUTENTICACIÓN
+      },
+      query: {
+        token: authToken // También enviar en query como respaldo
       },
       timeout: 20000, // Aumentado para estabilidad
       forceNew: true,

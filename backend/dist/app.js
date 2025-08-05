@@ -95,36 +95,45 @@ const io = new socket_io_1.Server(httpServer, {
     upgradeTimeout: 20000, // 20 segundos
     maxHttpBufferSize: 5e5, // 500KB - REDUCIDO de 1MB
     connectTimeout: 45000, // 45 segundos - AUMENTADO
-    allowRequest: (req, callback) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g;
-        try {
-            // Obtener token del handshake auth o headers
-            const token = ((_b = (_a = req.handshake) === null || _a === void 0 ? void 0 : _a.auth) === null || _b === void 0 ? void 0 : _b.token) ||
-                ((_d = (_c = req.handshake) === null || _c === void 0 ? void 0 : _c.query) === null || _d === void 0 ? void 0 : _d.token) ||
-                ((_f = (_e = req.headers) === null || _e === void 0 ? void 0 : _e.authorization) === null || _f === void 0 ? void 0 : _f.replace('Bearer ', '')) ||
-                ((_g = req.headers) === null || _g === void 0 ? void 0 : _g.token);
-            if (!token) {
-                console.log('❌ Socket.IO: Sin token de autenticación');
-                return callback('No authentication token', false);
-            }
-            // Validar con Supabase
-            const { supabaseAdmin } = require('./config/supabase');
-            const { data: { user }, error } = yield supabaseAdmin.auth.getUser(token);
-            if (error || !user) {
-                console.log('❌ Socket.IO: Token inválido:', error === null || error === void 0 ? void 0 : error.message);
-                return callback('Invalid token', false);
-            }
-            console.log('✅ Socket.IO: Conectado usuario:', user.email);
-            req.userId = user.id; // Guardar para uso posterior
-            callback(null, true);
-        }
-        catch (error) {
-            console.error('❌ Socket.IO: Error validando:', error);
-            callback('Authentication error', false);
-        }
-    })
+    // Por ahora permitir todas las conexiones, validaremos en el middleware
+    allowRequest: (req, callback) => {
+        callback(null, true);
+    }
 });
 exports.io = io;
+// Middleware de autenticación para Socket.IO
+io.use((socket, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    try {
+        // Obtener token del handshake
+        const token = ((_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token) ||
+            ((_b = socket.handshake.query) === null || _b === void 0 ? void 0 : _b.token) ||
+            ((_d = (_c = socket.handshake.headers) === null || _c === void 0 ? void 0 : _c.authorization) === null || _d === void 0 ? void 0 : _d.replace('Bearer ', ''));
+        console.log('🔍 [Socket.IO Auth] Verificando token...');
+        console.log('🔍 [Socket.IO Auth] Handshake auth:', socket.handshake.auth);
+        console.log('🔍 [Socket.IO Auth] Handshake query:', socket.handshake.query);
+        if (!token) {
+            console.log('❌ Socket.IO: Sin token de autenticación');
+            return next(new Error('No authentication token'));
+        }
+        // Validar con Supabase
+        const { supabaseAdmin } = require('./config/supabase');
+        const { data: { user }, error } = yield supabaseAdmin.auth.getUser(token);
+        if (error || !user) {
+            console.log('❌ Socket.IO: Token inválido:', error === null || error === void 0 ? void 0 : error.message);
+            return next(new Error('Invalid authentication token'));
+        }
+        console.log('✅ Socket.IO: Usuario autenticado:', user.email);
+        // Adjuntar usuario al socket para uso posterior
+        socket.userId = user.id;
+        socket.userEmail = user.email;
+        next();
+    }
+    catch (error) {
+        console.error('❌ Socket.IO: Error en autenticación:', error);
+        next(new Error('Authentication failed'));
+    }
+}));
 // Middleware para parsing JSON
 app.use(express_1.default.json());
 // Middleware para hacer disponible io en las rutas
