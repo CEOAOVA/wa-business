@@ -96,10 +96,12 @@ class MemoryMonitor {
             this.triggerEmergencyCleanup();
         }
         else if (memoryUsagePercent > this.warningThreshold) {
-            logger_1.logger.warn('WARNING: Uso de memoria alto', {
-                usagePercent: `${memoryUsagePercent.toFixed(2)}%`,
-                threshold: `${this.warningThreshold}%`
-            });
+            // DESHABILITADO: warning de memoria alto para reducir ruido en logs
+            // Solo se muestran los errores críticos, no warnings normales
+            // logger.warn('WARNING: Uso de memoria alto', {
+            //   usagePercent: `${memoryUsagePercent.toFixed(2)}%`,
+            //   threshold: `${this.warningThreshold}%`
+            // });
             this.triggerCleanup();
         }
     }

@@ -275,10 +275,48 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     messageQueueSize: 50
   });
 
+  // Función para cargar mensajes de una conversación (debe estar antes de selectChat)
+  const loadConversationMessages = useCallback(async (conversationId: string) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
+      const response = await dashboardApiService.getConversationMessages(conversationId);
+      if (response.success && response.data) {
+        response.data.forEach((message: any) => {
+          dispatch({
+            type: 'ADD_MESSAGE',
+            payload: {
+              id: message.id,
+              content: message.content,
+              senderId: message.sender_id,
+              chatId: conversationId,
+              timestamp: new Date(message.created_at),
+              type: message.type || 'text',
+              created_at: message.created_at,
+            }
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando mensajes de conversación:', error);
+      dispatch({ type: 'SET_ERROR', payload: 'Error cargando mensajes' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, []);
+
   // Memoizar funciones para evitar re-renders innecesarios
   const selectChat = useCallback((chat: Chat) => {
+    console.log('📋 [AppContextOptimized] Seleccionando chat:', chat.id);
     dispatch({ type: 'SET_CURRENT_CHAT', payload: chat });
-  }, []);
+    
+    // Cargar mensajes históricos de la conversación automáticamente
+    const chatId = chat.id.replace('conv-', ''); // Remover prefijo si existe
+    console.log('📨 [AppContextOptimized] Cargando mensajes para conversación:', chatId);
+    loadConversationMessages(chatId).catch(error => {
+      console.error('❌ [AppContextOptimized] Error cargando mensajes:', error);
+    });
+  }, [loadConversationMessages]);
 
   const markChatAsRead = useCallback((chatId: string) => {
     dispatch({
@@ -447,35 +485,6 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
       console.error('❌ [AppContextOptimized] Error cargando conversaciones del nuevo esquema:', error);
     }
   }, [state.chats]);
-
-  const loadConversationMessages = useCallback(async (conversationId: string) => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const response = await dashboardApiService.getConversationMessages(conversationId);
-      if (response.success && response.data) {
-        response.data.forEach((message: any) => {
-          dispatch({
-            type: 'ADD_MESSAGE',
-            payload: {
-              id: message.id,
-              content: message.content,
-              senderId: message.sender_id,
-              chatId: conversationId,
-              timestamp: new Date(message.created_at),
-              type: message.type || 'text',
-              created_at: message.created_at,
-            }
-          });
-        });
-      }
-    } catch (error) {
-      console.error('Error cargando mensajes de conversación:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Error cargando mensajes' });
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  }, []);
 
   const sendMessage = useCallback(async (content: string, type: Message['type'] = 'text') => {
     if (!state.currentChat) return;
@@ -714,6 +723,26 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     onNewMessage(handleNewMessage);
     onConversationUpdate(handleConversationUpdate);
   }, [onNewMessage, onConversationUpdate, state.messages]);
+
+  // Carga inicial de conversaciones al montar el componente
+  useEffect(() => {
+    console.log('🚀 [AppContextOptimized] Iniciando carga inicial de conversaciones...');
+    
+    const loadInitialData = async () => {
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true });
+        await loadNewSchemaConversations();
+        console.log('✅ [AppContextOptimized] Carga inicial completada exitosamente');
+      } catch (error) {
+        console.error('❌ [AppContextOptimized] Error en carga inicial:', error);
+        dispatch({ type: 'SET_ERROR', payload: 'Error cargando conversaciones iniciales' });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    };
+    
+    loadInitialData();
+  }, []); // Solo ejecutar una vez al montar
 
   // Memoizar el valor del contexto para evitar re-renders
   const contextValue = useMemo<AppContextOptimizedType>(() => ({

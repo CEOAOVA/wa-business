@@ -343,9 +343,9 @@ class UnifiedDatabaseService {
     optimizedDeleteMessage(messageId, context) {
         return __awaiter(this, void 0, void 0, function* () {
             // Implementar eliminación directa con Supabase
-            if (!supabase_1.supabase)
+            if (!supabase_1.supabaseAdmin)
                 throw new Error('Supabase not configured');
-            const { data, error } = yield supabase_1.supabase
+            const { data, error } = yield supabase_1.supabaseAdmin
                 .from('messages')
                 .delete()
                 .eq('id', messageId);
@@ -396,9 +396,9 @@ class UnifiedDatabaseService {
     legacyDeleteMessage(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
             // Implementar usando Supabase directamente como fallback
-            if (!supabase_1.supabase)
+            if (!supabase_1.supabaseAdmin)
                 throw new Error('Supabase not configured');
-            const { data, error } = yield supabase_1.supabase
+            const { data, error } = yield supabase_1.supabaseAdmin
                 .from('messages')
                 .delete()
                 .eq('id', messageId);

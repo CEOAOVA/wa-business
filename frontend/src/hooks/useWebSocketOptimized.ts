@@ -72,7 +72,15 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
   const lastPingTimeRef = useRef<number>(0);
   const connectionStartTimeRef = useRef<number>(0);
   
-  const { setConnectionState, incrementRetryCount, resetRetryCount, addNotification } = useAppStore();
+  const { 
+    setConnectionState, 
+    incrementRetryCount, 
+    resetRetryCount, 
+    addNotification,
+    addMessage,
+    addChat,
+    updateChat
+  } = useAppStore();
 
   // Calcular delay exponencial con jitter mejorado
   const calculateDelay = useCallback((attempt: number): number => {
@@ -282,12 +290,66 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     // Eventos de mensajería con optimizaciones
     socket.on('new_message', (data: WebSocketMessage) => {
       console.log('📨 Nuevo mensaje recibido:', data);
-      // El store se encargará de procesar el mensaje
+      
+      try {
+        // Procesar mensaje entrante
+        const message = {
+          id: data.message.id,
+          chatId: data.message.conversationId,
+          senderId: data.message.from,
+          content: data.message.message,
+          type: data.message.type as 'text' | 'image' | 'document' | 'audio' | 'video',
+          timestamp: new Date(data.message.timestamp),
+          isRead: data.message.read,
+          isDelivered: true,
+          status: 'delivered' as const,
+          metadata: {
+            waMessageId: data.message.waMessageId,
+            clientId: data.message.clientId
+          }
+        };
+        
+        // Agregar mensaje al store
+        addMessage(message);
+        
+        // Actualizar/crear chat
+        const chat = {
+          id: data.conversation.id,
+          clientId: data.conversation.contactId,
+          clientName: data.conversation.contactName,
+          clientPhone: data.conversation.contactId,
+          unreadCount: data.conversation.unreadCount,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          tags: [],
+          priority: 'medium' as const,
+          status: 'open' as const,
+          aiMode: 'active' as const
+        };
+        
+        addChat(chat);
+        
+        console.log('✅ Mensaje procesado y agregado al store');
+      } catch (error) {
+        console.error('❌ Error procesando mensaje WebSocket:', error);
+      }
     });
 
     socket.on('conversation_updated', (data: ConversationUpdateEvent) => {
       console.log('📝 Conversación actualizada:', data);
-      // El store se encargará de procesar la actualización
+      
+      try {
+        // Actualizar conversación en el store
+        updateChat(data.conversationId, {
+          unreadCount: data.unreadCount,
+          updatedAt: new Date()
+        });
+        
+        console.log('✅ Conversación actualizada en el store');
+      } catch (error) {
+        console.error('❌ Error actualizando conversación WebSocket:', error);
+      }
     });
 
     // Eventos de estado de conexión

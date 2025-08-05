@@ -15,7 +15,7 @@ const bulkhead_service_1 = require("./resilience/bulkhead.service");
 class SupabaseDatabaseService {
     constructor() {
         // FORZAR Supabase como única opción - NO más fallbacks
-        this.isEnabled = !!supabase_1.supabase;
+        this.isEnabled = !!supabase_1.supabaseAdmin;
         if (this.isEnabled) {
             console.log('🚀 Supabase Database Service activado (NUEVO ESQUEMA)');
             // Inicializar bulkhead para Supabase
@@ -38,11 +38,11 @@ class SupabaseDatabaseService {
      */
     getAgents() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: agents, error } = yield supabase_1.supabase
+                const { data: agents, error } = yield supabase_1.supabaseAdmin
                     .from('agents')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -63,11 +63,11 @@ class SupabaseDatabaseService {
      */
     getAgentById(agentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: agent, error } = yield supabase_1.supabase
+                const { data: agent, error } = yield supabase_1.supabaseAdmin
                     .from('agents')
                     .select('*')
                     .eq('id', agentId)
@@ -89,11 +89,11 @@ class SupabaseDatabaseService {
      */
     getAgentByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: agent, error } = yield supabase_1.supabase
+                const { data: agent, error } = yield supabase_1.supabaseAdmin
                     .from('agents')
                     .select('*')
                     .eq('email', email)
@@ -116,12 +116,12 @@ class SupabaseDatabaseService {
      */
     getOrCreateContact(phone, name) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
                 // Intentar obtener contacto existente
-                const { data: existingContact, error: fetchError } = yield supabase_1.supabase
+                const { data: existingContact, error: fetchError } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .select('*')
                     .eq('phone', phone)
@@ -130,7 +130,7 @@ class SupabaseDatabaseService {
                     return existingContact;
                 }
                 // Crear nuevo contacto si no existe
-                const { data: newContact, error: createError } = yield supabase_1.supabase
+                const { data: newContact, error: createError } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .insert({
                     phone,
@@ -157,11 +157,11 @@ class SupabaseDatabaseService {
      */
     getContactByPhone(phone) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: contact, error } = yield supabase_1.supabase
+                const { data: contact, error } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .select('*')
                     .eq('phone', phone)
@@ -183,11 +183,11 @@ class SupabaseDatabaseService {
      */
     getContactById(contactId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: contact, error } = yield supabase_1.supabase
+                const { data: contact, error } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .select('*')
                     .eq('id', contactId)
@@ -209,11 +209,11 @@ class SupabaseDatabaseService {
      */
     updateContact(contactId, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .update(Object.assign(Object.assign({}, data), { updated_at: new Date().toISOString() }))
                     .eq('id', contactId);
@@ -234,11 +234,11 @@ class SupabaseDatabaseService {
      */
     deleteContact(contactId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .delete()
                     .eq('id', contactId);
@@ -259,11 +259,11 @@ class SupabaseDatabaseService {
      */
     getContacts() {
         return __awaiter(this, arguments, void 0, function* (limit = 50, offset = 0) {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: contacts, error } = yield supabase_1.supabase
+                const { data: contacts, error } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .select('*')
                     .order('created_at', { ascending: false })
@@ -286,12 +286,12 @@ class SupabaseDatabaseService {
      */
     getOrCreateConversation(contactPhone) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible - configurar SUPABASE_URL y SUPABASE_ANON_KEY');
             }
             try {
                 // Intentar obtener conversación existente
-                const { data: existingConversation, error: fetchError } = yield supabase_1.supabase
+                const { data: existingConversation, error: fetchError } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*')
                     .eq('contact_phone', contactPhone)
@@ -300,7 +300,7 @@ class SupabaseDatabaseService {
                     return existingConversation;
                 }
                 // Crear nueva conversación si no existe
-                const { data: newConversation, error: createError } = yield supabase_1.supabase
+                const { data: newConversation, error: createError } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .insert({
                     contact_phone: contactPhone,
@@ -327,7 +327,7 @@ class SupabaseDatabaseService {
      */
     setConversationAIMode(conversationId, mode, agentId, reason) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return { success: false, error: '❌ Supabase no disponible' };
             }
             try {
@@ -341,7 +341,7 @@ class SupabaseDatabaseService {
                 if (reason) {
                     updateData.metadata = { takeover_reason: reason };
                 }
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update(updateData)
                     .eq('id', conversationId);
@@ -362,11 +362,11 @@ class SupabaseDatabaseService {
      */
     getConversationAIMode(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return null;
             }
             try {
-                const { data: conversation, error } = yield supabase_1.supabase
+                const { data: conversation, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('ai_mode')
                     .eq('id', conversationId)
@@ -388,11 +388,11 @@ class SupabaseDatabaseService {
      */
     getConversationsNeedingTakeover() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return [];
             }
             try {
-                const { data: conversations, error } = yield supabase_1.supabase
+                const { data: conversations, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*')
                     .eq('ai_mode', 'paused')
@@ -415,11 +415,11 @@ class SupabaseDatabaseService {
      */
     assignConversationToAgent(conversationId, agentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return { success: false, error: '❌ Supabase no disponible' };
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update({
                     assigned_agent_id: agentId,
@@ -444,7 +444,7 @@ class SupabaseDatabaseService {
      */
     releaseConversationFromAgent(conversationId, reason) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return { success: false, error: '❌ Supabase no disponible' };
             }
             try {
@@ -456,7 +456,7 @@ class SupabaseDatabaseService {
                 if (reason) {
                     updateData.metadata = { release_reason: reason };
                 }
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update(updateData)
                     .eq('id', conversationId);
@@ -477,11 +477,11 @@ class SupabaseDatabaseService {
      */
     updateConversationLastMessage(conversationId, timestamp) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return false;
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update({
                     last_message_at: timestamp.toISOString(),
@@ -506,11 +506,11 @@ class SupabaseDatabaseService {
      */
     createMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: message, error } = yield supabase_1.supabase
+                const { data: message, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .insert({
                     conversation_id: data.conversationId,
@@ -537,13 +537,13 @@ class SupabaseDatabaseService {
                 if (data.senderType === 'user') {
                     try {
                         // Intentar usar la función RPC si existe
-                        const { error: incrementError } = yield supabase_1.supabase.rpc('increment_unread_count', {
+                        const { error: incrementError } = yield supabase_1.supabaseAdmin.rpc('increment_unread_count', {
                             conversation_id: data.conversationId
                         });
                         if (incrementError) {
                             console.log('⚠️ Función RPC no disponible, usando método alternativo');
                             // Método alternativo: obtener el valor actual y sumar 1
-                            const { data: currentConversation } = yield supabase_1.supabase
+                            const { data: currentConversation } = yield supabase_1.supabaseAdmin
                                 .from('conversations')
                                 .select('unread_count')
                                 .eq('id', data.conversationId)
@@ -556,7 +556,7 @@ class SupabaseDatabaseService {
                     catch (error) {
                         console.log('⚠️ Error con función RPC, usando método alternativo');
                         // Método alternativo: obtener el valor actual y sumar 1
-                        const { data: currentConversation } = yield supabase_1.supabase
+                        const { data: currentConversation } = yield supabase_1.supabaseAdmin
                             .from('conversations')
                             .select('unread_count')
                             .eq('id', data.conversationId)
@@ -566,7 +566,7 @@ class SupabaseDatabaseService {
                         }
                     }
                 }
-                const { error: updateError } = yield supabase_1.supabase
+                const { error: updateError } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update(updateData)
                     .eq('id', data.conversationId);
@@ -589,11 +589,11 @@ class SupabaseDatabaseService {
      */
     checkMessageByClientId(conversationId, clientId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: message, error } = yield supabase_1.supabase
+                const { data: message, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .select('*')
                     .eq('conversation_id', conversationId)
@@ -616,13 +616,13 @@ class SupabaseDatabaseService {
      */
     getConversationMessages(conversationId_1) {
         return __awaiter(this, arguments, void 0, function* (conversationId, limit = 50) {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
                 console.log(`📨 [Supabase] Obteniendo mensajes para conversación: ${conversationId} (límite: ${limit})`);
                 // OPTIMIZACIÓN: Usar índices específicos y consulta más eficiente
-                const { data: messages, error } = yield supabase_1.supabase
+                const { data: messages, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .select('id, conversation_id, sender_type, content, message_type, whatsapp_message_id, client_id, is_read, metadata, created_at')
                     .eq('conversation_id', conversationId)
@@ -653,11 +653,11 @@ class SupabaseDatabaseService {
      */
     getLastMessage(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { data: message, error } = yield supabase_1.supabase
+                const { data: message, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .select('*')
                     .eq('conversation_id', conversationId)
@@ -684,11 +684,11 @@ class SupabaseDatabaseService {
      */
     markMessageAsRead(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return false;
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .update({ is_read: true })
                     .eq('id', messageId);
@@ -709,12 +709,12 @@ class SupabaseDatabaseService {
      */
     markConversationAsRead(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return false;
             }
             try {
                 // Marcar todos los mensajes de la conversación como leídos
-                const { error: messagesError } = yield supabase_1.supabase
+                const { error: messagesError } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .update({ is_read: true })
                     .eq('conversation_id', conversationId)
@@ -724,7 +724,7 @@ class SupabaseDatabaseService {
                     return false;
                 }
                 // Resetear contador de mensajes no leídos
-                const { error: conversationError } = yield supabase_1.supabase
+                const { error: conversationError } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update({ unread_count: 0 })
                     .eq('id', conversationId);
@@ -745,13 +745,13 @@ class SupabaseDatabaseService {
      */
     cleanupOldMessages(olderThanHours) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return 0;
             }
             try {
                 const cutoffDate = new Date();
                 cutoffDate.setHours(cutoffDate.getHours() - olderThanHours);
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .delete()
                     .lt('created_at', cutoffDate.toISOString());
@@ -775,7 +775,7 @@ class SupabaseDatabaseService {
      */
     getChatbotStats() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return {
                     totalConversations: 0,
                     totalMessages: 0,
@@ -785,21 +785,21 @@ class SupabaseDatabaseService {
             }
             try {
                 // Obtener estadísticas de conversaciones
-                const { count: totalConversations } = yield supabase_1.supabase
+                const { count: totalConversations } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*', { count: 'exact', head: true });
-                const { count: activeConversations } = yield supabase_1.supabase
+                const { count: activeConversations } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*', { count: 'exact', head: true })
                     .eq('status', 'active');
                 // Obtener estadísticas de mensajes
-                const { count: totalMessages } = yield supabase_1.supabase
+                const { count: totalMessages } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .select('*', { count: 'exact', head: true });
                 // Obtener estadísticas de órdenes (si existe la tabla)
                 let totalOrders = 0;
                 try {
-                    const { count } = yield supabase_1.supabase
+                    const { count } = yield supabase_1.supabaseAdmin
                         .from('orders')
                         .select('*', { count: 'exact', head: true });
                     totalOrders = count || 0;
@@ -862,11 +862,11 @@ class SupabaseDatabaseService {
     }
     getActiveConversations() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return [];
             }
             try {
-                const { data: conversations, error } = yield supabase_1.supabase
+                const { data: conversations, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*')
                     .eq('status', 'active')
@@ -885,12 +885,12 @@ class SupabaseDatabaseService {
     }
     getConversations() {
         return __awaiter(this, arguments, void 0, function* (limit = 50, offset = 0) {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return [];
             }
             try {
                 // Ordenar por last_message_at si existe, sino por updated_at
-                const { data: conversations, error } = yield supabase_1.supabase
+                const { data: conversations, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*')
                     .order('last_message_at', { ascending: false })
@@ -910,11 +910,11 @@ class SupabaseDatabaseService {
     }
     searchConversations(criteria) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return [];
             }
             try {
-                let query = supabase_1.supabase
+                let query = supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*');
                 if (criteria.contactPhone) {
@@ -947,11 +947,11 @@ class SupabaseDatabaseService {
      */
     getConversationTakeoverMode(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return null;
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('takeover_mode')
                     .eq('id', conversationId)
@@ -973,7 +973,7 @@ class SupabaseDatabaseService {
      */
     setConversationTakeoverMode(conversationId, mode, agentId, reason) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return { success: false, error: '❌ Supabase no disponible' };
             }
             try {
@@ -996,7 +996,7 @@ class SupabaseDatabaseService {
                     updateData.assigned_agent_id = null;
                     updateData.ai_mode = 'active';
                 }
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .update(updateData)
                     .eq('id', conversationId);
@@ -1019,11 +1019,11 @@ class SupabaseDatabaseService {
      */
     getSpectatorConversations() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return [];
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*')
                     .eq('takeover_mode', 'spectator')
@@ -1046,11 +1046,11 @@ class SupabaseDatabaseService {
      */
     getTakeoverConversations() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return [];
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('conversations')
                     .select('*')
                     .eq('takeover_mode', 'takeover')
@@ -1073,7 +1073,7 @@ class SupabaseDatabaseService {
      */
     canChatbotProcessMessage(conversationId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 // TEMPORAL: Permitir procesamiento si Supabase no está disponible
                 console.log('⚠️ Supabase no disponible, permitiendo procesamiento de chatbot por defecto');
                 return true;
@@ -1101,13 +1101,13 @@ class SupabaseDatabaseService {
      */
     addPostalCodeToContacts() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 return { success: false, error: '❌ Supabase no disponible' };
             }
             try {
                 console.log('🔄 Ejecutando migración: agregando postal_code a contacts...');
                 // Agregar columna postal_code si no existe
-                const { error: alterError } = yield supabase_1.supabase.rpc('exec_sql', {
+                const { error: alterError } = yield supabase_1.supabaseAdmin.rpc('exec_sql', {
                     sql_query: `
           ALTER TABLE contacts 
           ADD COLUMN IF NOT EXISTS postal_code TEXT;
@@ -1131,11 +1131,11 @@ class SupabaseDatabaseService {
      */
     updateContactWithPostalCode(contactId, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 throw new Error('❌ Supabase no disponible');
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('contacts')
                     .update(Object.assign(Object.assign({}, data), { updated_at: new Date().toISOString() }))
                     .eq('id', contactId);
@@ -1158,7 +1158,7 @@ class SupabaseDatabaseService {
      */
     updateMessageStatus(messageId, status) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [PERSISTENCE] Supabase no disponible');
                 return false;
             }
@@ -1180,7 +1180,7 @@ class SupabaseDatabaseService {
                 else if (status === 'failed') {
                     updateData.last_retry_at = new Date().toISOString();
                 }
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .update(updateData)
                     .eq('id', messageId);
@@ -1201,12 +1201,12 @@ class SupabaseDatabaseService {
      */
     updateMessageWithWhatsAppId(messageId, whatsappMessageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [PERSISTENCE] Supabase no disponible');
                 return false;
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .update({
                     whatsapp_message_id: whatsappMessageId,
@@ -1231,13 +1231,13 @@ class SupabaseDatabaseService {
      */
     getFailedMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [PERSISTENCE] Supabase no disponible');
                 return [];
             }
             try {
                 // Usar el índice parcial para mensajes fallidos
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .select('*')
                     .eq('status', 'failed')
@@ -1261,15 +1261,15 @@ class SupabaseDatabaseService {
      */
     incrementRetryCount(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [PERSISTENCE] Supabase no disponible');
                 return false;
             }
             try {
-                const { error } = yield supabase_1.supabase
+                const { error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .update({
-                    retry_count: supabase_1.supabase.rpc('increment_retry_count', { message_id: messageId }),
+                    retry_count: supabase_1.supabaseAdmin.rpc('increment_retry_count', { message_id: messageId }),
                     last_retry_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 })
@@ -1291,14 +1291,14 @@ class SupabaseDatabaseService {
      */
     cleanupTemporaryMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [PERSISTENCE] Supabase no disponible');
                 return 0;
             }
             try {
                 // Eliminar mensajes temporales más antiguos de 1 hora
                 const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .delete()
                     .like('whatsapp_message_id', 'temp_%')
@@ -1322,12 +1322,12 @@ class SupabaseDatabaseService {
      */
     getMessageById(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [RETRY] Supabase no disponible');
                 return null;
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .select('*')
                     .eq('id', messageId)
@@ -1349,12 +1349,12 @@ class SupabaseDatabaseService {
      */
     cleanupOldFailedMessages(cutoffTime) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isEnabled || !supabase_1.supabase) {
+            if (!this.isEnabled || !supabase_1.supabaseAdmin) {
                 console.error('❌ [RETRY] Supabase no disponible');
                 return 0;
             }
             try {
-                const { data, error } = yield supabase_1.supabase
+                const { data, error } = yield supabase_1.supabaseAdmin
                     .from('messages')
                     .delete()
                     .eq('status', 'failed')
