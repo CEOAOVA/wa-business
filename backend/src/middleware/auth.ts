@@ -58,9 +58,20 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     // Verificar token con Supabase de forma más simple
     if (!supabase) {
       console.error('❌ [AuthMiddleware] Supabase client no disponible');
+      console.error('❌ [AuthMiddleware] Environment variables check:', {
+        SUPABASE_URL: process.env.SUPABASE_URL ? 'Present' : 'Missing',
+        SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? 'Present' : 'Missing',
+        NODE_ENV: process.env.NODE_ENV
+      });
       return res.status(500).json({
         success: false,
-        message: 'Servicio de autenticación no disponible'
+        message: 'Servicio de autenticación no disponible',
+        error: 'SUPABASE_CLIENT_NULL',
+        debug: {
+          hasSupabaseUrl: !!process.env.SUPABASE_URL,
+          hasSupabaseKey: !!process.env.SUPABASE_ANON_KEY,
+          environment: process.env.NODE_ENV
+        }
       });
     }
 
