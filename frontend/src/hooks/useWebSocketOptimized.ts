@@ -208,15 +208,18 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     }
 
     const socket = io(BACKEND_URL, {
-      transports: ['websocket', 'polling'],
-      timeout: 15000, // Reducido para conexión más rápida
+      transports: ['websocket'], // Solo websocket como el backend requiere
+      auth: {
+        token: localStorage.getItem('authToken') || '' // ENVÍAR TOKEN DE AUTENTICACIÓN
+      },
+      timeout: 20000, // Aumentado para estabilidad
       forceNew: true,
       reconnection: false, // Manejar reconexión manualmente
       autoConnect: true,
       closeOnBeforeunload: false,
-      // Configuraciones adicionales para mejor rendimiento
-      upgrade: true,
+      upgrade: false, // No upgrade porque solo usamos websocket
       reconnectionAttempts: 0, // Deshabilitar reconexión automática
+      withCredentials: true, // Para CORS
     });
 
     // Configurar listeners ANTES de asignar el socket
@@ -268,7 +271,25 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     });
 
     socket.on('connect_error', (error) => {
-      console.error('❌ Error de conexión WebSocket:', error);
+      console.error('❌ Error de conexión WebSocket:', {
+        type: error.type,
+        message: error.message,
+        data: error.data
+      });
+      
+      // Si es error de autenticación
+      if (error.message?.includes('auth') || error.message?.includes('Invalid') || error.message?.includes('No authentication')) {
+        console.error('❌ Token inválido o expirado, requiere nuevo login');
+        localStorage.removeItem('authToken');
+        // Notificar al usuario
+        addNotification({
+          type: 'error',
+          title: 'Sesión expirada',
+          message: 'Por favor inicia sesión nuevamente',
+          isRead: false,
+        });
+      }
+      
       setConnectionError(error.message);
       setIsConnected(false);
       isConnectingRef.current = false;
@@ -279,7 +300,8 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
         connectionError: error.message,
       });
 
-      if (finalConfig.autoReconnect) {
+      // Solo reintentar si NO es error de autenticación
+      if (finalConfig.autoReconnect && !error.message?.includes('auth') && !error.message?.includes('token')) {
         handleReconnect();
       }
     });

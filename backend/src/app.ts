@@ -56,9 +56,35 @@ const io = new Server(httpServer, {
   upgradeTimeout: 20000, // 20 segundos
   maxHttpBufferSize: 5e5, // 500KB - REDUCIDO de 1MB
   connectTimeout: 45000, // 45 segundos - AUMENTADO
-  allowRequest: (req, callback) => {
-    // Permitir todas las conexiones por ahora
-    callback(null, true);
+  allowRequest: async (req, callback) => {
+    try {
+      // Obtener token del handshake auth o headers
+      const token = req._query?.token || 
+                    req.headers?.authorization?.replace('Bearer ', '') ||
+                    req.headers?.token;
+      
+      if (!token) {
+        console.log('❌ Socket.IO: Sin token de autenticación');
+        return callback('No authentication token', false);
+      }
+      
+      // Validar con Supabase
+      const { supabaseAdmin } = require('./config/supabase');
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+      
+      if (error || !user) {
+        console.log('❌ Socket.IO: Token inválido:', error?.message);
+        return callback('Invalid token', false);
+      }
+      
+      console.log('✅ Socket.IO: Conectado usuario:', user.email);
+      (req as any).userId = user.id; // Guardar para uso posterior
+      callback(null, true);
+      
+    } catch (error) {
+      console.error('❌ Socket.IO: Error validando:', error);
+      callback('Authentication error', false);
+    }
   }
 });
 

@@ -726,16 +726,47 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
 
   // Carga inicial de conversaciones al montar el componente
   useEffect(() => {
-    console.log('🚀 [AppContextOptimized] Iniciando carga inicial de conversaciones...');
+    console.log('🚀 [AppContextOptimized] Iniciando...');
+    
+    // Verificar token de autenticación
+    const authToken = localStorage.getItem('authToken');
+    
+    if (!authToken) {
+      console.warn('⚠️ No hay token de autenticación, algunas funciones estarán limitadas');
+      // No bloquear completamente, pero advertir al usuario
+    } else {
+      console.log('✅ Token encontrado:', authToken.substring(0, 20) + '...');
+    }
     
     const loadInitialData = async () => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
-        await loadNewSchemaConversations();
-        console.log('✅ [AppContextOptimized] Carga inicial completada exitosamente');
-      } catch (error) {
-        console.error('❌ [AppContextOptimized] Error en carga inicial:', error);
-        dispatch({ type: 'SET_ERROR', payload: 'Error cargando conversaciones iniciales' });
+        
+        // Solo cargar conversaciones si hay token
+        if (authToken) {
+          await loadNewSchemaConversations();
+          console.log('✅ [AppContextOptimized] Conversaciones cargadas exitosamente');
+        } else {
+          console.log('🔒 [AppContextOptimized] Sin token, saltando carga de conversaciones');
+        }
+        
+      } catch (error: any) {
+        console.error('❌ [AppContextOptimized] Error:', error);
+        
+        // Si es error 401, token inválido
+        if (error?.status === 401 || error?.response?.status === 401) {
+          console.error('❌ Token inválido o expirado');
+          localStorage.removeItem('authToken');
+          dispatch({ 
+            type: 'SET_ERROR', 
+            payload: 'Sesión expirada, por favor inicia sesión nuevamente' 
+          });
+        } else {
+          dispatch({ 
+            type: 'SET_ERROR', 
+            payload: 'Error cargando conversaciones: ' + (error?.message || 'Error desconocido')
+          });
+        }
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
