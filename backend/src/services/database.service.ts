@@ -584,6 +584,7 @@ export class DatabaseService {
     mediaUrl?: string;
     mediaCaption?: string;
     clientId?: string; // NUEVO: Incluir clientId para deduplicación
+    status?: string; // NUEVO: Estado del mensaje (pending, sent, delivered, read, failed)
   }): Promise<{
     success: boolean;
     message: {
@@ -920,6 +921,131 @@ export class DatabaseService {
     } catch (error) {
       console.error('❌ Error en checkMessageByClientId:', error);
       return null;
+    }
+  }
+
+  // ===== NUEVOS MÉTODOS PARA PERSISTENCIA =====
+
+  /**
+   * Actualizar estado de mensaje
+   */
+  async updateMessageStatus(messageId: number, status: string): Promise<boolean> {
+    try {
+      console.log(`🔄 [PERSISTENCE] Actualizando estado de mensaje ${messageId} a ${status}`);
+      const success = await supabaseDatabaseService.updateMessageStatus(messageId, status);
+      if (success) {
+        console.log(`✅ [PERSISTENCE] Estado actualizado: ${messageId} -> ${status}`);
+      } else {
+        console.error(`❌ [PERSISTENCE] Fallo al actualizar estado: ${messageId} -> ${status}`);
+      }
+      return success;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error actualizando estado de mensaje:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Actualizar mensaje con WhatsApp Message ID
+   */
+  async updateMessageWithWhatsAppId(messageId: number, whatsappMessageId: string): Promise<boolean> {
+    try {
+      console.log(`🔄 [PERSISTENCE] Actualizando mensaje ${messageId} con WhatsApp ID: ${whatsappMessageId}`);
+      const success = await supabaseDatabaseService.updateMessageWithWhatsAppId(messageId, whatsappMessageId);
+      if (success) {
+        console.log(`✅ [PERSISTENCE] WhatsApp ID actualizado: ${messageId} -> ${whatsappMessageId}`);
+      } else {
+        console.error(`❌ [PERSISTENCE] Fallo al actualizar WhatsApp ID: ${messageId}`);
+      }
+      return success;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error actualizando WhatsApp Message ID:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Obtener mensajes fallidos para retry
+   */
+  async getFailedMessages(): Promise<any[]> {
+    try {
+      console.log('🔄 [PERSISTENCE] Obteniendo mensajes fallidos para retry');
+      const failedMessages = await supabaseDatabaseService.getFailedMessages();
+      console.log(`✅ [PERSISTENCE] Mensajes fallidos encontrados: ${failedMessages.length}`);
+      return failedMessages;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error obteniendo mensajes fallidos:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Limpiar mensajes temporales antiguos
+   */
+  async cleanupTemporaryMessages(): Promise<number> {
+    try {
+      console.log('🧹 [PERSISTENCE] Limpiando mensajes temporales antiguos');
+      const deletedCount = await supabaseDatabaseService.cleanupTemporaryMessages();
+      console.log(`✅ [PERSISTENCE] Mensajes temporales eliminados: ${deletedCount}`);
+      return deletedCount;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error limpiando mensajes temporales:', error);
+      return 0;
+    }
+  }
+
+  // ===== MÉTODOS PARA FASE 3: RETRY SERVICE =====
+
+  /**
+   * Incrementar contador de reintentos de un mensaje
+   */
+  async incrementRetryCount(messageId: number): Promise<boolean> {
+    try {
+      console.log(`🔄 [RETRY] Incrementando contador de reintentos para mensaje ${messageId}`);
+      const success = await supabaseDatabaseService.incrementRetryCount(messageId);
+      if (success) {
+        console.log(`✅ [RETRY] Contador de reintentos incrementado: ${messageId}`);
+      } else {
+        console.error(`❌ [RETRY] Fallo al incrementar contador de reintentos: ${messageId}`);
+      }
+      return success;
+    } catch (error) {
+      console.error('❌ [RETRY] Error incrementando contador de reintentos:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Obtener mensaje por ID
+   */
+  async getMessageById(messageId: number): Promise<any | null> {
+    try {
+      console.log(`🔍 [RETRY] Obteniendo mensaje por ID: ${messageId}`);
+      const message = await supabaseDatabaseService.getMessageById(messageId);
+      if (message) {
+        console.log(`✅ [RETRY] Mensaje encontrado: ${messageId}`);
+      } else {
+        console.log(`⚠️ [RETRY] Mensaje no encontrado: ${messageId}`);
+      }
+      return message;
+    } catch (error) {
+      console.error('❌ [RETRY] Error obteniendo mensaje por ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Limpiar mensajes fallidos antiguos
+   */
+  async cleanupOldFailedMessages(cutoffTime: Date): Promise<number> {
+    try {
+      console.log(`🧹 [RETRY] Limpiando mensajes fallidos anteriores a: ${cutoffTime.toISOString()}`);
+      const deletedCount = await supabaseDatabaseService.cleanupOldFailedMessages(cutoffTime);
+      console.log(`✅ [RETRY] Mensajes fallidos antiguos eliminados: ${deletedCount}`);
+      return deletedCount;
+    } catch (error) {
+      console.error('❌ [RETRY] Error limpiando mensajes fallidos antiguos:', error);
+      return 0;
     }
   }
 }

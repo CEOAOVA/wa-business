@@ -1152,6 +1152,226 @@ class SupabaseDatabaseService {
             }
         });
     }
+    // ===== NUEVOS MÉTODOS PARA PERSISTENCIA =====
+    /**
+     * Actualizar estado de mensaje
+     */
+    updateMessageStatus(messageId, status) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [PERSISTENCE] Supabase no disponible');
+                return false;
+            }
+            try {
+                const updateData = {
+                    status: status,
+                    updated_at: new Date().toISOString()
+                };
+                // Actualizar timestamps específicos según el estado
+                if (status === 'sent') {
+                    updateData.sent_at = new Date().toISOString();
+                }
+                else if (status === 'delivered') {
+                    updateData.delivered_at = new Date().toISOString();
+                }
+                else if (status === 'read') {
+                    updateData.read_at = new Date().toISOString();
+                }
+                else if (status === 'failed') {
+                    updateData.last_retry_at = new Date().toISOString();
+                }
+                const { error } = yield supabase_1.supabase
+                    .from('messages')
+                    .update(updateData)
+                    .eq('id', messageId);
+                if (error) {
+                    console.error('❌ [PERSISTENCE] Error actualizando estado de mensaje:', error);
+                    return false;
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error en updateMessageStatus:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Actualizar mensaje con WhatsApp Message ID
+     */
+    updateMessageWithWhatsAppId(messageId, whatsappMessageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [PERSISTENCE] Supabase no disponible');
+                return false;
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('messages')
+                    .update({
+                    whatsapp_message_id: whatsappMessageId,
+                    status: 'sent',
+                    updated_at: new Date().toISOString()
+                })
+                    .eq('id', messageId);
+                if (error) {
+                    console.error('❌ [PERSISTENCE] Error actualizando WhatsApp Message ID:', error);
+                    return false;
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error en updateMessageWithWhatsAppId:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Obtener mensajes fallidos para retry
+     */
+    getFailedMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [PERSISTENCE] Supabase no disponible');
+                return [];
+            }
+            try {
+                // Usar el índice parcial para mensajes fallidos
+                const { data, error } = yield supabase_1.supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('status', 'failed')
+                    .lt('retry_count', 3) // Solo mensajes con menos de 3 intentos
+                    .order('created_at', { ascending: true })
+                    .limit(50); // Reducir límite para mejor performance
+                if (error) {
+                    console.error('❌ [PERSISTENCE] Error obteniendo mensajes fallidos:', error);
+                    return [];
+                }
+                return data || [];
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error en getFailedMessages:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Incrementar contador de retry para un mensaje
+     */
+    incrementRetryCount(messageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [PERSISTENCE] Supabase no disponible');
+                return false;
+            }
+            try {
+                const { error } = yield supabase_1.supabase
+                    .from('messages')
+                    .update({
+                    retry_count: supabase_1.supabase.rpc('increment_retry_count', { message_id: messageId }),
+                    last_retry_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                    .eq('id', messageId);
+                if (error) {
+                    console.error('❌ [PERSISTENCE] Error incrementando retry count:', error);
+                    return false;
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error en incrementRetryCount:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Limpiar mensajes temporales antiguos
+     */
+    cleanupTemporaryMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [PERSISTENCE] Supabase no disponible');
+                return 0;
+            }
+            try {
+                // Eliminar mensajes temporales más antiguos de 1 hora
+                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+                const { data, error } = yield supabase_1.supabase
+                    .from('messages')
+                    .delete()
+                    .like('whatsapp_message_id', 'temp_%')
+                    .lt('created_at', oneHourAgo)
+                    .select('id');
+                if (error) {
+                    console.error('❌ [PERSISTENCE] Error limpiando mensajes temporales:', error);
+                    return 0;
+                }
+                return (data === null || data === void 0 ? void 0 : data.length) || 0;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error en cleanupTemporaryMessages:', error);
+                return 0;
+            }
+        });
+    }
+    // ===== MÉTODOS PARA FASE 3: RETRY SERVICE =====
+    /**
+     * Obtener mensaje por ID
+     */
+    getMessageById(messageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [RETRY] Supabase no disponible');
+                return null;
+            }
+            try {
+                const { data, error } = yield supabase_1.supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('id', messageId)
+                    .single();
+                if (error) {
+                    console.error('❌ [RETRY] Error obteniendo mensaje por ID:', error);
+                    return null;
+                }
+                return data;
+            }
+            catch (error) {
+                console.error('❌ [RETRY] Error en getMessageById:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Limpiar mensajes fallidos antiguos
+     */
+    cleanupOldFailedMessages(cutoffTime) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isEnabled || !supabase_1.supabase) {
+                console.error('❌ [RETRY] Supabase no disponible');
+                return 0;
+            }
+            try {
+                const { data, error } = yield supabase_1.supabase
+                    .from('messages')
+                    .delete()
+                    .eq('status', 'failed')
+                    .lt('created_at', cutoffTime.toISOString())
+                    .select('id');
+                if (error) {
+                    console.error('❌ [RETRY] Error limpiando mensajes fallidos antiguos:', error);
+                    return 0;
+                }
+                return (data === null || data === void 0 ? void 0 : data.length) || 0;
+            }
+            catch (error) {
+                console.error('❌ [RETRY] Error en cleanupOldFailedMessages:', error);
+                return 0;
+            }
+        });
+    }
 }
 exports.SupabaseDatabaseService = SupabaseDatabaseService;
 // Instancia singleton

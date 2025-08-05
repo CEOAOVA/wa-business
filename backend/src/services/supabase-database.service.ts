@@ -49,9 +49,17 @@ export interface SupabaseMessage {
   message_type: 'text' | 'image' | 'quote' | 'document';
   whatsapp_message_id?: string;
   client_id?: string; // NUEVO: Identificador único del frontend para evitar duplicados
+  status?: string; // NUEVO: Estado del mensaje (pending, sent, delivered, read, failed)
   is_read: boolean;
   metadata?: any;
   created_at: string;
+  updated_at?: string; // NUEVO: Para tracking de actualizaciones
+  // NUEVAS COLUMNAS DE FASE 2
+  sent_at?: string; // Timestamp cuando se envió a WhatsApp
+  delivered_at?: string; // Timestamp cuando se entregó
+  read_at?: string; // Timestamp cuando se leyó
+  retry_count?: number; // Número de intentos de reenvío
+  last_retry_at?: string; // Timestamp del último intento
 }
 
 export interface SupabaseConversationSummary {
@@ -1334,6 +1342,235 @@ export class SupabaseDatabaseService {
     } catch (error) {
       console.error('❌ Error en updateContactWithPostalCode:', error);
       return false;
+    }
+  }
+
+  // ===== NUEVOS MÉTODOS PARA PERSISTENCIA =====
+
+  /**
+   * Actualizar estado de mensaje
+   */
+  async updateMessageStatus(messageId: number, status: string): Promise<boolean> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [PERSISTENCE] Supabase no disponible');
+      return false;
+    }
+
+    try {
+      const updateData: any = { 
+        status: status,
+        updated_at: new Date().toISOString()
+      };
+
+      // Actualizar timestamps específicos según el estado
+      if (status === 'sent') {
+        updateData.sent_at = new Date().toISOString();
+      } else if (status === 'delivered') {
+        updateData.delivered_at = new Date().toISOString();
+      } else if (status === 'read') {
+        updateData.read_at = new Date().toISOString();
+      } else if (status === 'failed') {
+        updateData.last_retry_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from('messages')
+        .update(updateData)
+        .eq('id', messageId);
+
+      if (error) {
+        console.error('❌ [PERSISTENCE] Error actualizando estado de mensaje:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error en updateMessageStatus:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Actualizar mensaje con WhatsApp Message ID
+   */
+  async updateMessageWithWhatsAppId(messageId: number, whatsappMessageId: string): Promise<boolean> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [PERSISTENCE] Supabase no disponible');
+      return false;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ 
+          whatsapp_message_id: whatsappMessageId,
+          status: 'sent',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', messageId);
+
+      if (error) {
+        console.error('❌ [PERSISTENCE] Error actualizando WhatsApp Message ID:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error en updateMessageWithWhatsAppId:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Obtener mensajes fallidos para retry
+   */
+  async getFailedMessages(): Promise<any[]> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [PERSISTENCE] Supabase no disponible');
+      return [];
+    }
+
+    try {
+      // Usar el índice parcial para mensajes fallidos
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('status', 'failed')
+        .lt('retry_count', 3) // Solo mensajes con menos de 3 intentos
+        .order('created_at', { ascending: true })
+        .limit(50); // Reducir límite para mejor performance
+
+      if (error) {
+        console.error('❌ [PERSISTENCE] Error obteniendo mensajes fallidos:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error en getFailedMessages:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Incrementar contador de retry para un mensaje
+   */
+  async incrementRetryCount(messageId: number): Promise<boolean> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [PERSISTENCE] Supabase no disponible');
+      return false;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ 
+          retry_count: supabase.rpc('increment_retry_count', { message_id: messageId }),
+          last_retry_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', messageId);
+
+      if (error) {
+        console.error('❌ [PERSISTENCE] Error incrementando retry count:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error en incrementRetryCount:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Limpiar mensajes temporales antiguos
+   */
+  async cleanupTemporaryMessages(): Promise<number> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [PERSISTENCE] Supabase no disponible');
+      return 0;
+    }
+
+    try {
+      // Eliminar mensajes temporales más antiguos de 1 hora
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      
+      const { data, error } = await supabase
+        .from('messages')
+        .delete()
+        .like('whatsapp_message_id', 'temp_%')
+        .lt('created_at', oneHourAgo)
+        .select('id');
+
+      if (error) {
+        console.error('❌ [PERSISTENCE] Error limpiando mensajes temporales:', error);
+        return 0;
+      }
+
+      return data?.length || 0;
+    } catch (error) {
+      console.error('❌ [PERSISTENCE] Error en cleanupTemporaryMessages:', error);
+      return 0;
+    }
+  }
+
+  // ===== MÉTODOS PARA FASE 3: RETRY SERVICE =====
+
+  /**
+   * Obtener mensaje por ID
+   */
+  async getMessageById(messageId: number): Promise<any | null> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [RETRY] Supabase no disponible');
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('id', messageId)
+        .single();
+
+      if (error) {
+        console.error('❌ [RETRY] Error obteniendo mensaje por ID:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('❌ [RETRY] Error en getMessageById:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Limpiar mensajes fallidos antiguos
+   */
+  async cleanupOldFailedMessages(cutoffTime: Date): Promise<number> {
+    if (!this.isEnabled || !supabase) {
+      console.error('❌ [RETRY] Supabase no disponible');
+      return 0;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('status', 'failed')
+        .lt('created_at', cutoffTime.toISOString())
+        .select('id');
+
+      if (error) {
+        console.error('❌ [RETRY] Error limpiando mensajes fallidos antiguos:', error);
+        return 0;
+      }
+
+      return data?.length || 0;
+    } catch (error) {
+      console.error('❌ [RETRY] Error en cleanupOldFailedMessages:', error);
+      return 0;
     }
   }
 }

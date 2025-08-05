@@ -901,6 +901,147 @@ class DatabaseService {
             }
         });
     }
+    // ===== NUEVOS MÉTODOS PARA PERSISTENCIA =====
+    /**
+     * Actualizar estado de mensaje
+     */
+    updateMessageStatus(messageId, status) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`🔄 [PERSISTENCE] Actualizando estado de mensaje ${messageId} a ${status}`);
+                const success = yield supabase_database_service_1.supabaseDatabaseService.updateMessageStatus(messageId, status);
+                if (success) {
+                    console.log(`✅ [PERSISTENCE] Estado actualizado: ${messageId} -> ${status}`);
+                }
+                else {
+                    console.error(`❌ [PERSISTENCE] Fallo al actualizar estado: ${messageId} -> ${status}`);
+                }
+                return success;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error actualizando estado de mensaje:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Actualizar mensaje con WhatsApp Message ID
+     */
+    updateMessageWithWhatsAppId(messageId, whatsappMessageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`🔄 [PERSISTENCE] Actualizando mensaje ${messageId} con WhatsApp ID: ${whatsappMessageId}`);
+                const success = yield supabase_database_service_1.supabaseDatabaseService.updateMessageWithWhatsAppId(messageId, whatsappMessageId);
+                if (success) {
+                    console.log(`✅ [PERSISTENCE] WhatsApp ID actualizado: ${messageId} -> ${whatsappMessageId}`);
+                }
+                else {
+                    console.error(`❌ [PERSISTENCE] Fallo al actualizar WhatsApp ID: ${messageId}`);
+                }
+                return success;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error actualizando WhatsApp Message ID:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Obtener mensajes fallidos para retry
+     */
+    getFailedMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log('🔄 [PERSISTENCE] Obteniendo mensajes fallidos para retry');
+                const failedMessages = yield supabase_database_service_1.supabaseDatabaseService.getFailedMessages();
+                console.log(`✅ [PERSISTENCE] Mensajes fallidos encontrados: ${failedMessages.length}`);
+                return failedMessages;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error obteniendo mensajes fallidos:', error);
+                return [];
+            }
+        });
+    }
+    /**
+     * Limpiar mensajes temporales antiguos
+     */
+    cleanupTemporaryMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log('🧹 [PERSISTENCE] Limpiando mensajes temporales antiguos');
+                const deletedCount = yield supabase_database_service_1.supabaseDatabaseService.cleanupTemporaryMessages();
+                console.log(`✅ [PERSISTENCE] Mensajes temporales eliminados: ${deletedCount}`);
+                return deletedCount;
+            }
+            catch (error) {
+                console.error('❌ [PERSISTENCE] Error limpiando mensajes temporales:', error);
+                return 0;
+            }
+        });
+    }
+    // ===== MÉTODOS PARA FASE 3: RETRY SERVICE =====
+    /**
+     * Incrementar contador de reintentos de un mensaje
+     */
+    incrementRetryCount(messageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`🔄 [RETRY] Incrementando contador de reintentos para mensaje ${messageId}`);
+                const success = yield supabase_database_service_1.supabaseDatabaseService.incrementRetryCount(messageId);
+                if (success) {
+                    console.log(`✅ [RETRY] Contador de reintentos incrementado: ${messageId}`);
+                }
+                else {
+                    console.error(`❌ [RETRY] Fallo al incrementar contador de reintentos: ${messageId}`);
+                }
+                return success;
+            }
+            catch (error) {
+                console.error('❌ [RETRY] Error incrementando contador de reintentos:', error);
+                return false;
+            }
+        });
+    }
+    /**
+     * Obtener mensaje por ID
+     */
+    getMessageById(messageId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`🔍 [RETRY] Obteniendo mensaje por ID: ${messageId}`);
+                const message = yield supabase_database_service_1.supabaseDatabaseService.getMessageById(messageId);
+                if (message) {
+                    console.log(`✅ [RETRY] Mensaje encontrado: ${messageId}`);
+                }
+                else {
+                    console.log(`⚠️ [RETRY] Mensaje no encontrado: ${messageId}`);
+                }
+                return message;
+            }
+            catch (error) {
+                console.error('❌ [RETRY] Error obteniendo mensaje por ID:', error);
+                return null;
+            }
+        });
+    }
+    /**
+     * Limpiar mensajes fallidos antiguos
+     */
+    cleanupOldFailedMessages(cutoffTime) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`🧹 [RETRY] Limpiando mensajes fallidos anteriores a: ${cutoffTime.toISOString()}`);
+                const deletedCount = yield supabase_database_service_1.supabaseDatabaseService.cleanupOldFailedMessages(cutoffTime);
+                console.log(`✅ [RETRY] Mensajes fallidos antiguos eliminados: ${deletedCount}`);
+                return deletedCount;
+            }
+            catch (error) {
+                console.error('❌ [RETRY] Error limpiando mensajes fallidos antiguos:', error);
+                return 0;
+            }
+        });
+    }
 }
 exports.DatabaseService = DatabaseService;
 // Instancia singleton

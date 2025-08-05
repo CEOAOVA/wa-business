@@ -12,6 +12,7 @@ import { applySecurity } from './config/security';
 import { authRateLimit, whatsappRateLimit } from './config/rate-limits';
 import { whatsappService } from './services/whatsapp.service';
 import { sessionCleanupService } from './services/session-cleanup.service';
+import { failedMessageRetryService } from './services/failed-message-retry.service';
 
 // Importar rutas
 import chatRoutes from './routes/chat';
@@ -357,6 +358,14 @@ async function startServer() {
     } catch (error) {
       logger.error('Error inicializando memory monitor', { error: String(error) });
     }
+
+    // FASE 3: Inicializar servicio de retry de mensajes fallidos
+    try {
+      failedMessageRetryService.startAutoRetry();
+      logger.info('🔄 Servicio de retry de mensajes fallidos inicializado');
+    } catch (error) {
+      logger.error('Error inicializando servicio de retry', { error: String(error) });
+    }
     
     // Iniciar servidor
     httpServer.listen(PORT, () => {
@@ -379,6 +388,7 @@ process.on('SIGINT', async () => {
   try {
     performanceMonitor.destroy();
     memoryMonitor.destroy();
+    failedMessageRetryService.destroy();
     httpServer.close();
   } catch (error) {
     logger.error('Error durante cleanup', { error: String(error) });
@@ -391,6 +401,7 @@ process.on('SIGTERM', async () => {
   try {
     performanceMonitor.destroy();
     memoryMonitor.destroy();
+    failedMessageRetryService.destroy();
     httpServer.close();
   } catch (error) {
     logger.error('Error durante cleanup', { error: String(error) });

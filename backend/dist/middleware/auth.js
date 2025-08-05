@@ -25,7 +25,9 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         console.log('🔐 [AuthMiddleware] Headers recibidos:', {
             authorization: req.headers.authorization ? 'Presente' : 'Ausente',
             'content-type': req.headers['content-type'],
-            'user-agent': req.headers['user-agent']
+            'user-agent': req.headers['user-agent'],
+            origin: req.headers.origin,
+            host: req.headers.host
         });
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -40,9 +42,20 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         // Verificar token con Supabase de forma más simple
         if (!supabase_1.supabase) {
             console.error('❌ [AuthMiddleware] Supabase client no disponible');
+            console.error('❌ [AuthMiddleware] Environment variables check:', {
+                SUPABASE_URL: process.env.SUPABASE_URL ? 'Present' : 'Missing',
+                SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? 'Present' : 'Missing',
+                NODE_ENV: process.env.NODE_ENV
+            });
             return res.status(500).json({
                 success: false,
-                message: 'Servicio de autenticación no disponible'
+                message: 'Servicio de autenticación no disponible',
+                error: 'SUPABASE_CLIENT_NULL',
+                debug: {
+                    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+                    hasSupabaseKey: !!process.env.SUPABASE_ANON_KEY,
+                    environment: process.env.NODE_ENV
+                }
             });
         }
         console.log('🔐 [AuthMiddleware] Verificando token con Supabase...');

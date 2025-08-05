@@ -1,11 +1,16 @@
 import express from 'express';
 import { whatsappService } from '../services/whatsapp.service';
-import { databaseService } from '../services/database.service';
+import { unifiedDatabaseService } from '../services/unified-database.service';
 import { validatePhoneNumber, verifyWebhook, getWebhookDebugInfo, setWebhookUrl, getStats } from '../utils/whatsapp-utils';
 import { webhookSecurity, securityLogger, SecureRequest } from '../middleware/webhook-security';
 import { authMiddleware } from '../middleware/auth';
 import { messageQueueService } from '../services/message-queue.service';
 import { StructuredLogger } from '../utils/structured-logger';
+import { databaseService } from '../services/database.service';
+import { chatbotService } from '../services/chatbot.service';
+import { failedMessageRetryService } from '../services/failed-message-retry.service';
+import { logger, logHelper } from '../config/logger';
+import { authRateLimit } from '../config/rate-limits';
 
 const router = express.Router();
 
@@ -387,7 +392,7 @@ router.get('/conversations/:id/messages', async (req: any, res: any) => {
     console.log(`📨 [Messages] Obteniendo historial para: ${conversationId} (límite: ${limit || 50})`);
 
     // Usar el servicio de base de datos con límite optimizado
-    const messages = await databaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
+    const messages = await unifiedDatabaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
     
     console.log(`📨 [Messages] ${messages.length} mensajes obtenidos para ${conversationId}`);
     
@@ -424,7 +429,7 @@ router.get('/conversations', async (req: any, res: any) => {
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
     
-    const conversations = await databaseService.getConversations(limit, offset);
+    const conversations = await unifiedDatabaseService.getConversations(limit, offset);
     
     res.json({
       success: true,
@@ -446,7 +451,7 @@ router.get('/messages', async (req: any, res: any) => {
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
     
-    const conversations = await databaseService.getConversations(limit, offset);
+    const conversations = await unifiedDatabaseService.getConversations(limit, offset);
     
     // Convertir a formato legacy
     const legacyFormat = {
@@ -480,7 +485,7 @@ router.get('/messages', async (req: any, res: any) => {
 router.put('/messages/:messageId/read', async (req: any, res: any) => {
   try {
     const { messageId } = req.params;
-    const result = await databaseService.markMessageAsRead(messageId);
+    const result = await unifiedDatabaseService.markMessageAsRead(messageId);
     
     if (result) {
       res.json({
@@ -506,7 +511,7 @@ router.put('/messages/:messageId/read', async (req: any, res: any) => {
 router.put('/conversations/:conversationId/read', async (req: any, res: any) => {
   try {
     const { conversationId } = req.params;
-    const result = await databaseService.markConversationAsRead(conversationId);
+    const result = await unifiedDatabaseService.markConversationAsRead(conversationId);
     
     if (result) {
       res.json({
@@ -532,7 +537,7 @@ router.put('/conversations/:conversationId/read', async (req: any, res: any) => 
 router.delete('/messages/cleanup', async (req: any, res: any) => {
   try {
     const hours = parseInt(req.query.hours as string) || 24;
-    const removedCount = await databaseService.cleanupOldMessages(hours);
+    const removedCount = await unifiedDatabaseService.cleanupOldMessages(hours);
     
     res.json({
       success: true,
@@ -551,7 +556,7 @@ router.delete('/messages/cleanup', async (req: any, res: any) => {
 // DELETE /api/chat/messages/clear-all - Limpiar TODOS los mensajes
 router.delete('/messages/clear-all', async (req: any, res: any) => {
   try {
-    const removedCount = await databaseService.cleanupOldMessages(0); // 0 horas = limpiar todo
+    const removedCount = await unifiedDatabaseService.cleanupOldMessages(0); // 0 días = limpiar todo
     
     res.json({
       success: true,
@@ -766,6 +771,79 @@ router.get('/webhook/health', (req: any, res: any) => {
       healthy: false,
       error: 'Error obteniendo información de salud del webhook',
       timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// ============================================
+// RUTAS PARA RETRY DE MENSAJES FALLIDOS
+// ============================================
+
+// GET /api/chat/failed-messages - Obtener mensajes fallidos
+router.get('/failed-messages', async (req: any, res: any) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+    
+    const failedMessages = await failedMessageRetryService.getFailedMessages(limit, offset);
+    
+    res.json({
+      success: true,
+      failedMessages: failedMessages,
+      total: failedMessages.length
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error obteniendo mensajes fallidos',
+      details: error.message
+    });
+  }
+});
+
+// POST /api/chat/failed-messages/:id/retry - Reintentar mensaje fallido
+router.post('/failed-messages/:id/retry', async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const result = await failedMessageRetryService.retryFailedMessage(id);
+    
+    if (result) {
+      res.json({
+        success: true,
+        message: 'Mensaje fallido reintentado',
+        messageId: result.messageId,
+        whatsappMessageId: result.whatsappMessageId
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Mensaje fallido no encontrado'
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error reintentando mensaje fallido',
+      details: error.message
+    });
+  }
+});
+
+// DELETE /api/chat/failed-messages/clear-all - Limpiar TODOS los mensajes fallidos
+router.delete('/failed-messages/clear-all', async (req: any, res: any) => {
+  try {
+    const removedCount = await failedMessageRetryService.clearAllFailedMessages();
+    
+    res.json({
+      success: true,
+      message: `LIMPIEZA TOTAL: ${removedCount} mensajes fallidos eliminados`,
+      removedCount
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Error limpiando mensajes fallidos',
+      details: error.message
     });
   }
 });

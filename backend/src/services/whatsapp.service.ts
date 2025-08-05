@@ -56,6 +56,87 @@ export class WhatsAppService {
   private io?: Server;
   private lastMessages: Map<string, string> = new Map(); // Almacenar últimos mensajes temporalmente
 
+  /**
+   * Validación robusta de mensajes antes de enviar
+   * Basado en mejores prácticas de sistemas de chat en tiempo real
+   */
+  private validateMessage(data: SendMessageRequest): { isValid: boolean; error?: string } {
+    console.log('🔍 [VALIDATION] Iniciando validación de mensaje:', {
+      to: data.to,
+      messageLength: data.message?.length,
+      clientId: data.clientId,
+      isChatbotResponse: data.isChatbotResponse
+    });
+
+    // 1. Validar campos requeridos
+    if (!data.to || !data.message) {
+      console.error('❌ [VALIDATION] Campos requeridos faltantes:', { to: !!data.to, message: !!data.message });
+      return { isValid: false, error: 'Los campos "to" y "message" son requeridos' };
+    }
+
+    // 2. Validar formato de teléfono
+    const phoneValidation = this.validatePhoneNumber(data.to);
+    if (!phoneValidation.isValid) {
+      console.error('❌ [VALIDATION] Formato de teléfono inválido:', phoneValidation.error);
+      return { isValid: false, error: phoneValidation.error };
+    }
+
+    // 3. Validar longitud de mensaje (límite de WhatsApp: 4096 caracteres)
+    if (data.message.length > 4096) {
+      console.error('❌ [VALIDATION] Mensaje demasiado largo:', data.message.length);
+      return { isValid: false, error: 'El mensaje no puede exceder 4096 caracteres' };
+    }
+
+    // 4. Validar clientId único (requerido para deduplicación)
+    if (!data.clientId) {
+      console.error('❌ [VALIDATION] ClientId requerido para deduplicación');
+      return { isValid: false, error: 'ClientId requerido para evitar duplicados' };
+    }
+
+    // 5. Validar que no sea un mensaje vacío o solo espacios
+    if (data.message.trim().length === 0) {
+      console.error('❌ [VALIDATION] Mensaje vacío o solo espacios');
+      return { isValid: false, error: 'El mensaje no puede estar vacío' };
+    }
+
+    // 6. Validar configuración de WhatsApp
+    if (!whatsappConfig.isConfigured) {
+      console.error('❌ [VALIDATION] WhatsApp no está configurado');
+      return { isValid: false, error: 'WhatsApp no está configurado' };
+    }
+
+    if (!whatsappConfig.accessToken || whatsappConfig.accessToken === 'not_configured') {
+      console.error('❌ [VALIDATION] Token de acceso no configurado');
+      return { isValid: false, error: 'Token de acceso de WhatsApp no configurado' };
+    }
+
+    console.log('✅ [VALIDATION] Mensaje validado correctamente');
+    return { isValid: true };
+  }
+
+  /**
+   * Validar formato de número de teléfono
+   */
+  private validatePhoneNumber(phone: string): { isValid: boolean; error?: string; formatted?: string } {
+    // Remover espacios y caracteres especiales
+    const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+    
+    // Validar que sea un número
+    if (!/^\d+$/.test(cleaned)) {
+      return { isValid: false, error: 'El número debe contener solo dígitos' };
+    }
+
+    // Validar longitud (WhatsApp requiere número completo con código de país)
+    if (cleaned.length < 10 || cleaned.length > 15) {
+      return { isValid: false, error: 'El número debe tener entre 10 y 15 dígitos' };
+    }
+
+    // Asegurar formato internacional
+    const formatted = cleaned.startsWith('52') ? cleaned : `52${cleaned}`;
+    
+    return { isValid: true, formatted };
+  }
+
   // Inicializar servicio de base de datos
   async initialize(socketIo?: Server) {
     try {
@@ -137,57 +218,28 @@ export class WhatsAppService {
   }
 
   /**
-   * Enviar mensaje de texto a WhatsApp
+   * Enviar mensaje a WhatsApp API
+   * Separado del flujo principal para mejor control de errores
    */
-  async sendMessage(data: SendMessageRequest) {
+  private async sendToWhatsApp(data: SendMessageRequest): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      console.log('📤 [WhatsAppService] Iniciando envío de mensaje:', {
+      console.log('📤 [WHATSAPP_API] Enviando a WhatsApp API:', {
         to: data.to,
         messageLength: data.message.length,
-        clientId: data.clientId,
-        isChatbotResponse: data.isChatbotResponse
+        clientId: data.clientId
       });
 
-      // Validar configuración de WhatsApp
-      console.log('📤 [WhatsAppService] Verificando configuración...');
-      console.log('📤 [WhatsAppService] isConfigured:', whatsappConfig.isConfigured);
-      console.log('📤 [WhatsAppService] accessToken length:', whatsappConfig.accessToken?.length || 0);
-      console.log('📤 [WhatsAppService] phoneNumberId:', whatsappConfig.phoneNumberId);
-      
-      if (!whatsappConfig.isConfigured) {
-        console.warn('⚠️ WhatsApp no está configurado - simulando envío');
-        return {
-          success: false,
-          error: 'WhatsApp no está configurado',
-          details: 'Configura WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID y WEBHOOK_VERIFY_TOKEN'
-        };
-      }
-
-      // Validar token de acceso
-      if (!whatsappConfig.accessToken || whatsappConfig.accessToken === 'not_configured') {
-        console.error('❌ Token de acceso de WhatsApp no configurado');
-        return {
-          success: false,
-          error: 'Token de acceso no configurado',
-          details: 'Configura WHATSAPP_ACCESS_TOKEN en las variables de entorno'
-        };
-      }
-
-      console.log('📤 [WhatsAppService] Construyendo URL de API...');
       const url = buildApiUrl(`${whatsappConfig.phoneNumberId}/messages`);
-      console.log('📤 [WhatsAppService] URL construida:', url);
       
       const payload = {
         messaging_product: 'whatsapp',
         to: data.to,
         type: 'text',
-        text: {
-          body: data.message
-        },
-        client_id: data.clientId // Incluir client_id en el payload
+        text: { body: data.message },
+        client_id: data.clientId
       };
 
-      console.log('📤 [WhatsAppService] Payload preparado:', {
+      console.log('📤 [WHATSAPP_API] Payload preparado:', {
         to: data.to,
         message: data.message.substring(0, 50) + '...',
         url,
@@ -195,110 +247,203 @@ export class WhatsAppService {
         tokenLength: whatsappConfig.accessToken?.length || 0
       });
 
-      console.log('📤 [WhatsAppService] Headers:', getHeaders());
-      console.log('📤 [WhatsAppService] Haciendo petición a WhatsApp API...');
-
+      // FASE 3: Timeout configurable y acknowledgment mejorado
       const response = await axios.post(url, payload, {
-        headers: getHeaders()
+        headers: getHeaders(),
+        timeout: 15000, // 15 segundos timeout (aumentado de 10s)
+        validateStatus: (status) => status < 500, // Solo reintentar errores 5xx
+        maxRedirects: 3
+        // Nota: axios no tiene propiedad 'retry', manejaremos retry manualmente
       });
 
-      console.log('✅ [WhatsAppService] Mensaje enviado exitosamente:', response.data);
-
-      // Guardar mensaje enviado en la base de datos (SOLO si NO es respuesta del chatbot)
       const messageId = response.data.messages?.[0]?.id;
-      console.log('📤 [WhatsAppService] Message ID recibido:', messageId);
       
-      if (messageId) {
-        try {
-          if (!data.isChatbotResponse) {
-            console.log('📤 [WhatsAppService] Procesando mensaje regular en BD...');
-            // Mensaje regular - guardar en BD y emitir evento
-            const result = await databaseService.processOutgoingMessage({
-              waMessageId: messageId,
-              toWaId: data.to,
-              content: data.message,
-              messageType: MessageType.TEXT,
-              timestamp: new Date(),
-              clientId: data.clientId // NUEVO: Pasar clientId para deduplicación
-            });
-
-            console.log('📤 [WhatsAppService] Resultado procesamiento BD:', result);
-
-            // Emitir evento de Socket.IO para mensaje enviado DESPUÉS del procesamiento en BD
-            if (this.io && result.success) {
-              console.log('📤 [WhatsAppService] Emitiendo evento Socket.IO...');
-              const sentMessage = {
-                id: result.message.id,
-                waMessageId: messageId,
-                from: 'us',
-                to: data.to,
-                message: data.message,
-                timestamp: result.message.timestamp,
-                type: 'text',
-                read: false,
-                conversationId: result.conversation.id,
-                contactId: result.contact.id,
-                clientId: data.clientId // Incluir client_id en el evento
-              };
-
-              this.emitNewMessage(sentMessage, {
-                id: result.conversation.id,
-                contactId: result.contact.id,
-                contactName: result.contact.name || result.contact.waId,
-                unreadCount: result.conversation.unreadCount || 0
-              });
-
-              console.log('🌐 [WhatsAppService] Evento Socket.IO emitido para mensaje enviado (después de BD)');
-            }
-          } else {
-            // Mensaje del chatbot - emitir evento después del procesamiento
-            console.log('🤖 [WhatsAppService] Mensaje del chatbot enviado - emitiendo evento después del procesamiento');
-            
-            // Obtener conversación para el evento
-            const conversation = await databaseService.getOrCreateConversationByPhone(data.to);
-            if (conversation && this.io) {
-              const chatbotMessage = {
-                id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
-                waMessageId: messageId,
-                from: 'us',
-                to: data.to,
-                message: data.message,
-                timestamp: new Date(),
-                type: 'text',
-                read: false,
-                conversationId: conversation.id,
-                contactId: conversation.contact_phone,
-                clientId: data.clientId // Incluir client_id en el evento
-              };
-
-              this.emitNewMessage(chatbotMessage, {
-                id: conversation.id,
-                contactId: conversation.contact_phone,
-                contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
-                unreadCount: conversation.unread_count || 0
-              });
-
-              console.log('🌐 [WhatsAppService] Evento Socket.IO emitido para mensaje del chatbot');
-            }
-          }
-        } catch (dbError) {
-          console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
-          // No fallar el envío por error de BD
-        }
+      if (!messageId) {
+        throw new Error('No se recibió messageId de WhatsApp API');
       }
 
-      return {
-        success: true,
+      console.log('✅ [WHATSAPP_API] Mensaje enviado exitosamente:', { 
         messageId,
-        data: response.data
-      };
-    } catch (error: any) {
-      console.error('❌ Error enviando mensaje:', error.response?.data || error.message);
+        status: response.status,
+        responseTime: response.headers['x-response-time'] || 'N/A'
+      });
       
+      return { success: true, messageId };
+
+    } catch (error: any) {
+      // FASE 3: Clasificación de errores para retry inteligente
+      const errorDetails = {
+        message: error.response?.data?.error?.message || error.message,
+        status: error.response?.status,
+        code: error.code,
+        isRetryable: this.isRetryableError(error),
+        data: error.response?.data
+      };
+
+      console.error('❌ [WHATSAPP_API] Error enviando a WhatsApp:', errorDetails);
+      
+      return { 
+        success: false, 
+        error: errorDetails.message
+      };
+    }
+  }
+
+  /**
+   * FASE 3: Clasificar errores para determinar si son retryables
+   */
+  private isRetryableError(error: any): boolean {
+    const retryableStatuses = [408, 429, 500, 502, 503, 504];
+    const retryableCodes = ['ECONNRESET', 'ENOTFOUND', 'ECONNREFUSED', 'ETIMEDOUT', 'NETWORK_ERROR'];
+    
+    // Errores de red
+    if (retryableCodes.includes(error.code)) {
+      return true;
+    }
+    
+    // Errores HTTP específicos
+    if (error.response?.status && retryableStatuses.includes(error.response.status)) {
+      return true;
+    }
+    
+    // Errores de timeout
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Enviar mensaje de texto a WhatsApp
+   * NUEVO FLUJO: Validar → Persistir → Enviar → Acknowledgment → Broadcast
+   */
+  async sendMessage(data: SendMessageRequest) {
+    try {
+      console.log('📤 [WhatsAppService] Iniciando nuevo flujo de persistencia:', {
+        to: data.to,
+        messageLength: data.message.length,
+        clientId: data.clientId,
+        isChatbotResponse: data.isChatbotResponse
+      });
+
+      // 1. VALIDACIÓN COMPLETA
+      console.log('🔍 [PERSISTENCE] Paso 1: Validación');
+      const validation = this.validateMessage(data);
+      if (!validation.isValid) {
+        console.error('❌ [PERSISTENCE] Validación fallida:', validation.error);
+        return { success: false, error: validation.error };
+      }
+
+      // Obtener teléfono formateado
+      const phoneValidation = this.validatePhoneNumber(data.to);
+      const formattedPhone = phoneValidation.formatted!;
+
+      // 2. PERSISTIR EN BD PRIMERO
+      console.log('💾 [PERSISTENCE] Paso 2: Persistir en BD');
+      const dbResult = await databaseService.processOutgoingMessage({
+        waMessageId: `temp_${Date.now()}`, // Temporal hasta confirmación WhatsApp
+        toWaId: formattedPhone,
+        content: data.message,
+        messageType: MessageType.TEXT,
+        timestamp: new Date(),
+        clientId: data.clientId,
+        status: 'pending' // Nuevo estado
+      });
+
+      if (!dbResult.success) {
+        console.error('❌ [PERSISTENCE] Fallo al persistir mensaje');
+        return { success: false, error: 'Error de persistencia en BD' };
+      }
+
+      console.log('✅ [PERSISTENCE] Mensaje persistido en BD:', {
+        messageId: dbResult.message.id,
+        conversationId: dbResult.conversation.id
+      });
+
+      // 3. ENVIAR A WHATSAPP
+      console.log('📤 [PERSISTENCE] Paso 3: Enviar a WhatsApp');
+      const whatsappResult = await this.sendToWhatsApp({
+        ...data,
+        to: formattedPhone
+      });
+      
+      if (!whatsappResult.success) {
+        // Marcar como fallido en BD
+        console.error('❌ [PERSISTENCE] Fallo al enviar a WhatsApp:', whatsappResult.error);
+        await databaseService.updateMessageStatus(dbResult.message.id, 'failed');
+        return { success: false, error: whatsappResult.error };
+      }
+
+      // 4. ACTUALIZAR CON WHATSAPP MESSAGE ID
+      console.log('🔄 [PERSISTENCE] Paso 4: Actualizar con WhatsApp Message ID');
+      const updateResult = await databaseService.updateMessageWithWhatsAppId(
+        dbResult.message.id, 
+        whatsappResult.messageId!
+      );
+
+      if (!updateResult) {
+        console.error('❌ [PERSISTENCE] Fallo al actualizar WhatsApp Message ID');
+        // No fallar aquí, solo loggear
+      }
+
+      // 5. BROADCAST CON CONFIRMACIÓN
+      console.log('📢 [PERSISTENCE] Paso 5: Broadcast con confirmación');
+      if (this.io && !data.isChatbotResponse) {
+        const sentMessage = {
+          id: dbResult.message.id,
+          waMessageId: whatsappResult.messageId,
+          from: 'us',
+          to: formattedPhone,
+          message: data.message,
+          timestamp: dbResult.message.timestamp,
+          type: 'text',
+          read: false,
+          conversationId: dbResult.conversation.id,
+          contactId: dbResult.contact.id,
+          clientId: data.clientId,
+          status: 'sent' // Nuevo campo de estado
+        };
+
+        this.emitNewMessage(sentMessage, {
+          id: dbResult.conversation.id,
+          contactId: dbResult.contact.id,
+          contactName: dbResult.contact.name || dbResult.contact.waId,
+          unreadCount: dbResult.conversation.unreadCount || 0
+        });
+
+        // Emitir actualización de conversación
+        this.emitConversationUpdate(
+          dbResult.conversation.id,
+          {
+            id: dbResult.message.id,
+            content: data.message,
+            timestamp: dbResult.message.timestamp,
+            type: 'text'
+          },
+          dbResult.conversation.unreadCount || 0
+        );
+      }
+
+      console.log('✅ [PERSISTENCE] Flujo completado exitosamente:', {
+        messageId: dbResult.message.id,
+        whatsappMessageId: whatsappResult.messageId,
+        conversationId: dbResult.conversation.id
+      });
+
+      return { 
+        success: true, 
+        messageId: whatsappResult.messageId,
+        waMessageId: whatsappResult.messageId,
+        to: formattedPhone
+      };
+
+    } catch (error: any) {
+      console.error('❌ [PERSISTENCE] Error en flujo de persistencia:', error);
       return {
         success: false,
-        error: error.response?.data?.error || error.message,
-        details: error.response?.data
+        error: 'Error en flujo de persistencia',
+        details: error.message
       };
     }
   }

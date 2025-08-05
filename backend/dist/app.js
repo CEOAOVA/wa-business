@@ -58,6 +58,7 @@ const security_1 = require("./config/security");
 const rate_limits_1 = require("./config/rate-limits");
 const whatsapp_service_1 = require("./services/whatsapp.service");
 const session_cleanup_service_1 = require("./services/session-cleanup.service");
+const failed_message_retry_service_1 = require("./services/failed-message-retry.service");
 // Importar rutas
 const chat_1 = __importDefault(require("./routes/chat"));
 const contacts_1 = __importDefault(require("./routes/contacts"));
@@ -66,6 +67,7 @@ const chatbot_1 = __importDefault(require("./routes/chatbot"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const monitoring_1 = __importDefault(require("./routes/monitoring"));
+const health_1 = __importDefault(require("./routes/health"));
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 // Debug de variables de entorno
@@ -177,6 +179,30 @@ app.use('/api/chatbot', chatbot_1.default);
 app.use('/api/dashboard', dashboard_1.default);
 // Rutas de monitoreo
 app.use('/api/monitoring', monitoring_1.default);
+// Rutas de health check
+app.use('/api', health_1.default);
+// NUEVO: Rutas de logging para el frontend con structured logging
+app.post('/api/logging/batch', (req, res) => {
+    try {
+        const logs = req.body;
+        if (Array.isArray(logs)) {
+            logs.forEach(log => {
+                logger_1.logger.info('Frontend Log', {
+                    level: log.level,
+                    message: log.message,
+                    timestamp: log.timestamp,
+                    data: log.data,
+                    source: 'frontend'
+                });
+            });
+        }
+        res.json({ success: true, message: 'Logs received', count: logs.length });
+    }
+    catch (error) {
+        logger_1.logger.error('Error processing frontend logs:', error);
+        res.status(500).json({ success: false, error: 'Failed to process logs' });
+    }
+});
 // Información de la API
 app.get('/api', (_req, res) => {
     res.json({
@@ -338,6 +364,14 @@ function startServer() {
             catch (error) {
                 logger_1.logger.error('Error inicializando memory monitor', { error: String(error) });
             }
+            // FASE 3: Inicializar servicio de retry de mensajes fallidos
+            try {
+                failed_message_retry_service_1.failedMessageRetryService.startAutoRetry();
+                logger_1.logger.info('🔄 Servicio de retry de mensajes fallidos inicializado');
+            }
+            catch (error) {
+                logger_1.logger.error('Error inicializando servicio de retry', { error: String(error) });
+            }
             // Iniciar servidor
             httpServer.listen(PORT, () => {
                 logger_1.logHelper.appStart(PORT);
@@ -360,6 +394,7 @@ process.on('SIGINT', () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         performance_metrics_1.performanceMonitor.destroy();
         memory_monitor_1.memoryMonitor.destroy();
+        failed_message_retry_service_1.failedMessageRetryService.destroy();
         httpServer.close();
     }
     catch (error) {
@@ -372,6 +407,7 @@ process.on('SIGTERM', () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         performance_metrics_1.performanceMonitor.destroy();
         memory_monitor_1.memoryMonitor.destroy();
+        failed_message_retry_service_1.failedMessageRetryService.destroy();
         httpServer.close();
     }
     catch (error) {

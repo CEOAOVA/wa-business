@@ -23,6 +23,74 @@ class WhatsAppService {
     constructor() {
         this.lastMessages = new Map(); // Almacenar últimos mensajes temporalmente
     }
+    /**
+     * Validación robusta de mensajes antes de enviar
+     * Basado en mejores prácticas de sistemas de chat en tiempo real
+     */
+    validateMessage(data) {
+        var _a;
+        console.log('🔍 [VALIDATION] Iniciando validación de mensaje:', {
+            to: data.to,
+            messageLength: (_a = data.message) === null || _a === void 0 ? void 0 : _a.length,
+            clientId: data.clientId,
+            isChatbotResponse: data.isChatbotResponse
+        });
+        // 1. Validar campos requeridos
+        if (!data.to || !data.message) {
+            console.error('❌ [VALIDATION] Campos requeridos faltantes:', { to: !!data.to, message: !!data.message });
+            return { isValid: false, error: 'Los campos "to" y "message" son requeridos' };
+        }
+        // 2. Validar formato de teléfono
+        const phoneValidation = this.validatePhoneNumber(data.to);
+        if (!phoneValidation.isValid) {
+            console.error('❌ [VALIDATION] Formato de teléfono inválido:', phoneValidation.error);
+            return { isValid: false, error: phoneValidation.error };
+        }
+        // 3. Validar longitud de mensaje (límite de WhatsApp: 4096 caracteres)
+        if (data.message.length > 4096) {
+            console.error('❌ [VALIDATION] Mensaje demasiado largo:', data.message.length);
+            return { isValid: false, error: 'El mensaje no puede exceder 4096 caracteres' };
+        }
+        // 4. Validar clientId único (requerido para deduplicación)
+        if (!data.clientId) {
+            console.error('❌ [VALIDATION] ClientId requerido para deduplicación');
+            return { isValid: false, error: 'ClientId requerido para evitar duplicados' };
+        }
+        // 5. Validar que no sea un mensaje vacío o solo espacios
+        if (data.message.trim().length === 0) {
+            console.error('❌ [VALIDATION] Mensaje vacío o solo espacios');
+            return { isValid: false, error: 'El mensaje no puede estar vacío' };
+        }
+        // 6. Validar configuración de WhatsApp
+        if (!whatsapp_1.whatsappConfig.isConfigured) {
+            console.error('❌ [VALIDATION] WhatsApp no está configurado');
+            return { isValid: false, error: 'WhatsApp no está configurado' };
+        }
+        if (!whatsapp_1.whatsappConfig.accessToken || whatsapp_1.whatsappConfig.accessToken === 'not_configured') {
+            console.error('❌ [VALIDATION] Token de acceso no configurado');
+            return { isValid: false, error: 'Token de acceso de WhatsApp no configurado' };
+        }
+        console.log('✅ [VALIDATION] Mensaje validado correctamente');
+        return { isValid: true };
+    }
+    /**
+     * Validar formato de número de teléfono
+     */
+    validatePhoneNumber(phone) {
+        // Remover espacios y caracteres especiales
+        const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+        // Validar que sea un número
+        if (!/^\d+$/.test(cleaned)) {
+            return { isValid: false, error: 'El número debe contener solo dígitos' };
+        }
+        // Validar longitud (WhatsApp requiere número completo con código de país)
+        if (cleaned.length < 10 || cleaned.length > 15) {
+            return { isValid: false, error: 'El número debe tener entre 10 y 15 dígitos' };
+        }
+        // Asegurar formato internacional
+        const formatted = cleaned.startsWith('52') ? cleaned : `52${cleaned}`;
+        return { isValid: true, formatted };
+    }
     // Inicializar servicio de base de datos
     initialize(socketIo) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -100,153 +168,197 @@ class WhatsAppService {
         this.emitToConversation(conversationId, 'conversation_updated', eventData);
     }
     /**
-     * Enviar mensaje de texto a WhatsApp
+     * Enviar mensaje a WhatsApp API
+     * Separado del flujo principal para mejor control de errores
      */
-    sendMessage(data) {
+    sendToWhatsApp(data) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c, _d, _e, _f, _g, _h;
             try {
-                console.log('📤 [WhatsAppService] Iniciando envío de mensaje:', {
+                console.log('📤 [WHATSAPP_API] Enviando a WhatsApp API:', {
+                    to: data.to,
+                    messageLength: data.message.length,
+                    clientId: data.clientId
+                });
+                const url = (0, whatsapp_1.buildApiUrl)(`${whatsapp_1.whatsappConfig.phoneNumberId}/messages`);
+                const payload = {
+                    messaging_product: 'whatsapp',
+                    to: data.to,
+                    type: 'text',
+                    text: { body: data.message },
+                    client_id: data.clientId
+                };
+                console.log('📤 [WHATSAPP_API] Payload preparado:', {
+                    to: data.to,
+                    message: data.message.substring(0, 50) + '...',
+                    url,
+                    tokenConfigured: !!whatsapp_1.whatsappConfig.accessToken,
+                    tokenLength: ((_a = whatsapp_1.whatsappConfig.accessToken) === null || _a === void 0 ? void 0 : _a.length) || 0
+                });
+                // FASE 3: Timeout configurable y acknowledgment mejorado
+                const response = yield axios_1.default.post(url, payload, {
+                    headers: (0, whatsapp_1.getHeaders)(),
+                    timeout: 15000, // 15 segundos timeout (aumentado de 10s)
+                    validateStatus: (status) => status < 500, // Solo reintentar errores 5xx
+                    maxRedirects: 3
+                    // Nota: axios no tiene propiedad 'retry', manejaremos retry manualmente
+                });
+                const messageId = (_c = (_b = response.data.messages) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.id;
+                if (!messageId) {
+                    throw new Error('No se recibió messageId de WhatsApp API');
+                }
+                console.log('✅ [WHATSAPP_API] Mensaje enviado exitosamente:', {
+                    messageId,
+                    status: response.status,
+                    responseTime: response.headers['x-response-time'] || 'N/A'
+                });
+                return { success: true, messageId };
+            }
+            catch (error) {
+                // FASE 3: Clasificación de errores para retry inteligente
+                const errorDetails = {
+                    message: ((_f = (_e = (_d = error.response) === null || _d === void 0 ? void 0 : _d.data) === null || _e === void 0 ? void 0 : _e.error) === null || _f === void 0 ? void 0 : _f.message) || error.message,
+                    status: (_g = error.response) === null || _g === void 0 ? void 0 : _g.status,
+                    code: error.code,
+                    isRetryable: this.isRetryableError(error),
+                    data: (_h = error.response) === null || _h === void 0 ? void 0 : _h.data
+                };
+                console.error('❌ [WHATSAPP_API] Error enviando a WhatsApp:', errorDetails);
+                return {
+                    success: false,
+                    error: errorDetails.message
+                };
+            }
+        });
+    }
+    /**
+     * FASE 3: Clasificar errores para determinar si son retryables
+     */
+    isRetryableError(error) {
+        var _a, _b;
+        const retryableStatuses = [408, 429, 500, 502, 503, 504];
+        const retryableCodes = ['ECONNRESET', 'ENOTFOUND', 'ECONNREFUSED', 'ETIMEDOUT', 'NETWORK_ERROR'];
+        // Errores de red
+        if (retryableCodes.includes(error.code)) {
+            return true;
+        }
+        // Errores HTTP específicos
+        if (((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) && retryableStatuses.includes(error.response.status)) {
+            return true;
+        }
+        // Errores de timeout
+        if (error.code === 'ECONNABORTED' || ((_b = error.message) === null || _b === void 0 ? void 0 : _b.includes('timeout'))) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Enviar mensaje de texto a WhatsApp
+     * NUEVO FLUJO: Validar → Persistir → Enviar → Acknowledgment → Broadcast
+     */
+    sendMessage(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log('📤 [WhatsAppService] Iniciando nuevo flujo de persistencia:', {
                     to: data.to,
                     messageLength: data.message.length,
                     clientId: data.clientId,
                     isChatbotResponse: data.isChatbotResponse
                 });
-                // Validar configuración de WhatsApp
-                console.log('📤 [WhatsAppService] Verificando configuración...');
-                console.log('📤 [WhatsAppService] isConfigured:', whatsapp_1.whatsappConfig.isConfigured);
-                console.log('📤 [WhatsAppService] accessToken length:', ((_a = whatsapp_1.whatsappConfig.accessToken) === null || _a === void 0 ? void 0 : _a.length) || 0);
-                console.log('📤 [WhatsAppService] phoneNumberId:', whatsapp_1.whatsappConfig.phoneNumberId);
-                if (!whatsapp_1.whatsappConfig.isConfigured) {
-                    console.warn('⚠️ WhatsApp no está configurado - simulando envío');
-                    return {
-                        success: false,
-                        error: 'WhatsApp no está configurado',
-                        details: 'Configura WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID y WEBHOOK_VERIFY_TOKEN'
-                    };
+                // 1. VALIDACIÓN COMPLETA
+                console.log('🔍 [PERSISTENCE] Paso 1: Validación');
+                const validation = this.validateMessage(data);
+                if (!validation.isValid) {
+                    console.error('❌ [PERSISTENCE] Validación fallida:', validation.error);
+                    return { success: false, error: validation.error };
                 }
-                // Validar token de acceso
-                if (!whatsapp_1.whatsappConfig.accessToken || whatsapp_1.whatsappConfig.accessToken === 'not_configured') {
-                    console.error('❌ Token de acceso de WhatsApp no configurado');
-                    return {
-                        success: false,
-                        error: 'Token de acceso no configurado',
-                        details: 'Configura WHATSAPP_ACCESS_TOKEN en las variables de entorno'
-                    };
-                }
-                console.log('📤 [WhatsAppService] Construyendo URL de API...');
-                const url = (0, whatsapp_1.buildApiUrl)(`${whatsapp_1.whatsappConfig.phoneNumberId}/messages`);
-                console.log('📤 [WhatsAppService] URL construida:', url);
-                const payload = {
-                    messaging_product: 'whatsapp',
-                    to: data.to,
-                    type: 'text',
-                    text: {
-                        body: data.message
-                    },
-                    client_id: data.clientId // Incluir client_id en el payload
-                };
-                console.log('📤 [WhatsAppService] Payload preparado:', {
-                    to: data.to,
-                    message: data.message.substring(0, 50) + '...',
-                    url,
-                    tokenConfigured: !!whatsapp_1.whatsappConfig.accessToken,
-                    tokenLength: ((_b = whatsapp_1.whatsappConfig.accessToken) === null || _b === void 0 ? void 0 : _b.length) || 0
+                // Obtener teléfono formateado
+                const phoneValidation = this.validatePhoneNumber(data.to);
+                const formattedPhone = phoneValidation.formatted;
+                // 2. PERSISTIR EN BD PRIMERO
+                console.log('💾 [PERSISTENCE] Paso 2: Persistir en BD');
+                const dbResult = yield database_service_1.databaseService.processOutgoingMessage({
+                    waMessageId: `temp_${Date.now()}`, // Temporal hasta confirmación WhatsApp
+                    toWaId: formattedPhone,
+                    content: data.message,
+                    messageType: database_1.MessageType.TEXT,
+                    timestamp: new Date(),
+                    clientId: data.clientId,
+                    status: 'pending' // Nuevo estado
                 });
-                console.log('📤 [WhatsAppService] Headers:', (0, whatsapp_1.getHeaders)());
-                console.log('📤 [WhatsAppService] Haciendo petición a WhatsApp API...');
-                const response = yield axios_1.default.post(url, payload, {
-                    headers: (0, whatsapp_1.getHeaders)()
-                });
-                console.log('✅ [WhatsAppService] Mensaje enviado exitosamente:', response.data);
-                // Guardar mensaje enviado en la base de datos (SOLO si NO es respuesta del chatbot)
-                const messageId = (_d = (_c = response.data.messages) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.id;
-                console.log('📤 [WhatsAppService] Message ID recibido:', messageId);
-                if (messageId) {
-                    try {
-                        if (!data.isChatbotResponse) {
-                            console.log('📤 [WhatsAppService] Procesando mensaje regular en BD...');
-                            // Mensaje regular - guardar en BD y emitir evento
-                            const result = yield database_service_1.databaseService.processOutgoingMessage({
-                                waMessageId: messageId,
-                                toWaId: data.to,
-                                content: data.message,
-                                messageType: database_1.MessageType.TEXT,
-                                timestamp: new Date(),
-                                clientId: data.clientId // NUEVO: Pasar clientId para deduplicación
-                            });
-                            console.log('📤 [WhatsAppService] Resultado procesamiento BD:', result);
-                            // Emitir evento de Socket.IO para mensaje enviado DESPUÉS del procesamiento en BD
-                            if (this.io && result.success) {
-                                console.log('📤 [WhatsAppService] Emitiendo evento Socket.IO...');
-                                const sentMessage = {
-                                    id: result.message.id,
-                                    waMessageId: messageId,
-                                    from: 'us',
-                                    to: data.to,
-                                    message: data.message,
-                                    timestamp: result.message.timestamp,
-                                    type: 'text',
-                                    read: false,
-                                    conversationId: result.conversation.id,
-                                    contactId: result.contact.id,
-                                    clientId: data.clientId // Incluir client_id en el evento
-                                };
-                                this.emitNewMessage(sentMessage, {
-                                    id: result.conversation.id,
-                                    contactId: result.contact.id,
-                                    contactName: result.contact.name || result.contact.waId,
-                                    unreadCount: result.conversation.unreadCount || 0
-                                });
-                                console.log('🌐 [WhatsAppService] Evento Socket.IO emitido para mensaje enviado (después de BD)');
-                            }
-                        }
-                        else {
-                            // Mensaje del chatbot - emitir evento después del procesamiento
-                            console.log('🤖 [WhatsAppService] Mensaje del chatbot enviado - emitiendo evento después del procesamiento');
-                            // Obtener conversación para el evento
-                            const conversation = yield database_service_1.databaseService.getOrCreateConversationByPhone(data.to);
-                            if (conversation && this.io) {
-                                const chatbotMessage = {
-                                    id: `chatbot_${Date.now()}`, // ID temporal para el chatbot
-                                    waMessageId: messageId,
-                                    from: 'us',
-                                    to: data.to,
-                                    message: data.message,
-                                    timestamp: new Date(),
-                                    type: 'text',
-                                    read: false,
-                                    conversationId: conversation.id,
-                                    contactId: conversation.contact_phone,
-                                    clientId: data.clientId // Incluir client_id en el evento
-                                };
-                                this.emitNewMessage(chatbotMessage, {
-                                    id: conversation.id,
-                                    contactId: conversation.contact_phone,
-                                    contactName: conversation.contact_phone, // Usar teléfono como nombre por defecto
-                                    unreadCount: conversation.unread_count || 0
-                                });
-                                console.log('🌐 [WhatsAppService] Evento Socket.IO emitido para mensaje del chatbot');
-                            }
-                        }
-                    }
-                    catch (dbError) {
-                        console.error('⚠️ Error guardando mensaje enviado en BD:', dbError);
-                        // No fallar el envío por error de BD
-                    }
+                if (!dbResult.success) {
+                    console.error('❌ [PERSISTENCE] Fallo al persistir mensaje');
+                    return { success: false, error: 'Error de persistencia en BD' };
                 }
+                console.log('✅ [PERSISTENCE] Mensaje persistido en BD:', {
+                    messageId: dbResult.message.id,
+                    conversationId: dbResult.conversation.id
+                });
+                // 3. ENVIAR A WHATSAPP
+                console.log('📤 [PERSISTENCE] Paso 3: Enviar a WhatsApp');
+                const whatsappResult = yield this.sendToWhatsApp(Object.assign(Object.assign({}, data), { to: formattedPhone }));
+                if (!whatsappResult.success) {
+                    // Marcar como fallido en BD
+                    console.error('❌ [PERSISTENCE] Fallo al enviar a WhatsApp:', whatsappResult.error);
+                    yield database_service_1.databaseService.updateMessageStatus(dbResult.message.id, 'failed');
+                    return { success: false, error: whatsappResult.error };
+                }
+                // 4. ACTUALIZAR CON WHATSAPP MESSAGE ID
+                console.log('🔄 [PERSISTENCE] Paso 4: Actualizar con WhatsApp Message ID');
+                const updateResult = yield database_service_1.databaseService.updateMessageWithWhatsAppId(dbResult.message.id, whatsappResult.messageId);
+                if (!updateResult) {
+                    console.error('❌ [PERSISTENCE] Fallo al actualizar WhatsApp Message ID');
+                    // No fallar aquí, solo loggear
+                }
+                // 5. BROADCAST CON CONFIRMACIÓN
+                console.log('📢 [PERSISTENCE] Paso 5: Broadcast con confirmación');
+                if (this.io && !data.isChatbotResponse) {
+                    const sentMessage = {
+                        id: dbResult.message.id,
+                        waMessageId: whatsappResult.messageId,
+                        from: 'us',
+                        to: formattedPhone,
+                        message: data.message,
+                        timestamp: dbResult.message.timestamp,
+                        type: 'text',
+                        read: false,
+                        conversationId: dbResult.conversation.id,
+                        contactId: dbResult.contact.id,
+                        clientId: data.clientId,
+                        status: 'sent' // Nuevo campo de estado
+                    };
+                    this.emitNewMessage(sentMessage, {
+                        id: dbResult.conversation.id,
+                        contactId: dbResult.contact.id,
+                        contactName: dbResult.contact.name || dbResult.contact.waId,
+                        unreadCount: dbResult.conversation.unreadCount || 0
+                    });
+                    // Emitir actualización de conversación
+                    this.emitConversationUpdate(dbResult.conversation.id, {
+                        id: dbResult.message.id,
+                        content: data.message,
+                        timestamp: dbResult.message.timestamp,
+                        type: 'text'
+                    }, dbResult.conversation.unreadCount || 0);
+                }
+                console.log('✅ [PERSISTENCE] Flujo completado exitosamente:', {
+                    messageId: dbResult.message.id,
+                    whatsappMessageId: whatsappResult.messageId,
+                    conversationId: dbResult.conversation.id
+                });
                 return {
                     success: true,
-                    messageId,
-                    data: response.data
+                    messageId: whatsappResult.messageId,
+                    waMessageId: whatsappResult.messageId,
+                    to: formattedPhone
                 };
             }
             catch (error) {
-                console.error('❌ Error enviando mensaje:', ((_e = error.response) === null || _e === void 0 ? void 0 : _e.data) || error.message);
+                console.error('❌ [PERSISTENCE] Error en flujo de persistencia:', error);
                 return {
                     success: false,
-                    error: ((_g = (_f = error.response) === null || _f === void 0 ? void 0 : _f.data) === null || _g === void 0 ? void 0 : _g.error) || error.message,
-                    details: (_h = error.response) === null || _h === void 0 ? void 0 : _h.data
+                    error: 'Error en flujo de persistencia',
+                    details: error.message
                 };
             }
         });

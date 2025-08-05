@@ -14,43 +14,77 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const whatsapp_service_1 = require("../services/whatsapp.service");
-const database_service_1 = require("../services/database.service");
+const unified_database_service_1 = require("../services/unified-database.service");
 const whatsapp_utils_1 = require("../utils/whatsapp-utils");
 const auth_1 = require("../middleware/auth");
+const message_queue_service_1 = require("../services/message-queue.service");
+const structured_logger_1 = require("../utils/structured-logger");
+const failed_message_retry_service_1 = require("../services/failed-message-retry.service");
 const router = express_1.default.Router();
+/**
+ * Determinar prioridad del mensaje basado en el contenido del webhook
+ */
+function determineMessagePriority(webhookData) {
+    try {
+        const { entry } = webhookData;
+        if (!Array.isArray(entry) || entry.length === 0) {
+            return 'normal';
+        }
+        // Verificar si hay mensajes en el webhook
+        const hasMessages = entry.some((e) => { var _a; return (_a = e.changes) === null || _a === void 0 ? void 0 : _a.some((c) => { var _a, _b; return ((_b = (_a = c.value) === null || _a === void 0 ? void 0 : _a.messages) === null || _b === void 0 ? void 0 : _b.length) > 0; }); });
+        if (hasMessages) {
+            // Verificar si es un mensaje de texto simple (prioridad normal)
+            // vs mensaje con media o interactivo (prioridad alta)
+            const hasMedia = entry.some((e) => {
+                var _a;
+                return (_a = e.changes) === null || _a === void 0 ? void 0 : _a.some((c) => {
+                    var _a, _b;
+                    return (_b = (_a = c.value) === null || _a === void 0 ? void 0 : _a.messages) === null || _b === void 0 ? void 0 : _b.some((m) => m.type !== 'text' || m.interactive || m.button);
+                });
+            });
+            return hasMedia ? 'high' : 'normal';
+        }
+        // Status updates o notificaciones tienen prioridad baja
+        return 'low';
+    }
+    catch (error) {
+        structured_logger_1.StructuredLogger.logError('determine_message_priority', error, { webhookData });
+        return 'normal'; // Default fallback
+    }
+}
 // POST /api/chat/send - Enviar mensaje de texto
 router.post('/send', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
-        console.log('📤 [ChatRouter] Headers:', req.headers);
-        console.log('📤 [ChatRouter] User:', req.user);
+        console.log(' [ChatRouter] Recibiendo petición de envío:', req.body);
+        console.log(' [ChatRouter] Headers:', req.headers);
+        console.log(' [ChatRouter] User:', req.user);
         const { to, message, clientId } = req.body; // NUEVO: Incluir clientId
         if (!to || !message) {
-            console.log('❌ [ChatRouter] Campos faltantes:', { to, message });
+            console.log(' [ChatRouter] Campos faltantes:', { to, message });
             return res.status(400).json({
                 success: false,
                 error: 'Los campos "to" y "message" son requeridos'
             });
         }
-        console.log('📱 [ChatRouter] Validando número:', to);
+        console.log(' [ChatRouter] Validando número:', to);
         const phoneValidation = (0, whatsapp_utils_1.validatePhoneNumber)(to);
-        console.log('📱 [ChatRouter] Resultado validación:', phoneValidation);
+        console.log(' [ChatRouter] Resultado validación:', phoneValidation);
         if (!phoneValidation.isValid) {
-            console.log('❌ [ChatRouter] Número inválido:', phoneValidation.error);
+            console.log(' [ChatRouter] Número inválido:', phoneValidation.error);
             return res.status(400).json({
                 success: false,
                 error: phoneValidation.error
             });
         }
-        console.log('📤 [ChatRouter] Llamando a whatsappService.sendMessage...');
+        console.log(' [ChatRouter] Llamando a whatsappService.sendMessage...');
         const result = yield whatsapp_service_1.whatsappService.sendMessage({
             to: phoneValidation.formatted,
             message: message.toString(),
             clientId: clientId // NUEVO: Pasar clientId
         });
-        console.log('📤 [ChatRouter] Resultado de sendMessage:', result);
+        console.log(' [ChatRouter] Resultado de sendMessage:', result);
         if (result.success) {
-            console.log('✅ [ChatRouter] Mensaje enviado exitosamente');
+            console.log(' [ChatRouter] Mensaje enviado exitosamente');
             res.json({
                 success: true,
                 message: 'Mensaje enviado exitosamente',
@@ -60,7 +94,7 @@ router.post('/send', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void
             });
         }
         else {
-            console.error('❌ [ChatRouter] Error enviando mensaje:', result.error);
+            console.error(' [ChatRouter] Error enviando mensaje:', result.error);
             res.status(500).json({
                 success: false,
                 error: 'Error enviando mensaje',
@@ -69,8 +103,8 @@ router.post('/send', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void
         }
     }
     catch (error) {
-        console.error('❌ [ChatRouter] Error interno del servidor:', error);
-        console.error('❌ [ChatRouter] Stack trace:', error.stack);
+        console.error(' [ChatRouter] Error interno del servidor:', error);
+        console.error(' [ChatRouter] Stack trace:', error.stack);
         res.status(500).json({
             success: false,
             error: 'Error interno del servidor',
@@ -197,20 +231,20 @@ router.get('/webhook', (req, res) => {
     const requestId = `verify_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
     try {
-        console.log(`🔐 [${requestId}] Webhook verification request from IP: ${clientIp}`);
-        console.log(`🔐 [${requestId}] Headers:`, JSON.stringify(req.headers, null, 2));
-        console.log(`🔐 [${requestId}] Query params:`, JSON.stringify(req.query, null, 2));
+        console.log(` [${requestId}] Webhook verification request from IP: ${clientIp}`);
+        console.log(` [${requestId}] Headers:`, JSON.stringify(req.headers, null, 2));
+        console.log(` [${requestId}] Query params:`, JSON.stringify(req.query, null, 2));
         const mode = req.query['hub.mode'];
         const token = req.query['hub.verify_token'];
         const challenge = req.query['hub.challenge'];
-        console.log(`🔐 [${requestId}] Parsed values:`, {
+        console.log(` [${requestId}] Parsed values:`, {
             mode,
             token: token ? `${token.substring(0, 10)}...` : 'undefined',
             challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined'
         });
         // Validate required parameters según Meta webhook requirements
         if (!mode || !token || !challenge) {
-            console.error(`❌ [${requestId}] Missing required parameters:`, {
+            console.error(` [${requestId}] Missing required parameters:`, {
                 mode: !!mode,
                 token: !!token,
                 challenge: !!challenge
@@ -219,25 +253,25 @@ router.get('/webhook', (req, res) => {
         }
         // Verificar modo de suscripción
         if (mode !== 'subscribe') {
-            console.error(`❌ [${requestId}] Invalid mode: ${mode}, expected: subscribe`);
+            console.error(` [${requestId}] Invalid mode: ${mode}, expected: subscribe`);
             return res.status(403).send('Invalid mode. Expected: subscribe');
         }
         // Verificar token - esto es crítico para la seguridad
         const result = (0, whatsapp_utils_1.verifyWebhook)(mode, token, challenge);
         if (result) {
-            console.log(`✅ [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
-            // 🚀 IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
+            console.log(` [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
+            // IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
             // Meta espera exactamente el challenge string, no un objeto JSON
             res.status(200).send(result);
         }
         else {
-            console.error(`❌ [${requestId}] Webhook verification failed - token mismatch`);
-            console.error(`❌ [${requestId}] Expected token: ${(0, whatsapp_utils_1.getWebhookDebugInfo)().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
+            console.error(` [${requestId}] Webhook verification failed - token mismatch`);
+            console.error(` [${requestId}] Expected token: ${(0, whatsapp_utils_1.getWebhookDebugInfo)().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
             res.status(403).send('Forbidden: Invalid verify token');
         }
     }
     catch (error) {
-        console.error(`❌ [${requestId}] Error in webhook verification:`, error);
+        console.error(` [${requestId}] Error in webhook verification:`, error);
         res.status(500).send('Internal server error during webhook verification');
     }
 });
@@ -246,49 +280,65 @@ router.post('/webhook', (req, res) => __awaiter(void 0, void 0, void 0, function
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
     const userAgent = req.get('User-Agent') || 'unknown';
-    // 🚀 RESPONDER INMEDIATAMENTE CON 200 para evitar reenvíos de WhatsApp
+    // RESPONDER INMEDIATAMENTE CON 200 para evitar reenvíos de WhatsApp
     // Según las mejores prácticas, WhatsApp reenvía si no recibe 200 rápidamente
     res.status(200).json({
         success: true,
         message: 'received'
     });
     try {
-        console.log(`🔒 [${requestId}] Webhook recibido desde IP: ${clientIp}`);
+        console.log(` [${requestId}] Webhook recibido desde IP: ${clientIp}`);
         // Validación básica de estructura
         if (!req.body || typeof req.body !== 'object') {
-            console.warn(`⚠️ [${requestId}] Webhook con payload inválido`);
+            console.warn(` [${requestId}] Webhook con payload inválido`);
             return; // Ya respondimos con 200, solo loggeamos
         }
         // Verificar estructura básica de webhook de WhatsApp
         const { object, entry } = req.body;
         if (!object || !Array.isArray(entry)) {
-            console.warn(`⚠️ [${requestId}] Estructura de webhook inválida`);
+            console.warn(` [${requestId}] Estructura de webhook inválida`);
             return; // Ya respondimos con 200, solo loggeamos
         }
         // Verificar que es de WhatsApp Business
         if (object !== 'whatsapp_business_account') {
-            console.warn(`⚠️ [${requestId}] Objeto de webhook no es whatsapp_business_account: ${object}`);
+            console.warn(` [${requestId}] Objeto de webhook no es whatsapp_business_account: ${object}`);
             return; // Ya respondimos con 200, solo loggeamos
         }
         // Log detallado solo en desarrollo
         if (process.env.NODE_ENV === 'development') {
-            console.log(`📨 [${requestId}] Webhook mensaje completo:`, JSON.stringify(req.body, null, 2));
+            console.log(` [${requestId}] Webhook mensaje completo:`, JSON.stringify(req.body, null, 2));
         }
         else {
             // En producción, log resumido por seguridad
-            console.log(`📊 [${requestId}] Webhook: ${object}, entries: ${entry.length}, UA: ${userAgent.substring(0, 50)}`);
+            console.log(` [${requestId}] Webhook: ${object}, entries: ${entry.length}, UA: ${userAgent.substring(0, 50)}`);
         }
-        // Procesar webhook de forma asíncrona (no bloqueante)
+        // Procesar webhook usando cola de mensajes para mejor resilencia
         setImmediate(() => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                yield whatsapp_service_1.whatsappService.processWebhook(req.body);
-                console.log(`✅ [${requestId}] Webhook procesado exitosamente`);
+                // Determinar prioridad basada en tipo de mensaje
+                const priority = determineMessagePriority(req.body);
+                // Agregar a cola de mensajes para procesamiento asíncrono
+                const queueId = yield message_queue_service_1.messageQueueService.addToQueue(Object.assign(Object.assign({}, req.body), { requestId,
+                    clientIp,
+                    userAgent, timestamp: new Date().toISOString() }), priority);
+                structured_logger_1.StructuredLogger.logWebhookEvent('webhook_queued', {
+                    requestId,
+                    queueId,
+                    priority,
+                    clientIp
+                });
+                console.log(`✅ [${requestId}] Webhook agregado a cola: ${queueId} (prioridad: ${priority})`);
                 // Opcional: Notificar via Socket.IO a clientes conectados
                 // TODO: Implementar notificación en tiempo real si es necesario
                 console.log(`📢 [${requestId}] Webhook procesado correctamente`);
             }
             catch (error) {
-                console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente:`, error);
+                const errorId = structured_logger_1.StructuredLogger.logError('webhook_async_processing', error, {
+                    requestId,
+                    clientIp,
+                    userAgent
+                });
+                console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente (${errorId}):`, error);
                 // No podemos responder al webhook aquí, pero loggeamos para debugging
             }
         }));
@@ -308,7 +358,7 @@ router.get('/conversations/:id/messages', (req, res) => __awaiter(void 0, void 0
         const { limit, offset } = req.query;
         console.log(`📨 [Messages] Obteniendo historial para: ${conversationId} (límite: ${limit || 50})`);
         // Usar el servicio de base de datos con límite optimizado
-        const messages = yield database_service_1.databaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
+        const messages = yield unified_database_service_1.unifiedDatabaseService.getConversationMessages(conversationId, parseInt(limit) || 50, parseInt(offset) || 0);
         console.log(`📨 [Messages] ${messages.length} mensajes obtenidos para ${conversationId}`);
         // DEBUG: Contar mensajes por tipo de remitente
         if (messages.length > 0) {
@@ -339,7 +389,7 @@ router.get('/conversations', (req, res) => __awaiter(void 0, void 0, void 0, fun
     try {
         const limit = parseInt(req.query.limit) || 50;
         const offset = parseInt(req.query.offset) || 0;
-        const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
+        const conversations = yield unified_database_service_1.unifiedDatabaseService.getConversations(limit, offset);
         res.json({
             success: true,
             conversations: conversations,
@@ -359,7 +409,7 @@ router.get('/messages', (req, res) => __awaiter(void 0, void 0, void 0, function
     try {
         const limit = parseInt(req.query.limit) || 50;
         const offset = parseInt(req.query.offset) || 0;
-        const conversations = yield database_service_1.databaseService.getConversations(limit, offset);
+        const conversations = yield unified_database_service_1.unifiedDatabaseService.getConversations(limit, offset);
         // Convertir a formato legacy
         const legacyFormat = {
             success: true,
@@ -394,7 +444,7 @@ router.get('/messages', (req, res) => __awaiter(void 0, void 0, void 0, function
 router.put('/messages/:messageId/read', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { messageId } = req.params;
-        const result = yield database_service_1.databaseService.markMessageAsRead(messageId);
+        const result = yield unified_database_service_1.unifiedDatabaseService.markMessageAsRead(messageId);
         if (result) {
             res.json({
                 success: true,
@@ -420,7 +470,7 @@ router.put('/messages/:messageId/read', (req, res) => __awaiter(void 0, void 0, 
 router.put('/conversations/:conversationId/read', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { conversationId } = req.params;
-        const result = yield database_service_1.databaseService.markConversationAsRead(conversationId);
+        const result = yield unified_database_service_1.unifiedDatabaseService.markConversationAsRead(conversationId);
         if (result) {
             res.json({
                 success: true,
@@ -446,7 +496,7 @@ router.put('/conversations/:conversationId/read', (req, res) => __awaiter(void 0
 router.delete('/messages/cleanup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const hours = parseInt(req.query.hours) || 24;
-        const removedCount = yield database_service_1.databaseService.cleanupOldMessages(hours);
+        const removedCount = yield unified_database_service_1.unifiedDatabaseService.cleanupOldMessages(hours);
         res.json({
             success: true,
             message: `${removedCount} mensajes eliminados`,
@@ -464,7 +514,7 @@ router.delete('/messages/cleanup', (req, res) => __awaiter(void 0, void 0, void 
 // DELETE /api/chat/messages/clear-all - Limpiar TODOS los mensajes
 router.delete('/messages/clear-all', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const removedCount = yield database_service_1.databaseService.cleanupOldMessages(0); // 0 horas = limpiar todo
+        const removedCount = yield unified_database_service_1.unifiedDatabaseService.cleanupOldMessages(0); // 0 días = limpiar todo
         res.json({
             success: true,
             message: `LIMPIEZA TOTAL: ${removedCount} mensajes eliminados`,
@@ -677,4 +727,73 @@ router.get('/webhook/health', (req, res) => {
         });
     }
 });
+// ============================================
+// RUTAS PARA RETRY DE MENSAJES FALLIDOS
+// ============================================
+// GET /api/chat/failed-messages - Obtener mensajes fallidos
+router.get('/failed-messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const limit = parseInt(req.query.limit) || 50;
+        const offset = parseInt(req.query.offset) || 0;
+        const failedMessages = yield failed_message_retry_service_1.failedMessageRetryService.getFailedMessages(limit, offset);
+        res.json({
+            success: true,
+            failedMessages: failedMessages,
+            total: failedMessages.length
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error obteniendo mensajes fallidos',
+            details: error.message
+        });
+    }
+}));
+// POST /api/chat/failed-messages/:id/retry - Reintentar mensaje fallido
+router.post('/failed-messages/:id/retry', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield failed_message_retry_service_1.failedMessageRetryService.retryFailedMessage(id);
+        if (result) {
+            res.json({
+                success: true,
+                message: 'Mensaje fallido reintentado',
+                messageId: result.messageId,
+                whatsappMessageId: result.whatsappMessageId
+            });
+        }
+        else {
+            res.status(404).json({
+                success: false,
+                error: 'Mensaje fallido no encontrado'
+            });
+        }
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error reintentando mensaje fallido',
+            details: error.message
+        });
+    }
+}));
+// DELETE /api/chat/failed-messages/clear-all - Limpiar TODOS los mensajes fallidos
+router.delete('/failed-messages/clear-all', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const removedCount = yield failed_message_retry_service_1.failedMessageRetryService.clearAllFailedMessages();
+        res.json({
+            success: true,
+            message: `LIMPIEZA TOTAL: ${removedCount} mensajes fallidos eliminados`,
+            removedCount
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error limpiando mensajes fallidos',
+            details: error.message
+        });
+    }
+}));
 exports.default = router;

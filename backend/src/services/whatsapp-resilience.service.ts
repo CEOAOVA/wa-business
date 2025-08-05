@@ -87,7 +87,7 @@ export class WhatsAppResilienceService {
         
         throw new Error(result.error || 'Unknown WhatsApp API error');
         
-      } catch (error) {
+      } catch (error: any) {
         lastError = error;
         const attemptDuration = Date.now() - attemptStartTime;
         
@@ -199,7 +199,7 @@ export class WhatsAppResilienceService {
           
           return {
             success: false,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             attempts: attempt + 1,
             totalDuration
           };
@@ -343,7 +343,7 @@ export class WhatsAppResilienceService {
           
           return {
             success: false,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             attempts: attempt + 1,
             totalDuration
           };

@@ -7,13 +7,14 @@ import express from 'express';
 import { supabase } from '../config/supabase';
 import { whatsappService } from '../services/whatsapp.service';
 import { StructuredLogger } from '../utils/structured-logger';
+import { unifiedDatabaseService } from '../services/unified-database.service';
 
 const router = express.Router();
 
 /**
  * Health check general del sistema
  */
-router.get('/health', async (req, res) => {
+router.get('/health', async (req: any, res) => {
   const startTime = Date.now();
   const correlationId = req.correlationId || `health_${Date.now()}`;
   
@@ -67,7 +68,7 @@ router.get('/health', async (req, res) => {
 /**
  * Health check detallado con métricas
  */
-router.get('/health/detailed', async (req, res) => {
+router.get('/health/detailed', async (req: any, res) => {
   const startTime = Date.now();
   const correlationId = req.correlationId || `detailed_health_${Date.now()}`;
   
@@ -128,8 +129,19 @@ router.get('/health/detailed', async (req, res) => {
 async function checkDatabase(correlationId?: string): Promise<any> {
   try {
     const startTime = Date.now();
-    const { data, error } = await supabase.from('agents').select('count').limit(1);
+    const result = await supabase?.from('agents').select('count').limit(1);
     const duration = Date.now() - startTime;
+    
+    if (!result) {
+      StructuredLogger.logError('database_health_check', new Error('Supabase client not available'), { duration }, correlationId);
+      return { 
+        status: 'error', 
+        details: 'Supabase client not available',
+        responseTime: duration
+      };
+    }
+    
+    const { data, error } = result;
     
     if (error) {
       StructuredLogger.logError('database_health_check', error, { duration }, correlationId);
@@ -147,10 +159,11 @@ async function checkDatabase(correlationId?: string): Promise<any> {
       responseTime: duration
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     StructuredLogger.logError('database_health_check', error, {}, correlationId);
     return { 
       status: 'error', 
-      details: error.message,
+      details: errorMessage,
       responseTime: -1
     };
   }
@@ -165,19 +178,19 @@ async function checkDatabaseDetailed(correlationId?: string): Promise<any> {
     
     // Verificar múltiples tablas
     const checks = await Promise.allSettled([
-      supabase.from('agents').select('count').limit(1),
-      supabase.from('contacts').select('count').limit(1),
-      supabase.from('conversations').select('count').limit(1),
-      supabase.from('messages').select('count').limit(1)
+      supabase?.from('agents').select('count').limit(1),
+      supabase?.from('contacts').select('count').limit(1),
+      supabase?.from('conversations').select('count').limit(1),
+      supabase?.from('messages').select('count').limit(1)
     ]);
     
     const duration = Date.now() - startTime;
     const tables = ['agents', 'contacts', 'conversations', 'messages'];
     const results = checks.map((check, index) => ({
       table: tables[index],
-      status: check.status === 'fulfilled' && !check.value.error ? 'ok' : 'error',
-      error: check.status === 'rejected' ? check.reason.message : 
-             (check.status === 'fulfilled' && check.value.error ? check.value.error.message : null)
+      status: check.status === 'fulfilled' && check.value && !check.value.error ? 'ok' : 'error',
+      error: check.status === 'rejected' ? (check.reason instanceof Error ? check.reason.message : 'Unknown error') : 
+             (check.status === 'fulfilled' && check.value && check.value.error ? check.value.error.message : null)
     }));
     
     const allTablesHealthy = results.every(r => r.status === 'ok');
@@ -189,10 +202,11 @@ async function checkDatabaseDetailed(correlationId?: string): Promise<any> {
       tables: results
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     StructuredLogger.logError('database_detailed_health_check', error, {}, correlationId);
     return {
       status: 'error',
-      details: error.message,
+      details: errorMessage,
       responseTime: -1,
       tables: []
     };
@@ -224,10 +238,11 @@ async function checkWhatsAppAPI(correlationId?: string): Promise<any> {
       responseTime: duration
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     StructuredLogger.logError('whatsapp_health_check', error, {}, correlationId);
     return { 
       status: 'error', 
-      details: error.message,
+      details: errorMessage,
       responseTime: -1
     };
   }
@@ -261,10 +276,11 @@ async function checkWhatsAppDetailed(correlationId?: string): Promise<any> {
       }
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     StructuredLogger.logError('whatsapp_detailed_health_check', error, {}, correlationId);
     return {
       status: 'error',
-      details: error.message,
+      details: errorMessage,
       responseTime: -1,
       phoneNumberInfo: null
     };
@@ -288,18 +304,20 @@ async function checkSupabase(correlationId?: string): Promise<any> {
       hasUrl,
       hasAnonKey,
       hasServiceKey,
-      allConfigured
-    }, correlationId);
+      allConfigured,
+      correlationId
+    });
     
     return { 
       status: allConfigured ? 'ok' : 'error', 
       details: allConfigured ? 'Supabase client configured' : 'Supabase configuration incomplete'
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     StructuredLogger.logError('supabase_health_check', error, {}, correlationId);
     return { 
       status: 'error', 
-      details: error.message
+      details: errorMessage
     };
   }
 }
@@ -327,10 +345,11 @@ async function checkSupabaseDetailed(correlationId?: string): Promise<any> {
       configuration: config
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     StructuredLogger.logError('supabase_detailed_health_check', error, {}, correlationId);
     return {
       status: 'error',
-      details: error.message,
+      details: errorMessage,
       configuration: null
     };
   }
@@ -351,6 +370,198 @@ function checkMemoryUsage(): any {
     usedMB,
     usagePercent,
     details: `Memory usage: ${usedMB}MB / ${totalMB}MB (${usagePercent}%)`
+  };
+}
+
+/**
+ * Health check específico para migración de base de datos
+ */
+router.get('/health/database-migration', async (req: any, res) => {
+  const startTime = Date.now();
+  const correlationId = req.correlationId || `migration_health_${Date.now()}`;
+  
+  try {
+    const metrics = unifiedDatabaseService.getMetrics();
+    const config = unifiedDatabaseService.getConfig();
+    
+    // Ejecutar tests de validación
+    const validationTests = await Promise.allSettled([
+      testLegacyMethod(correlationId),
+      testOptimizedMethod(correlationId),
+      testBatchOperations(correlationId)
+    ]);
+    
+    const testResults = validationTests.map((test, index) => ({
+      testName: ['legacy_method', 'optimized_method', 'batch_operations'][index],
+      status: test.status,
+      result: test.status === 'fulfilled' ? test.value : null,
+      error: test.status === 'rejected' ? test.reason.message : null
+    }));
+    
+    const allTestsPassed = testResults.every(t => t.status === 'fulfilled');
+    const responseTime = Date.now() - startTime;
+    
+    const migrationHealth = {
+      status: allTestsPassed ? 'healthy' : 'degraded',
+      timestamp: new Date().toISOString(),
+      correlationId,
+      responseTime,
+      currentConfig: config,
+      metrics,
+      validationTests: testResults,
+      recommendations: {
+        shouldUseDirect: metrics.recommendedConfig.useDirectSupabase,
+        shouldUseOptimized: metrics.recommendedConfig.useOptimizedQueries,
+        shouldUseCircuitBreaker: metrics.recommendedConfig.useCircuitBreaker,
+        migrationProgress: calculateMigrationProgress(metrics)
+      }
+    };
+    
+    StructuredLogger.logSystemEvent('migration_health_check_completed', {
+      correlationId,
+      status: migrationHealth.status,
+      responseTime,
+      testsPassed: allTestsPassed
+    });
+    
+    res.status(allTestsPassed ? 200 : 503).json(migrationHealth);
+    
+  } catch (error: any) {
+    const responseTime = Date.now() - startTime;
+    const errorId = StructuredLogger.logError('health_check', error, {
+      correlationId,
+      responseTime
+    });
+    
+    res.status(500).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      correlationId,
+      errorId,
+      message: 'Health check failed',
+      details: error?.message || 'Unknown error',
+      responseTime
+    });
+  }
+});
+
+/**
+ * Test método legacy
+ */
+async function testLegacyMethod(correlationId: string): Promise<any> {
+  const startTime = Date.now();
+  
+  try {
+    // Test simple: obtener conversaciones usando método legacy
+    const conversations = await unifiedDatabaseService.getConversations(5, 0);
+    const duration = Date.now() - startTime;
+    
+    return {
+      success: true,
+      duration,
+      resultCount: conversations.length,
+      method: 'legacy'
+    };
+  } catch (error: any) {
+    const duration = Date.now() - startTime;
+    StructuredLogger.logError('legacy_method_test', error, { correlationId, duration });
+    throw error;
+  }
+}
+
+/**
+ * Test método optimizado
+ */
+async function testOptimizedMethod(correlationId: string): Promise<any> {
+  const startTime = Date.now();
+  
+  try {
+    // Temporalmente activar método optimizado para test
+    const originalConfig = unifiedDatabaseService.getConfig();
+    unifiedDatabaseService.updateConfig({ useOptimizedQueries: true });
+    
+    const conversations = await unifiedDatabaseService.getConversations(5, 0);
+    const duration = Date.now() - startTime;
+    
+    // Restaurar configuración original
+    unifiedDatabaseService.updateConfig(originalConfig);
+    
+    return {
+      success: true,
+      duration,
+      resultCount: conversations.length,
+      method: 'optimized'
+    };
+  } catch (error: any) {
+    const duration = Date.now() - startTime;
+    StructuredLogger.logError('optimized_method_test', error, { correlationId, duration });
+    throw error;
+  }
+}
+
+/**
+ * Test operaciones batch
+ */
+async function testBatchOperations(correlationId: string): Promise<any> {
+  const startTime = Date.now();
+  
+  try {
+    // Test simple: verificar que las operaciones batch están disponibles
+    const config = unifiedDatabaseService.getConfig();
+    const duration = Date.now() - startTime;
+    
+    return {
+      success: true,
+      duration,
+      batchOperationsEnabled: config.useBatchOperations,
+      method: 'batch_test'
+    };
+  } catch (error: any) {
+    const duration = Date.now() - startTime;
+    StructuredLogger.logError('batch_operations_test', error, { correlationId, duration });
+    throw error;
+  }
+}
+
+/**
+ * Calcular progreso de migración
+ */
+function calculateMigrationProgress(metrics: any): any {
+  const totalOperations = metrics.legacyOperations + metrics.optimizedOperations;
+  
+  if (totalOperations === 0) {
+    return {
+      percentage: 0,
+      stage: 'not_started',
+      recommendation: 'Begin with 10% traffic'
+    };
+  }
+  
+  const optimizedPercentage = (metrics.optimizedOperations / totalOperations) * 100;
+  
+  let stage = 'testing';
+  let recommendation = 'Continue monitoring';
+  
+  if (optimizedPercentage < 10) {
+    stage = 'initial_testing';
+    recommendation = 'Increase to 25% traffic if metrics are good';
+  } else if (optimizedPercentage < 50) {
+    stage = 'gradual_rollout';
+    recommendation = 'Increase to 75% traffic if error rate < 5%';
+  } else if (optimizedPercentage < 90) {
+    stage = 'majority_rollout';
+    recommendation = 'Complete migration if performance is better';
+  } else {
+    stage = 'migration_complete';
+    recommendation = 'Consider removing legacy code';
+  }
+  
+  return {
+    percentage: Math.round(optimizedPercentage),
+    stage,
+    recommendation,
+    totalOperations,
+    errorRate: metrics.errorRate
   };
 }
 
