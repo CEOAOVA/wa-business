@@ -4,6 +4,7 @@ import type { AppState, Chat, Message, Notification, AppAction } from '../types'
 import { whatsappApi } from '../services/whatsapp-api';
 import { dashboardApiService } from '../services/dashboard-api';
 import { useWebSocketOptimized, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocketOptimized';
+import '../utils/auth-debug'; // Cargar herramientas de debug al inicio
 
 // Estado inicial optimizado
 const initialState: AppState = {

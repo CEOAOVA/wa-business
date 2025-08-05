@@ -207,29 +207,51 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       socketRef.current = null;
     }
 
-    // Obtener token antes de conectar
+    // Obtener y validar token
     const authToken = localStorage.getItem('authToken');
     
     if (!authToken) {
-      console.error('❌ No hay token de autenticación en localStorage');
-      console.log('🔑 Necesitas iniciar sesión primero');
-      setConnectionError('No hay token de autenticación');
+      console.error('❌ No hay token de autenticación');
+      setConnectionError('No hay token de autenticación - Inicia sesión');
       isConnectingRef.current = false;
+      
+      // Notificar al usuario
+      addNotification({
+        type: 'error',
+        title: 'No autenticado',
+        message: 'Por favor inicia sesión para continuar',
+        isRead: false,
+      });
+      
+      // Redirigir a login después de 2 segundos
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+      
       return;
     }
     
-    console.log('🔐 Token encontrado:', authToken.substring(0, 30) + '...');
+    // Validar formato del token
+    if (authToken.length < 100) {
+      console.error('❌ Token parece inválido (muy corto)');
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+      return;
+    }
+    
+    console.log('🔐 Token encontrado, longitud:', authToken.length);
+    console.log('🔐 Primeros 30 caracteres:', authToken.substring(0, 30) + '...');
     console.log('🌐 Conectando a:', BACKEND_URL);
     
     const socket = io(BACKEND_URL, {
       transports: ['websocket'], // Solo websocket como el backend requiere
       auth: {
-        token: authToken // ENVÍAR TOKEN DE AUTENTICACIÓN
+        token: authToken // Sin "Bearer " - solo el token
       },
       query: {
-        token: authToken // También enviar en query como respaldo
+        token: authToken // Respaldo en query params
       },
-      timeout: 20000, // Aumentado para estabilidad
+      timeout: 30000, // Aumentar timeout a 30 segundos
       forceNew: true,
       reconnection: false, // Manejar reconexión manualmente
       autoConnect: true,

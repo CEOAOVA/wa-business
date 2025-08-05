@@ -103,35 +103,46 @@ const io = new socket_io_1.Server(httpServer, {
 exports.io = io;
 // Middleware de autenticación para Socket.IO
 io.use((socket, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
+    var _a, _b;
     try {
         // Obtener token del handshake
         const token = ((_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token) ||
-            ((_b = socket.handshake.query) === null || _b === void 0 ? void 0 : _b.token) ||
-            ((_d = (_c = socket.handshake.headers) === null || _c === void 0 ? void 0 : _c.authorization) === null || _d === void 0 ? void 0 : _d.replace('Bearer ', ''));
-        console.log('🔍 [Socket.IO Auth] Verificando token...');
-        console.log('🔍 [Socket.IO Auth] Handshake auth:', socket.handshake.auth);
-        console.log('🔍 [Socket.IO Auth] Handshake query:', socket.handshake.query);
+            ((_b = socket.handshake.query) === null || _b === void 0 ? void 0 : _b.token);
+        console.log('🔍 [Socket.IO Auth] Verificando conexión...');
         if (!token) {
             console.log('❌ Socket.IO: Sin token de autenticación');
             return next(new Error('No authentication token'));
         }
-        // Validar con Supabase
+        console.log('🔐 Token recibido (primeros 30 chars):', token.substring(0, 30) + '...');
+        // IMPORTANTE: getUser necesita solo el token, no "Bearer "
+        const cleanToken = token.replace('Bearer ', '');
+        // Validar con Supabase - usar try/catch para manejar errores
         const { supabaseAdmin } = require('./config/supabase');
-        const { data: { user }, error } = yield supabaseAdmin.auth.getUser(token);
-        if (error || !user) {
-            console.log('❌ Socket.IO: Token inválido:', error === null || error === void 0 ? void 0 : error.message);
-            return next(new Error('Invalid authentication token'));
+        try {
+            const { data: { user }, error } = yield supabaseAdmin.auth.getUser(cleanToken);
+            if (error) {
+                console.log('❌ Socket.IO: Error de Supabase:', error.message);
+                console.log('💡 Posible token expirado o inválido');
+                return next(new Error('Invalid or expired token'));
+            }
+            if (!user) {
+                console.log('❌ Socket.IO: No se encontró usuario');
+                return next(new Error('User not found'));
+            }
+            console.log('✅ Socket.IO: Usuario autenticado:', user.email);
+            // Adjuntar usuario al socket
+            socket.userId = user.id;
+            socket.userEmail = user.email;
+            next();
         }
-        console.log('✅ Socket.IO: Usuario autenticado:', user.email);
-        // Adjuntar usuario al socket para uso posterior
-        socket.userId = user.id;
-        socket.userEmail = user.email;
-        next();
+        catch (authError) {
+            console.error('❌ Error validando con Supabase:', authError);
+            return next(new Error('Authentication validation failed'));
+        }
     }
     catch (error) {
-        console.error('❌ Socket.IO: Error en autenticación:', error);
-        next(new Error('Authentication failed'));
+        console.error('❌ Socket.IO: Error general en autenticación:', error);
+        next(new Error('Authentication error'));
     }
 }));
 // Middleware para parsing JSON
