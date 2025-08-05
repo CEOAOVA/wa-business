@@ -4,49 +4,88 @@ import { databaseService } from '../services/database.service';
 import { validatePhoneNumber, verifyWebhook, getWebhookDebugInfo, setWebhookUrl, getStats } from '../utils/whatsapp-utils';
 import { webhookSecurity, securityLogger, SecureRequest } from '../middleware/webhook-security';
 import { authMiddleware } from '../middleware/auth';
+import { messageQueueService } from '../services/message-queue.service';
+import { StructuredLogger } from '../utils/structured-logger';
 
 const router = express.Router();
+
+/**
+ * Determinar prioridad del mensaje basado en el contenido del webhook
+ */
+function determineMessagePriority(webhookData: any): 'high' | 'normal' | 'low' {
+  try {
+    const { entry } = webhookData;
+    if (!Array.isArray(entry) || entry.length === 0) {
+      return 'normal';
+    }
+
+    // Verificar si hay mensajes en el webhook
+    const hasMessages = entry.some((e: any) => 
+      e.changes?.some((c: any) => c.value?.messages?.length > 0)
+    );
+
+    if (hasMessages) {
+      // Verificar si es un mensaje de texto simple (prioridad normal)
+      // vs mensaje con media o interactivo (prioridad alta)
+      const hasMedia = entry.some((e: any) => 
+        e.changes?.some((c: any) => 
+          c.value?.messages?.some((m: any) => 
+            m.type !== 'text' || m.interactive || m.button
+          )
+        )
+      );
+      
+      return hasMedia ? 'high' : 'normal';
+    }
+
+    // Status updates o notificaciones tienen prioridad baja
+    return 'low';
+  } catch (error) {
+    StructuredLogger.logError('determine_message_priority', error, { webhookData });
+    return 'normal'; // Default fallback
+  }
+}
 
 // POST /api/chat/send - Enviar mensaje de texto
 router.post('/send', authMiddleware, async (req: any, res: any) => {
   try {
-    console.log('📤 [ChatRouter] Recibiendo petición de envío:', req.body);
-    console.log('📤 [ChatRouter] Headers:', req.headers);
-    console.log('📤 [ChatRouter] User:', req.user);
+    console.log(' [ChatRouter] Recibiendo petición de envío:', req.body);
+    console.log(' [ChatRouter] Headers:', req.headers);
+    console.log(' [ChatRouter] User:', req.user);
     
     const { to, message, clientId } = req.body; // NUEVO: Incluir clientId
     
     if (!to || !message) {
-      console.log('❌ [ChatRouter] Campos faltantes:', { to, message });
+      console.log(' [ChatRouter] Campos faltantes:', { to, message });
       return res.status(400).json({
         success: false,
         error: 'Los campos "to" y "message" son requeridos'
       });
     }
 
-    console.log('📱 [ChatRouter] Validando número:', to);
+    console.log(' [ChatRouter] Validando número:', to);
     const phoneValidation = validatePhoneNumber(to);
-    console.log('📱 [ChatRouter] Resultado validación:', phoneValidation);
+    console.log(' [ChatRouter] Resultado validación:', phoneValidation);
     
     if (!phoneValidation.isValid) {
-      console.log('❌ [ChatRouter] Número inválido:', phoneValidation.error);
+      console.log(' [ChatRouter] Número inválido:', phoneValidation.error);
       return res.status(400).json({
         success: false,
         error: phoneValidation.error
       });
     }
 
-    console.log('📤 [ChatRouter] Llamando a whatsappService.sendMessage...');
+    console.log(' [ChatRouter] Llamando a whatsappService.sendMessage...');
     const result = await whatsappService.sendMessage({
       to: phoneValidation.formatted,
       message: message.toString(),
       clientId: clientId // NUEVO: Pasar clientId
     });
 
-    console.log('📤 [ChatRouter] Resultado de sendMessage:', result);
+    console.log(' [ChatRouter] Resultado de sendMessage:', result);
 
     if (result.success) {
-      console.log('✅ [ChatRouter] Mensaje enviado exitosamente');
+      console.log(' [ChatRouter] Mensaje enviado exitosamente');
       res.json({
         success: true,
         message: 'Mensaje enviado exitosamente',
@@ -55,7 +94,7 @@ router.post('/send', authMiddleware, async (req: any, res: any) => {
         to: phoneValidation.formatted
       });
     } else {
-      console.error('❌ [ChatRouter] Error enviando mensaje:', result.error);
+      console.error(' [ChatRouter] Error enviando mensaje:', result.error);
       res.status(500).json({
         success: false,
         error: 'Error enviando mensaje',
@@ -63,8 +102,8 @@ router.post('/send', authMiddleware, async (req: any, res: any) => {
       });
     }
   } catch (error: any) {
-    console.error('❌ [ChatRouter] Error interno del servidor:', error);
-    console.error('❌ [ChatRouter] Stack trace:', error.stack);
+    console.error(' [ChatRouter] Error interno del servidor:', error);
+    console.error(' [ChatRouter] Stack trace:', error.stack);
     res.status(500).json({
       success: false,
       error: 'Error interno del servidor',
@@ -200,15 +239,15 @@ router.get('/webhook', (req: any, res: any) => {
   const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
   
   try {
-    console.log(`🔐 [${requestId}] Webhook verification request from IP: ${clientIp}`);
-    console.log(`🔐 [${requestId}] Headers:`, JSON.stringify(req.headers, null, 2));
-    console.log(`🔐 [${requestId}] Query params:`, JSON.stringify(req.query, null, 2));
+    console.log(` [${requestId}] Webhook verification request from IP: ${clientIp}`);
+    console.log(` [${requestId}] Headers:`, JSON.stringify(req.headers, null, 2));
+    console.log(` [${requestId}] Query params:`, JSON.stringify(req.query, null, 2));
     
     const mode = req.query['hub.mode'] as string;
     const token = req.query['hub.verify_token'] as string;
     const challenge = req.query['hub.challenge'] as string;
 
-    console.log(`🔐 [${requestId}] Parsed values:`, {
+    console.log(` [${requestId}] Parsed values:`, {
       mode,
       token: token ? `${token.substring(0, 10)}...` : 'undefined',
       challenge: challenge ? `${challenge.substring(0, 20)}...` : 'undefined'
@@ -216,7 +255,7 @@ router.get('/webhook', (req: any, res: any) => {
 
     // Validate required parameters según Meta webhook requirements
     if (!mode || !token || !challenge) {
-      console.error(`❌ [${requestId}] Missing required parameters:`, {
+      console.error(` [${requestId}] Missing required parameters:`, {
         mode: !!mode,
         token: !!token,
         challenge: !!challenge
@@ -226,24 +265,24 @@ router.get('/webhook', (req: any, res: any) => {
 
     // Verificar modo de suscripción
     if (mode !== 'subscribe') {
-      console.error(`❌ [${requestId}] Invalid mode: ${mode}, expected: subscribe`);
+      console.error(` [${requestId}] Invalid mode: ${mode}, expected: subscribe`);
       return res.status(403).send('Invalid mode. Expected: subscribe');
     }
 
     // Verificar token - esto es crítico para la seguridad
     const result = verifyWebhook(mode, token, challenge);
     if (result) {
-      console.log(`✅ [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
-      // 🚀 IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
+      console.log(` [${requestId}] Webhook verification successful, returning challenge: ${challenge}`);
+      // IMPORTANTE: Responder SOLO con el challenge (como string, no JSON)
       // Meta espera exactamente el challenge string, no un objeto JSON
       res.status(200).send(result);
     } else {
-      console.error(`❌ [${requestId}] Webhook verification failed - token mismatch`);
-      console.error(`❌ [${requestId}] Expected token: ${getWebhookDebugInfo().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
+      console.error(` [${requestId}] Webhook verification failed - token mismatch`);
+      console.error(` [${requestId}] Expected token: ${getWebhookDebugInfo().verifyTokenConfigured ? 'configured' : 'NOT CONFIGURED'}`);
       res.status(403).send('Forbidden: Invalid verify token');
     }
   } catch (error: any) {
-    console.error(`❌ [${requestId}] Error in webhook verification:`, error);
+    console.error(` [${requestId}] Error in webhook verification:`, error);
     res.status(500).send('Internal server error during webhook verification');
   }
 });
@@ -254,7 +293,7 @@ router.post('/webhook', async (req: any, res: any) => {
   const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
   const userAgent = req.get('User-Agent') || 'unknown';
   
-  // 🚀 RESPONDER INMEDIATAMENTE CON 200 para evitar reenvíos de WhatsApp
+  // RESPONDER INMEDIATAMENTE CON 200 para evitar reenvíos de WhatsApp
   // Según las mejores prácticas, WhatsApp reenvía si no recibe 200 rápidamente
   res.status(200).json({
     success: true,
@@ -262,46 +301,69 @@ router.post('/webhook', async (req: any, res: any) => {
   });
 
   try {
-    console.log(`🔒 [${requestId}] Webhook recibido desde IP: ${clientIp}`);
+    console.log(` [${requestId}] Webhook recibido desde IP: ${clientIp}`);
     
     // Validación básica de estructura
     if (!req.body || typeof req.body !== 'object') {
-      console.warn(`⚠️ [${requestId}] Webhook con payload inválido`);
+      console.warn(` [${requestId}] Webhook con payload inválido`);
       return; // Ya respondimos con 200, solo loggeamos
     }
 
     // Verificar estructura básica de webhook de WhatsApp
     const { object, entry } = req.body;
     if (!object || !Array.isArray(entry)) {
-      console.warn(`⚠️ [${requestId}] Estructura de webhook inválida`);
+      console.warn(` [${requestId}] Estructura de webhook inválida`);
       return; // Ya respondimos con 200, solo loggeamos
     }
 
     // Verificar que es de WhatsApp Business
     if (object !== 'whatsapp_business_account') {
-      console.warn(`⚠️ [${requestId}] Objeto de webhook no es whatsapp_business_account: ${object}`);
+      console.warn(` [${requestId}] Objeto de webhook no es whatsapp_business_account: ${object}`);
       return; // Ya respondimos con 200, solo loggeamos
     }
 
     // Log detallado solo en desarrollo
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📨 [${requestId}] Webhook mensaje completo:`, JSON.stringify(req.body, null, 2));
+      console.log(` [${requestId}] Webhook mensaje completo:`, JSON.stringify(req.body, null, 2));
     } else {
       // En producción, log resumido por seguridad
-      console.log(`📊 [${requestId}] Webhook: ${object}, entries: ${entry.length}, UA: ${userAgent.substring(0, 50)}`);
+      console.log(` [${requestId}] Webhook: ${object}, entries: ${entry.length}, UA: ${userAgent.substring(0, 50)}`);
     }
 
-    // Procesar webhook de forma asíncrona (no bloqueante)
+    // Procesar webhook usando cola de mensajes para mejor resilencia
     setImmediate(async () => {
       try {
-        await whatsappService.processWebhook(req.body);
-        console.log(`✅ [${requestId}] Webhook procesado exitosamente`);
+        // Determinar prioridad basada en tipo de mensaje
+        const priority = determineMessagePriority(req.body);
+        
+        // Agregar a cola de mensajes para procesamiento asíncrono
+        const queueId = await messageQueueService.addToQueue({
+          ...req.body,
+          requestId,
+          clientIp,
+          userAgent,
+          timestamp: new Date().toISOString()
+        }, priority);
+        
+        StructuredLogger.logWebhookEvent('webhook_queued', {
+          requestId,
+          queueId,
+          priority,
+          clientIp
+        });
+        
+        console.log(`✅ [${requestId}] Webhook agregado a cola: ${queueId} (prioridad: ${priority})`);
         
         // Opcional: Notificar via Socket.IO a clientes conectados
         // TODO: Implementar notificación en tiempo real si es necesario
         console.log(`📢 [${requestId}] Webhook procesado correctamente`);
       } catch (error: any) {
-        console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente:`, error);
+        const errorId = StructuredLogger.logError('webhook_async_processing', error, {
+          requestId,
+          clientIp,
+          userAgent
+        });
+        console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente (${errorId}):`, error);
         // No podemos responder al webhook aquí, pero loggeamos para debugging
       }
     });

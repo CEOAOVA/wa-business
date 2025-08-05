@@ -21,6 +21,7 @@ import chatbotRoutes from './routes/chatbot';
 import authRoutes from './routes/auth';
 import dashboardRoutes from './routes/dashboard';
 import monitoringRoutes from './routes/monitoring';
+import healthRoutes from './routes/health';
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -159,7 +160,10 @@ app.use('/api/dashboard', dashboardRoutes);
 // Rutas de monitoreo
 app.use('/api/monitoring', monitoringRoutes);
 
-// NUEVO: Rutas de logging para el frontend
+// Rutas de health check
+app.use('/api', healthRoutes);
+
+// NUEVO: Rutas de logging para el frontend con structured logging
 app.post('/api/logging/batch', (req, res) => {
   try {
     const logs = req.body;
@@ -169,11 +173,12 @@ app.post('/api/logging/batch', (req, res) => {
           level: log.level,
           message: log.message,
           timestamp: log.timestamp,
-          data: log.data
+          data: log.data,
+          source: 'frontend'
         });
       });
     }
-    res.json({ success: true, message: 'Logs received' });
+    res.json({ success: true, message: 'Logs received', count: logs.length });
   } catch (error) {
     logger.error('Error processing frontend logs:', error);
     res.status(500).json({ success: false, error: 'Failed to process logs' });
