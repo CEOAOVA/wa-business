@@ -163,7 +163,7 @@ const ChatPanelOptimized: React.FC = () => {
   const { 
     sendMessage: sendWhatsAppMessage
   } = useWhatsApp();
-  const { uploadFile, isUploading } = useMediaUpload();
+  const { isUploading } = useMediaUpload();
 
   // Obtener mensajes del chat actual
   const currentMessages = currentChat ? (messages[currentChat.id] || []) : [];

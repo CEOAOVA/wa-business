@@ -14,10 +14,14 @@ export const useChat = () => {
       return lastMessageTime > oneDayAgo;
     }).length;
 
+    // Calcular tiempo promedio de respuesta (simulado por ahora)
+    const avgResponseTime = '2.3 min';
+
     return {
       totalChats,
       totalUnread,
-      activeChats
+      activeChats,
+      avgResponseTime
     };
   }, [state.chats]);
 

@@ -55566,3 +55566,268 @@
   timestamp: '2025-08-04 20:06:20.294'
 }
 {"level":"info","message":"Cerrando servidor (SIGINT)","timestamp":"2025-08-05T02:06:25.410Z"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-05T02:10:24.208Z","warningThreshold":"80%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 20:10:26.726'
+}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:10:26.099Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-05T02:10:26.110Z"}
+{"level":"debug","message":"Estado de variables de entorno","timestamp":"2025-08-05T02:10:26.685Z"}
+{"level":"info","message":"Iniciando limpieza de sesiones al arranque","timestamp":"2025-08-05T02:10:26.692Z"}
+{"level":"info","message":"Rate limiter limpiado","timestamp":"2025-08-05T02:10:26.740Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-05T02:10:26.741Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:10:26.742Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-05T02:10:26.742Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 20:10:26.739'
+}
+{"level":"info","message":"0 conversaciones inactivas limpiadas","timestamp":"2025-08-05T02:10:26.757Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-05T02:10:26.759Z"}
+{"level":"info","message":"Limpieza de sesiones completada al arranque","timestamp":"2025-08-05T02:10:26.759Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 20:10:26.740'
+}
+{"level":"info","message":"WhatsApp Service inicializado con base de datos","timestamp":"2025-08-05T02:10:26.759Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 20:10:26.741'
+}
+{"level":"info","message":"Socket.IO integrado con WhatsApp Service","timestamp":"2025-08-05T02:10:26.759Z"}
+{"level":"info","message":"Inicializando servicios","timestamp":"2025-08-05T02:10:26.760Z"}
+{"isRunning":false,"level":"info","message":"Servicio de limpieza de sesiones inicializado","timestamp":"2025-08-05T02:10:26.760Z"}
+{"intervalMs":60000,"level":"info","message":"Performance monitor iniciado","timestamp":"2025-08-05T02:10:26.760Z"}
+{"level":"info","message":"Performance monitor inicializado correctamente","timestamp":"2025-08-05T02:10:26.760Z"}
+{"criticalThreshold":"95%","isMonitoring":true,"level":"info","message":"Memory monitor inicializado","timestamp":"2025-08-05T02:10:26.761Z","warningThreshold":"80%"}
+{"environment":"development","level":"info","message":"🚀 Aplicación iniciada","port":3002,"timestamp":"2025-08-05T02:10:26.813Z"}
+{"environment":"development","level":"info","memoryMonitoring":true,"message":"Backend iniciado correctamente","port":3002,"timestamp":"2025-08-05T02:10:26.813Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"4gYMoZ5GjmgrSD27AAAB","timestamp":"2025-08-05T02:10:27.048Z"}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 265, heapUsed: 207, heapTotal: 213 },
+    uptime: 35,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 20:10:56.288'
+}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-05T02:10:56.297Z","warningThreshold":"80%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 20:10:58.061'
+}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:10:57.608Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-05T02:10:57.616Z"}
+{"level":"debug","message":"Estado de variables de entorno","timestamp":"2025-08-05T02:10:58.024Z"}
+{"level":"info","message":"Iniciando limpieza de sesiones al arranque","timestamp":"2025-08-05T02:10:58.030Z"}
+{"level":"info","message":"Rate limiter limpiado","timestamp":"2025-08-05T02:10:58.076Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-05T02:10:58.077Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:10:58.078Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-05T02:10:58.079Z"}
+{"level":"info","message":"0 conversaciones inactivas limpiadas","timestamp":"2025-08-05T02:10:58.094Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-05T02:10:58.095Z"}
+{"level":"info","message":"Limpieza de sesiones completada al arranque","timestamp":"2025-08-05T02:10:58.095Z"}
+{"level":"info","message":"WhatsApp Service inicializado con base de datos","timestamp":"2025-08-05T02:10:58.095Z"}
+{"level":"info","message":"Socket.IO integrado con WhatsApp Service","timestamp":"2025-08-05T02:10:58.095Z"}
+{"level":"info","message":"Inicializando servicios","timestamp":"2025-08-05T02:10:58.095Z"}
+{"isRunning":false,"level":"info","message":"Servicio de limpieza de sesiones inicializado","timestamp":"2025-08-05T02:10:58.096Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 20:10:58.075'
+}
+{"intervalMs":60000,"level":"info","message":"Performance monitor iniciado","timestamp":"2025-08-05T02:10:58.096Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 20:10:58.076'
+}
+{"level":"info","message":"Performance monitor inicializado correctamente","timestamp":"2025-08-05T02:10:58.096Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 20:10:58.077'
+}
+{"criticalThreshold":"95%","isMonitoring":true,"level":"info","message":"Memory monitor inicializado","timestamp":"2025-08-05T02:10:58.096Z","warningThreshold":"80%"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-05T02:11:07.387Z","warningThreshold":"80%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 20:11:10.967'
+}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:11:10.168Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-05T02:11:10.179Z"}
+{"level":"debug","message":"Estado de variables de entorno","timestamp":"2025-08-05T02:11:10.897Z"}
+{"level":"info","message":"Iniciando limpieza de sesiones al arranque","timestamp":"2025-08-05T02:11:10.906Z"}
+{"level":"info","message":"Rate limiter limpiado","timestamp":"2025-08-05T02:11:10.989Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-05T02:11:10.991Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:11:10.992Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-05T02:11:10.992Z"}
+{"level":"info","message":"0 conversaciones inactivas limpiadas","timestamp":"2025-08-05T02:11:11.015Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-05T02:11:11.017Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 20:11:10.988'
+}
+{"level":"info","message":"Limpieza de sesiones completada al arranque","timestamp":"2025-08-05T02:11:11.017Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 20:11:10.990'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 20:11:10.991'
+}
+{"level":"info","message":"WhatsApp Service inicializado con base de datos","timestamp":"2025-08-05T02:11:11.018Z"}
+{"level":"info","message":"Socket.IO integrado con WhatsApp Service","timestamp":"2025-08-05T02:11:11.018Z"}
+{"level":"info","message":"Inicializando servicios","timestamp":"2025-08-05T02:11:11.019Z"}
+{"isRunning":false,"level":"info","message":"Servicio de limpieza de sesiones inicializado","timestamp":"2025-08-05T02:11:11.019Z"}
+{"intervalMs":60000,"level":"info","message":"Performance monitor iniciado","timestamp":"2025-08-05T02:11:11.019Z"}
+{"level":"info","message":"Performance monitor inicializado correctamente","timestamp":"2025-08-05T02:11:11.020Z"}
+{"criticalThreshold":"95%","isMonitoring":true,"level":"info","message":"Memory monitor inicializado","timestamp":"2025-08-05T02:11:11.020Z","warningThreshold":"80%"}
+{"environment":"development","level":"info","message":"🚀 Aplicación iniciada","port":3002,"timestamp":"2025-08-05T02:11:11.118Z"}
+{"environment":"development","level":"info","memoryMonitoring":true,"message":"Backend iniciado correctamente","port":3002,"timestamp":"2025-08-05T02:11:11.118Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"PmHCa8LF2GQCgALbAAAC","timestamp":"2025-08-05T02:11:11.170Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"yfvpYpHdps0ycAkxAAAD","timestamp":"2025-08-05T02:11:11.182Z"}
+{"level":"info","message":"Cerrando servidor (SIGINT)","timestamp":"2025-08-05T02:11:38.415Z"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-05T02:11:55.931Z","warningThreshold":"80%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 20:11:57.932'
+}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:11:57.484Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-05T02:11:57.492Z"}
+{"level":"debug","message":"Estado de variables de entorno","timestamp":"2025-08-05T02:11:57.890Z"}
+{"level":"info","message":"Iniciando limpieza de sesiones al arranque","timestamp":"2025-08-05T02:11:57.894Z"}
+{"level":"info","message":"Rate limiter limpiado","timestamp":"2025-08-05T02:11:57.945Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-05T02:11:57.946Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:11:57.948Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-05T02:11:57.948Z"}
+{"level":"info","message":"0 conversaciones inactivas limpiadas","timestamp":"2025-08-05T02:11:57.962Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-05T02:11:57.963Z"}
+{"level":"info","message":"Limpieza de sesiones completada al arranque","timestamp":"2025-08-05T02:11:57.964Z"}
+{"level":"info","message":"WhatsApp Service inicializado con base de datos","timestamp":"2025-08-05T02:11:57.964Z"}
+{"level":"info","message":"Socket.IO integrado con WhatsApp Service","timestamp":"2025-08-05T02:11:57.964Z"}
+{"level":"info","message":"Inicializando servicios","timestamp":"2025-08-05T02:11:57.964Z"}
+{"isRunning":false,"level":"info","message":"Servicio de limpieza de sesiones inicializado","timestamp":"2025-08-05T02:11:57.964Z"}
+{"intervalMs":60000,"level":"info","message":"Performance monitor iniciado","timestamp":"2025-08-05T02:11:57.965Z"}
+{"level":"info","message":"Performance monitor inicializado correctamente","timestamp":"2025-08-05T02:11:57.965Z"}
+{"criticalThreshold":"95%","isMonitoring":true,"level":"info","message":"Memory monitor inicializado","timestamp":"2025-08-05T02:11:57.965Z","warningThreshold":"80%"}
+{"environment":"development","level":"info","message":"🚀 Aplicación iniciada","port":3002,"timestamp":"2025-08-05T02:11:58.013Z"}
+{"environment":"development","level":"info","memoryMonitoring":true,"message":"Backend iniciado correctamente","port":3002,"timestamp":"2025-08-05T02:11:58.013Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 20:11:57.945'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 20:11:57.946'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 20:11:57.946'
+}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"-egf-tY5DDHc6z3tAAAB","timestamp":"2025-08-05T02:11:58.112Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"govySiajzrd72Q2JAAAD","timestamp":"2025-08-05T02:11:58.125Z"}
+{"level":"debug","message":"❌ Cliente desconectado","reason":"transport close","socketId":"-egf-tY5DDHc6z3tAAAB","timestamp":"2025-08-05T02:12:01.281Z"}
+{"level":"debug","message":"❌ Cliente desconectado","reason":"transport close","socketId":"govySiajzrd72Q2JAAAD","timestamp":"2025-08-05T02:12:01.283Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"I02c74uRi8Oiym2HAAAG","timestamp":"2025-08-05T02:12:01.736Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"kJ-kuS6EeDWtXVgxAAAH","timestamp":"2025-08-05T02:12:01.763Z"}
+{"level":"info","message":"Cerrando servidor (SIGINT)","timestamp":"2025-08-05T02:12:07.585Z"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-05T02:12:12.919Z","warningThreshold":"80%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-04 20:12:14.931'
+}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:12:14.523Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-05T02:12:14.531Z"}
+{"level":"debug","message":"Estado de variables de entorno","timestamp":"2025-08-05T02:12:14.894Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-04 20:12:14.946'
+}
+{"level":"info","message":"Iniciando limpieza de sesiones al arranque","timestamp":"2025-08-05T02:12:14.898Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-04 20:12:14.947'
+}
+{"level":"info","message":"Rate limiter limpiado","timestamp":"2025-08-05T02:12:14.946Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-04 20:12:14.947'
+}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-05T02:12:14.947Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-05T02:12:14.948Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-05T02:12:14.948Z"}
+{"level":"info","message":"0 conversaciones inactivas limpiadas","timestamp":"2025-08-05T02:12:14.962Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-05T02:12:14.963Z"}
+{"level":"info","message":"Limpieza de sesiones completada al arranque","timestamp":"2025-08-05T02:12:14.964Z"}
+{"level":"info","message":"WhatsApp Service inicializado con base de datos","timestamp":"2025-08-05T02:12:14.964Z"}
+{"level":"info","message":"Socket.IO integrado con WhatsApp Service","timestamp":"2025-08-05T02:12:14.964Z"}
+{"level":"info","message":"Inicializando servicios","timestamp":"2025-08-05T02:12:14.964Z"}
+{"isRunning":false,"level":"info","message":"Servicio de limpieza de sesiones inicializado","timestamp":"2025-08-05T02:12:14.964Z"}
+{"intervalMs":60000,"level":"info","message":"Performance monitor iniciado","timestamp":"2025-08-05T02:12:14.964Z"}
+{"level":"info","message":"Performance monitor inicializado correctamente","timestamp":"2025-08-05T02:12:14.965Z"}
+{"criticalThreshold":"95%","isMonitoring":true,"level":"info","message":"Memory monitor inicializado","timestamp":"2025-08-05T02:12:14.965Z","warningThreshold":"80%"}
+{"environment":"development","level":"info","message":"🚀 Aplicación iniciada","port":3002,"timestamp":"2025-08-05T02:12:15.010Z"}
+{"environment":"development","level":"info","memoryMonitoring":true,"message":"Backend iniciado correctamente","port":3002,"timestamp":"2025-08-05T02:12:15.010Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"8PhXzPqbEk6ehduXAAAC","timestamp":"2025-08-05T02:12:15.028Z"}
+{"level":"debug","message":"🌐 Cliente conectado","socketId":"4sSrtFWD719QuyplAAAD","timestamp":"2025-08-05T02:12:15.035Z"}
+{
+  service: 'system',
+  metrics: {
+    memory: { rss: 270, heapUsed: 207, heapTotal: 214 },
+    uptime: 34,
+    requests: 4,
+    errors: 0,
+    avgResponseTime: 0
+  },
+  level: 'info',
+  message: 'System metrics',
+  timestamp: '2025-08-04 20:12:44.645'
+}
+{"level":"debug","message":"❌ Cliente desconectado","reason":"transport close","socketId":"4sSrtFWD719QuyplAAAD","timestamp":"2025-08-05T02:12:56.307Z"}
+{"level":"debug","message":"❌ Cliente desconectado","reason":"transport close","socketId":"8PhXzPqbEk6ehduXAAAC","timestamp":"2025-08-05T02:12:56.309Z"}
+{"level":"info","message":"Cerrando servidor (SIGINT)","timestamp":"2025-08-05T02:13:00.082Z"}
