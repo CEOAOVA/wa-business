@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useChat } from "../hooks/useChat";
-import { useApp } from "../context/AppContext";
+import { useAppOptimized } from "../context/AppContextOptimized";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
 import MediaMessage from "./MediaMessage";
@@ -158,17 +158,42 @@ const ConnectionStatus: React.FC<{
 ConnectionStatus.displayName = 'ConnectionStatus';
 
 const ChatPanelOptimized: React.FC = () => {
-  const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
-  const { updateChatTakeoverMode } = useApp();
+  const { currentChat, messages, sendMessage } = useChat();
+  const { updateChatTakeoverMode } = useAppOptimized();
   const { 
     sendMessage: sendWhatsAppMessage
   } = useWhatsApp();
-  const { isUploading } = useMediaUpload({
-    apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
-  });
+  const { uploadFile, isUploading } = useMediaUpload();
+
+  // Obtener mensajes del chat actual
+  const currentMessages = currentChat ? (messages[currentChat.id] || []) : [];
 
   // WebSocket manejado por el contexto
-  const { isWebSocketConnected } = useApp();
+  const { isWebSocketConnected } = useAppOptimized();
+
+  // Funciones utilitarias
+  const getRelativeTime = (date: Date | string): string => {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    if (isNaN(dateObj.getTime())) return 'Ahora';
+    
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Ahora';
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d`;
+    
+    return dateObj.toLocaleDateString();
+  };
+
+  const isOwnMessage = (message: any): boolean => {
+    return message.senderId === 'agent' || message.senderId === 'bot';
+  };
 
   // States existentes
   const [newMessage, setNewMessage] = useState("");
@@ -195,28 +220,28 @@ const ChatPanelOptimized: React.FC = () => {
 
   // Detectar nuevos mensajes y hacer scroll automático
   useEffect(() => {
-    if (messages.length > lastMessageCountRef.current) {
-      const newMessagesCount = messages.length - lastMessageCountRef.current;
-      lastMessageCountRef.current = messages.length;
+    if (currentMessages.length > lastMessageCountRef.current) {
+      const newMessagesCount = currentMessages.length - lastMessageCountRef.current;
+      lastMessageCountRef.current = currentMessages.length;
       
       // Scroll automático solo si hay nuevos mensajes
       if (newMessagesCount > 0) {
         setTimeout(scrollToBottom, 100);
       }
     }
-  }, [messages.length, scrollToBottom]);
+  }, [currentMessages.length, scrollToBottom]);
 
   // El contexto optimizado maneja automáticamente las conversaciones
   // No necesitamos unirse/salir manualmente
 
   // Simular indicador de escritura cuando se reciben mensajes
   useEffect(() => {
-    if (messages.length > 0 && !isOwnMessage(messages[messages.length - 1])) {
+    if (currentMessages.length > 0 && !isOwnMessage(currentMessages[currentMessages.length - 1])) {
       setIsTyping(true);
       const timer = setTimeout(() => setIsTyping(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [messages, isOwnMessage]);
+  }, [currentMessages, isOwnMessage]);
 
   // Funciones utilitarias
   const validatePhone = (phone: string) => {
@@ -367,12 +392,12 @@ const ChatPanelOptimized: React.FC = () => {
   // Memoizar el componente de lista de mensajes
   const messagesList = useMemo(() => (
     <MessagesListOptimized
-      messages={messages}
+      messages={currentMessages}
       getRelativeTime={getRelativeTime}
       isOwnMessage={isOwnMessage}
       messagesEndRef={messagesEndRef}
     />
-  ), [messages, getRelativeTime, isOwnMessage]);
+  ), [currentMessages, getRelativeTime, isOwnMessage]);
 
   if (!currentChat) {
     return (

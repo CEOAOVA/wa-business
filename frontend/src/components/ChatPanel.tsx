@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useChat } from "../hooks/useChat";
 import { useAuth } from "../context/AuthContext";
-import { useApp } from "../context/AppContext";
+import { useAppOptimized } from "../context/AppContextOptimized";
 import { useWhatsApp } from "../hooks/useWhatsApp";
 import { useMediaUpload } from "../hooks/useMediaUpload";
 import { useRealtimeMessages } from "../hooks/useRealtimeMessages";
@@ -66,21 +66,45 @@ const MessageBubble: React.FC<{
 };
 
 const ChatPanel: React.FC = () => {
-  const { currentChat, currentMessages: messages, sendMessage, getRelativeTime, isOwnMessage } = useChat();
+  const { currentChat, messages, sendMessage } = useChat();
   const { state: authState, logout } = useAuth();
-  const { updateChatTakeoverMode } = useApp();
+  const { updateChatTakeoverMode } = useAppOptimized();
   const { 
     sendMessage: sendWhatsAppMessage, 
-    checkConnection: checkWhatsAppConnection,
-    connectionStatus
+    isConnected: isWhatsAppConnected 
   } = useWhatsApp();
-  const { isUploading } = useMediaUpload({
-    apiBaseUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:3002'),
-  });
+  const { uploadFile, isUploading } = useMediaUpload();
+
+  // Obtener mensajes del chat actual
+  const currentMessages = currentChat ? (messages[currentChat.id] || []) : [];
+
+  // Funciones utilitarias
+  const getRelativeTime = (date: Date | string): string => {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    if (isNaN(dateObj.getTime())) return 'Ahora';
+    
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Ahora';
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d`;
+    
+    return dateObj.toLocaleDateString();
+  };
+
+  const isOwnMessage = (message: any): boolean => {
+    return message.senderId === 'agent' || message.senderId === 'bot';
+  };
 
   // DEBUG: Logging para mensajes
   logger.debug('Chat actual', { currentChat }, 'ChatPanel');
-  logger.debug('Mensajes recibidos', { count: messages.length }, 'ChatPanel');
+  logger.debug('Mensajes recibidos', { count: currentMessages.length }, 'ChatPanel');
   logger.debug('Mensajes', { messages }, 'ChatPanel');
 
   // States existentes
@@ -169,7 +193,7 @@ const ChatPanel: React.FC = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [currentMessages]);
 
   // Auto-scroll inmediato cuando se carga un nuevo chat
   useEffect(() => {
@@ -384,7 +408,7 @@ const ChatPanel: React.FC = () => {
         status: 'in_progress',
         nextAction: 'Seguimiento de consulta',
         generatedAt: new Date().toISOString(),
-        totalMessages: messages.length
+        totalMessages: currentMessages.length
       };
       
       setConversationSummary(mockSummary);
@@ -462,10 +486,13 @@ const ChatPanel: React.FC = () => {
         <div className="flex items-center gap-4">
           {whatsappMode ? (
             <div className="flex items-center gap-2 text-sm">
-              <span>Estado: {connectionStatus}</span>
+              <span>Estado: {isWhatsAppConnected ? 'Conectado' : 'Desconectado'}</span>
               <button 
                 className="text-embler-yellow hover:text-yellow-400 transition-colors"
-                onClick={checkWhatsAppConnection}
+                onClick={() => {
+                  // TODO: Implementar lógica para verificar conexión
+                  console.log('Verificando conexión a WhatsApp...');
+                }}
                 title="Verificar conexión"
               >
                 🔄
@@ -611,7 +638,7 @@ const ChatPanel: React.FC = () => {
 
       {/* Mensajes */}
       <div className="flex-1 px-6 py-4 flex flex-col gap-1 overflow-y-auto scrollbar-thin scrollbar-thumb-embler-accent scrollbar-track-embler-dark messages-container relative">
-        {!whatsappMode && messages.length === 0 ? (
+        {!whatsappMode && currentMessages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center text-gray-400">
               <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -624,7 +651,7 @@ const ChatPanel: React.FC = () => {
             </div>
           </div>
         ) : (
-          messages.map(message => (
+          currentMessages.map(message => (
             <MessageBubble
               key={message.id}
               message={message}
@@ -636,7 +663,7 @@ const ChatPanel: React.FC = () => {
         <div ref={messagesEndRef} />
         
         {/* Botones de navegación de scroll */}
-        {messages.length > 5 && (
+        {currentMessages.length > 5 && (
           <div className="absolute bottom-4 right-4 flex flex-col gap-2">
             <button
               onClick={scrollToTop}
@@ -914,7 +941,7 @@ const ChatPanel: React.FC = () => {
                       Conversación ID: {getCurrentConversationId()}
                     </div>
                     <div>
-                      Total mensajes: {messages.length}
+                      Total mensajes: {currentMessages.length}
                     </div>
                   </div>
                 </div>
