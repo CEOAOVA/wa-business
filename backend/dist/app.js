@@ -59,6 +59,7 @@ const rate_limits_1 = require("./config/rate-limits");
 const whatsapp_service_1 = require("./services/whatsapp.service");
 const session_cleanup_service_1 = require("./services/session-cleanup.service");
 const failed_message_retry_service_1 = require("./services/failed-message-retry.service");
+const error_handler_1 = require("./middleware/error-handler");
 // Importar rutas
 const chat_1 = __importDefault(require("./routes/chat"));
 const contacts_1 = __importDefault(require("./routes/contacts"));
@@ -309,6 +310,10 @@ app.get('/api', (_req, res) => {
         }
     });
 });
+// Middleware para manejar rutas no encontradas (debe ir antes del error handler)
+app.use(error_handler_1.notFoundHandler);
+// Middleware global de manejo de errores (debe ser el último middleware)
+app.use(error_handler_1.errorHandler);
 // Función para limpiar sesiones al inicio
 function cleanupSessionsOnStartup() {
     return __awaiter(this, void 0, void 0, function* () {

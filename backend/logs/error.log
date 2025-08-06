@@ -4961,3 +4961,26 @@
 {"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T03:53:55.881Z"}
 {"level":"error","message":"Métrica memory_usage excedió threshold critical: 97.32101097343838% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754452437823,"unit":"%","value":97.32101097343838},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T03:53:57.824Z"}
 {"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754452437823,"unit":"%","value":97.32101097343838},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T03:53:57.825Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:14:53.612Z","usagePercent":"95.93%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:14:53.613Z"}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.44001120014309% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754460897226,"unit":"%","value":96.44001120014309},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:14:57.264Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754460897226,"unit":"%","value":96.44001120014309},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:14:57.273Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:15:53.623Z","usagePercent":"96.57%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:15:53.623Z"}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.51526302396135% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754460957230,"unit":"%","value":96.51526302396135},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:15:57.239Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754460957230,"unit":"%","value":96.51526302396135},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:15:57.240Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:16:53.623Z","usagePercent":"96.34%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:16:53.624Z"}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.68867480061648% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754461017216,"unit":"%","value":96.68867480061648},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:16:57.220Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:19:05.517Z","usagePercent":"96.62%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:19:05.518Z"}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.61863250613828% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754461153002,"unit":"%","value":96.61863250613828},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:19:13.015Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754461153002,"unit":"%","value":96.61863250613828},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:19:13.016Z"}
+{"level":"error","message":"Métrica cpu_usage excedió threshold critical: 100% (threshold: 90)","metric":{"name":"cpu_usage","timestamp":1754461153004,"unit":"%","value":100},"threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-06T06:19:13.020Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"cpu_usage","timestamp":1754461153004,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-06T06:19:13.021Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:20:05.525Z","usagePercent":"96.25%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:20:05.526Z"}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.63630695568077% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754461212985,"unit":"%","value":96.63630695568077},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:20:12.996Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754461212985,"unit":"%","value":96.63630695568077},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:20:12.996Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:21:05.531Z","usagePercent":"96.42%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:21:05.532Z"}

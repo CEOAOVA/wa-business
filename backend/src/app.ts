@@ -13,6 +13,7 @@ import { authRateLimit, whatsappRateLimit } from './config/rate-limits';
 import { whatsappService } from './services/whatsapp.service';
 import { sessionCleanupService } from './services/session-cleanup.service';
 import { failedMessageRetryService } from './services/failed-message-retry.service';
+import { errorHandler, notFoundHandler } from './middleware/error-handler';
 
 // Importar rutas
 import chatRoutes from './routes/chat';
@@ -302,6 +303,12 @@ app.get('/api', (_req, res) => {
     }
   });
 });
+
+// Middleware para manejar rutas no encontradas (debe ir antes del error handler)
+app.use(notFoundHandler);
+
+// Middleware global de manejo de errores (debe ser el último middleware)
+app.use(errorHandler);
 
 // Función para limpiar sesiones al inicio
 async function cleanupSessionsOnStartup() {

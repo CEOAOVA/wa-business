@@ -48,13 +48,13 @@ class SupabaseDatabaseService {
                     .order('created_at', { ascending: false });
                 if (error) {
                     console.error('❌ Error obteniendo agentes:', error);
-                    return [];
+                    throw new Error(`Supabase Error [getAgents]: ${error.message} - Code: ${error.code}`);
                 }
                 return agents || [];
             }
             catch (error) {
                 console.error('❌ Error en getAgents:', error);
-                return [];
+                throw error;
             }
         });
     }
@@ -74,13 +74,13 @@ class SupabaseDatabaseService {
                     .single();
                 if (error) {
                     console.error('❌ Error obteniendo agente por ID:', error);
-                    return null;
+                    throw new Error(`Supabase Error [getAgentById]: ${error.message} - Code: ${error.code}`);
                 }
                 return agent;
             }
             catch (error) {
                 console.error('❌ Error en getAgentById:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -100,13 +100,13 @@ class SupabaseDatabaseService {
                     .single();
                 if (error) {
                     console.error('❌ Error obteniendo agente por email:', error);
-                    return null;
+                    throw new Error(`Supabase Error [getAgentByEmail]: ${error.message} - Code: ${error.code}`);
                 }
                 return agent;
             }
             catch (error) {
                 console.error('❌ Error en getAgentByEmail:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -142,13 +142,13 @@ class SupabaseDatabaseService {
                     .single();
                 if (createError) {
                     console.error('❌ Error creando contacto:', createError);
-                    return null;
+                    throw new Error(`Supabase Error [createContact]: ${createError.message} - Code: ${createError.code}`);
                 }
                 return newContact;
             }
             catch (error) {
                 console.error('❌ Error en getOrCreateContact:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -168,13 +168,17 @@ class SupabaseDatabaseService {
                     .single();
                 if (error) {
                     console.error('❌ Error obteniendo contacto por teléfono:', error);
-                    return null;
+                    // Si el error es porque no se encontró el registro, devolver null es válido
+                    if (error.code === 'PGRST116') {
+                        return null;
+                    }
+                    throw new Error(`Supabase Error [getContactByPhone]: ${error.message} - Code: ${error.code}`);
                 }
                 return contact;
             }
             catch (error) {
                 console.error('❌ Error en getContactByPhone:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -312,13 +316,13 @@ class SupabaseDatabaseService {
                     .single();
                 if (createError) {
                     console.error('❌ Error creando conversación:', createError);
-                    return null;
+                    throw new Error(`Supabase Error [createConversation]: ${createError.message} - Code: ${createError.code}`);
                 }
                 return newConversation;
             }
             catch (error) {
                 console.error('❌ Error en getOrCreateConversation:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -526,7 +530,7 @@ class SupabaseDatabaseService {
                     .single();
                 if (error) {
                     console.error('❌ Error creando mensaje:', error);
-                    return null;
+                    throw new Error(`Supabase Error [createMessage]: ${error.message} - Code: ${error.code}`);
                 }
                 // Actualizar la conversación con el último mensaje y timestamp
                 const updateData = {
@@ -580,7 +584,7 @@ class SupabaseDatabaseService {
             }
             catch (error) {
                 console.error('❌ Error en createMessage:', error);
-                return null;
+                throw error;
             }
         });
     }
@@ -630,7 +634,7 @@ class SupabaseDatabaseService {
                     .limit(limit);
                 if (error) {
                     console.error('❌ Error obteniendo mensajes:', error);
-                    return [];
+                    throw new Error(`Supabase Error [getConversationMessages]: ${error.message} - Code: ${error.code}`);
                 }
                 console.log(`📨 [Supabase] ${(messages === null || messages === void 0 ? void 0 : messages.length) || 0} mensajes obtenidos para ${conversationId}`);
                 // DEBUG: Contar mensajes por tipo de remitente
@@ -644,7 +648,7 @@ class SupabaseDatabaseService {
             }
             catch (error) {
                 console.error('❌ Error en getConversationMessages:', error);
-                return [];
+                throw error;
             }
         });
     }
