@@ -1,5 +1,6 @@
 import { supabase, supabaseAdmin } from '../config/supabase';
 import { logger } from '../utils/logger';
+import * as jwt from 'jsonwebtoken';
 
 export interface UserProfile {
   id: string;
@@ -24,7 +25,7 @@ export interface CreateUserData {
 }
 
 export interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -87,105 +88,104 @@ export class AuthService {
   }
 
   /**
-   * Autenticar usuario (versión simplificada y menos restrictiva)
+   * Autenticar usuario validando directamente contra tabla agents
    */
   static async login(loginData: LoginData): Promise<{ user: UserProfile; session: any }> {
     try {
-      if (!supabase || !supabaseAdmin) {
+      if (!supabaseAdmin) {
         throw new Error('Servicio de autenticación no disponible');
       }
 
-      // Primero intentar autenticar con Supabase Auth (más rápido)
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password
-      });
+      // Buscar usuario por username en tabla agents
+      const { data: agent, error: agentError } = await supabaseAdmin
+        .from('agents')
+        .select('*')
+        .eq('username', loginData.username)
+        .single();
 
-      if (authError) {
-        logger.error('Error authenticating user:', authError);
-        throw new Error(`Error de autenticación: ${authError.message}`);
+      if (agentError || !agent) {
+        logger.error(`Usuario no encontrado: ${loginData.username}`);
+        throw new Error('Usuario o contraseña incorrectos');
       }
 
-      if (!authData.user || !authData.session) {
-        throw new Error('No se pudo autenticar al usuario');
+      // Verificar contraseña (comparación directa)
+      // NOTA: En producción deberías usar hash de contraseñas
+      if (agent.password !== loginData.password) {
+        logger.error(`Contraseña incorrecta para usuario: ${loginData.username}`);
+        throw new Error('Usuario o contraseña incorrectos');
       }
 
-      // Buscar el perfil del usuario (más flexible)
-      let profileData: UserProfile;
-      
-      try {
-        const { data: profileResult, error: profileError } = await supabaseAdmin
-          .from('agents')
-          .select('*')
-          .eq('email', loginData.email)
-          .single();
+      // Verificar si el usuario está activo
+      if (!agent.is_active) {
+        logger.warn(`Usuario inactivo intentando acceder: ${loginData.username}`);
+        throw new Error('Usuario inactivo');
+      }
 
-        if (profileError) {
-          logger.warn('Error fetching user profile, creating basic profile');
-          // Si no existe el perfil, crear uno básico
-          profileData = {
-            id: authData.user.id,
-            username: authData.user.user_metadata?.username || authData.user.email?.split('@')[0] || 'user',
-            full_name: authData.user.user_metadata?.full_name || authData.user.email || 'Usuario',
-            email: authData.user.email || '',
-            role: authData.user.user_metadata?.role || 'agent',
-            whatsapp_id: authData.user.user_metadata?.whatsapp_id,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-        } else {
-          profileData = profileResult;
-          
-          // Si el usuario está marcado como inactivo, reactivarlo automáticamente
-          if (!profileData.is_active) {
-            logger.info('Reactivating inactive user');
-            profileData.is_active = true;
-            profileData.updated_at = new Date().toISOString();
+      // Crear perfil de usuario para retornar
+      const profileData: UserProfile = {
+        id: agent.id,
+        username: agent.username,
+        full_name: agent.full_name || agent.username,
+        email: agent.email || `${agent.username}@local`,
+        role: agent.role || 'agent',
+        whatsapp_id: agent.whatsapp_id,
+        is_active: agent.is_active,
+        created_at: agent.created_at,
+        updated_at: agent.updated_at
+      };
+
+      // Generar token JWT manualmente
+      const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+      const expiresIn = process.env.JWT_EXPIRES_IN || '8h';
+      const token = jwt.sign(
+        {
+          sub: agent.id,
+          email: agent.email || agent.username,
+          role: agent.role,
+          username: agent.username
+        },
+        jwtSecret,
+        {
+          expiresIn: expiresIn as jwt.SignOptions['expiresIn']
+        }
+      );
+
+      // Crear sesión simulada compatible con el frontend
+      const session = {
+        access_token: token,
+        token_type: 'bearer',
+        expires_in: 28800,
+        expires_at: Math.floor(Date.now() / 1000) + 28800,
+        refresh_token: token, // Usamos el mismo token como refresh
+        user: {
+          id: agent.id,
+          email: agent.email || agent.username,
+          user_metadata: {
+            username: agent.username,
+            full_name: agent.full_name,
+            role: agent.role
           }
         }
-      } catch (profileError) {
-        logger.warn('Error with user profile, using auth data');
-        // Crear perfil básico si hay problemas
-        profileData = {
-          id: authData.user.id,
-          username: authData.user.user_metadata?.username || authData.user.email?.split('@')[0] || 'user',
-          full_name: authData.user.user_metadata?.full_name || authData.user.email || 'Usuario',
-          email: authData.user.email || '',
-          role: authData.user.user_metadata?.role || 'agent',
-          whatsapp_id: authData.user.user_metadata?.whatsapp_id,
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-      }
+      };
 
-      // Actualizar último login y estado activo
+      // Actualizar último login
       try {
         await supabaseAdmin
           .from('agents')
-          .upsert({
-            id: profileData.id,
-            username: profileData.username,
-            full_name: profileData.full_name,
-            email: profileData.email,
-            role: profileData.role,
-            whatsapp_id: profileData.whatsapp_id,
-            is_active: true,
+          .update({
             last_login: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'id'
-          });
+          })
+          .eq('id', agent.id);
       } catch (updateError) {
-        logger.warn('Error updating user profile');
+        logger.warn('Error actualizando último login', { error: updateError });
         // Continuar aunque falle la actualización
       }
 
-      logger.info(`User logged in successfully: ${loginData.email}`);
-      return { user: profileData, session: authData.session };
+      logger.info(`Usuario autenticado exitosamente: ${loginData.username}`);
+      return { user: profileData, session };
     } catch (error) {
-      logger.error('Error in login:', error);
+      logger.error('Error en login:', error);
       throw error;
     }
   }

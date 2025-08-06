@@ -59,14 +59,14 @@ const router = (0, express_1.Router)();
  */
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) {
+        const { username, password } = req.body;
+        if (!username || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Email y contraseña son requeridos'
+                message: 'Usuario y contraseña son requeridos'
             });
         }
-        const result = yield auth_service_1.AuthService.login({ email, password });
+        const result = yield auth_service_1.AuthService.login({ username, password });
         res.json({
             success: true,
             message: 'Login exitoso',

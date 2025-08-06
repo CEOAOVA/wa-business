@@ -26,7 +26,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ||
    'https://dev-apiwaprueba.aova.mx');
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 

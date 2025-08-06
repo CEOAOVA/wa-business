@@ -63,7 +63,8 @@ const logger_1 = require("../config/logger");
 class ChatbotService {
     constructor() {
         this.conversations = new Map();
-        this.SESSION_TIMEOUT_MS = 15 * 60 * 1000; // REDUCIDO de 30 a 15 minutos
+        this.SESSION_TIMEOUT_MS = 15 * 60 * 1000; // Timeout configurable
+        this.MAX_CONVERSATIONS = 1000; // ✅ LÍMITE MÁXIMO DE CONVERSACIONES
         // NUEVO: Usar configuración centralizada
         this.config = (0, config_1.getConfig)();
         this.openRouterConfig = {
@@ -85,7 +86,32 @@ class ChatbotService {
      * Limpiar sesiones expiradas - OPTIMIZADO
      */
     startCleanupInterval() {
-        this.cleanupInterval = setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // REDUCIDO a cada 3 minutos
+        this.cleanupInterval = setInterval(() => this.cleanupExpiredSessions(), 3 * 60 * 1000); // Intervalo configurable
+    }
+    /**
+     * ✅ NUEVO: Agregar conversación con límite de memoria
+     */
+    addConversation(phoneNumber, state) {
+        // Verificar límite antes de agregar
+        if (this.conversations.size >= this.MAX_CONVERSATIONS) {
+            logger_1.logger.warn(`⚠️ Límite de conversaciones alcanzado (${this.MAX_CONVERSATIONS}). Limpiando antiguas...`);
+            this.cleanupOldestConversations(Math.floor(this.MAX_CONVERSATIONS * 0.1)); // Limpiar 10%
+        }
+        this.conversations.set(phoneNumber, state);
+        logger_1.logger.debug(`Conversación agregada para ${phoneNumber}. Total: ${this.conversations.size}`);
+    }
+    /**
+     * ✅ NUEVO: Limpiar las conversaciones más antiguas
+     */
+    cleanupOldestConversations(count) {
+        const sorted = Array.from(this.conversations.entries())
+            .sort((a, b) => a[1].lastActivity.getTime() - b[1].lastActivity.getTime());
+        let cleaned = 0;
+        for (let i = 0; i < Math.min(count, sorted.length); i++) {
+            this.conversations.delete(sorted[i][0]);
+            cleaned++;
+        }
+        logger_1.logger.info(`✅ Limpiadas ${cleaned} conversaciones antiguas. Conversaciones activas: ${this.conversations.size}`);
     }
     /**
      * Detectar si el mensaje es sobre piezas automotrices
@@ -230,7 +256,7 @@ class ChatbotService {
                 createdAt: new Date(),
                 lastActivity: new Date()
             };
-            this.conversations.set(conversationId, conversation);
+            this.addConversation(conversationId, conversation); // ✅ Usando método con límite
             return conversation;
         });
     }

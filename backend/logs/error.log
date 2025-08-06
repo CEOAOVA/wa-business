@@ -4984,3 +4984,549 @@
 {"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754461212985,"unit":"%","value":96.63630695568077},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-06T06:20:12.996Z"}
 {"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T06:21:05.531Z","usagePercent":"96.42%"}
 {"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T06:21:05.532Z"}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 15:21:41.624'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 15:21:41.626'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 15:21:41.627'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 15:21:42.618'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 15:21:42.620'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 15:21:42.621'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 15:21:43.579'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 15:21:43.580'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 15:21:43.581'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 15:21:44.317'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 15:21:44.318'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 15:21:44.319'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 15:21:45.161'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 15:21:45.162'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 15:21:45.163'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 15:21:56.805'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 15:21:56.806'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 15:21:56.807'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Invalid login credentials',
+    stack: 'AuthApiError: Invalid login credentials\n' +
+      '    at handleError (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:102:9)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async _handleRequest (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:195:5)\n' +
+      '    at async _request (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\lib\\fetch.ts:157:16)\n' +
+      '    at async SupabaseAuthClient.signInWithPassword (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\node_modules\\@supabase\\auth-js\\src\\GoTrueClient.ts:573:15)',
+    name: 'AuthApiError'
+  },
+  level: 'error',
+  message: 'Error authenticating user:',
+  timestamp: '2025-08-06 16:58:16.506'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error in login:',
+  timestamp: '2025-08-06 16:58:16.508'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error de autenticación: Invalid login credentials',
+    stack: 'Error: Error de autenticación: Invalid login credentials\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:106:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:5:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 16:58:16.509'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-06T22:59:05.960Z","usagePercent":"96.71%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-06T22:59:05.961Z"}
+{
+  service: 'whatsapp-llm',
+  error: undefined,
+  level: 'error',
+  message: 'Contraseña incorrecta para usuario: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 17:15:58.504'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error en login:',
+  timestamp: '2025-08-06 17:15:58.508'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 17:15:58.509'
+}
+{
+  service: 'whatsapp-llm',
+  error: undefined,
+  level: 'error',
+  message: 'Contraseña incorrecta para usuario: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 17:15:59.577'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error en login:',
+  timestamp: '2025-08-06 17:15:59.578'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 17:15:59.579'
+}
+{
+  service: 'whatsapp-llm',
+  error: undefined,
+  level: 'error',
+  message: 'Contraseña incorrecta para usuario: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 17:16:00.229'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error en login:',
+  timestamp: '2025-08-06 17:16:00.230'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 17:16:00.230'
+}
+{
+  service: 'whatsapp-llm',
+  error: undefined,
+  level: 'error',
+  message: 'Contraseña incorrecta para usuario: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 17:16:00.850'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error en login:',
+  timestamp: '2025-08-06 17:16:00.851'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 17:16:00.852'
+}
+{
+  service: 'whatsapp-llm',
+  error: undefined,
+  level: 'error',
+  message: 'Contraseña incorrecta para usuario: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 17:16:10.270'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error en login:',
+  timestamp: '2025-08-06 17:16:10.272'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 17:16:10.272'
+}
+{
+  service: 'whatsapp-llm',
+  error: undefined,
+  level: 'error',
+  message: 'Contraseña incorrecta para usuario: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 17:16:41.733'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error en login:',
+  timestamp: '2025-08-06 17:16:41.735'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Usuario o contraseña incorrectos',
+    stack: 'Error: Usuario o contraseña incorrectos\n' +
+      '    at Function.<anonymous> (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:115:15)\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (C:\\Users\\karal\\Documents\\whtsppbsnss - copia\\backend\\src\\services\\auth.service.ts:38:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Login error:',
+  timestamp: '2025-08-06 17:16:41.735'
+}

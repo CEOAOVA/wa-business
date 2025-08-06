@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
 import { authApiService } from '../services/auth-api';
 import { cleanupInvalidAuth, clearAllAuthData, refreshTokenIfNeeded, getRefreshStats } from '../utils/auth-cleanup';
+import { authRefreshService } from '../services/auth-refresh.service'; // ✅ AGREGADO: Auto-refresh service
 import logger from '../services/logger';
 
 // Estado inicial
@@ -96,6 +97,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
+  // ✅ Escuchar eventos de token refresh
+  useEffect(() => {
+    const handleTokenRefreshed = (event: CustomEvent) => {
+      logger.info('✅ Token actualizado por refresh service', { timestamp: event.detail.timestamp }, 'AuthContext');
+      
+      // Actualizar estado si es necesario
+      if (state.isAuthenticated) {
+        // Opcionalmente, recargar información del usuario
+        checkAuth();
+      }
+    };
+    
+    window.addEventListener('auth:token-refreshed', handleTokenRefreshed as any);
+    
+    return () => {
+      window.removeEventListener('auth:token-refreshed', handleTokenRefreshed as any);
+    };
+  }, [state.isAuthenticated]);
+
   // Hacer funciones de debug disponibles globalmente
   useEffect(() => {
     // @ts-ignore - Hacer funciones disponibles globalmente para debug
@@ -103,13 +123,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       checkAuth,
       getRefreshStats,
       getAuthState: () => state,
+      getRefreshStatus: () => authRefreshService.getStatus(), // ✅ Agregado: Estado del refresh service
     };
   }, [state]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      logger.debug('Iniciando login', { email: credentials.email }, 'AuthContext');
+      logger.debug('Iniciando login', { username: credentials.username }, 'AuthContext');
 
       const response = await authApiService.login(credentials);
       
@@ -123,6 +144,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         // Convertir el usuario al formato esperado
         const user = authApiService.convertToUser(response.user);
+        
+        // ✅ INICIAR AUTO-REFRESH DE TOKENS
+        await authRefreshService.startAutoRefresh();
+        logger.info('✅ Auto-refresh de tokens activado', {}, 'AuthContext');
         
         logger.info('Login exitoso', { userId: user.id, email: user.email }, 'AuthContext');
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
@@ -140,11 +165,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       logger.debug('Iniciando logout', {}, 'AuthContext');
       
+      // ✅ DETENER AUTO-REFRESH DE TOKENS
+      authRefreshService.stopAutoRefresh();
+      logger.info('✅ Auto-refresh de tokens detenido', {}, 'AuthContext');
+      
       // Llamar al endpoint de logout del backend
       await authApiService.logout();
       
       // Limpiar datos locales
       clearAllAuthData();
+      authRefreshService.cleanup(); // ✅ Limpiar servicio de refresh
       
       logger.info('Logout exitoso', {}, 'AuthContext');
       dispatch({ type: 'LOGOUT' });
@@ -152,6 +182,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       logger.error('Error en logout', { error: error instanceof Error ? error.message : String(error) }, 'AuthContext');
       // Aún limpiar datos locales aunque falle el logout del backend
       clearAllAuthData();
+      authRefreshService.cleanup(); // ✅ Limpiar servicio de refresh
       dispatch({ type: 'LOGOUT' });
     }
   };

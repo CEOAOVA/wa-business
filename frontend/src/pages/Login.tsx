@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { MessageCircle, Shield, Zap, Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, RefreshCw, Bug, Trash2 } from "lucide-react";
+import { MessageCircle, Shield, Zap, Eye, EyeOff, User, Lock, ArrowRight, Sparkles, RefreshCw, Bug, Trash2 } from "lucide-react";
 import Logo from "../components/LogoDebug";
 import { forceLogout } from "../utils/auth-cleanup";
 
@@ -10,7 +10,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { state, login, clearError } = useAuth();
   
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -35,21 +35,21 @@ const Login: React.FC = () => {
     if (state.error) {
       clearError();
     }
-  }, [email, password, clearError]);
+  }, [username, password, clearError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🔍 [Login] Iniciando submit con credenciales:', { email: email.trim(), password: password ? '***' : 'vacía' });
+    console.log('🔍 [Login] Iniciando submit con credenciales:', { username: username.trim(), password: password ? '***' : 'vacía' });
     
-    if (!email.trim() || !password.trim()) {
+    if (!username.trim() || !password.trim()) {
       console.warn('⚠️ [Login] Credenciales incompletas');
       return;
     }
 
     try {
       console.log('🔍 [Login] Llamando a login...');
-      await login({ email: email.trim(), password, rememberMe: remember });
+      await login({ username: username.trim(), password, rememberMe: remember });
       console.log('✅ [Login] Login completado exitosamente');
       // La navegación se manejará automáticamente por el useEffect
     } catch (error) {
@@ -66,21 +66,21 @@ const Login: React.FC = () => {
   const demoCredentials = [
     {
       name: "Administrador",
-      email: "moises.s@aova.mx",
+      username: "moises.s@aova.mx",
       password: "Admin2024!",
       role: "admin",
       description: "Acceso completo al sistema"
     },
     {
       name: "Agente 1",
-      email: "k.alvarado@aova.mx",
+      username: "k.alvarado@aova.mx",
       password: "Agente2024!",
       role: "agent",
       description: "Gestión de conversaciones"
     },
     {
       name: "Agente 2",
-      email: "elisa.n@synaracare.com",
+      username: "elisa.n@synaracare.com",
       password: "Agente2024!",
       role: "agent",
       description: "Gestión de conversaciones"
@@ -88,7 +88,7 @@ const Login: React.FC = () => {
   ];
 
   const handleDemoLogin = (credentials: typeof demoCredentials[0]) => {
-    setEmail(credentials.email);
+    setUsername(credentials.username);
     setPassword(credentials.password);
     setRemember(true);
   };
@@ -273,7 +273,7 @@ const Login: React.FC = () => {
             
             {demoCredentials.map((credential, index) => (
               <motion.button
-                key={credential.email}
+                key={credential.username}
                 className="w-full p-3 bg-embler-yellow/10 border border-embler-yellow/30 rounded-xl backdrop-blur-sm hover:bg-embler-yellow/20 transition-all text-left"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -328,19 +328,19 @@ const Login: React.FC = () => {
           >
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email
+                Usuario
               </label>
               <div className="relative">
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-4 py-4 pl-12 bg-embler-gray border border-embler-grayLight rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-embler-yellow/50 focus:border-transparent transition-all backdrop-blur-sm"
-                  placeholder="tu@email.com"
+                  placeholder="tu.usuario@dominio.com"
                   required
                   disabled={state.isLoading}
                 />
-                <Mail className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
+                <User className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
               </div>
             </div>
 
@@ -396,7 +396,7 @@ const Login: React.FC = () => {
 
             <motion.button
               type="submit"
-              disabled={state.isLoading || !email.trim() || !password.trim()}
+              disabled={state.isLoading || !username.trim() || !password.trim()}
               className="w-full py-4 px-6 bg-embler-yellow text-black font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-embler-yellow focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg hover:bg-embler-yellowLight"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

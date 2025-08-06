@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { AppState, Chat, Message, Notification, AppAction } from '../types';
 import { whatsappApi } from '../services/whatsapp-api';
 import { dashboardApiService } from '../services/dashboard-api';
-import { useWebSocket, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocket';
+import { useWebSocketOptimized as useWebSocket, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocketOptimized';
 
 // Estado inicial
 const initialState: AppState = {
@@ -415,15 +415,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // Aquí podrías actualizar contadores de mensajes no leídos, etc.
     });
 
-    // Manejar cambios de conexión
-    webSocket.onConnectionChange((connected: boolean) => {
-      console.log(`🌐 Estado de conexión WebSocket: ${connected ? 'Conectado' : 'Desconectado'}`);
-      if (!connected) {
-        dispatch({ type: 'SET_ERROR', payload: 'Conexión WebSocket perdida. Intentando reconectar...' });
-      } else {
-        dispatch({ type: 'SET_ERROR', payload: null });
+    // Manejar cambios de conexión mediante polling del estado
+    const previousConnected = React.useRef(webSocket.isConnected);
+    
+    React.useEffect(() => {
+      if (previousConnected.current !== webSocket.isConnected) {
+        console.log(`🌐 Estado de conexión WebSocket: ${webSocket.isConnected ? 'Conectado' : 'Desconectado'}`);
+        if (!webSocket.isConnected) {
+          dispatch({ type: 'SET_ERROR', payload: 'Conexión WebSocket perdida. Intentando reconectar...' });
+        } else {
+          dispatch({ type: 'SET_ERROR', payload: null });
+        }
+        previousConnected.current = webSocket.isConnected;
       }
-    });
+    }, [webSocket.isConnected]);
   }, [webSocket, state.chats]);
 
   // Convertir mensaje de WhatsApp a Chat (comentado por no uso actual)

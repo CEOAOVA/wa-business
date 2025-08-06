@@ -24,6 +24,7 @@ import authRoutes from './routes/auth';
 import dashboardRoutes from './routes/dashboard';
 import monitoringRoutes from './routes/monitoring';
 import healthRoutes from './routes/health';
+import queueRoutes from './routes/queue'; // ✅ AGREGADO: Rutas de cola
 
 // Cargar variables de entorno con soporte Unicode
 loadEnvWithUnicodeSupport();
@@ -41,7 +42,7 @@ app.set('trust proxy', true);
 // Aplicar configuración de seguridad ANTES de cualquier otra cosa
 applySecurity(app);
 
-// Configuración optimizada de Socket.IO para mejor rendimiento en tiempo real
+// ✅ CONFIGURACIÓN OPTIMIZADA DE SOCKET.IO - IMPLEMENTADO
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
@@ -49,17 +50,23 @@ const io = new Server(httpServer, {
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
   },
-  // OPTIMIZACIONES DE MEMORIA Y RENDIMIENTO
-  transports: ['websocket'], // Eliminar polling para reducir overhead
+  // 🚀 OPTIMIZACIONES DE RENDIMIENTO - APLICADAS
+  transports: ['websocket', 'polling'], // Polling habilitado como fallback
   allowEIO3: false, // Deshabilitar versión antigua
-  pingTimeout: 30000, // 30 segundos - AUMENTADO para reducir frecuencia
-  pingInterval: 25000, // 25 segundos - AUMENTADO para reducir frecuencia
-  upgradeTimeout: 20000, // 20 segundos
-  maxHttpBufferSize: 5e5, // 500KB - REDUCIDO de 1MB
-  connectTimeout: 45000, // 45 segundos - AUMENTADO
-  // Por ahora permitir todas las conexiones, validaremos en el middleware
+  pingTimeout: 10000, // ⚡ OPTIMIZADO: 10 segundos (era 30)
+  pingInterval: 5000, // ⚡ OPTIMIZADO: 5 segundos (era 25)
+  upgradeTimeout: 10000, // ⚡ OPTIMIZADO: 10 segundos
+  maxHttpBufferSize: 1e6, // ⚡ OPTIMIZADO: 1MB
+  connectTimeout: 20000, // ⚡ OPTIMIZADO: 20 segundos (era 45)
+  // 📊 Configuración de compresión
+  perMessageDeflate: {
+    threshold: 1024 // Comprimir mensajes > 1KB
+  },
+  // Validación rápida de token
   allowRequest: (req, callback) => {
-    callback(null, true);
+    const token = req.headers.authorization || (req as any)._query?.token;
+    const isValid = token && token.length > 50;
+    callback(null, isValid);
   }
 });
 
@@ -215,6 +222,9 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Rutas de monitoreo
 app.use('/api/monitoring', monitoringRoutes);
+
+// Rutas de colas (Bull Queue) ✅ AGREGADO
+app.use('/api/queue', queueRoutes);
 
 // Rutas de health check
 app.use('/api', healthRoutes);

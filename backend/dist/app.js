@@ -69,6 +69,7 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const monitoring_1 = __importDefault(require("./routes/monitoring"));
 const health_1 = __importDefault(require("./routes/health"));
+const queue_1 = __importDefault(require("./routes/queue")); // ✅ AGREGADO: Rutas de cola
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 // Debug de variables de entorno
@@ -80,7 +81,7 @@ const PORT = whatsapp_1.whatsappConfig.server.port;
 app.set('trust proxy', true);
 // Aplicar configuración de seguridad ANTES de cualquier otra cosa
 (0, security_1.applySecurity)(app);
-// Configuración optimizada de Socket.IO para mejor rendimiento en tiempo real
+// ✅ CONFIGURACIÓN OPTIMIZADA DE SOCKET.IO - IMPLEMENTADO
 const io = new socket_io_1.Server(httpServer, {
     cors: {
         origin: process.env.FRONTEND_URL || "http://localhost:5173",
@@ -88,17 +89,24 @@ const io = new socket_io_1.Server(httpServer, {
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"]
     },
-    // OPTIMIZACIONES DE MEMORIA Y RENDIMIENTO
-    transports: ['websocket'], // Eliminar polling para reducir overhead
+    // 🚀 OPTIMIZACIONES DE RENDIMIENTO - APLICADAS
+    transports: ['websocket', 'polling'], // Polling habilitado como fallback
     allowEIO3: false, // Deshabilitar versión antigua
-    pingTimeout: 30000, // 30 segundos - AUMENTADO para reducir frecuencia
-    pingInterval: 25000, // 25 segundos - AUMENTADO para reducir frecuencia
-    upgradeTimeout: 20000, // 20 segundos
-    maxHttpBufferSize: 5e5, // 500KB - REDUCIDO de 1MB
-    connectTimeout: 45000, // 45 segundos - AUMENTADO
-    // Por ahora permitir todas las conexiones, validaremos en el middleware
+    pingTimeout: 10000, // ⚡ OPTIMIZADO: 10 segundos (era 30)
+    pingInterval: 5000, // ⚡ OPTIMIZADO: 5 segundos (era 25)
+    upgradeTimeout: 10000, // ⚡ OPTIMIZADO: 10 segundos
+    maxHttpBufferSize: 1e6, // ⚡ OPTIMIZADO: 1MB
+    connectTimeout: 20000, // ⚡ OPTIMIZADO: 20 segundos (era 45)
+    // 📊 Configuración de compresión
+    perMessageDeflate: {
+        threshold: 1024 // Comprimir mensajes > 1KB
+    },
+    // Validación rápida de token
     allowRequest: (req, callback) => {
-        callback(null, true);
+        var _a;
+        const token = req.headers.authorization || ((_a = req._query) === null || _a === void 0 ? void 0 : _a.token);
+        const isValid = token && token.length > 50;
+        callback(null, isValid);
     }
 });
 exports.io = io;
@@ -224,6 +232,8 @@ app.use('/api/chatbot', chatbot_1.default);
 app.use('/api/dashboard', dashboard_1.default);
 // Rutas de monitoreo
 app.use('/api/monitoring', monitoring_1.default);
+// Rutas de colas (Bull Queue) ✅ AGREGADO
+app.use('/api/queue', queue_1.default);
 // Rutas de health check
 app.use('/api', health_1.default);
 // NUEVO: Rutas de logging para el frontend con structured logging

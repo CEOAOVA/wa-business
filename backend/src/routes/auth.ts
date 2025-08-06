@@ -17,16 +17,16 @@ const router = Router();
  */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password }: LoginData = req.body;
+    const { username, password }: LoginData = req.body;
 
-    if (!email || !password) {
+    if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Email y contraseña son requeridos'
+        message: 'Usuario y contraseña son requeridos'
       });
     }
 
-    const result = await AuthService.login({ email, password });
+    const result = await AuthService.login({ username, password });
     
     res.json({
       success: true,
