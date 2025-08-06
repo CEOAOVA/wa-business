@@ -193,7 +193,7 @@ services:
       - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
       
       # Alternative API URLs
-      - VITE_API_URL=${VITE_API_URL:-https://dev-apiwaprueba.aova.mx}
+      - VITE_API_URL=${VITE_API_URL}
       
       # Frontend Logging
       - VITE_LOG_LEVEL=${VITE_LOG_LEVEL:-warn}
