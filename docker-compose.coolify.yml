@@ -63,11 +63,49 @@ services:
       # CORS Configuration
       - CORS_ORIGINS=${CORS_ORIGINS}
       
+      # Frontend/Backend URLs (CRÍTICAS para CORS y WebSocket)
+      - FRONTEND_URL=${FRONTEND_URL:-https://dev-waprueba.aova.mx}
+      - BACKEND_URL=${BACKEND_URL:-https://dev-apiwaprueba.aova.mx}
+      - PUBLIC_URL=${PUBLIC_URL:-https://dev-apiwaprueba.aova.mx}
+      
       # Security Configuration
       - HOSTNAME=0.0.0.0
       - TRUST_PROXY=true
+      - ENABLE_WEBHOOK_SIGNATURE=${ENABLE_WEBHOOK_SIGNATURE:-true}
+      
+      # Rate Limiting (Enhanced)
       - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-60000}
       - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - RATE_LIMIT_AUTH_MAX=${RATE_LIMIT_AUTH_MAX:-20}
+      - RATE_LIMIT_WEBHOOK_WINDOW=${RATE_LIMIT_WEBHOOK_WINDOW:-60000}
+      - RATE_LIMIT_WEBHOOK_MAX=${RATE_LIMIT_WEBHOOK_MAX:-200}
+      
+      # Performance & Optimization (CRÍTICAS)
+      - USE_DIRECT_SUPABASE=${USE_DIRECT_SUPABASE:-true}
+      - USE_OPTIMIZED_QUERIES=${USE_OPTIMIZED_QUERIES:-true}
+      - USE_BATCH_OPERATIONS=${USE_BATCH_OPERATIONS:-true}
+      - USE_CIRCUIT_BREAKER=${USE_CIRCUIT_BREAKER:-true}
+      - ENABLE_PERFORMANCE_METRICS=${ENABLE_PERFORMANCE_METRICS:-true}
+      - ROLLBACK_THRESHOLD=${ROLLBACK_THRESHOLD:-10}
+      - PERFORMANCE_MONITOR_INTERVAL=${PERFORMANCE_MONITOR_INTERVAL:-60000}
+      
+      # Memory Management (CRÍTICAS)
+      - MAX_MEMORY_USAGE=${MAX_MEMORY_USAGE:-80}
+      - CRITICAL_MEMORY_USAGE=${CRITICAL_MEMORY_USAGE:-95}
+      - MEMORY_CHECK_INTERVAL=${MEMORY_CHECK_INTERVAL:-60000}
+      - CACHE_MAX_SIZE=${CACHE_MAX_SIZE:-1000}
+      
+      # Database Configuration (Extended)
+      - SUPABASE_POOLING=${SUPABASE_POOLING:-true}
+      - SUPABASE_MAX_CONNECTIONS=${SUPABASE_MAX_CONNECTIONS:-10}
+      
+      # Authentication (Extended)
+      - INITIAL_ADMIN_EMAIL=${INITIAL_ADMIN_EMAIL:-admin@aova.mx}
+      - INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:-Agente2024!}
+      
+      # SOAP Configuration (Extended)
+      - SOAP_CONNECTION_RETRIES=${SOAP_CONNECTION_RETRIES:-3}
+      - LLM_TIMEOUT_MS=${LLM_TIMEOUT_MS:-60000}
       
       # System Configuration
       - ENABLE_DETAILED_LOGS=${ENABLE_DETAILED_LOGS:-false}
@@ -149,6 +187,16 @@ services:
       
       # Backend API Connection
       - VITE_BACKEND_URL=${VITE_BACKEND_URL:-https://dev-apiwaprueba.aova.mx}
+      
+      # Supabase Frontend Access (Para realtime)
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      
+      # Alternative API URLs
+      - VITE_API_URL=${VITE_API_URL:-${VITE_BACKEND_URL:-https://dev-apiwaprueba.aova.mx}}
+      
+      # Frontend Logging
+      - VITE_LOG_LEVEL=${VITE_LOG_LEVEL:-warn}
       
       # SSL/Security Configuration
       - NGINX_HOST=0.0.0.0
