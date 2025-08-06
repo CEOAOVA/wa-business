@@ -200,6 +200,10 @@ services:
       target: production
     ports:
       - "80"
+    depends_on:
+      - backend
+    links:
+      - backend
     environment:
       # App Configuration
       - NODE_ENV=production
