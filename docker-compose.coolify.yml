@@ -7,8 +7,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: production
-    ports:
-      - "3002"
     environment:
       # App Configuration
       - NODE_ENV=production
@@ -198,26 +196,20 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: production
-    ports:
-      - "80"
-    depends_on:
-      - backend
-    links:
-      - backend
     environment:
       # App Configuration
       - NODE_ENV=production
       - PORT=80
       
-      # Backend API Connection
-      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+      # Backend API Connection - IMPORTANTE: Debe apuntar a la URL pública del backend
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL:-https://dev-apiwaprueba.aova.mx}
       
       # Supabase Frontend Access (Para realtime)
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
       - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
       
       # Alternative API URLs
-      - VITE_API_URL=${VITE_API_URL}
+      - VITE_API_URL=${VITE_API_URL:-https://dev-apiwaprueba.aova.mx}
       
       # Frontend Logging
       - VITE_LOG_LEVEL=${VITE_LOG_LEVEL:-warn}
@@ -233,12 +225,6 @@ services:
       - VITE_USE_OPTIMISTIC_UPDATES=${VITE_USE_OPTIMISTIC_UPDATES:-true}
       - VITE_MESSAGE_BATCH_SIZE=${VITE_MESSAGE_BATCH_SIZE:-50}
       - VITE_CACHE_DURATION_MS=${VITE_CACHE_DURATION_MS:-300000}
-      
-      # SSL/Security Configuration
-      - NGINX_HOST=0.0.0.0
-      - NGINX_PORT=80
-      - HOSTNAME=0.0.0.0
-      - TRUST_PROXY=true
       
     restart: unless-stopped
     
