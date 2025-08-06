@@ -7,8 +7,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: production
-    expose:
-      - "3002"
     environment:
       # App Configuration
       - NODE_ENV=production
@@ -136,43 +134,34 @@ services:
     labels:
       - "coolify.managed=true"
       - "coolify.version=4"
-      - "coolify.service=wa-business-backend"
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       
       # Router HTTPS principal
-      - "traefik.http.routers.wa-business-backend.rule=Host(`dev-apiwaprueba.aova.mx`)"
-      - "traefik.http.routers.wa-business-backend.tls=true"
-      - "traefik.http.routers.wa-business-backend.tls.certresolver=myresolver"
-      - "traefik.http.routers.wa-business-backend.entrypoints=websecure"
-      - "traefik.http.routers.wa-business-backend.service=wa-business-backend"
-      
-      # Router HTTP (redirect a HTTPS)
-      - "traefik.http.routers.wa-business-backend-http.rule=Host(`dev-apiwaprueba.aova.mx`)"
-      - "traefik.http.routers.wa-business-backend-http.entrypoints=web"
-      - "traefik.http.routers.wa-business-backend-http.middlewares=backend-redirect-https"
-      - "traefik.http.routers.wa-business-backend-http.service=wa-business-backend"
-      
-      # Middleware para redirect HTTPS del backend
-      - "traefik.http.middlewares.backend-redirect-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.backend-redirect-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.wa-backend.rule=Host(`dev-apiwaprueba.aova.mx`)"
+      - "traefik.http.routers.wa-backend.tls=true"
+      - "traefik.http.routers.wa-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wa-backend.entrypoints=websecure"
       
       # Service configuration
-      - "traefik.http.services.wa-business-backend.loadbalancer.server.port=3002"
-      
-      # Security headers middleware
-      - "traefik.http.middlewares.backend-headers.headers.forcestsheader=true"
-      - "traefik.http.middlewares.backend-headers.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.backend-headers.headers.stsseconds=31536000"
-      - "traefik.http.middlewares.backend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.services.wa-backend.loadbalancer.server.port=3002"
       
       # CORS middleware
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=Content-Type,Authorization,X-Requested-With,Accept,Origin,X-CSRF-Token,X-Hub-Signature-256"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlistregex=^https://(.*\\.)?aova\\.mx$"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.wa-backend-cors.headers.accesscontrolallowmethods=*"
+      - "traefik.http.middlewares.wa-backend-cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.wa-backend-cors.headers.accesscontrolalloworiginlist=https://dev-waprueba.aova.mx"
+      - "traefik.http.middlewares.wa-backend-cors.headers.accesscontrolallowcredentials=true"
       
-      # Apply middlewares to HTTPS router
-      - "traefik.http.routers.wa-business-backend.middlewares=backend-headers,backend-cors"
+      # Apply middleware
+      - "traefik.http.routers.wa-backend.middlewares=wa-backend-cors"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     
     # Configuración de recursos
     deploy:
@@ -198,8 +187,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: production
-    expose:
-      - "80"
     environment:
       # App Configuration
       - NODE_ENV=production
@@ -236,44 +223,25 @@ services:
     labels:
       - "coolify.managed=true"
       - "coolify.version=4"
-      - "coolify.service=wa-business-frontend"
-      - "coolify.type=frontend"
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       
       # Router HTTPS principal
-      - "traefik.http.routers.wa-business-frontend.rule=Host(`dev-waprueba.aova.mx`)"
-      - "traefik.http.routers.wa-business-frontend.tls=true"
-      - "traefik.http.routers.wa-business-frontend.tls.certresolver=myresolver"
-      - "traefik.http.routers.wa-business-frontend.entrypoints=websecure"
-      - "traefik.http.routers.wa-business-frontend.service=wa-business-frontend"
-      
-      # Router HTTP (redirect a HTTPS)
-      - "traefik.http.routers.wa-business-frontend-http.rule=Host(`dev-waprueba.aova.mx`)"
-      - "traefik.http.routers.wa-business-frontend-http.entrypoints=web"
-      - "traefik.http.routers.wa-business-frontend-http.middlewares=frontend-redirect-https"
-      - "traefik.http.routers.wa-business-frontend-http.service=wa-business-frontend"
-      
-      # Middleware para redirect HTTPS del frontend
-      - "traefik.http.middlewares.frontend-redirect-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.frontend-redirect-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.wa-frontend.rule=Host(`dev-waprueba.aova.mx`)"
+      - "traefik.http.routers.wa-frontend.tls=true"
+      - "traefik.http.routers.wa-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wa-frontend.entrypoints=websecure"
       
       # Service configuration
-      - "traefik.http.services.wa-business-frontend.loadbalancer.server.port=80"
-      
-      # Security headers middleware
-      - "traefik.http.middlewares.frontend-headers.headers.forcestsheader=true"
-      - "traefik.http.middlewares.frontend-headers.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.frontend-headers.headers.stsseconds=31536000"
-      - "traefik.http.middlewares.frontend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.frontend-headers.headers.frameDeny=true"
-      - "traefik.http.middlewares.frontend-headers.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.frontend-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
-      
-      # CSP middleware - Actualizado para incluir Supabase Realtime
-      - "traefik.http.middlewares.frontend-csp.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: wss: https://dev-apiwaprueba.aova.mx wss://*.supabase.co https://*.supabase.co; font-src 'self' https:; object-src 'none';"
-      
-      # Apply middlewares to HTTPS router
-      - "traefik.http.routers.wa-business-frontend.middlewares=frontend-headers,frontend-csp"
+      - "traefik.http.services.wa-frontend.loadbalancer.server.port=80"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     
     # Configuración de recursos
     deploy:
@@ -291,4 +259,4 @@ services:
 
 networks:
   coolify:
-    external: true 
+    external: true
