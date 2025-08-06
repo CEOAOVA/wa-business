@@ -4,11 +4,11 @@ services:
   # Backend - WhatsApp Business API
   backend:
     build:
-      ports:
-      - "3002:3002"
       context: ./backend
       dockerfile: Dockerfile
       target: production
+    expose:
+      - "3002"
     environment:
       # App Configuration
       - NODE_ENV=production
@@ -195,11 +195,11 @@ services:
   # Frontend - React WhatsApp Business Panel
   frontend:
     build:
-      ports:
-      - "80:80"
       context: ./frontend
       dockerfile: Dockerfile
       target: production
+    expose:
+      - "80"
     environment:
       # App Configuration
       - NODE_ENV=production
