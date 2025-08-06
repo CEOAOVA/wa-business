@@ -50,14 +50,55 @@ export function debugAuth() {
     
     console.log('\n📊 DETALLES ADICIONALES:');
     console.log('  Longitud del token:', token.length, 'caracteres');
-    console.log('  Session ID:', payload.session_id || 'No disponible');
-    console.log('  AAL:', payload.aal || 'No disponible');
+    console.log('  Remember auth:', localStorage.getItem('rememberAuth'));
+    console.log('  User data:', localStorage.getItem('userData'));
     
     return payload;
   } catch (error) {
     console.error('❌ Error decodificando token:', error);
-    console.log('💡 El token puede estar corrupto. Intenta cerrar sesión y volver a iniciar.');
     return null;
+  }
+}
+
+// NUEVO: Función global para limpiar sesión
+export function clearSession() {
+  console.log('🧹 LIMPIANDO SESIÓN...');
+  
+  // Limpiar localStorage
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('rememberAuth');
+  localStorage.removeItem('userData');
+  localStorage.removeItem('appState');
+  localStorage.removeItem('chatState');
+  
+  // Limpiar sessionStorage
+  sessionStorage.clear();
+  
+  // Limpiar cookies
+  document.cookie.split(";").forEach((c) => {
+    document.cookie = c
+      .replace(/^ +/, "")
+      .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+  });
+  
+  console.log('✅ Sesión limpiada completamente');
+  console.log('🔄 Recargando página...');
+  
+  // Redirigir a login
+  window.location.href = '/login';
+}
+
+// NUEVO: Función para verificar estado de autenticación
+export function checkAuthState() {
+  console.log('🔍 ESTADO DE AUTENTICACIÓN:');
+  console.log('  Token:', localStorage.getItem('authToken') ? 'Presente' : 'Ausente');
+  console.log('  Remember auth:', localStorage.getItem('rememberAuth'));
+  console.log('  User data:', localStorage.getItem('userData'));
+  console.log('  Session storage:', sessionStorage.length > 0 ? 'Con datos' : 'Vacío');
+  console.log('  Cookies:', document.cookie ? 'Presentes' : 'Ausentes');
+  
+  if (localStorage.getItem('authToken')) {
+    console.log('\n💡 Para limpiar la sesión, ejecuta: clearSession()');
   }
 }
 
@@ -148,28 +189,123 @@ export async function testWebSocketConnection() {
   }, 30000);
 }
 
-/**
- * Limpiar sesión y recargar
- */
-export function clearAndReload() {
-  console.log('🧹 Limpiando sesión...');
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('rememberAuth');
-  console.log('✅ Sesión limpiada');
-  console.log('🔄 Recargando en 2 segundos...');
-  setTimeout(() => {
-    window.location.href = '/login';
-  }, 2000);
+// NUEVO: Función para probar conexión con el backend
+export function testBackendConnection() {
+  console.log('🔍 PROBANDO CONEXIÓN CON BACKEND...');
+  
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://dev-apiwaprueba.aova.mx';
+  console.log('🌐 URL del backend:', backendUrl);
+  
+  // Probar endpoint de health
+  fetch(`${backendUrl}/api/health`)
+    .then(response => {
+      console.log('✅ Backend responde:', response.status, response.statusText);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📊 Respuesta del backend:', data);
+    })
+    .catch(error => {
+      console.error('❌ Error conectando al backend:', error);
+    });
 }
 
-// Hacer disponibles en consola global
-if (typeof window !== 'undefined') {
-  (window as any).debugAuth = debugAuth;
-  (window as any).testWebSocket = testWebSocketConnection;
-  (window as any).clearAuth = clearAndReload;
+// NUEVO: Función para probar login con credenciales demo
+export function testLogin() {
+  console.log('🔐 PROBANDO LOGIN...');
   
-  console.log('🛠️ Herramientas de debug disponibles:');
-  console.log('  debugAuth() - Analizar token JWT');
+  const credentials = {
+    email: 'k.alvarado@aova.mx',
+    password: 'Agente2024!'
+  };
+  
+  console.log('📧 Credenciales de prueba:', credentials.email);
+  
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://dev-apiwaprueba.aova.mx';
+  
+  fetch(`${backendUrl}/api/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials)
+  })
+    .then(response => {
+      console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📊 Datos de respuesta:', data);
+      
+      if (data.success && data.data?.session?.access_token) {
+        console.log('✅ Login exitoso! Token recibido');
+        localStorage.setItem('authToken', data.data.session.access_token);
+        console.log('💾 Token guardado en localStorage');
+      } else {
+        console.error('❌ Login falló:', data.message || 'Respuesta inválida');
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error en login:', error);
+    });
+}
+
+// NUEVO: Función para verificar estado completo del sistema
+export function checkSystemStatus() {
+  console.log('🔍 VERIFICANDO ESTADO DEL SISTEMA...\n');
+  
+  // 1. Verificar variables de entorno
+  console.log('1️⃣ VARIABLES DE ENTORNO:');
+  console.log('  VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
+  console.log('  NODE_ENV:', import.meta.env.NODE_ENV);
+  console.log('  DEV:', import.meta.env.DEV);
+  
+  // 2. Verificar localStorage
+  console.log('\n2️⃣ LOCALSTORAGE:');
+  console.log('  authToken:', localStorage.getItem('authToken') ? 'Presente' : 'Ausente');
+  console.log('  rememberAuth:', localStorage.getItem('rememberAuth'));
+  console.log('  userData:', localStorage.getItem('userData'));
+  
+  // 3. Verificar sessionStorage
+  console.log('\n3️⃣ SESSIONSTORAGE:');
+  console.log('  Elementos:', sessionStorage.length);
+  
+  // 4. Verificar cookies
+  console.log('\n4️⃣ COOKIES:');
+  console.log('  Cookies:', document.cookie || 'No hay cookies');
+  
+  // 5. Verificar conexión de red
+  console.log('\n5️⃣ CONEXIÓN DE RED:');
+  console.log('  Online:', navigator.onLine);
+  console.log('  User Agent:', navigator.userAgent.substring(0, 50) + '...');
+  
+  console.log('\n💡 Para probar el backend, ejecuta: testBackendConnection()');
+  console.log('💡 Para probar login, ejecuta: testLogin()');
+}
+
+// Hacer funciones disponibles globalmente
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.debugAuth = debugAuth;
+  // @ts-ignore
+  window.clearSession = clearSession;
+  // @ts-ignore
+  window.checkAuthState = checkAuthState;
+  // @ts-ignore
+  window.testWebSocket = testWebSocketConnection;
+  // @ts-ignore
+  window.testBackendConnection = testBackendConnection;
+  // @ts-ignore
+  window.testLogin = testLogin;
+  // @ts-ignore
+  window.checkSystemStatus = checkSystemStatus;
+  
+  console.log('🔧 Funciones de debug disponibles:');
+  console.log('  debugAuth() - Analizar token actual');
+  console.log('  clearSession() - Limpiar sesión completamente');
+  console.log('  checkAuthState() - Verificar estado de autenticación');
   console.log('  testWebSocket() - Probar conexión WebSocket');
-  console.log('  clearAuth() - Limpiar sesión y recargar');
+  console.log('  testBackendConnection() - Probar conexión con backend');
+  console.log('  testLogin() - Probar login con credenciales demo');
+  console.log('  checkSystemStatus() - Verificar estado completo del sistema');
 }

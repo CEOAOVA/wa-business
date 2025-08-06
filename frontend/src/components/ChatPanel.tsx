@@ -167,7 +167,6 @@ const ChatPanel: React.FC = () => {
         isSubscribed: realtimeHookResult.stats.isSubscribed,
         messagesReceived: realtimeHookResult.stats.messagesReceived,
         errors: realtimeHookResult.stats.errors,
-        lastMessageReceived: realtimeHookResult.stats.lastMessageReceived,
         connectionStatus: realtimeHookResult.stats.connectionStatus,
         reconnectAttempts: realtimeHookResult.stats.reconnectAttempts
       });

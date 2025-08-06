@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { MessageCircle, Shield, Zap, Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
+import { MessageCircle, Shield, Zap, Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, RefreshCw, Bug, Trash2 } from "lucide-react";
 import Logo from "../components/LogoDebug";
 import { forceLogout } from "../utils/auth-cleanup";
 
@@ -91,6 +91,24 @@ const Login: React.FC = () => {
     setEmail(credentials.email);
     setPassword(credentials.password);
     setRemember(true);
+  };
+
+  // Función para debug de sesión
+  const debugSession = () => {
+    const token = localStorage.getItem('authToken');
+    console.log('🔍 [Debug] Token actual:', token ? token.substring(0, 30) + '...' : 'No hay token');
+    console.log('🔍 [Debug] Remember auth:', localStorage.getItem('rememberAuth'));
+    console.log('🔍 [Debug] User data:', localStorage.getItem('userData'));
+  };
+
+  // Función para limpiar sesión sin redirigir
+  const clearSessionOnly = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('rememberAuth');
+    localStorage.removeItem('userData');
+    sessionStorage.clear();
+    console.log('🧹 [Debug] Sesión limpiada (sin redirigir)');
+    window.location.reload();
   };
 
   const features = [
@@ -410,6 +428,30 @@ const Login: React.FC = () => {
             >
               <RefreshCw className="w-4 h-4" />
               <span>Limpiar Sesión</span>
+            </motion.button>
+
+            {/* Botón de debug */}
+            <motion.button
+              type="button"
+              onClick={debugSession}
+              className="w-full py-3 px-6 bg-gray-800 text-gray-300 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-transparent hover:bg-gray-700 flex items-center justify-center gap-3 text-sm"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Bug className="w-4 h-4" />
+              <span>Debug Sesión</span>
+            </motion.button>
+
+            {/* Botón para limpiar sesión sin redirigir */}
+            <motion.button
+              type="button"
+              onClick={clearSessionOnly}
+              className="w-full py-3 px-6 bg-red-600 text-white font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-transparent hover:bg-red-700 flex items-center justify-center gap-3 text-sm"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Limpiar Sesión (Sin Redirigir)</span>
             </motion.button>
           </motion.form>
         </div>

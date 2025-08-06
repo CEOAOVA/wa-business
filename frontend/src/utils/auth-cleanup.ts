@@ -44,11 +44,47 @@ export const clearAllAuthData = (): void => {
   console.log('✅ Datos de autenticación limpiados completamente');
 };
 
+// NUEVO: Función para forzar logout completo
 export const forceLogout = (): void => {
+  console.log('🧹 [forceLogout] Limpiando sesión completamente...');
+  
+  // Limpiar todos los datos de autenticación
   clearAllAuthData();
   
-  // Redirigir al login
-  window.location.href = '/login';
+  // Limpiar cualquier estado de la aplicación
+  if (typeof window !== 'undefined') {
+    // Limpiar cualquier estado en sessionStorage
+    sessionStorage.clear();
+    
+    // Limpiar cualquier dato en localStorage relacionado con la app
+    const keysToRemove = [
+      'authToken',
+      'rememberAuth',
+      'userData',
+      'appState',
+      'chatState',
+      'websocketState'
+    ];
+    
+    keysToRemove.forEach(key => {
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+        console.log(`🧹 [forceLogout] Removido: ${key}`);
+      }
+    });
+    
+    // Limpiar cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    
+    console.log('✅ [forceLogout] Sesión limpiada completamente');
+    
+    // Redirigir a login
+    window.location.href = '/login';
+  }
 };
 
 // Función para verificar si hay datos de autenticación

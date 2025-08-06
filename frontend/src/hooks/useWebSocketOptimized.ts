@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAppStore } from '../stores/appStore';
 
-// Use relative path to leverage Vite proxy in development
+// Configuración del backend - Usando variables de entorno
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'https://dev-apiwaprueba.aova.mx');
 
 export interface WebSocketMessage {
@@ -17,7 +16,7 @@ export interface WebSocketMessage {
     read: boolean;
     conversationId: string;
     contactId: string;
-    clientId?: string; // NUEVO: Identificador único del frontend para evitar duplicados
+    clientId?: string;
   };
   conversation: {
     id: string;
@@ -44,58 +43,65 @@ interface WebSocketConfig {
   messageQueueSize: number;
 }
 
-const DEFAULT_CONFIG: WebSocketConfig = {
-  maxRetries: 15,
-  baseDelay: 500, // 0.5 segundos
-  maxDelay: 30000, // 30 segundos
-  heartbeatInterval: 5000, // 5 segundos - SINCRONIZADO con backend
-  heartbeatTimeout: 8000, // 8 segundos - SINCRONIZADO con backend
-  reconnectOnClose: true,
-  autoReconnect: true,
-  messageQueueSize: 100,
-};
-
 export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
-  const finalConfig = { ...DEFAULT_CONFIG, ...config };
+  // Configuración por defecto estable
+  const defaultConfig: WebSocketConfig = {
+    maxRetries: 5,
+    baseDelay: 1000,
+    maxDelay: 30000,
+    heartbeatInterval: 25000,
+    heartbeatTimeout: 8000,
+    reconnectOnClose: true,
+    autoReconnect: true,
+    messageQueueSize: 50,
+  };
+
+  const finalConfig = useMemo(() => ({
+    ...defaultConfig,
+    ...config,
+  }), [config]);
+
+  // Estados estables
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [lastHeartbeat, setLastHeartbeat] = useState<Date | null>(null);
-  const [connectionQuality, setConnectionQuality] = useState<'excellent' | 'good' | 'poor'>('good');
-  
+  const [connectionQuality, setConnectionQuality] = useState<'excellent' | 'good' | 'poor'>('poor');
+
+  // Refs estables
   const socketRef = useRef<Socket | null>(null);
-  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const heartbeatTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isConnectingRef = useRef(false);
-  const messageQueueRef = useRef<any[]>([]);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastPingTimeRef = useRef<number>(0);
   const connectionStartTimeRef = useRef<number>(0);
-  
-  const { 
-    setConnectionState, 
-    incrementRetryCount, 
-    resetRetryCount, 
-    addNotification,
-    addMessage,
-    addChat,
-    updateChat
-  } = useAppStore();
+  const messageQueueRef = useRef<Array<{ event: string; data: any; timestamp: number }>>([]);
+  const hasInitializedRef = useRef(false);
 
-  // Calcular delay exponencial con jitter mejorado
+  // Callbacks para eventos de WebSocket
+  const [newMessageCallback, setNewMessageCallback] = useState<((data: WebSocketMessage) => void) | null>(null);
+  const [conversationUpdateCallback, setConversationUpdateCallback] = useState<((data: ConversationUpdateEvent) => void) | null>(null);
+
+  // Verificar token de forma estable - SOLO UNA VEZ
+  const hasValidToken = useMemo(() => {
+    const token = localStorage.getItem('authToken');
+    return token && token.length >= 100;
+  }, []);
+
+  // Calcular delay exponencial con jitter mejorado - ESTABLE
   const calculateDelay = useCallback((attempt: number): number => {
     const exponentialDelay = Math.min(
-      finalConfig.baseDelay * Math.pow(1.5, attempt), // Backoff más suave
+      finalConfig.baseDelay * Math.pow(1.5, attempt),
       finalConfig.maxDelay
     );
     
-    // Jitter más inteligente basado en el intento
     const jitterFactor = Math.min(attempt * 0.1, 0.5);
     const jitter = Math.random() * jitterFactor * exponentialDelay;
     return exponentialDelay + jitter;
-  }, [finalConfig]);
+  }, [finalConfig.baseDelay, finalConfig.maxDelay]);
 
-  // Limpiar timeouts y intervals
+  // Limpiar timeouts y intervals - ESTABLE
   const clearTimeouts = useCallback(() => {
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
@@ -111,7 +117,7 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     }
   }, []);
 
-  // Procesar cola de mensajes
+  // Procesar cola de mensajes - ESTABLE
   const processMessageQueue = useCallback(() => {
     if (!socketRef.current?.connected || messageQueueRef.current.length === 0) {
       return;
@@ -122,13 +128,13 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
 
     messages.forEach(({ event, data, timestamp }) => {
       const age = Date.now() - timestamp;
-      if (age < 30000) { // Solo procesar mensajes de menos de 30 segundos
+      if (age < 30000) {
         socketRef.current?.emit(event, data);
       }
     });
   }, []);
 
-  // Configurar heartbeat optimizado
+  // Configurar heartbeat optimizado - ESTABLE
   const setupHeartbeat = useCallback(() => {
     if (heartbeatIntervalRef.current) {
       clearInterval(heartbeatIntervalRef.current);
@@ -142,7 +148,6 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
         console.log('💓 Enviando heartbeat...');
         socketRef.current.emit('ping', { timestamp: now });
         
-        // Configurar timeout para heartbeat
         if (heartbeatTimeoutRef.current) {
           clearTimeout(heartbeatTimeoutRef.current);
         }
@@ -156,7 +161,7 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     }, finalConfig.heartbeatInterval);
   }, [finalConfig.heartbeatInterval, finalConfig.heartbeatTimeout]);
 
-  // Manejar heartbeat response con métricas
+  // Manejar heartbeat response con métricas - ESTABLE
   const handlePong = useCallback((data: { timestamp: number }) => {
     const now = Date.now();
     const latency = now - data.timestamp;
@@ -167,7 +172,6 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       heartbeatTimeoutRef.current = null;
     }
 
-    // Evaluar calidad de conexión basada en latencia
     if (latency < 100) {
       setConnectionQuality('excellent');
     } else if (latency < 500) {
@@ -179,10 +183,17 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     console.log(`💓 Heartbeat recibido - Latencia: ${latency}ms`);
   }, []);
 
-  // Conectar WebSocket con optimizaciones
+  // Conectar WebSocket con optimizaciones - ESTABLE
   const connect = useCallback(() => {
     if (isConnectingRef.current || socketRef.current?.connected) {
       console.log('🌐 WebSocket ya está conectando/conectado');
+      return;
+    }
+
+    // NO CONECTAR SI NO HAY TOKEN VÁLIDO
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken || authToken.length < 100) {
+      console.log('🔒 No hay token válido - saltando conexión');
       return;
     }
 
@@ -190,13 +201,7 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     connectionStartTimeRef.current = Date.now();
     
     console.log(`🔌 Conectando a WebSocket... (intento ${retryCount + 1}/${finalConfig.maxRetries})`);
-    
-    setConnectionState({
-      isConnecting: true,
-      connectionError: undefined,
-    });
 
-    // Limpiar cualquier socket anterior
     if (socketRef.current) {
       try {
         socketRef.current.removeAllListeners();
@@ -206,62 +211,29 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       }
       socketRef.current = null;
     }
-
-    // Obtener y validar token
-    const authToken = localStorage.getItem('authToken');
-    
-    if (!authToken) {
-      console.error('❌ No hay token de autenticación');
-      setConnectionError('No hay token de autenticación - Inicia sesión');
-      isConnectingRef.current = false;
-      
-      // Notificar al usuario
-      addNotification({
-        type: 'error',
-        title: 'No autenticado',
-        message: 'Por favor inicia sesión para continuar',
-        isRead: false,
-      });
-      
-      // Redirigir a login después de 2 segundos
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 2000);
-      
-      return;
-    }
-    
-    // Validar formato del token
-    if (authToken.length < 100) {
-      console.error('❌ Token parece inválido (muy corto)');
-      localStorage.removeItem('authToken');
-      window.location.href = '/login';
-      return;
-    }
     
     console.log('🔐 Token encontrado, longitud:', authToken.length);
     console.log('🔐 Primeros 30 caracteres:', authToken.substring(0, 30) + '...');
     console.log('🌐 Conectando a:', BACKEND_URL);
     
     const socket = io(BACKEND_URL, {
-      transports: ['websocket'], // Solo websocket como el backend requiere
+      transports: ['websocket'],
       auth: {
-        token: authToken // Sin "Bearer " - solo el token
+        token: authToken
       },
       query: {
-        token: authToken // Respaldo en query params
+        token: authToken
       },
-      timeout: 30000, // Aumentar timeout a 30 segundos
+      timeout: 30000,
       forceNew: true,
-      reconnection: false, // Manejar reconexión manualmente
+      reconnection: false,
       autoConnect: true,
       closeOnBeforeunload: false,
-      upgrade: false, // No upgrade porque solo usamos websocket
-      reconnectionAttempts: 0, // Deshabilitar reconexión automática
-      withCredentials: true, // Para CORS
+      upgrade: false,
+      reconnectionAttempts: 0,
+      withCredentials: true,
     });
 
-    // Configurar listeners ANTES de asignar el socket
     socket.on('connect', () => {
       const connectionTime = Date.now() - connectionStartTimeRef.current;
       console.log(`✅ WebSocket conectado en ${connectionTime}ms:`, socket.id);
@@ -271,24 +243,8 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       setRetryCount(0);
       isConnectingRef.current = false;
       
-      setConnectionState({
-        isConnected: true,
-        isConnecting: false,
-        lastConnected: new Date(),
-        connectionError: undefined,
-        retryCount: 0,
-      });
-
-      resetRetryCount();
       setupHeartbeat();
-      processMessageQueue(); // Procesar mensajes en cola
-      
-      addNotification({
-        type: 'success',
-        title: 'Conectado',
-        message: `Conexión establecida en ${connectionTime}ms`,
-        isRead: false,
-      });
+      processMessageQueue();
     });
 
     socket.on('disconnect', (reason) => {
@@ -297,13 +253,6 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
       isConnectingRef.current = false;
       clearTimeouts();
       
-      setConnectionState({
-        isConnected: false,
-        isConnecting: false,
-        connectionError: reason || 'Desconexión desconocida',
-      });
-
-      // Solo reconectar si no fue una desconexión intencional
       if (reason !== 'io client disconnect' && finalConfig.reconnectOnClose) {
         handleReconnect();
       }
@@ -316,144 +265,59 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
         data: error.data || null
       });
       
-      // Si es error de autenticación
       if (error.message?.includes('auth') || error.message?.includes('Invalid') || error.message?.includes('No authentication')) {
         console.error('❌ Token inválido o expirado, requiere nuevo login');
         localStorage.removeItem('authToken');
-        // Notificar al usuario
-        addNotification({
-          type: 'error',
-          title: 'Sesión expirada',
-          message: 'Por favor inicia sesión nuevamente',
-          isRead: false,
-        });
+        window.location.href = '/login';
+        return;
       }
       
       setConnectionError(error.message);
       setIsConnected(false);
       isConnectingRef.current = false;
       
-      setConnectionState({
-        isConnected: false,
-        isConnecting: false,
-        connectionError: error.message,
-      });
-
-      // Solo reintentar si NO es error de autenticación
       if (finalConfig.autoReconnect && !error.message?.includes('auth') && !error.message?.includes('token')) {
         handleReconnect();
       }
     });
 
-    // Eventos de heartbeat
     socket.on('pong', handlePong);
-
-    // Eventos de mensajería con optimizaciones
-    socket.on('new_message', (data: WebSocketMessage) => {
+    socket.on('new_message', (data) => {
       console.log('📨 Nuevo mensaje recibido:', data);
-      
-      try {
-        // Procesar mensaje entrante
-        const message = {
-          id: data.message.id,
-          chatId: data.message.conversationId,
-          senderId: data.message.from,
-          content: data.message.message,
-          type: data.message.type as 'text' | 'image' | 'document' | 'audio' | 'video',
-          timestamp: new Date(data.message.timestamp),
-          isRead: data.message.read,
-          isDelivered: true,
-          status: 'delivered' as const,
-          metadata: {
-            waMessageId: data.message.waMessageId,
-            clientId: data.message.clientId
-          }
-        };
-        
-        // Agregar mensaje al store
-        addMessage(message);
-        
-        // Actualizar/crear chat
-        const chat = {
-          id: data.conversation.id,
-          clientId: data.conversation.contactId,
-          clientName: data.conversation.contactName,
-          clientPhone: data.conversation.contactId,
-          unreadCount: data.conversation.unreadCount,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          tags: [],
-          priority: 'medium' as const,
-          status: 'open' as const,
-          aiMode: 'active' as const
-        };
-        
-        addChat(chat);
-        
-        console.log('✅ Mensaje procesado y agregado al store');
-      } catch (error) {
-        console.error('❌ Error procesando mensaje WebSocket:', error);
+      if (newMessageCallback) {
+        newMessageCallback(data);
       }
     });
-
-    socket.on('conversation_updated', (data: ConversationUpdateEvent) => {
+    
+    socket.on('conversation_updated', (data) => {
       console.log('📝 Conversación actualizada:', data);
-      
-      try {
-        // Actualizar conversación en el store
-        updateChat(data.conversationId, {
-          unreadCount: data.unreadCount,
-          updatedAt: new Date()
-        });
-        
-        console.log('✅ Conversación actualizada en el store');
-      } catch (error) {
-        console.error('❌ Error actualizando conversación WebSocket:', error);
+      if (conversationUpdateCallback) {
+        conversationUpdateCallback(data);
       }
     });
 
-    // Eventos de estado de conexión
-    socket.on('reconnect_attempt', (attemptNumber) => {
-      console.log(`🔄 Intento de reconexión ${attemptNumber}`);
-    });
-
-    socket.on('reconnect_failed', () => {
-      console.error('❌ Falló la reconexión automática');
-    });
-
-    // Asignar el socket DESPUÉS de configurar todos los listeners
     socketRef.current = socket;
-  }, [retryCount, finalConfig, setConnectionState, resetRetryCount, setupHeartbeat, addNotification, clearTimeouts, handlePong, processMessageQueue]);
+  }, [retryCount, finalConfig.maxRetries, finalConfig.reconnectOnClose, finalConfig.autoReconnect, setupHeartbeat, processMessageQueue, clearTimeouts, handlePong, newMessageCallback, conversationUpdateCallback]);
 
-  // Manejar reconexión con backoff exponencial mejorado
+  // Manejar reconexión con backoff exponencial mejorado - ESTABLE
   const handleReconnect = useCallback(() => {
     if (retryCount >= finalConfig.maxRetries) {
       console.error(`❌ Máximo número de reintentos alcanzado (${finalConfig.maxRetries})`);
       setConnectionError('No se pudo establecer conexión después de múltiples intentos');
-      
-      addNotification({
-        type: 'error',
-        title: 'Error de conexión',
-        message: 'No se pudo conectar al servidor. Verifica tu conexión a internet.',
-        isRead: false,
-      });
-      
       return;
     }
 
     const delay = calculateDelay(retryCount);
     console.log(`🔄 Reintentando conexión en ${delay}ms...`);
     
-    incrementRetryCount();
     setRetryCount(prev => prev + 1);
     
     retryTimeoutRef.current = setTimeout(() => {
       connect();
     }, delay);
-  }, [retryCount, finalConfig.maxRetries, calculateDelay, incrementRetryCount, connect, addNotification]);
+  }, [retryCount, finalConfig.maxRetries, calculateDelay, connect]);
 
-  // Desconectar WebSocket
+  // Desconectar WebSocket - ESTABLE
   const disconnect = useCallback(() => {
     console.log('🔌 Desconectando WebSocket...');
     clearTimeouts();
@@ -477,35 +341,26 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     setConnectionError(null);
     setRetryCount(0);
     isConnectingRef.current = false;
-    
-    setConnectionState({
-      isConnected: false,
-      isConnecting: false,
-      connectionError: undefined,
-      retryCount: 0,
-    });
-  }, [clearTimeouts, setConnectionState]);
+  }, [clearTimeouts]);
 
-  // Reconectar manualmente
+  // Reconectar manualmente - ESTABLE
   const reconnect = useCallback(() => {
     console.log('🔄 Reconexión manual iniciada...');
     disconnect();
     setRetryCount(0);
-    resetRetryCount();
     
     setTimeout(() => {
       connect();
-    }, 500); // Reducido para reconexión más rápida
-  }, [disconnect, connect, resetRetryCount]);
+    }, 500);
+  }, [disconnect, connect]);
 
-  // Unirse a una conversación específica
+  // Unirse a una conversación específica - ESTABLE
   const joinConversation = useCallback((conversationId: string) => {
     if (socketRef.current?.connected) {
       console.log(`📨 Uniéndose a conversación: ${conversationId}`);
       socketRef.current.emit('join_conversation', conversationId);
     } else {
       console.warn('⚠️ No se puede unir a conversación - WebSocket no conectado');
-      // Agregar a la cola para enviar cuando se reconecte
       messageQueueRef.current.push({
         event: 'join_conversation',
         data: conversationId,
@@ -514,7 +369,7 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     }
   }, []);
 
-  // Salir de una conversación
+  // Salir de una conversación - ESTABLE
   const leaveConversation = useCallback((conversationId: string) => {
     if (socketRef.current?.connected) {
       console.log(`📤 Saliendo de conversación: ${conversationId}`);
@@ -522,16 +377,12 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     }
   }, []);
 
-  // Enviar mensaje personalizado con cola
+  // Enviar mensaje personalizado con cola - ESTABLE
   const sendMessage = useCallback((event: string, data: any) => {
     if (socketRef.current?.connected) {
-      console.log(`📤 Enviando evento ${event}:`, data);
       socketRef.current.emit(event, data);
-      return true;
     } else {
-      console.warn('⚠️ No se puede enviar mensaje - WebSocket no conectado, agregando a cola');
-      
-      // Agregar a la cola si hay espacio
+      console.warn('⚠️ No se puede enviar mensaje - WebSocket no conectado');
       if (messageQueueRef.current.length < finalConfig.messageQueueSize) {
         messageQueueRef.current.push({
           event,
@@ -539,36 +390,8 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
           timestamp: Date.now()
         });
       }
-      return false;
     }
   }, [finalConfig.messageQueueSize]);
-
-  // Efecto para conectar automáticamente
-  useEffect(() => {
-    const isMountedRef = { current: true };
-    
-    if (isMountedRef.current) {
-      connect();
-    }
-
-    // Cleanup al desmontar
-    return () => {
-      isMountedRef.current = false;
-      disconnect();
-    };
-  }, []); // Solo ejecutar una vez al montar
-
-  // Efecto para manejar cambios en el estado de conexión
-  useEffect(() => {
-    if (!isConnected && !connectionError && retryCount === 0) {
-      // Primera conexión fallida
-      handleReconnect();
-    }
-  }, [isConnected, connectionError, retryCount, handleReconnect]);
-
-  // Callbacks para eventos de WebSocket
-  const [newMessageCallback, setNewMessageCallback] = useState<((data: WebSocketMessage) => void) | null>(null);
-  const [conversationUpdateCallback, setConversationUpdateCallback] = useState<((data: ConversationUpdateEvent) => void) | null>(null);
 
   // Configurar callbacks para eventos
   const onNewMessage = useCallback((callback: (data: WebSocketMessage) => void) => {
@@ -579,34 +402,27 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     setConversationUpdateCallback(() => callback);
   }, []);
 
-  // Efecto para manejar eventos de WebSocket
+  // UN SOLO EFECTO PARA INICIALIZAR - SIN BUCLE
   useEffect(() => {
-    if (!socketRef.current) return;
-
-    const handleNewMessage = (data: WebSocketMessage) => {
-      console.log('📨 Nuevo mensaje recibido:', data);
-      if (newMessageCallback) {
-        newMessageCallback(data);
-      }
-    };
-
-    const handleConversationUpdate = (data: ConversationUpdateEvent) => {
-      console.log('📝 Conversación actualizada:', data);
-      if (conversationUpdateCallback) {
-        conversationUpdateCallback(data);
-      }
-    };
-
-    socketRef.current.on('new_message', handleNewMessage);
-    socketRef.current.on('conversation_updated', handleConversationUpdate);
+    // Solo inicializar una vez
+    if (hasInitializedRef.current) {
+      return;
+    }
+    
+    hasInitializedRef.current = true;
+    
+    // Solo conectar si hay token válido Y no está ya conectado
+    if (hasValidToken && !isConnected && !isConnectingRef.current) {
+      console.log('🔌 [useWebSocketOptimized] Inicializando conexión...');
+      connect();
+    } else {
+      console.log('🔒 [useWebSocketOptimized] No hay token válido o ya está conectando');
+    }
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.off('new_message', handleNewMessage);
-        socketRef.current.off('conversation_updated', handleConversationUpdate);
-      }
+      disconnect();
     };
-  }, [newMessageCallback, conversationUpdateCallback]);
+  }, []); // SIN DEPENDENCIAS - SOLO UNA VEZ
 
   // Memoizar valores de retorno para evitar re-renders innecesarios
   const returnValue = useMemo(() => ({
@@ -631,8 +447,6 @@ export function useWebSocketOptimized(config: Partial<WebSocketConfig> = {}) {
     
     // Utilidades
     socket: socketRef.current,
-    canSend: isConnected && socketRef.current?.connected,
-    messageQueueSize: messageQueueRef.current.length,
   }), [
     isConnected,
     connectionError,

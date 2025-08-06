@@ -55,6 +55,27 @@ const DEFAULT_CONFIG: WebSocketConfig = {
 };
 
 export function useWebSocket(config: Partial<WebSocketConfig> = {}) {
+  // Chequeo de token al inicio del hook
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const hasValidToken = !!authToken && authToken.length > 100;
+  // Si no hay token válido, retorna early un objeto mínimo sin conectar
+  if (!hasValidToken) {
+    return {
+      isConnected: false,
+      connectionError: 'No hay token de autenticación',
+      connect: () => {},
+      disconnect: () => {},
+      sendMessage: () => {},
+      onNewMessage: () => {},
+      onConversationUpdate: () => {},
+      onConnectionChange: () => {},
+      connectionQuality: 'poor',
+      retryCount: 0,
+      lastHeartbeat: null,
+      processMessageQueue: () => {},
+      addNotification: () => {},
+    };
+  }
   const finalConfig = { ...DEFAULT_CONFIG, ...config };
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);

@@ -227,6 +227,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 
 // Contexto
 interface AppContextType {
+  isAuthenticated: boolean;
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
   // WebSocket estado
@@ -259,6 +260,8 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  // Chequeo de token al inicio del provider
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Integración WebSocket para mensajería en tiempo real
@@ -653,7 +656,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Salir de la conversación anterior si existe
     if (state.currentChat) {
       const currentConversationId = extractConversationId(state.currentChat.id);
-      if (currentConversationId) {
+      if (currentConversationId && webSocket?.leaveConversation) {
         webSocket.leaveConversation(currentConversationId);
       }
     }
@@ -663,7 +666,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     // Unirse a la nueva conversación
     const conversationId = extractConversationId(chat.id);
-    if (conversationId) {
+    if (conversationId && webSocket?.joinConversation) {
       webSocket.joinConversation(conversationId);
     }
 
@@ -1032,13 +1035,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AppContextType = {
+  // Crear el valor del contexto
+  const contextValue: AppContextType = {
     state,
     dispatch,
-    // WebSocket estado
-    isWebSocketConnected: webSocket.isConnected,
-    webSocketError: webSocket.connectionError,
-    // Funciones
+    isWebSocketConnected: webSocket?.isConnected || false,
+    webSocketError: webSocket?.connectionError || null,
     selectChat,
     sendMessage,
     markChatAsRead,
@@ -1052,10 +1054,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     injectTestWhatsAppMessage,
     injectTestOutgoingMessage,
     updateChatTakeoverMode,
+    isAuthenticated: !!authToken && authToken.length > 100,
   };
 
   return (
-    <AppContext.Provider value={value}>
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );

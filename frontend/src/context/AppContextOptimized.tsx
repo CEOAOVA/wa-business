@@ -6,6 +6,9 @@ import { dashboardApiService } from '../services/dashboard-api';
 import { useWebSocketOptimized, type WebSocketMessage, type ConversationUpdateEvent } from '../hooks/useWebSocketOptimized';
 import '../utils/auth-debug'; // Cargar herramientas de debug al inicio
 
+// Crear el contexto
+const AppContextOptimized = createContext<AppContextOptimizedType | undefined>(undefined);
+
 // Estado inicial optimizado
 const initialState: AppState = {
   currentChat: null,
@@ -222,6 +225,7 @@ const appReducerOptimized = (state: AppState, action: AppAction): AppState => {
 
 // Contexto optimizado
 interface AppContextOptimizedType {
+  isAuthenticated: boolean;
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
   // WebSocket estado optimizado
@@ -252,6 +256,8 @@ interface AppProviderOptimizedProps {
 }
 
 export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ children }) => {
+  // Chequeo de token al inicio del provider
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
   const [state, dispatch] = useReducer(appReducerOptimized, initialState);
 
   // Formatear número de teléfono para mostrar
@@ -266,7 +272,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
   const {
     isConnected: isWebSocketConnected,
     connectionError: webSocketError,
-    connectionQuality,
+    connectionQuality: wsConnectionQuality,
     onNewMessage,
     onConversationUpdate,
   } = useWebSocketOptimized({
@@ -275,6 +281,12 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     heartbeatInterval: 20000,
     messageQueueSize: 50
   });
+
+  // Asegurar que connectionQuality tenga el tipo correcto
+  const connectionQuality: 'excellent' | 'good' | 'poor' = 
+    wsConnectionQuality === 'excellent' || wsConnectionQuality === 'good' || wsConnectionQuality === 'poor' 
+      ? wsConnectionQuality 
+      : 'good';
 
   // Función para cargar mensajes de una conversación (debe estar antes de selectChat)
   const loadConversationMessages = useCallback(async (conversationId: string) => {
@@ -725,6 +737,41 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     onConversationUpdate(handleConversationUpdate);
   }, [onNewMessage, onConversationUpdate, state.messages]);
 
+  // Función para cargar datos iniciales
+  const loadInitialData = async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // Solo cargar conversaciones si hay token
+      if (authToken) {
+        await loadNewSchemaConversations();
+        console.log('✅ [AppContextOptimized] Conversaciones cargadas exitosamente');
+      } else {
+        console.log('🔒 [AppContextOptimized] Sin token, saltando carga de conversaciones');
+      }
+      
+    } catch (error: any) {
+      console.error('❌ [AppContextOptimized] Error:', error);
+      
+      // Si es error 401, token inválido
+      if (error?.status === 401 || error?.response?.status === 401) {
+        console.error('❌ Token inválido o expirado');
+        localStorage.removeItem('authToken');
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: 'Sesión expirada, por favor inicia sesión nuevamente' 
+        });
+      } else {
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: 'Error cargando conversaciones: ' + (error?.message || 'Error desconocido')
+        });
+      }
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
   // Carga inicial de conversaciones al montar el componente
   useEffect(() => {
     console.log('🚀 [AppContextOptimized] Iniciando...');
@@ -733,48 +780,15 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     const authToken = localStorage.getItem('authToken');
     
     if (!authToken) {
-      console.warn('⚠️ No hay token de autenticación, algunas funciones estarán limitadas');
-      // No bloquear completamente, pero advertir al usuario
+      console.log('🔒 [AppContextOptimized] No hay token de autenticación - saltando carga inicial');
+      // NO cargar datos si no hay token - esto es el comportamiento correcto
+      return;
     } else {
-      console.log('✅ Token encontrado:', authToken.substring(0, 20) + '...');
+      console.log('✅ [AppContextOptimized] Token encontrado:', authToken.substring(0, 20) + '...');
+      // Solo cargar datos si hay token válido
+      loadInitialData();
     }
-    
-    const loadInitialData = async () => {
-      try {
-        dispatch({ type: 'SET_LOADING', payload: true });
-        
-        // Solo cargar conversaciones si hay token
-        if (authToken) {
-          await loadNewSchemaConversations();
-          console.log('✅ [AppContextOptimized] Conversaciones cargadas exitosamente');
-        } else {
-          console.log('🔒 [AppContextOptimized] Sin token, saltando carga de conversaciones');
-        }
-        
-      } catch (error: any) {
-        console.error('❌ [AppContextOptimized] Error:', error);
-        
-        // Si es error 401, token inválido
-        if (error?.status === 401 || error?.response?.status === 401) {
-          console.error('❌ Token inválido o expirado');
-          localStorage.removeItem('authToken');
-          dispatch({ 
-            type: 'SET_ERROR', 
-            payload: 'Sesión expirada, por favor inicia sesión nuevamente' 
-          });
-        } else {
-          dispatch({ 
-            type: 'SET_ERROR', 
-            payload: 'Error cargando conversaciones: ' + (error?.message || 'Error desconocido')
-          });
-        }
-      } finally {
-        dispatch({ type: 'SET_LOADING', payload: false });
-      }
-    };
-    
-    loadInitialData();
-  }, []); // Solo ejecutar una vez al montar
+  }, [loadNewSchemaConversations]);
 
   // Memoizar el valor del contexto para evitar re-renders
   const contextValue = useMemo<AppContextOptimizedType>(() => ({
@@ -796,6 +810,7 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     injectTestWhatsAppMessage,
     injectTestOutgoingMessage,
     updateChatTakeoverMode,
+    isAuthenticated: !!localStorage.getItem('authToken'),
   }), [
     state,
     isWebSocketConnected,
@@ -822,9 +837,6 @@ export const AppProviderOptimized: React.FC<AppProviderOptimizedProps> = ({ chil
     </AppContextOptimized.Provider>
   );
 };
-
-// Crear el contexto
-const AppContextOptimized = createContext<AppContextOptimizedType | undefined>(undefined);
 
 // Hook optimizado para usar el contexto
 export const useAppOptimized = (): AppContextOptimizedType => {

@@ -31,6 +31,22 @@ export const useRealtimeMessages = (
   conversationId: string | undefined,
   options: UseRealtimeMessagesOptions = {}
 ) => {
+  // Chequeo de token al inicio del hook
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const hasValidToken = !!authToken && authToken.length > 100;
+  if (!hasValidToken) {
+    return {
+      stats: {
+        isEnabled: false,
+        isSubscribed: false,
+        messagesReceived: 0,
+        errors: 0,
+        reconnectAttempts: 0,
+        connectionStatus: 'disconnected',
+      },
+      cleanup: () => {},
+    };
+  }
   const { dispatch } = useAppOptimized();
   const [stats, setStats] = useState<RealtimeStats>({
     isEnabled: false,

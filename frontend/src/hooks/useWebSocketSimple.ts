@@ -33,6 +33,22 @@ export interface ConversationUpdateEvent {
 }
 
 export function useWebSocketSimple() {
+  // Chequeo de token al inicio del hook
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const hasValidToken = !!authToken && authToken.length > 100;
+  // Si no hay token válido, retorna early un objeto mínimo sin conectar
+  if (!hasValidToken) {
+    return {
+      isConnected: false,
+      connectionError: 'No hay token de autenticación',
+      connect: () => {},
+      disconnect: () => {},
+      sendMessage: () => {},
+      onNewMessage: () => {},
+      onConversationUpdate: () => {},
+      onConnectionChange: () => {},
+    };
+  }
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
