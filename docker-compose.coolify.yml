@@ -186,7 +186,7 @@ services:
       - PORT=80
       
       # Backend API Connection
-      - VITE_BACKEND_URL=${VITE_BACKEND_URL:-https://dev-apiwaprueba.aova.mx}
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
       
       # Supabase Frontend Access (Para realtime)
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
