@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applySecurity = exports.validateUserAgent = exports.securityLogger = exports.webhookRateLimit = exports.whatsappRateLimit = exports.authRateLimit = exports.generalRateLimit = exports.configureSecurityHeaders = exports.configureCORS = void 0;
+exports.applySecurity = exports.validateUserAgent = exports.securityLogger = exports.webhookRateLimit = exports.whatsappRateLimit = exports.generalRateLimit = exports.configureSecurityHeaders = exports.configureCORS = void 0;
 /**
  * Middleware de seguridad para WhatsApp Business Platform
  * Implementa CORS restrictivo, headers de seguridad y rate limiting
@@ -174,45 +174,8 @@ exports.generalRateLimit = (0, express_rate_limit_1.default)({
         });
     }
 });
-/**
- * Rate limiting para autenticación
- */
-exports.authRateLimit = (0, express_rate_limit_1.default)({
-    windowMs: 5 * 60 * 1000, // 5 minutos (aumentar de 15 min)
-    max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más permisivo
-    message: {
-        success: false,
-        error: 'Demasiados intentos de login. Intenta de nuevo en 5 minutos.',
-        code: 'RATE_LIMIT_EXCEEDED'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    // Configuración específica para Docker/proxy
-    keyGenerator: (req) => {
-        // Usar X-Forwarded-For si está disponible, sino usar req.ip
-        const forwarded = req.headers['x-forwarded-for'];
-        const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
-        // En producción, usar una clave más específica que incluya User-Agent
-        if (process.env.NODE_ENV === 'production') {
-            const userAgent = req.headers['user-agent'] || 'unknown';
-            return `${ip}-${userAgent.substring(0, 20)}`;
-        }
-        return ip || 'unknown';
-    },
-    skip: (req) => {
-        // Saltar rate limiting para IPs locales en desarrollo
-        const ip = req.ip || '';
-        return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
-    },
-    handler: (req, res) => {
-        logger_1.logger.warn('Auth rate limit excedido', { ip: req.ip, path: req.path });
-        res.status(429).json({
-            success: false,
-            error: 'Demasiados intentos de login. Intenta de nuevo en 5 minutos.',
-            code: 'RATE_LIMIT_EXCEEDED'
-        });
-    }
-});
+// Rate limiting para autenticación se ha movido a config/rate-limits.ts
+// Esta configuración duplicada se ha eliminado para evitar conflictos
 // NUEVO: Rate limit específico para WhatsApp API
 exports.whatsappRateLimit = (0, express_rate_limit_1.default)({
     windowMs: 60 * 1000, // 1 minuto

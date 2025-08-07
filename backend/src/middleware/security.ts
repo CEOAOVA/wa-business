@@ -190,47 +190,8 @@ export const generalRateLimit = rateLimit({
   }
 });
 
-/**
- * Rate limiting para autenticación
- */
-export const authRateLimit = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutos (aumentar de 15 min)
-  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más permisivo
-  message: {
-    success: false,
-    error: 'Demasiados intentos de login. Intenta de nuevo en 5 minutos.',
-    code: 'RATE_LIMIT_EXCEEDED'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Configuración específica para Docker/proxy
-  keyGenerator: (req) => {
-    // Usar X-Forwarded-For si está disponible, sino usar req.ip
-    const forwarded = req.headers['x-forwarded-for'];
-    const ip = forwarded ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0]) : req.ip;
-    
-    // En producción, usar una clave más específica que incluya User-Agent
-    if (process.env.NODE_ENV === 'production') {
-      const userAgent = req.headers['user-agent'] || 'unknown';
-      return `${ip}-${userAgent.substring(0, 20)}`;
-    }
-    
-    return ip || 'unknown';
-  },
-  skip: (req) => {
-    // Saltar rate limiting para IPs locales en desarrollo
-    const ip = req.ip || '';
-    return process.env.NODE_ENV === 'development' && (ip.includes('127.0.0.1') || ip.includes('::1'));
-  },
-  handler: (req, res) => {
-    logger.warn('Auth rate limit excedido', { ip: req.ip, path: req.path });
-    res.status(429).json({
-      success: false,
-      error: 'Demasiados intentos de login. Intenta de nuevo en 5 minutos.',
-      code: 'RATE_LIMIT_EXCEEDED'
-    });
-  }
-});
+// Rate limiting para autenticación se ha movido a config/rate-limits.ts
+// Esta configuración duplicada se ha eliminado para evitar conflictos
 
 // NUEVO: Rate limit específico para WhatsApp API
 export const whatsappRateLimit = rateLimit({

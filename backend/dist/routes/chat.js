@@ -20,6 +20,7 @@ const auth_jwt_1 = require("../middleware/auth-jwt");
 const message_queue_service_1 = require("../services/message-queue.service");
 const structured_logger_1 = require("../utils/structured-logger");
 const failed_message_retry_service_1 = require("../services/failed-message-retry.service");
+// authRateLimit removido - ya no se necesita rate limiting
 const router = express_1.default.Router();
 /**
  * Determinar prioridad del mensaje basado en el contenido del webhook

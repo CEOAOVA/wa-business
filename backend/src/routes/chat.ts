@@ -10,7 +10,7 @@ import { databaseService } from '../services/database.service';
 import { chatbotService } from '../services/chatbot.service';
 import { failedMessageRetryService } from '../services/failed-message-retry.service';
 import { logger, logHelper } from '../config/logger';
-import { authRateLimit } from '../config/rate-limits';
+// authRateLimit removido - ya no se necesita rate limiting
 
 const router = express.Router();
 

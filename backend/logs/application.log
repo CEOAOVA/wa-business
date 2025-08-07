@@ -56458,3 +56458,93 @@
   message: 'Usuario autenticado exitosamente: k.alvarado@aova.mx',
   timestamp: '2025-08-06 23:08:40.741'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-06 23:10:09.138'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:10:09.157'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:10:09.158'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-06 23:10:09.158'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Usuario autenticado exitosamente: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 23:10:29.891'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:11:06.949'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:11:06.951'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-06 23:13:55.911'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:13:55.926'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:13:55.927'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-06 23:13:55.927'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-06 23:14:10.099'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:14:10.119'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:14:10.120'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-06 23:14:10.121'
+}
