@@ -200,6 +200,64 @@ RoleRedirect redirige según rol
 - ✅ `@types/jsonwebtoken` ya instalado en backend
 - ✅ Todas las importaciones funcionando correctamente
 
+## 🚨 Error de Rate Limiting - SOLUCIONADO
+
+### Problema Identificado:
+El error **"Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos"** **NO viene de Supabase**, sino que está **programado en el sistema** mediante rate limiting.
+
+### Ubicación del Rate Limiting:
+**Archivo:** `backend/src/config/rate-limits.ts`
+```typescript
+export const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 5, // máximo 5 intentos por ventana
+  message: {
+    error: 'Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.'
+  }
+});
+```
+
+**Aplicación:** `backend/src/app.ts:205`
+```typescript
+app.use('/api/auth', authRateLimit, authRoutes);
+```
+
+### Solución Implementada:
+✅ **Rate limiting más permisivo en desarrollo:**
+- **Desarrollo:** 50 intentos por 15 minutos (en lugar de 5)
+- **Producción:** 5 intentos por 15 minutos (mantenido)
+- **IPs locales:** Rate limiting deshabilitado en desarrollo
+
+### Código de la Solución:
+```typescript
+export const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: process.env.NODE_ENV === 'production' ? 5 : 50, // Más permisivo en desarrollo
+  message: {
+    error: 'Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  // Agregar configuración para saltar rate limiting en desarrollo
+  skip: (req) => {
+    // Saltar rate limiting para IPs locales en desarrollo
+    const ip = req.ip || req.connection.remoteAddress || '';
+    const isLocalDev = process.env.NODE_ENV === 'development' && (
+      ip.includes('127.0.0.1') || 
+      ip.includes('::1') || 
+      ip.includes('localhost') ||
+      ip.includes('192.168.')
+    );
+    
+    // Saltar para health checks
+    const isHealthCheck = req.path === '/health';
+    
+    return isLocalDev || isHealthCheck;
+  }
+});
+```
+
 ## 🚀 Próximos Pasos
 
 ### Mejoras Sugeridas:
@@ -227,5 +285,6 @@ El sistema de login ahora:
 - ✅ Genera tokens JWT manualmente
 - ✅ Compila sin errores
 - ✅ Mantiene compatibilidad con el frontend existente
+- ✅ **Rate limiting configurado para desarrollo** (50 intentos vs 5 en producción)
 
 **Estado:** ✅ **IMPLEMENTACIÓN COMPLETADA Y FUNCIONAL** 
