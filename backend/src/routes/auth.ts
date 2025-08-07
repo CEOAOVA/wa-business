@@ -4,6 +4,7 @@
  */
 import { Router } from 'express';
 import { AuthService, CreateUserData, LoginData } from '../services/auth.service';
+import { TokenService } from '../services/token.service';
 import { logger } from '../utils/logger';
 import { authMiddleware, requireAdmin, optionalAuth } from '../middleware/auth-jwt';
 import { sessionCleanupService } from '../services/session-cleanup.service';
@@ -510,45 +511,84 @@ router.delete('/sessions/:userId', authMiddleware, requireAdmin, async (req, res
 
 /**
  * @route POST /api/auth/refresh
- * @desc Refrescar token de autenticación
- * @access Private
+ * @desc Refrescar access token usando refresh token
+ * @access Public (requiere refresh token válido)
  */
-router.post('/refresh', authMiddleware, async (req, res) => {
+router.post('/refresh', async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
+    const { refresh_token } = req.body;
+    const userAgent = req.get('User-Agent');
+    const ipAddress = req.ip || req.connection.remoteAddress;
+
+    if (!refresh_token) {
+      return res.status(400).json({
         success: false,
-        message: 'Usuario no autenticado'
+        message: 'Refresh token es requerido'
       });
     }
 
-    // Obtener perfil completo del usuario
-    const userProfile = await AuthService.getUserById(req.user.id);
-    
-    if (!userProfile || !userProfile.is_active) {
+    // Usar TokenService para renovar el access token
+    const result = await TokenService.refreshAccessToken(refresh_token, userAgent, ipAddress);
+
+    if (!result) {
       return res.status(401).json({
         success: false,
-        message: 'Usuario no encontrado o inactivo'
+        message: 'Refresh token inválido o expirado'
       });
     }
-
-    // Actualizar último login
-    await AuthService.updateUserProfile(req.user.id, {
-      last_login: new Date().toISOString()
-    });
 
     res.json({
       success: true,
-      message: 'Token refrescado exitosamente',
+      message: 'Token renovado exitosamente',
       data: {
-        user: userProfile
+        access_token: result.accessToken,
+        token_type: 'bearer',
+        expires_in: result.expiresIn
       }
     });
   } catch (error) {
     logger.error('Refresh token error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al refrescar token'
+      message: 'Error al renovar token'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/revoke
+ * @desc Revocar refresh token
+ * @access Private
+ */
+router.post('/revoke', authMiddleware, async (req, res) => {
+  try {
+    const { refresh_token } = req.body;
+
+    if (!refresh_token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token es requerido'
+      });
+    }
+
+    const success = await TokenService.revokeRefreshToken(refresh_token);
+
+    if (!success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Error al revocar token'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Token revocado exitosamente'
+    });
+  } catch (error) {
+    logger.error('Revoke token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al revocar token'
     });
   }
 });

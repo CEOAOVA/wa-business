@@ -62598,3 +62598,63 @@
 {"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754545515739,"unit":"%","value":97.4577531591667},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:45:15.740Z"}
 {"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754545515739,"unit":"%","value":97.4577531591667},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:45:15.740Z"}
 {"level":"info","message":"Cerrando servidor (SIGINT)","timestamp":"2025-08-07T05:45:22.358Z"}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error obteniendo agentes: relation "public.agents" does not exist',
+    stack: 'Error: Error obteniendo agentes: relation "public.agents" does not exist\n' +
+      '    at D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:26:13\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:9:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error fatal en migración de contraseñas:',
+  timestamp: '2025-08-07 13:12:54.022'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error obteniendo agentes: relation "public.agents" does not exist',
+    stack: 'Error: Error obteniendo agentes: relation "public.agents" does not exist\n' +
+      '    at D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:26:13\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:9:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error fatal en migración de contraseñas:',
+  timestamp: '2025-08-07 13:25:20.498'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error obteniendo agentes: relation "public.agents" does not exist',
+    stack: 'Error: Error obteniendo agentes: relation "public.agents" does not exist\n' +
+      '    at D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:26:13\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:9:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error fatal en migración de contraseñas:',
+  timestamp: '2025-08-07 13:29:51.428'
+}
+{
+  service: 'whatsapp-llm',
+  error: {
+    message: 'Error obteniendo agentes: relation "public.agents" does not exist',
+    stack: 'Error: Error obteniendo agentes: relation "public.agents" does not exist\n' +
+      '    at D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:26:13\n' +
+      '    at Generator.next (<anonymous>)\n' +
+      '    at fulfilled (D:\\Emprendimiento\\AOVA\\EMBLER\\whatsapp\\wa-business1\\backend\\src\\scripts\\migrate-passwords.ts:9:58)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    name: 'Error'
+  },
+  level: 'error',
+  message: 'Error fatal en migración de contraseñas:',
+  timestamp: '2025-08-07 13:41:57.543'
+}

@@ -1,10 +1,11 @@
 import axios from 'axios';
-import { Server } from 'socket.io';
 import { whatsappConfig, buildApiUrl, getHeaders } from '../config/whatsapp';
 import { databaseService } from './database.service';
 import { MessageType } from '../types/database';
 import { chatbotService } from './chatbot.service'; // NUEVO: Import del chatbot
 import { logger, logHelper } from '../config/logger';
+import { socketService } from './socket.service';
+import { ProcessedWebhookPayload, WhatsAppWebhook, WhatsAppMessage, MessageStatus } from '../types/webhook.types';
 
 export interface SendMessageRequest {
   to: string;
@@ -53,7 +54,7 @@ export interface WhatsAppWebhookMessage {
 }
 
 export class WhatsAppService {
-  private io?: Server;
+  // Socket.IO ahora se maneja a través del servicio centralizado
   private lastMessages: Map<string, string> = new Map(); // Almacenar últimos mensajes temporalmente
 
   /**
@@ -138,14 +139,12 @@ export class WhatsAppService {
   }
 
   // Inicializar servicio de base de datos
-  async initialize(socketIo?: Server) {
+  async initialize(socketIo?: any) {
     try {
-      this.io = socketIo;
+      // Socket.IO ahora se maneja a través del servicio centralizado
       await databaseService.connect();
       logger.info('WhatsApp Service inicializado con base de datos');
-      if (socketIo) {
-        logger.info('Socket.IO integrado con WhatsApp Service');
-      }
+      logger.info('Socket.IO se maneja a través de socketService');
     } catch (error) {
       logger.error('Error inicializando WhatsApp Service', { error: error instanceof Error ? error.message : String(error) });
       throw error;
@@ -156,31 +155,18 @@ export class WhatsAppService {
    * Emitir evento WebSocket optimizado (método público para uso externo)
    */
   emitSocketEvent(event: string, data: any) {
-    if (this.io) {
-      // Emitir con optimizaciones para tiempo real
-      this.io.emit(event, data, {
-        compress: true, // Comprimir datos
-        volatile: false, // Asegurar entrega
-        timeout: 5000 // Timeout de 5 segundos
-      });
-      logger.debug('Evento WebSocket emitido', { event, data });
-    } else {
-      logger.warn('No hay conexión WebSocket para emitir evento', { event });
-    }
+    // Usar servicio centralizado de Socket.IO
+    socketService.emitGlobal(event, data);
+    logger.debug('Evento WebSocket emitido', { event, data });
   }
 
   /**
    * Emitir evento a una conversación específica
    */
   emitToConversation(conversationId: string, event: string, data: any) {
-    if (this.io) {
-      this.io.to(conversationId).emit(event, data, {
-        compress: true,
-        volatile: false,
-        timeout: 5000
-      });
-      console.log(`🌐 [Socket] Evento '${event}' emitido a conversación ${conversationId}:`, data);
-    }
+    // Usar servicio centralizado de Socket.IO
+    socketService.emitToConversation(conversationId, event, data);
+    console.log(`🌐 [Socket] Evento '${event}' emitido a conversación ${conversationId}:`, data);
   }
 
   /**
@@ -389,7 +375,7 @@ export class WhatsAppService {
 
       // 5. BROADCAST CON CONFIRMACIÓN
       console.log('📢 [PERSISTENCE] Paso 5: Broadcast con confirmación');
-      if (this.io && !data.isChatbotResponse) {
+      if (!data.isChatbotResponse) {
         const sentMessage = {
           id: dbResult.message.id,
           waMessageId: whatsappResult.messageId,
@@ -874,7 +860,7 @@ export class WhatsAppService {
       });
 
       // Emitir evento de Socket.IO para mensaje multimedia enviado
-      if (this.io && result) {
+      if (result) {
         const sentMessage = {
           id: result.message.id,
           waMessageId: data.whatsappMessageId,
@@ -942,7 +928,7 @@ export class WhatsAppService {
       });
 
       // Emitir evento de Socket.IO para mensaje multimedia recibido
-      if (this.io && result) {
+      if (result) {
         const receivedMessage = {
           id: result.message.id,
           waMessageId: data.waMessageId,
@@ -974,6 +960,268 @@ export class WhatsAppService {
       console.error('❌ Error procesando mensaje multimedia entrante:', error);
       throw error;
     }
+  }
+
+  /**
+   * Procesar webhook de WhatsApp (llamado desde Bull Queue)
+   * Maneja todos los tipos de mensajes y estados
+   */
+  async processWebhook(data: ProcessedWebhookPayload): Promise<void> {
+    const { requestId, payload, messageId } = data;
+    const startTime = Date.now();
+
+    try {
+      logger.info(`Procesando webhook ${requestId}`, { messageId });
+
+      // Validar estructura del webhook
+      if (!payload?.entry?.[0]?.changes?.[0]?.value) {
+        logger.warn('Webhook con estructura inválida', { requestId });
+        return;
+      }
+
+      const change = payload.entry[0].changes[0];
+      const value = change.value;
+
+      // Procesar mensajes entrantes
+      if (value.messages && value.messages.length > 0) {
+        for (const message of value.messages) {
+          await this.processIncomingMessage(message, value, requestId);
+        }
+      }
+
+      // Procesar actualizaciones de estado
+      if (value.statuses && value.statuses.length > 0) {
+        for (const status of value.statuses) {
+          await this.processMessageStatus(status, requestId);
+        }
+      }
+
+      // Procesar errores
+      if (value.errors && value.errors.length > 0) {
+        for (const error of value.errors) {
+          await this.processWebhookError(error, requestId);
+        }
+      }
+
+      const processingTime = Date.now() - startTime;
+      logger.info(`Webhook procesado exitosamente en ${processingTime}ms`, {
+        requestId,
+        messageId
+      });
+
+    } catch (error: any) {
+      logger.error('Error procesando webhook', {
+        requestId,
+        messageId,
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Procesar mensaje entrante según su tipo
+   */
+  private async processIncomingMessage(
+    message: WhatsAppMessage,
+    value: any,
+    requestId: string
+  ): Promise<void> {
+    try {
+      const contact = value.contacts?.[0];
+      const phoneNumberId = value.metadata.phone_number_id;
+
+      // Preparar datos base del mensaje
+      const baseMessageData = {
+        waMessageId: message.id,
+        fromWaId: message.from,
+        phoneNumberId,
+        timestamp: new Date(parseInt(message.timestamp) * 1000),
+        contactName: contact?.profile?.name || 'Usuario'
+      };
+
+      logger.debug(`Procesando mensaje tipo: ${message.type}`, {
+        messageId: message.id,
+        from: message.from,
+        type: message.type
+      });
+
+      // Procesar según el tipo de mensaje
+      switch (message.type) {
+        case 'text':
+          await this.processTextMessage({
+            ...baseMessageData,
+            text: message.text.body
+          });
+          break;
+
+        case 'image':
+        case 'video':
+        case 'audio':
+        case 'document':
+        case 'sticker':
+          await this.processMediaMessage({
+            ...baseMessageData,
+            mediaType: message.type,
+            mediaId: message[message.type].id,
+            caption: message[message.type].caption
+          });
+          break;
+
+        case 'location':
+          await this.processLocationMessage({
+            ...baseMessageData,
+            location: message.location
+          });
+          break;
+
+        case 'contacts':
+          await this.processContactsMessage({
+            ...baseMessageData,
+            contacts: message.contacts
+          });
+          break;
+
+        case 'interactive':
+          await this.processInteractiveMessage({
+            ...baseMessageData,
+            interactive: message.interactive
+          });
+          break;
+
+        default:
+          logger.warn(`Tipo de mensaje no soportado: ${message.type}`, {
+            messageId: message.id,
+            requestId
+          });
+      }
+
+    } catch (error: any) {
+      logger.error('Error procesando mensaje entrante', {
+        messageId: message.id,
+        type: message.type,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Procesar actualización de estado de mensaje
+   */
+  private async processMessageStatus(
+    status: MessageStatus,
+    requestId: string
+  ): Promise<void> {
+    try {
+      logger.debug('Procesando actualización de estado', {
+        messageId: status.id,
+        status: status.status,
+        recipient: status.recipient_id
+      });
+
+      // Actualizar en base de datos
+      await databaseService.updateMessageStatus(status.id, status.status);
+
+      // Emitir evento via Socket.IO
+      socketService.emitGlobal('message_status_update', {
+        messageId: status.id,
+        status: status.status,
+        recipientId: status.recipient_id,
+        timestamp: status.timestamp
+      });
+
+      // Si hay errores, procesarlos
+      if (status.errors && status.errors.length > 0) {
+        for (const error of status.errors) {
+          logger.error('Error en mensaje', {
+            messageId: status.id,
+            errorCode: error.code,
+            errorTitle: error.title,
+            errorMessage: error.message
+          });
+        }
+      }
+
+    } catch (error: any) {
+      logger.error('Error procesando estado de mensaje', {
+        messageId: status.id,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Procesar errores del webhook
+   */
+  private async processWebhookError(
+    error: any,
+    requestId: string
+  ): Promise<void> {
+    logger.error('Error recibido en webhook', {
+      requestId,
+      errorCode: error.code,
+      errorTitle: error.title,
+      errorMessage: error.message,
+      errorDetails: error.error_data?.details
+    });
+
+    // Emitir evento de error
+    socketService.emitGlobal('webhook_error', {
+      code: error.code,
+      title: error.title,
+      message: error.message,
+      details: error.error_data?.details
+    });
+  }
+
+  /**
+   * Procesar mensaje de ubicación
+   */
+  private async processLocationMessage(data: any): Promise<void> {
+    const messageData = {
+      ...data,
+      text: `📍 Ubicación: ${data.location.name || 'Sin nombre'}\n${data.location.address || `Lat: ${data.location.latitude}, Lon: ${data.location.longitude}`}`
+    };
+
+    await this.processTextMessage(messageData);
+  }
+
+  /**
+   * Procesar mensaje de contactos
+   */
+  private async processContactsMessage(data: any): Promise<void> {
+    const contactsText = data.contacts
+      .map((c: any) => `👤 ${c.name.formatted_name}${c.phones?.[0] ? ` - ${c.phones[0].phone}` : ''}`)
+      .join('\n');
+
+    const messageData = {
+      ...data,
+      text: `Contactos compartidos:\n${contactsText}`
+    };
+
+    await this.processTextMessage(messageData);
+  }
+
+  /**
+   * Procesar mensaje interactivo
+   */
+  private async processInteractiveMessage(data: any): Promise<void> {
+    let text = '';
+    
+    if (data.interactive.type === 'button_reply') {
+      text = `Botón seleccionado: ${data.interactive.button_reply.title}`;
+    } else if (data.interactive.type === 'list_reply') {
+      text = `Opción seleccionada: ${data.interactive.list_reply.title}`;
+    }
+
+    const messageData = {
+      ...data,
+      text
+    };
+
+    await this.processTextMessage(messageData);
   }
 }
 

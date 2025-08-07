@@ -1,156 +1,148 @@
+/**
+ * Middleware de manejo global de errores
+ */
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../config/logger';
+import { logger } from '../utils/logger';
 
-interface CustomError extends Error {
-  statusCode?: number;
-  code?: string;
-  details?: any;
+// Tipos de errores personalizados
+export class AppError extends Error {
+  statusCode: number;
+  code: string;
+  isOperational: boolean;
+
+  constructor(message: string, statusCode: number = 500, code: string = 'INTERNAL_ERROR') {
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string, errors?: any) {
+    super(message, 400, 'VALIDATION_ERROR');
+    if (errors) {
+      (this as any).errors = errors;
+    }
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(message: string = 'No autenticado') {
+    super(message, 401, 'AUTHENTICATION_ERROR');
+  }
+}
+
+export class AuthorizationError extends AppError {
+  constructor(message: string = 'No autorizado') {
+    super(message, 403, 'AUTHORIZATION_ERROR');
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message: string = 'Recurso no encontrado') {
+    super(message, 404, 'NOT_FOUND');
+  }
+}
+
+export class ConflictError extends AppError {
+  constructor(message: string = 'Conflicto con el estado actual') {
+    super(message, 409, 'CONFLICT');
+  }
+}
+
+export class RateLimitError extends AppError {
+  constructor(message: string = 'Demasiadas solicitudes', retryAfter?: number) {
+    super(message, 429, 'RATE_LIMIT_EXCEEDED');
+    if (retryAfter) {
+      (this as any).retryAfter = retryAfter;
+    }
+  }
 }
 
 /**
- * Middleware global para manejo de errores
- * Captura todos los errores no manejados y envía respuestas apropiadas
+ * Middleware de manejo global de errores
  */
 export const errorHandler = (
-  err: CustomError,
+  err: Error | AppError,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // Log del error completo para debugging
-  logger.error('Error Handler Triggered:', {
+  // Si la respuesta ya fue enviada, delegar a Express
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  // Determinar si es un error operacional
+  const isOperational = (err as AppError).isOperational || false;
+  const statusCode = (err as AppError).statusCode || 500;
+  const code = (err as AppError).code || 'INTERNAL_ERROR';
+  
+  // Log del error
+  const errorInfo = {
     message: err.message,
+    code,
+    statusCode,
     stack: err.stack,
-    code: err.code,
-    statusCode: err.statusCode,
     path: req.path,
     method: req.method,
-    body: req.body,
-    query: req.query,
-    params: req.params
-  });
+    ip: req.ip,
+    userId: req.user?.id,
+    requestId: (req as any).requestId
+  };
 
-  // Determinar el tipo de error y responder apropiadamente
-  
-  // Errores de Supabase
-  if (err.message?.includes('Supabase Error')) {
-    const supabaseErrorMatch = err.message.match(/Code: (\w+)/);
-    const errorCode = supabaseErrorMatch ? supabaseErrorMatch[1] : 'UNKNOWN';
-    
-    // Mapear códigos de error de Supabase a mensajes amigables
-    let userMessage = 'Error al acceder a la base de datos';
-    let statusCode = 500;
-    
-    switch (errorCode) {
-      case 'PGRST116': // No rows found
-        userMessage = 'Registro no encontrado';
-        statusCode = 404;
-        break;
-      case '23505': // Unique constraint violation
-        userMessage = 'El registro ya existe';
-        statusCode = 409;
-        break;
-      case '23503': // Foreign key violation
-        userMessage = 'Referencia a registro inválida';
-        statusCode = 400;
-        break;
-      case '42501': // Insufficient privilege
-        userMessage = 'Sin permisos para realizar esta operación';
-        statusCode = 403;
-        break;
-      case 'PGRST301': // JWT expired
-        userMessage = 'Sesión expirada, por favor inicie sesión nuevamente';
-        statusCode = 401;
-        break;
-      default:
-        if (err.message.includes('RLS')) {
-          userMessage = 'Acceso denegado por políticas de seguridad';
-          statusCode = 403;
-        }
-    }
-    
-    return res.status(statusCode).json({
-      success: false,
-      error: userMessage,
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
-      code: `SUPABASE_${errorCode}`,
-      timestamp: new Date().toISOString()
-    });
+  if (!isOperational || statusCode >= 500) {
+    logger.error('Unhandled error', errorInfo);
+  } else {
+    logger.warn('Operational error', errorInfo);
   }
-  
-  // Errores de WhatsApp API
-  if (err.message?.includes('WhatsApp') || err.message?.includes('webhook')) {
-    return res.status(503).json({
-      success: false,
-      error: 'Servicio de WhatsApp temporalmente no disponible',
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
-      code: 'WHATSAPP_ERROR',
-      timestamp: new Date().toISOString()
-    });
-  }
-  
-  // Errores de validación
-  if (err.message?.includes('validation') || err.message?.includes('required')) {
-    return res.status(400).json({
-      success: false,
-      error: 'Datos de entrada inválidos',
-      details: err.message,
-      code: 'VALIDATION_ERROR',
-      timestamp: new Date().toISOString()
-    });
-  }
-  
-  // Errores de autenticación
-  if (err.message?.includes('auth') || err.message?.includes('token')) {
-    return res.status(401).json({
-      success: false,
-      error: 'Error de autenticación',
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
-      code: 'AUTH_ERROR',
-      timestamp: new Date().toISOString()
-    });
-  }
-  
-  // Error genérico
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
+
+  // Preparar respuesta
+  const response: any = {
     success: false,
-    error: statusCode === 500 ? 'Error interno del servidor' : err.message,
-    details: process.env.NODE_ENV === 'development' ? {
-      message: err.message,
-      stack: err.stack
-    } : undefined,
-    code: err.code || 'INTERNAL_ERROR',
-    timestamp: new Date().toISOString()
-  });
+    message: err.message || 'Error interno del servidor',
+    code
+  };
+
+  // Incluir información adicional según el tipo de error
+  if ((err as any).errors) {
+    response.errors = (err as any).errors;
+  }
+
+  if ((err as any).retryAfter) {
+    response.retryAfter = (err as any).retryAfter;
+    res.set('Retry-After', (err as any).retryAfter.toString());
+  }
+
+  // En desarrollo, incluir stack trace
+  if (process.env.NODE_ENV === 'development' && !isOperational) {
+    response.stack = err.stack;
+  }
+
+  // Enviar respuesta
+  res.status(statusCode).json(response);
 };
 
 /**
  * Middleware para capturar errores asíncronos
- * Envuelve funciones asíncronas para capturar rechazos de promesas
  */
-export const asyncHandler = (fn: Function) => (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+export const asyncHandler = (fn: Function) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
 };
 
 /**
  * Middleware para rutas no encontradas
  */
 export const notFoundHandler = (req: Request, res: Response) => {
-  logger.warn('404 - Ruta no encontrada:', {
-    path: req.path,
-    method: req.method
-  });
-  
+  const error = new NotFoundError(`Ruta no encontrada: ${req.method} ${req.path}`);
   res.status(404).json({
     success: false,
-    error: 'Ruta no encontrada',
-    path: req.path,
-    code: 'NOT_FOUND',
-    timestamp: new Date().toISOString()
+    message: error.message,
+    code: error.code
   });
 };

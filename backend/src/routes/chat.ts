@@ -6,6 +6,7 @@ import { webhookSecurity, securityLogger, SecureRequest } from '../middleware/we
 import { authMiddleware } from '../middleware/auth-jwt';
 import { messageQueueService } from '../services/message-queue.service';
 import { StructuredLogger } from '../utils/structured-logger';
+import { bullQueueService } from '../services/bull-queue.service';
 import { databaseService } from '../services/database.service';
 import { chatbotService } from '../services/chatbot.service';
 import { failedMessageRetryService } from '../services/failed-message-retry.service';
@@ -292,91 +293,52 @@ router.get('/webhook', (req: any, res: any) => {
   }
 });
 
-// POST /api/chat/webhook - Recibir mensajes (con seguridad integrada)
+// POST /api/chat/webhook - Recibir mensajes (optimizado < 100ms)
 router.post('/webhook', async (req: any, res: any) => {
-  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
-  const userAgent = req.get('User-Agent') || 'unknown';
+  // CRITICAL: Responder INMEDIATAMENTE - WhatsApp requiere < 5s, apuntamos a < 100ms
+  res.status(200).send('OK');
   
-  // RESPONDER INMEDIATAMENTE CON 200 para evitar reenvíos de WhatsApp
-  // Según las mejores prácticas, WhatsApp reenvía si no recibe 200 rápidamente
-  res.status(200).json({
-    success: true,
-    message: 'received'
-  });
-
-  try {
-    console.log(` [${requestId}] Webhook recibido desde IP: ${clientIp}`);
+  // TODO el procesamiento se hace DESPUÉS de responder
+  setImmediate(async () => {
+    const startTime = Date.now();
+    const requestId = `req_${startTime}_${Math.random().toString(36).substr(2, 9)}`;
+    const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
+    const userAgent = req.get('User-Agent') || 'unknown';
     
-    // Validación básica de estructura
-    if (!req.body || typeof req.body !== 'object') {
-      console.warn(` [${requestId}] Webhook con payload inválido`);
-      return; // Ya respondimos con 200, solo loggeamos
-    }
-
-    // Verificar estructura básica de webhook de WhatsApp
-    const { object, entry } = req.body;
-    if (!object || !Array.isArray(entry)) {
-      console.warn(` [${requestId}] Estructura de webhook inválida`);
-      return; // Ya respondimos con 200, solo loggeamos
-    }
-
-    // Verificar que es de WhatsApp Business
-    if (object !== 'whatsapp_business_account') {
-      console.warn(` [${requestId}] Objeto de webhook no es whatsapp_business_account: ${object}`);
-      return; // Ya respondimos con 200, solo loggeamos
-    }
-
-    // Log detallado solo en desarrollo
-    if (process.env.NODE_ENV === 'development') {
-      console.log(` [${requestId}] Webhook mensaje completo:`, JSON.stringify(req.body, null, 2));
-    } else {
-      // En producción, log resumido por seguridad
-      console.log(` [${requestId}] Webhook: ${object}, entries: ${entry.length}, UA: ${userAgent.substring(0, 50)}`);
-    }
-
-    // Procesar webhook usando cola de mensajes para mejor resilencia
-    setImmediate(async () => {
-      try {
-        // Determinar prioridad basada en tipo de mensaje
-        const priority = determineMessagePriority(req.body);
-        
-        // Agregar a cola de mensajes para procesamiento asíncrono
-        const queueId = await messageQueueService.addToQueue({
-          ...req.body,
-          requestId,
-          clientIp,
-          userAgent,
-          timestamp: new Date().toISOString()
-        }, priority);
-        
-        StructuredLogger.logWebhookEvent('webhook_queued', {
-          requestId,
-          queueId,
-          priority,
-          clientIp
-        });
-        
-        console.log(`✅ [${requestId}] Webhook agregado a cola: ${queueId} (prioridad: ${priority})`);
-        
-        // Opcional: Notificar via Socket.IO a clientes conectados
-        // TODO: Implementar notificación en tiempo real si es necesario
-        console.log(`📢 [${requestId}] Webhook procesado correctamente`);
-      } catch (error: any) {
-        const errorId = StructuredLogger.logError('webhook_async_processing', error, {
-          requestId,
-          clientIp,
-          userAgent
-        });
-        console.error(`❌ [${requestId}] Error procesando webhook asincrónicamente (${errorId}):`, error);
-        // No podemos responder al webhook aquí, pero loggeamos para debugging
+    try {
+      // Validación mínima de estructura
+      if (!req.body || typeof req.body !== 'object' || req.body.object !== 'whatsapp_business_account') {
+        logger.debug(`Webhook ignorado - no es de WhatsApp Business`, { requestId });
+        return;
       }
-    });
 
-  } catch (error: any) {
-    console.error(`❌ [${requestId}] Error inicial en webhook:`, error);
-    // Ya respondimos con 200, así que solo loggeamos
-  }
+      // Determinar prioridad
+      const priority = determineMessagePriority(req.body);
+      
+      // Agregar a Bull Queue para procesamiento robusto
+      const jobId = await bullQueueService.addWebhookToQueue({
+        requestId,
+        payload: req.body,
+        timestamp: new Date().toISOString(),
+        priority
+      });
+      
+      // Log mínimo para performance
+      const processingTime = Date.now() - startTime;
+      logger.debug(`Webhook encolado en ${processingTime}ms`, {
+        requestId,
+        jobId,
+        priority
+      });
+      
+    } catch (error: any) {
+      logger.error('Error encolando webhook', {
+        requestId,
+        error: error.message,
+        stack: error.stack
+      });
+    }
+  });
 });
 
 // ============================================

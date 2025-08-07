@@ -1,6 +1,8 @@
 import { supabase, supabaseAdmin } from '../config/supabase';
 import { logger } from '../utils/logger';
 import * as jwt from 'jsonwebtoken';
+import { PasswordUtils } from '../utils/password.utils';
+import { TokenService } from './token.service';
 
 export interface UserProfile {
   id: string;
@@ -61,6 +63,9 @@ export class AuthService {
       }
 
       // Crear perfil de usuario en la tabla agents usando el cliente administrativo
+      // Hashear la contraseña antes de guardarla
+      const hashedPassword = await PasswordUtils.hashPassword(userData.password);
+      
       const { data: profileData, error: profileError } = await supabaseAdmin
         .from('agents')
         .insert({
@@ -69,6 +74,7 @@ export class AuthService {
           full_name: userData.full_name,
           email: userData.email,
           role: userData.role || 'agent',
+          password: hashedPassword, // Guardar el hash, no la contraseña en texto plano
           is_active: true
         })
         .select()
@@ -108,9 +114,22 @@ export class AuthService {
         throw new Error('Usuario o contraseña incorrectos');
       }
 
-      // Verificar contraseña (comparación directa)
-      // NOTA: En producción deberías usar hash de contraseñas
-      if (agent.password !== loginData.password) {
+      // Verificar contraseña usando bcrypt
+      let isPasswordValid = false;
+      
+      // Verificar si la contraseña está hasheada o en texto plano (para migración)
+      if (PasswordUtils.isPasswordHashed(agent.password)) {
+        // Si está hasheada, usar bcrypt.compare
+        isPasswordValid = await PasswordUtils.verifyPassword(loginData.password, agent.password);
+      } else {
+        // Si está en texto plano, comparar directamente (solo durante migración)
+        isPasswordValid = agent.password === loginData.password;
+        
+        // Log para identificar usuarios que necesitan migración
+        logger.warn(`Usuario ${loginData.username} tiene contraseña en texto plano - necesita migración`);
+      }
+      
+      if (!isPasswordValid) {
         logger.error(`Contraseña incorrecta para usuario: ${loginData.username}`);
         throw new Error('Usuario o contraseña incorrectos');
       }
@@ -134,29 +153,23 @@ export class AuthService {
         updated_at: agent.updated_at
       };
 
-      // Generar token JWT manualmente
-      const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
-      const expiresIn = process.env.JWT_EXPIRES_IN || '8h';
-      const token = jwt.sign(
-        {
-          sub: agent.id,
-          email: agent.email || agent.username,
-          role: agent.role,
-          username: agent.username
-        },
-        jwtSecret,
-        {
-          expiresIn: expiresIn as jwt.SignOptions['expiresIn']
-        }
-      );
+      // Generar par de tokens usando TokenService
+      const tokenPair = await TokenService.generateTokenPair({
+        sub: agent.id,
+        email: agent.email || agent.username,
+        role: agent.role,
+        username: agent.username
+      });
 
-      // Crear sesión simulada compatible con el frontend
+      // Crear sesión compatible con el frontend
       const session = {
-        access_token: token,
+        access_token: tokenPair.accessToken,
+        refresh_token: tokenPair.refreshToken,
         token_type: 'bearer',
-        expires_in: 28800,
-        expires_at: Math.floor(Date.now() / 1000) + 28800,
-        refresh_token: token, // Usamos el mismo token como refresh
+        expires_in: tokenPair.expiresIn,
+        expires_at: Math.floor(Date.now() / 1000) + tokenPair.expiresIn,
+        refresh_expires_in: tokenPair.refreshExpiresIn,
+        refresh_expires_at: Math.floor(Date.now() / 1000) + tokenPair.refreshExpiresIn,
         user: {
           id: agent.id,
           email: agent.email || agent.username,
@@ -393,6 +406,12 @@ export class AuthService {
       if (existingAdmin) {
         logger.info('Initial admin already exists');
         return existingAdmin;
+      }
+
+      // Validar que la contraseña del admin sea segura
+      const passwordValidation = PasswordUtils.validatePasswordStrength(adminPassword);
+      if (!passwordValidation.isValid) {
+        logger.warn(`Contraseña inicial del admin débil: ${passwordValidation.message}`);
       }
 
       // Crear admin inicial

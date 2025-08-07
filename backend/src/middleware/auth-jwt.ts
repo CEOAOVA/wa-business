@@ -4,6 +4,7 @@
  */
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
+import { TokenService } from '../services/token.service';
 import * as jwt from 'jsonwebtoken';
 
 // Extender la interfaz Request para incluir el usuario
@@ -47,59 +48,55 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const token = authHeader.substring(7); // Remover 'Bearer ' del token
     console.log('🔐 [AuthMiddleware] Token extraído:', token.substring(0, 20) + '...');
 
-    // Verificar JWT token generado por nuestro sistema
-    const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+    // Verificar token usando TokenService
+    const decoded = TokenService.verifyAccessToken(token);
     
-    try {
-      // Verificar y decodificar el token JWT
-      const decoded = jwt.verify(token, jwtSecret) as any;
-      console.log('✅ [AuthMiddleware] Token JWT válido, datos decodificados:', {
-        sub: decoded.sub,
-        username: decoded.username,
-        role: decoded.role
-      });
-
-      // Obtener perfil del usuario desde la base de datos
-      const userProfile = await AuthService.getUserById(decoded.sub);
-      
-      if (!userProfile) {
-        console.warn('❌ [AuthMiddleware] Perfil de usuario no encontrado', { userId: decoded.sub });
-        return res.status(401).json({
-          success: false,
-          message: 'Perfil de usuario no encontrado'
-        });
-      }
-
-      console.log('✅ [AuthMiddleware] Perfil de usuario obtenido:', {
-        userId: userProfile.id,
-        username: userProfile.username,
-        role: userProfile.role,
-        isActive: userProfile.is_active
-      });
-
-      // Verificar si el usuario está activo
-      if (!userProfile.is_active) {
-        console.warn('❌ [AuthMiddleware] Usuario inactivo intentando acceder', { userId: userProfile.id });
-        return res.status(401).json({
-          success: false,
-          message: 'Usuario inactivo'
-        });
-      }
-
-      // Adjuntar usuario al request para usar en las rutas
-      (req as any).user = userProfile;
-
-      console.log('✅ [AuthMiddleware] Autenticación exitosa, continuando...');
-      next();
-    } catch (jwtError: any) {
-      console.warn('❌ [AuthMiddleware] Token JWT inválido o expirado', { 
-        error: jwtError.message
-      });
+    if (!decoded) {
+      console.warn('❌ [AuthMiddleware] Token inválido o expirado');
       return res.status(401).json({
         success: false,
         message: 'Token inválido o expirado'
       });
     }
+
+    console.log('✅ [AuthMiddleware] Token JWT válido, datos decodificados:', {
+      sub: decoded.sub,
+      username: decoded.username,
+      role: decoded.role
+    });
+
+    // Obtener perfil del usuario desde la base de datos
+    const userProfile = await AuthService.getUserById(decoded.sub);
+    
+    if (!userProfile) {
+      console.warn('❌ [AuthMiddleware] Perfil de usuario no encontrado', { userId: decoded.sub });
+      return res.status(401).json({
+        success: false,
+        message: 'Perfil de usuario no encontrado'
+      });
+    }
+
+    console.log('✅ [AuthMiddleware] Perfil de usuario obtenido:', {
+      userId: userProfile.id,
+      username: userProfile.username,
+      role: userProfile.role,
+      isActive: userProfile.is_active
+    });
+
+    // Verificar si el usuario está activo
+    if (!userProfile.is_active) {
+      console.warn('❌ [AuthMiddleware] Usuario inactivo intentando acceder', { userId: userProfile.id });
+      return res.status(401).json({
+        success: false,
+        message: 'Usuario inactivo'
+      });
+    }
+
+    // Adjuntar usuario al request para usar en las rutas
+    (req as any).user = userProfile;
+
+    console.log('✅ [AuthMiddleware] Autenticación exitosa, continuando...');
+    next();
   } catch (error) {
     console.error('❌ [AuthMiddleware] Error general en middleware:', error);
     res.status(500).json({
@@ -143,17 +140,18 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.substring(7);
-    const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
     
-    try {
-      const decoded = jwt.verify(token, jwtSecret) as any;
+    // Verificar token usando TokenService
+    const decoded = TokenService.verifyAccessToken(token);
+    
+    if (decoded) {
       const userProfile = await AuthService.getUserById(decoded.sub);
       
       if (userProfile && userProfile.is_active) {
         (req as any).user = userProfile;
         (req as any).isAuthenticated = true;
       }
-    } catch (jwtError) {
+    } else {
       // Token inválido, pero es opcional, continuar sin usuario
       console.log('Token opcional inválido, continuando sin autenticación');
     }
