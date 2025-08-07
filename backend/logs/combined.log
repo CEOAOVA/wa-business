@@ -61601,3 +61601,366 @@
 {"level":"info","message":"🔄 Servicio de retry de mensajes fallidos inicializado","timestamp":"2025-08-07T05:14:10.139Z"}
 {"environment":"development","level":"info","message":"🚀 Aplicación iniciada","port":3002,"timestamp":"2025-08-07T05:14:10.173Z"}
 {"environment":"development","level":"info","memoryMonitoring":true,"message":"Backend iniciado correctamente","port":3002,"timestamp":"2025-08-07T05:14:10.173Z"}
+{"heapFree":"8MB","heapTotal":"241MB","heapUsed":"233MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:15:08.284Z","usagePercent":"96.64%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:15:08.287'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:15:08.285Z","usagePercent":"96.64%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:15:08.286Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:15:08.287Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:15:08.288Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:15:08.289Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:15:08.290Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:15:08.291Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:15:08.291Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:15:08.291'
+}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:15:08.292Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:15:08.292Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:15:08.292Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"96.79%","timestamp":"2025-08-07T05:15:08.292Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:15:10.163Z","unit":"%","value":96.6693318902617}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:15:10.163Z","unit":"MB","value":232.8900146484375}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:15:10.163Z","unit":"%","value":0}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:15:10.163Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:15:10.163Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:15:10.163Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:15:10.163Z","unit":"connections","value":43}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:15:10.163Z","unit":"requests/min","value":20}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:15:10.163Z","unit":"ms","value":534}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:15:10.163Z","unit":"connections","value":6}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:15:10.164Z","unit":"ms","value":107}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:15:10.164Z","unit":"%","value":73}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:15:10.164Z","unit":"connections","value":21}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:15:10.164Z","unit":"messages/min","value":161}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:15:10.164Z","unit":"ms","value":51}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.6693318902617% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754543710163,"unit":"%","value":96.6693318902617},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:15:10.164Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754543710163,"unit":"%","value":96.6693318902617},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:15:10.164Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754543710163,"unit":"%","value":96.6693318902617},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:15:10.164Z"}
+{"heapFree":"9MB","heapTotal":"242MB","heapUsed":"233MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:16:08.295Z","usagePercent":"96.42%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:16:08.296'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:16:08.295Z","usagePercent":"96.42%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:16:08.300'
+}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:16:08.295Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:16:08.297Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:16:08.297Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:16:08.299Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:16:08.299Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:16:08.300Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:16:08.300Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:16:08.300Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:16:08.300Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:16:08.300Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"96.52%","timestamp":"2025-08-07T05:16:08.301Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:16:10.165Z","unit":"%","value":96.7650658604112}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:16:10.165Z","unit":"MB","value":233.1206512451172}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:16:10.165Z","unit":"%","value":0}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:16:10.165Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:16:10.166Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:16:10.166Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:16:10.166Z","unit":"connections","value":40}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:16:10.166Z","unit":"requests/min","value":44}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:16:10.166Z","unit":"ms","value":325}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:16:10.166Z","unit":"connections","value":6}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:16:10.166Z","unit":"ms","value":85}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:16:10.166Z","unit":"%","value":88}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:16:10.166Z","unit":"connections","value":23}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:16:10.166Z","unit":"messages/min","value":100}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:16:10.166Z","unit":"ms","value":44}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.7650658604112% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754543770165,"unit":"%","value":96.7650658604112},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:16:10.166Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754543770165,"unit":"%","value":96.7650658604112},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:16:10.166Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754543770165,"unit":"%","value":96.7650658604112},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:16:10.167Z"}
+{"heapFree":"8MB","heapTotal":"242MB","heapUsed":"234MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:17:08.309Z","usagePercent":"96.54%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:17:08.311'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:17:08.309Z","usagePercent":"96.54%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:17:08.310Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:17:08.311Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:17:08.312Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:17:08.313Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:17:08.313Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:17:08.314Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:17:08.314Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:17:08.314Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:17:08.314Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:17:08.314Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"96.64%","timestamp":"2025-08-07T05:17:08.314Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:17:08.313'
+}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"whatsapp","timeSinceLastFailure":1754543829584},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:17:09.584Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:17:10.171Z","unit":"%","value":96.88228376220125}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:17:10.172Z","unit":"MB","value":233.40304565429688}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:17:10.172Z","unit":"%","value":100}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:17:10.172Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:17:10.172Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:17:10.172Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:17:10.172Z","unit":"connections","value":14}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:17:10.172Z","unit":"requests/min","value":83}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:17:10.172Z","unit":"ms","value":352}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:17:10.172Z","unit":"connections","value":2}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:17:10.172Z","unit":"ms","value":155}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:17:10.173Z","unit":"%","value":73}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:17:10.173Z","unit":"connections","value":12}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:17:10.173Z","unit":"messages/min","value":63}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:17:10.173Z","unit":"ms","value":26}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.88228376220125% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754543830171,"unit":"%","value":96.88228376220125},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:17:10.173Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754543830171,"unit":"%","value":96.88228376220125},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:17:10.173Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754543830171,"unit":"%","value":96.88228376220125},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:17:10.173Z"}
+{"level":"error","message":"Métrica cpu_usage excedió threshold critical: 100% (threshold: 90)","metric":{"name":"cpu_usage","timestamp":1754543830172,"unit":"%","value":100},"threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:17:10.173Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"cpu_usage","timestamp":1754543830172,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:17:10.173Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"cpu_usage","timestamp":1754543830172,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:17:10.173Z"}
+{"heapFree":"8MB","heapTotal":"242MB","heapUsed":"234MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:18:08.311Z","usagePercent":"96.61%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:18:08.313'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:18:08.311Z","usagePercent":"96.61%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:18:08.312Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:18:08.314Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:18:08.314Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:18:08.316Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:18:08.317Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:18:08.318Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:18:08.318Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:18:08.318Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:18:08.318Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:18:08.319Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"96.72%","timestamp":"2025-08-07T05:18:08.319Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:18:08.317'
+}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"supabase","timeSinceLastFailure":1754543889579},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:18:09.579Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:18:10.181Z","unit":"%","value":96.9337285180926}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:18:10.182Z","unit":"MB","value":233.76931762695312}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:18:10.182Z","unit":"%","value":0}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:18:10.182Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:18:10.182Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:18:10.183Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:18:10.183Z","unit":"connections","value":25}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:18:10.183Z","unit":"requests/min","value":114}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:18:10.183Z","unit":"ms","value":504}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:18:10.183Z","unit":"connections","value":3}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:18:10.183Z","unit":"ms","value":166}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:18:10.183Z","unit":"%","value":82}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:18:10.183Z","unit":"connections","value":15}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:18:10.184Z","unit":"messages/min","value":232}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:18:10.184Z","unit":"ms","value":81}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.9337285180926% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754543890181,"unit":"%","value":96.9337285180926},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:18:10.184Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754543890181,"unit":"%","value":96.9337285180926},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:18:10.184Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754543890181,"unit":"%","value":96.9337285180926},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:18:10.185Z"}
+{"heapFree":"8MB","heapTotal":"242MB","heapUsed":"234MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:19:08.320Z","usagePercent":"96.65%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:19:08.323'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:19:08.321Z","usagePercent":"96.65%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:19:08.322Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:19:08.323Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:19:08.324Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:19:08.325Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:19:08.325Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:19:08.326Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:19:08.326'
+}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:19:08.326Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:19:08.326Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:19:08.326Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:19:08.327Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"96.75%","timestamp":"2025-08-07T05:19:08.327Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"database","timeSinceLastFailure":1754543949583},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:19:09.583Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:19:10.193Z","unit":"%","value":97.02665206700087}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:19:10.194Z","unit":"MB","value":233.99341583251953}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:19:10.194Z","unit":"%","value":100}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:19:10.194Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:19:10.194Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:19:10.194Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:19:10.194Z","unit":"connections","value":16}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:19:10.194Z","unit":"requests/min","value":108}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:19:10.194Z","unit":"ms","value":207}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:19:10.194Z","unit":"connections","value":7}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:19:10.195Z","unit":"ms","value":103}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:19:10.195Z","unit":"%","value":82}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:19:10.195Z","unit":"connections","value":11}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:19:10.195Z","unit":"messages/min","value":143}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:19:10.195Z","unit":"ms","value":80}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 97.02665206700087% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754543950193,"unit":"%","value":97.02665206700087},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:19:10.195Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754543950193,"unit":"%","value":97.02665206700087},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:19:10.195Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754543950193,"unit":"%","value":97.02665206700087},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:19:10.196Z"}
+{"level":"error","message":"Métrica cpu_usage excedió threshold critical: 100% (threshold: 90)","metric":{"name":"cpu_usage","timestamp":1754543950194,"unit":"%","value":100},"threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:19:10.196Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"cpu_usage","timestamp":1754543950194,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:19:10.196Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"cpu_usage","timestamp":1754543950194,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:19:10.196Z"}
+{"heapFree":"8MB","heapTotal":"242MB","heapUsed":"234MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:20:08.321Z","usagePercent":"96.72%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:20:08.322'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:20:08.321Z","usagePercent":"96.72%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:20:08.321Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:20:08.323Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:20:08.324Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:20:08.325Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:20:08.325Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:20:08.325Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:20:08.326Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:20:08.326Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:20:08.326Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:20:08.326Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:20:08.325'
+}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"96.82%","timestamp":"2025-08-07T05:20:08.326Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"whatsapp","timeSinceLastFailure":1754544009591},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:20:09.591Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:20:10.203Z","unit":"%","value":96.94604707209568}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:20:10.203Z","unit":"MB","value":234.76848602294922}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:20:10.203Z","unit":"%","value":100}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:20:10.203Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:20:10.203Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:20:10.204Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:20:10.204Z","unit":"connections","value":15}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:20:10.204Z","unit":"requests/min","value":61}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:20:10.204Z","unit":"ms","value":473}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:20:10.204Z","unit":"connections","value":2}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:20:10.205Z","unit":"ms","value":123}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:20:10.205Z","unit":"%","value":70}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:20:10.205Z","unit":"connections","value":17}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:20:10.205Z","unit":"messages/min","value":153}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:20:10.205Z","unit":"ms","value":56}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 96.94604707209568% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754544010203,"unit":"%","value":96.94604707209568},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:20:10.205Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754544010203,"unit":"%","value":96.94604707209568},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:20:10.205Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754544010203,"unit":"%","value":96.94604707209568},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:20:10.206Z"}
+{"level":"error","message":"Métrica cpu_usage excedió threshold critical: 100% (threshold: 90)","metric":{"name":"cpu_usage","timestamp":1754544010203,"unit":"%","value":100},"threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:20:10.206Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"cpu_usage","timestamp":1754544010203,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:20:10.206Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"cpu_usage","timestamp":1754544010203,"unit":"%","value":100},"metricName":"cpu_usage","threshold":{"action":"alert","critical":90,"warning":70},"timestamp":"2025-08-07T05:20:10.206Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"whatsapp","timeSinceLastFailure":1754544524856},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:28:44.856Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:28:44.894'
+}
+{"heapFree":"7MB","heapTotal":"241MB","heapUsed":"234MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:28:44.890Z","usagePercent":"97.13%"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:28:44.891Z","usagePercent":"97.13%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:28:44.891Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:28:44.895Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:28:44.897Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:28:44.899Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:28:44.901Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:28:44.910Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:28:44.911Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:28:44.912Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:28:44.903'
+}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:28:44.914Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:28:44.914Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"97.23%","timestamp":"2025-08-07T05:28:44.919Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:28:45.070Z","unit":"%","value":97.24891818551782}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:28:45.071Z","unit":"MB","value":234.5294418334961}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:28:45.071Z","unit":"%","value":49.7341628777791}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:28:45.071Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:28:45.073Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:28:45.073Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:28:45.073Z","unit":"connections","value":14}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:28:45.074Z","unit":"requests/min","value":30}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:28:45.074Z","unit":"ms","value":305}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:28:45.074Z","unit":"connections","value":5}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:28:45.074Z","unit":"ms","value":129}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:28:45.074Z","unit":"%","value":95}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:28:45.074Z","unit":"connections","value":10}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:28:45.075Z","unit":"messages/min","value":71}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:28:45.075Z","unit":"ms","value":90}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 97.24891818551782% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754544525069,"unit":"%","value":97.24891818551782},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:28:45.075Z"}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754544525069,"unit":"%","value":97.24891818551782},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:28:45.079Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754544525069,"unit":"%","value":97.24891818551782},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:28:45.079Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"supabase","timeSinceLastFailure":1754544525079},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:28:45.079Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"database","timeSinceLastFailure":1754544525088},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:28:45.088Z"}
+{"heapFree":"7MB","heapTotal":"242MB","heapUsed":"235MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-07T05:34:14.410Z","usagePercent":"96.91%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:34:14.424'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-07T05:34:14.411Z","usagePercent":"96.91%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-07T05:34:14.412Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-07T05:34:14.426Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-07T05:34:14.428Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-07T05:34:14.429Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-07T05:34:14.430Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-07T05:34:14.432Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-07T05:34:14.432Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-07T05:34:14.432Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-07T05:34:14.432Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-07T05:34:14.433Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"97.01%","timestamp":"2025-08-07T05:34:14.433Z"}
+{"level":"debug","message":"Métrica registrada","name":"memory_usage","timestamp":"2025-08-07T05:34:14.633Z","unit":"%","value":97.02814612099559}
+{"level":"debug","message":"Métrica registrada","name":"memory_used_mb","timestamp":"2025-08-07T05:34:14.634Z","unit":"MB","value":234.96730041503906}
+{"level":"debug","message":"Métrica registrada","name":"cpu_usage","timestamp":"2025-08-07T05:34:14.634Z","unit":"%","value":31.95642380815425}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_1min","timestamp":"2025-08-07T05:34:14.634Z","unit":"load","value":0.5}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_5min","timestamp":"2025-08-07T05:34:14.635Z","unit":"load","value":0.3}
+{"level":"debug","message":"Métrica registrada","name":"cpu_load_15min","timestamp":"2025-08-07T05:34:14.635Z","unit":"load","value":0.2}
+{"level":"debug","message":"Métrica registrada","name":"network_connections","timestamp":"2025-08-07T05:34:14.636Z","unit":"connections","value":55}
+{"level":"debug","message":"Métrica registrada","name":"network_requests_per_minute","timestamp":"2025-08-07T05:34:14.636Z","unit":"requests/min","value":101}
+{"level":"debug","message":"Métrica registrada","name":"network_response_time","timestamp":"2025-08-07T05:34:14.637Z","unit":"ms","value":106}
+{"level":"debug","message":"Métrica registrada","name":"database_connections","timestamp":"2025-08-07T05:34:14.637Z","unit":"connections","value":10}
+{"level":"debug","message":"Métrica registrada","name":"database_query_time","timestamp":"2025-08-07T05:34:14.637Z","unit":"ms","value":202}
+{"level":"debug","message":"Métrica registrada","name":"database_cache_hit_rate","timestamp":"2025-08-07T05:34:14.637Z","unit":"%","value":84}
+{"level":"debug","message":"Métrica registrada","name":"websocket_connections","timestamp":"2025-08-07T05:34:14.637Z","unit":"connections","value":22}
+{"level":"debug","message":"Métrica registrada","name":"websocket_messages_per_minute","timestamp":"2025-08-07T05:34:14.638Z","unit":"messages/min","value":56}
+{"level":"debug","message":"Métrica registrada","name":"websocket_latency","timestamp":"2025-08-07T05:34:14.638Z","unit":"ms","value":21}
+{"level":"error","message":"Métrica memory_usage excedió threshold critical: 97.02814612099559% (threshold: 95)","metric":{"name":"memory_usage","timestamp":1754544854633,"unit":"%","value":97.02814612099559},"threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:34:14.638Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:34:14.432'
+}
+{"level":"error","message":"🚨 CRÍTICO: Threshold excedido","metric":{"name":"memory_usage","timestamp":1754544854633,"unit":"%","value":97.02814612099559},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:34:14.638Z"}
+{"level":"warn","message":"🚨 ALERTA: Métrica crítica","metric":{"name":"memory_usage","timestamp":1754544854633,"unit":"%","value":97.02814612099559},"metricName":"memory_usage","threshold":{"action":"alert","critical":95,"warning":80},"timestamp":"2025-08-07T05:34:14.638Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"whatsapp","timeSinceLastFailure":1754544854653},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:34:14.653Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"supabase","timeSinceLastFailure":1754544854656},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:34:14.656Z"}
+{"data":{"oldStats":{"failureRate":0,"failures":0,"lastFailureTime":0,"lastSuccessTime":0,"state":"CLOSED","successes":0,"totalCalls":0},"serviceName":"database","timeSinceLastFailure":1754544854657},"event":"circuit_breaker_stats_reset","level":"info","message":"System: circuit_breaker_stats_reset","service":"system","timestamp":"2025-08-07T05:34:14.657Z"}
