@@ -3,7 +3,7 @@
  * Proporciona estadísticas y métricas del sistema
  */
 import { Router } from 'express';
-import { authMiddleware, requireAdmin } from '../middleware/auth';
+import { authMiddleware, requireAdmin } from '../middleware/auth-jwt';
 import { AuthService } from '../services/auth.service';
 import { logger } from '../utils/logger';
 import { supabaseAdmin } from '../config/supabase';

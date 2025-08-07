@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { AuthService, CreateUserData, LoginData } from '../services/auth.service';
 import { logger } from '../utils/logger';
-import { authMiddleware, requireAdmin, optionalAuth, tempAuth } from '../middleware/auth';
+import { authMiddleware, requireAdmin, optionalAuth } from '../middleware/auth-jwt';
 import { sessionCleanupService } from '../services/session-cleanup.service';
 
 const router = Router();
@@ -513,7 +513,7 @@ router.delete('/sessions/:userId', authMiddleware, requireAdmin, async (req, res
  * @desc Refrescar token de autenticación
  * @access Private
  */
-router.post('/refresh', tempAuth, async (req, res) => {
+router.post('/refresh', authMiddleware, async (req, res) => {
   try {
     if (!req.user) {
       return res.status(401).json({

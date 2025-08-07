@@ -1,6 +1,6 @@
 // ✅ RUTAS DE MONITOREO DE COLAS - IMPLEMENTADO
 import express, { Request, Response } from 'express';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware } from '../middleware/auth-jwt';
 import { getMessageQueueService } from '../services/queue/message-queue.service';
 import { logger } from '../config/logger';
 

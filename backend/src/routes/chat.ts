@@ -3,7 +3,7 @@ import { whatsappService } from '../services/whatsapp.service';
 import { unifiedDatabaseService } from '../services/unified-database.service';
 import { validatePhoneNumber, verifyWebhook, getWebhookDebugInfo, setWebhookUrl, getStats } from '../utils/whatsapp-utils';
 import { webhookSecurity, securityLogger, SecureRequest } from '../middleware/webhook-security';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware } from '../middleware/auth-jwt';
 import { messageQueueService } from '../services/message-queue.service';
 import { StructuredLogger } from '../utils/structured-logger';
 import { databaseService } from '../services/database.service';

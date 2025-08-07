@@ -16,7 +16,7 @@ const express_1 = __importDefault(require("express"));
 const whatsapp_service_1 = require("../services/whatsapp.service");
 const unified_database_service_1 = require("../services/unified-database.service");
 const whatsapp_utils_1 = require("../utils/whatsapp-utils");
-const auth_1 = require("../middleware/auth");
+const auth_jwt_1 = require("../middleware/auth-jwt");
 const message_queue_service_1 = require("../services/message-queue.service");
 const structured_logger_1 = require("../utils/structured-logger");
 const failed_message_retry_service_1 = require("../services/failed-message-retry.service");
@@ -53,7 +53,7 @@ function determineMessagePriority(webhookData) {
     }
 }
 // POST /api/chat/send - Enviar mensaje de texto
-router.post('/send', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/send', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log(' [ChatRouter] Recibiendo petición de envío:', req.body);
         console.log(' [ChatRouter] Headers:', req.headers);

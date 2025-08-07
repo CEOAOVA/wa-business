@@ -49,7 +49,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
 const logger_1 = require("../utils/logger");
-const auth_1 = require("../middleware/auth");
+const auth_jwt_1 = require("../middleware/auth-jwt");
 const session_cleanup_service_1 = require("../services/session-cleanup.service");
 const router = (0, express_1.Router)();
 /**
@@ -89,7 +89,7 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
  * @desc Registrar nuevo usuario (solo admins)
  * @access Private (Admin)
  */
-router.post('/register', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/register', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
         // Validaciones básicas
@@ -136,7 +136,7 @@ router.post('/register', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) 
  * @desc Obtener perfil del usuario actual
  * @access Private
  */
-router.get('/profile', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/profile', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         // Obtener usuario desde el middleware de autenticación
@@ -174,7 +174,7 @@ router.get('/profile', auth_1.authMiddleware, (req, res) => __awaiter(void 0, vo
  * @desc Actualizar perfil del usuario
  * @access Private
  */
-router.put('/profile', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/profile', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
@@ -212,7 +212,7 @@ router.put('/profile', auth_1.authMiddleware, (req, res) => __awaiter(void 0, vo
  * @desc Obtener todos los usuarios (solo admins)
  * @access Private (Admin)
  */
-router.get('/users', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/users', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const currentUser = req.user;
         if (!currentUser || currentUser.role !== 'admin') {
@@ -242,7 +242,7 @@ router.get('/users', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => _
  * @desc Cerrar sesión
  * @access Private
  */
-router.post('/logout', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/logout', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // En Supabase, el logout se maneja en el cliente
         // Aquí solo podemos limpiar la sesión del servidor si es necesario
@@ -297,7 +297,7 @@ router.post('/init-admin', (req, res) => __awaiter(void 0, void 0, void 0, funct
  * @desc Limpiar todas las sesiones del servidor (solo admins)
  * @access Private (Admin)
  */
-router.post('/clear-sessions', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/clear-sessions', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const currentUser = req.user;
         if (!currentUser || currentUser.role !== 'admin') {
@@ -383,7 +383,7 @@ router.post('/clear-sessions', auth_1.authMiddleware, auth_1.requireAdmin, (req,
  * @desc Desactivar usuario (solo admins)
  * @access Private (Admin)
  */
-router.delete('/users/:userId', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/users/:userId', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const currentUser = req.user;
         if (!currentUser || currentUser.role !== 'admin') {
@@ -419,7 +419,7 @@ router.delete('/users/:userId', auth_1.authMiddleware, auth_1.requireAdmin, (req
  * @desc Obtener información de sesiones activas (solo admins)
  * @access Private (Admin)
  */
-router.get('/sessions', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/sessions', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const sessions = yield session_cleanup_service_1.sessionCleanupService.getActiveSessions();
         res.json({
@@ -443,7 +443,7 @@ router.get('/sessions', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) =
  * @desc Limpiar sesiones expiradas (solo admins)
  * @access Private (Admin)
  */
-router.post('/sessions/cleanup', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/sessions/cleanup', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield session_cleanup_service_1.sessionCleanupService.cleanupExpiredSessions();
         res.json({
@@ -465,7 +465,7 @@ router.post('/sessions/cleanup', auth_1.authMiddleware, auth_1.requireAdmin, (re
  * @desc Forzar limpieza de todas las sesiones (solo admins)
  * @access Private (Admin)
  */
-router.post('/sessions/force-cleanup', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/sessions/force-cleanup', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield session_cleanup_service_1.sessionCleanupService.forceCleanupAllSessions();
         res.json({
@@ -487,7 +487,7 @@ router.post('/sessions/force-cleanup', auth_1.authMiddleware, auth_1.requireAdmi
  * @desc Limpiar sesión de un usuario específico (solo admins)
  * @access Private (Admin)
  */
-router.delete('/sessions/:userId', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/sessions/:userId', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params;
         const success = yield session_cleanup_service_1.sessionCleanupService.cleanupUserSessions(userId);
@@ -517,7 +517,7 @@ router.delete('/sessions/:userId', auth_1.authMiddleware, auth_1.requireAdmin, (
  * @desc Refrescar token de autenticación
  * @access Private
  */
-router.post('/refresh', auth_1.tempAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/refresh', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.user) {
             return res.status(401).json({
@@ -558,7 +558,7 @@ router.post('/refresh', auth_1.tempAuth, (req, res) => __awaiter(void 0, void 0,
  * @desc Verificar estado de autenticación
  * @access Private
  */
-router.get('/status', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/status', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.json({
             success: true,

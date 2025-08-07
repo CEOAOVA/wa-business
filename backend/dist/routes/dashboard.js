@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Proporciona estadísticas y métricas del sistema
  */
 const express_1 = require("express");
-const auth_1 = require("../middleware/auth");
+const auth_jwt_1 = require("../middleware/auth-jwt");
 const auth_service_1 = require("../services/auth.service");
 const logger_1 = require("../utils/logger");
 const supabase_1 = require("../config/supabase");
@@ -24,7 +24,7 @@ const router = (0, express_1.Router)();
  * @desc Obtener estadísticas generales del sistema
  * @access Private (Admin)
  */
-router.get('/stats', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/stats', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!supabase_1.supabaseAdmin) {
             throw new Error('Servicio de base de datos no disponible');
@@ -112,7 +112,7 @@ router.get('/stats', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => _
  * @desc Obtener lista detallada de usuarios
  * @access Private (Admin)
  */
-router.get('/users', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/users', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield auth_service_1.AuthService.getAllUsers();
         res.json({
@@ -133,7 +133,7 @@ router.get('/users', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => _
  * @desc Obtener estadísticas de conversaciones
  * @access Private (Admin)
  */
-router.get('/conversations', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/conversations', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!supabase_1.supabaseAdmin) {
             throw new Error('Servicio de base de datos no disponible');
@@ -163,7 +163,7 @@ router.get('/conversations', auth_1.authMiddleware, auth_1.requireAdmin, (req, r
  * @desc Obtener conversaciones para agentes (sin restricción de admin)
  * @access Private (Agentes y Admin)
  */
-router.get('/conversations/public', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/conversations/public', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!supabase_1.supabaseAdmin) {
             throw new Error('Servicio de base de datos no disponible');
@@ -224,7 +224,7 @@ router.get('/conversations/public', auth_1.authMiddleware, (req, res) => __await
  * @desc Obtener estadísticas de pedidos
  * @access Private (Admin)
  */
-router.get('/orders', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/orders', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!supabase_1.supabaseAdmin) {
             throw new Error('Servicio de base de datos no disponible');
@@ -254,7 +254,7 @@ router.get('/orders', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => 
  * @desc Obtener información del sistema
  * @access Private (Admin)
  */
-router.get('/system', auth_1.authMiddleware, auth_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/system', auth_jwt_1.authMiddleware, auth_jwt_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const systemInfo = {
             uptime: process.uptime(),

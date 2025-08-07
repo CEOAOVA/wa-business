@@ -6,6 +6,7 @@ import { Request, Response, NextFunction } from 'express';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { AuthService } from '../services/auth.service';
+import * as jwt from 'jsonwebtoken';
 
 // Extender la interfaz Request para incluir el usuario
 declare global {

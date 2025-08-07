@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // ✅ RUTAS DE MONITOREO DE COLAS - IMPLEMENTADO
 const express_1 = __importDefault(require("express"));
-const auth_1 = require("../middleware/auth");
+const auth_jwt_1 = require("../middleware/auth-jwt");
 const message_queue_service_1 = require("../services/queue/message-queue.service");
 const logger_1 = require("../config/logger");
 const router = express_1.default.Router();
@@ -22,7 +22,7 @@ const router = express_1.default.Router();
  * GET /api/queue/stats
  * Obtener estadísticas de las colas
  */
-router.get('/stats', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/stats', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const queueService = (0, message_queue_service_1.getMessageQueueService)();
         const stats = yield queueService.getQueueStats();
@@ -44,7 +44,7 @@ router.get('/stats', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void
  * POST /api/queue/clean/completed
  * Limpiar trabajos completados
  */
-router.post('/clean/completed', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/clean/completed', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const queueService = (0, message_queue_service_1.getMessageQueueService)();
         yield queueService.cleanCompleted();
@@ -65,7 +65,7 @@ router.post('/clean/completed', auth_1.authMiddleware, (req, res) => __awaiter(v
  * POST /api/queue/clean/failed
  * Limpiar trabajos fallidos
  */
-router.post('/clean/failed', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/clean/failed', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const queueService = (0, message_queue_service_1.getMessageQueueService)();
         yield queueService.cleanFailed();
@@ -86,7 +86,7 @@ router.post('/clean/failed', auth_1.authMiddleware, (req, res) => __awaiter(void
  * POST /api/queue/pause
  * Pausar todas las colas
  */
-router.post('/pause', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/pause', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const queueService = (0, message_queue_service_1.getMessageQueueService)();
         yield queueService.pauseQueues();
@@ -107,7 +107,7 @@ router.post('/pause', auth_1.authMiddleware, (req, res) => __awaiter(void 0, voi
  * POST /api/queue/resume
  * Reanudar todas las colas
  */
-router.post('/resume', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/resume', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const queueService = (0, message_queue_service_1.getMessageQueueService)();
         yield queueService.resumeQueues();
@@ -128,7 +128,7 @@ router.post('/resume', auth_1.authMiddleware, (req, res) => __awaiter(void 0, vo
  * GET /api/queue/job/:queue/:jobId
  * Obtener detalles de un trabajo específico
  */
-router.get('/job/:queue/:jobId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/job/:queue/:jobId', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { queue, jobId } = req.params;
         if (queue !== 'messages' && queue !== 'chatbot') {
@@ -171,7 +171,7 @@ router.get('/job/:queue/:jobId', auth_1.authMiddleware, (req, res) => __awaiter(
  * POST /api/queue/retry/:queue/:jobId
  * Reintentar un trabajo fallido
  */
-router.post('/retry/:queue/:jobId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/retry/:queue/:jobId', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { queue, jobId } = req.params;
         if (queue !== 'messages' && queue !== 'chatbot') {
