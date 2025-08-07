@@ -110,43 +110,54 @@ const io = new socket_io_1.Server(httpServer, {
     }
 });
 exports.io = io;
-// Middleware de autenticación para Socket.IO
+// Middleware de autenticación para Socket.IO con JWT manual
 io.use((socket, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
         // Obtener token del handshake
         const token = ((_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token) ||
             ((_b = socket.handshake.query) === null || _b === void 0 ? void 0 : _b.token);
-        console.log('🔍 [Socket.IO Auth] Verificando conexión...');
+        console.log('🔍 [Socket.IO Auth] Verificando conexión con JWT manual...');
         if (!token) {
             console.log('❌ Socket.IO: Sin token de autenticación');
             return next(new Error('No authentication token'));
         }
         console.log('🔐 Token recibido (primeros 30 chars):', token.substring(0, 30) + '...');
-        // IMPORTANTE: getUser necesita solo el token, no "Bearer "
+        // Limpiar token (remover "Bearer " si existe)
         const cleanToken = token.replace('Bearer ', '');
-        // Validar con Supabase - usar try/catch para manejar errores
-        const { supabaseAdmin } = require('./config/supabase');
+        // Validar JWT token generado por nuestro sistema
+        const jwt = require('jsonwebtoken');
+        const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+        const { AuthService } = require('./services/auth.service');
         try {
-            const { data: { user }, error } = yield supabaseAdmin.auth.getUser(cleanToken);
-            if (error) {
-                console.log('❌ Socket.IO: Error de Supabase:', error.message);
-                console.log('💡 Posible token expirado o inválido');
-                return next(new Error('Invalid or expired token'));
+            // Verificar y decodificar el token JWT
+            const decoded = jwt.verify(cleanToken, jwtSecret);
+            console.log('✅ [Socket.IO] Token JWT válido, datos decodificados:', {
+                sub: decoded.sub,
+                username: decoded.username,
+                role: decoded.role
+            });
+            // Obtener perfil del usuario desde la base de datos
+            const userProfile = yield AuthService.getUserById(decoded.sub);
+            if (!userProfile) {
+                console.log('❌ Socket.IO: Perfil de usuario no encontrado:', decoded.sub);
+                return next(new Error('User profile not found'));
             }
-            if (!user) {
-                console.log('❌ Socket.IO: No se encontró usuario');
-                return next(new Error('User not found'));
+            if (!userProfile.is_active) {
+                console.log('❌ Socket.IO: Usuario inactivo:', userProfile.username);
+                return next(new Error('Inactive user'));
             }
-            console.log('✅ Socket.IO: Usuario autenticado:', user.email);
+            console.log('✅ Socket.IO: Usuario autenticado:', userProfile.username);
             // Adjuntar usuario al socket
-            socket.userId = user.id;
-            socket.userEmail = user.email;
+            socket.userId = userProfile.id;
+            socket.userEmail = userProfile.email;
+            socket.userName = userProfile.username;
+            socket.userRole = userProfile.role;
             next();
         }
-        catch (authError) {
-            console.error('❌ Error validando con Supabase:', authError);
-            return next(new Error('Authentication validation failed'));
+        catch (jwtError) {
+            console.log('❌ Socket.IO: Token JWT inválido:', jwtError.message);
+            return next(new Error('Invalid or expired JWT token'));
         }
     }
     catch (error) {

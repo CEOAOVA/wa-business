@@ -1,6 +1,6 @@
 // ✅ HOOK PERSONALIZADO PARA LA PÁGINA DE CHATS - CORREGIDO v2
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useApp } from '../context/AppContext';
+import { useAppOptimized } from '../context/AppContextOptimized';
 import { useAuth } from '../context/AuthContext';
 import { useWebSocketOptimized } from './useWebSocketOptimized';
 import { useNotifications } from './useNotifications';
@@ -39,7 +39,7 @@ interface UseChatsPageReturn extends ChatsPageState {
 
 export function useChatsPage(): UseChatsPageReturn {
   // Context hooks
-  const { state: appState, dispatch } = useApp();
+  const { state: appState, dispatch } = useAppOptimized();
   const { state: authState } = useAuth();
   const { addNotification } = useNotifications();
   
