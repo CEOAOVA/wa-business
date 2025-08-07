@@ -56410,3 +56410,51 @@
   message: 'Usuario autenticado exitosamente: k.alvarado@aova.mx',
   timestamp: '2025-08-06 22:34:33.343'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-06 23:07:15.488'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:07:15.505'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:07:15.506'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-06 23:07:15.506'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Usuario autenticado exitosamente: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 23:07:49.132'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-06 23:08:13.188'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-06 23:08:13.191'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Usuario autenticado exitosamente: k.alvarado@aova.mx',
+  timestamp: '2025-08-06 23:08:40.741'
+}
