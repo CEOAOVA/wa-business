@@ -6,6 +6,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 import { TokenService } from '../services/token.service';
 import * as jwt from 'jsonwebtoken';
+import { supabaseAdmin } from '../config/supabase';
 
 // Extender la interfaz Request para incluir el usuario
 declare global {
@@ -48,11 +49,53 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const token = authHeader.substring(7); // Remover 'Bearer ' del token
     console.log('🔐 [AuthMiddleware] Token extraído:', token.substring(0, 20) + '...');
 
-    // Verificar token usando TokenService
-    const decoded = TokenService.verifyAccessToken(token);
-    
+    // Verificar token usando TokenService (JWT propio)
+    let decoded = TokenService.verifyAccessToken(token);
+
+    // Fallback: aceptar token de Supabase si el nuestro no es válido
     if (!decoded) {
-      console.warn('❌ [AuthMiddleware] Token inválido o expirado');
+      console.warn('❕ [AuthMiddleware] JWT propio inválido/expirado. Probando token de Supabase...');
+      try {
+        if (!supabaseAdmin) {
+          console.warn('⚠️ [AuthMiddleware] supabaseAdmin no configurado para validar token de Supabase');
+        } else {
+          const { data, error } = await supabaseAdmin.auth.getUser(token);
+          if (error) {
+            console.warn('❌ [AuthMiddleware] Supabase getUser error:', error.message);
+          }
+          if (data?.user) {
+            console.log('✅ [AuthMiddleware] Token Supabase válido. Usuario:', {
+              id: data.user.id,
+              email: (data.user as any).email
+            });
+
+            // Intentar obtener perfil por id primero, luego por email
+            const byId = await AuthService.getUserById(data.user.id);
+            const byEmail = !byId && (data.user as any).email
+              ? await AuthService.getUserByEmail((data.user as any).email as string)
+              : null;
+            const userProfile = byId || byEmail;
+
+            if (!userProfile) {
+              console.warn('❌ [AuthMiddleware] Perfil de usuario no encontrado para Supabase user');
+              return res.status(401).json({
+                success: false,
+                message: 'Perfil de usuario no encontrado'
+              });
+            }
+
+            // Adjuntar y continuar
+            (req as any).user = userProfile;
+            console.log('✅ [AuthMiddleware] Autenticación exitosa vía Supabase');
+            return next();
+          }
+        }
+      } catch (supaErr) {
+        console.error('❌ [AuthMiddleware] Error validando token con Supabase:', supaErr);
+      }
+
+      // Si tampoco fue un token de Supabase válido, rechazar
+      console.warn('❌ [AuthMiddleware] Token inválido o expirado (tampoco válido en Supabase)');
       return res.status(401).json({
         success: false,
         message: 'Token inválido o expirado'

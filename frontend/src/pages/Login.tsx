@@ -48,10 +48,10 @@ const Login: React.FC = () => {
     }
 
     try {
-      console.log('🔍 [Login] Llamando a login...');
+      console.log('🔍 [Login] Llamando a login (Supabase email/password)...');
       await login({ username: username.trim(), password, rememberMe: remember });
       console.log('✅ [Login] Login completado exitosamente');
-      // La navegación se manejará automáticamente por el useEffect
+      // Redirección por rol la maneja el router/RoleRedirect
     } catch (error) {
       // El error se maneja en el contexto
       console.error('❌ [Login] Error en login:', error);

@@ -62717,3 +62717,7 @@
   timestamp: '2025-08-07 21:54:58.304'
 }
 {"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"97.24%","timestamp":"2025-08-08T03:54:58.305Z"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-08T19:29:34.797Z","warningThreshold":"80%"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T19:29:37.873Z"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-08T19:38:32.330Z","warningThreshold":"80%"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T19:38:34.244Z"}

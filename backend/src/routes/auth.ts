@@ -7,6 +7,7 @@ import { AuthService, CreateUserData, LoginData } from '../services/auth.service
 import { TokenService } from '../services/token.service';
 import { logger } from '../utils/logger';
 import { authMiddleware, requireAdmin, optionalAuth } from '../middleware/auth-jwt';
+import { supabaseAdmin } from '../config/supabase';
 import { sessionCleanupService } from '../services/session-cleanup.service';
 
 const router = Router();
@@ -19,6 +20,31 @@ const router = Router();
 router.post('/login', async (req, res) => {
   try {
     const { username, password }: LoginData = req.body;
+
+    // Si llega un token de Supabase (por ejemplo desde frontend ya autenticado), permitir bypass
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ') && supabaseAdmin) {
+      const token = authHeader.substring(7);
+      const { data, error } = await supabaseAdmin.auth.getUser(token);
+      if (data?.user && !error) {
+        // Ya autenticado con Supabase; devolver perfil y sesión simulada
+        const byId = await AuthService.getUserById(data.user.id);
+        const byEmail = !byId && (data.user as any).email
+          ? await AuthService.getUserByEmail((data.user as any).email as string)
+          : null;
+        const user = byId || byEmail;
+        if (user) {
+          return res.json({
+            success: true,
+            message: 'Login vía Supabase',
+            data: {
+              user,
+              session: { access_token: token, token_type: 'bearer' }
+            }
+          });
+        }
+      }
+    }
 
     if (!username || !password) {
       return res.status(400).json({

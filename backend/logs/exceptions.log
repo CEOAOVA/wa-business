@@ -3500,3 +3500,281 @@
   ],
   timestamp: '2025-08-07 21:53:03.161'
 }
+{
+  error: src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    "src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.\r\n" +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    "src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.\r\n" +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    "src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.\r\n" +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Fri Aug 08 2025 13:29:38 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 24776,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 360136704,
+      heapTotal: 300167168,
+      heapUsed: 270442264,
+      external: 6560334,
+      arrayBuffers: 2534306
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 872701.234 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-08-08 13:29:38.401'
+}
+{
+  error: src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    "src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.\r\n" +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    "src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.\r\n" +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    "src/utils/password.utils.ts(1,25): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.\r\n" +
+    '\n' +
+    '    at createTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:859:12)\n' +
+    '    at reportTSError (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:863:19)\n' +
+    '    at getOutput (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1077:36)\n' +
+    '    at Object.compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1433:41)\n' +
+    '    at Module.m._compile (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Fri Aug 08 2025 13:38:34 GMT-0600 (hora estándar central)',
+  process: {
+    pid: 5484,
+    uid: null,
+    gid: null,
+    cwd: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend',
+    execPath: 'C:\\Program Files\\nodejs\\node.exe',
+    version: 'v22.16.0',
+    argv: [
+      'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\dist\\bin.js',
+      'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\src\\app.ts'
+    ],
+    memoryUsage: {
+      rss: 361861120,
+      heapTotal: 301215744,
+      heapUsed: 267341944,
+      external: 8977430,
+      arrayBuffers: 4951402
+    }
+  },
+  os: { loadavg: [ 0, 0, 0 ], uptime: 873237.437 },
+  trace: [
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: 'C:\\Users\\karal\\Documents\\login\\whtsppbsnss - copia\\backend\\node_modules\\ts-node\\src\\index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  timestamp: '2025-08-08 13:38:34.612'
+}

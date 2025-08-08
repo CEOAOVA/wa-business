@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 import type { AuthState, User, LoginCredentials } from '../types';
 import { authApiService } from '../services/auth-api';
 import { cleanupInvalidAuth, clearAllAuthData, refreshTokenIfNeeded, getRefreshStats } from '../utils/auth-cleanup';
-import { authRefreshService } from '../services/auth-refresh.service'; // ✅ AGREGADO: Auto-refresh service
+import { authRefreshService } from '../services/auth-refresh.service'; // ✅ Auto-refresh via Supabase
+import { supabase } from '../config/supabase';
 import logger from '../services/logger';
 
 // Estado inicial
@@ -92,9 +93,29 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Verificar autenticación al cargar
+  // Verificar autenticación al cargar + sincronizar auth Supabase
   useEffect(() => {
     checkAuth();
+
+    if (supabase) {
+      const { data: subscription } = supabase.auth.onAuthStateChange(async (event, session) => {
+        // Mantener localStorage.authToken sincronizado
+        if (session?.access_token) {
+          localStorage.setItem('authToken', session.access_token);
+        }
+        if (event === 'SIGNED_OUT') {
+          clearAllAuthData();
+          dispatch({ type: 'LOGOUT' });
+        }
+      });
+
+      return () => {
+        try {
+          // @ts-ignore - handle possible shape
+          subscription?.subscription?.unsubscribe?.();
+        } catch {}
+      };
+    }
   }, []);
 
   // ✅ Escuchar eventos de token refresh
@@ -132,28 +153,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: 'AUTH_START' });
       logger.debug('Iniciando login', { username: credentials.username }, 'AuthContext');
 
-      const response = await authApiService.login(credentials);
-      
-      // El response ya contiene user y session directamente
-      if (response.user && response.session) {
-        // Guardar token en localStorage
-        if (response.session.access_token) {
-          localStorage.setItem('authToken', response.session.access_token);
+      // 1) Intentar autenticación con Supabase (username es email)
+      let supabaseOk = false;
+      if (supabase) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: credentials.username,
+          password: credentials.password,
+        });
+
+        if (!signInError && signInData?.session) {
+          supabaseOk = true;
+          // Guardar access token para cliente API existente
+          localStorage.setItem('authToken', signInData.session.access_token);
           localStorage.setItem('rememberAuth', 'true');
         }
-        
-        // Convertir el usuario al formato esperado
-        const user = authApiService.convertToUser(response.user);
-        
-        // ✅ INICIAR AUTO-REFRESH DE TOKENS
-        await authRefreshService.startAutoRefresh();
-        logger.info('✅ Auto-refresh de tokens activado', {}, 'AuthContext');
-        
-        logger.info('Login exitoso', { userId: user.id, email: user.email }, 'AuthContext');
-        dispatch({ type: 'AUTH_SUCCESS', payload: user });
-      } else {
-        throw new Error('Respuesta inválida del servidor');
       }
+
+      // 2) Si falló Supabase, intentar login legacy contra backend (tabla agents/JWT propio)
+      if (!supabaseOk) {
+        logger.warn('Supabase login falló o no está configurado. Probando login legacy...');
+        const legacy = await authApiService.login({ username: credentials.username, password: credentials.password });
+        if (legacy?.session?.access_token) {
+          localStorage.setItem('authToken', legacy.session.access_token);
+          localStorage.setItem('rememberAuth', 'true');
+        }
+      }
+
+      // 3) Obtener perfil desde backend (usa el token que haya quedado)
+      const profile = await authApiService.getProfile();
+
+      // 4) Iniciar auto-refresh si Supabase está activo
+      if (supabaseOk) {
+        await authRefreshService.startAutoRefresh();
+        logger.info('✅ Auto-refresh de tokens (Supabase) activado', {}, 'AuthContext');
+      }
+
+      logger.info('Login exitoso', { userId: profile.id, email: profile.email }, 'AuthContext');
+      dispatch({ type: 'AUTH_SUCCESS', payload: profile });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido en login';
       logger.error('Error en login', { error: errorMessage }, 'AuthContext');

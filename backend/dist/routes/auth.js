@@ -51,6 +51,7 @@ const auth_service_1 = require("../services/auth.service");
 const token_service_1 = require("../services/token.service");
 const logger_1 = require("../utils/logger");
 const auth_jwt_1 = require("../middleware/auth-jwt");
+const supabase_1 = require("../config/supabase");
 const session_cleanup_service_1 = require("../services/session-cleanup.service");
 const router = (0, express_1.Router)();
 /**
@@ -61,6 +62,30 @@ const router = (0, express_1.Router)();
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
+        // Si llega un token de Supabase (por ejemplo desde frontend ya autenticado), permitir bypass
+        const authHeader = req.headers.authorization;
+        if ((authHeader === null || authHeader === void 0 ? void 0 : authHeader.startsWith('Bearer ')) && supabase_1.supabaseAdmin) {
+            const token = authHeader.substring(7);
+            const { data, error } = yield supabase_1.supabaseAdmin.auth.getUser(token);
+            if ((data === null || data === void 0 ? void 0 : data.user) && !error) {
+                // Ya autenticado con Supabase; devolver perfil y sesión simulada
+                const byId = yield auth_service_1.AuthService.getUserById(data.user.id);
+                const byEmail = !byId && data.user.email
+                    ? yield auth_service_1.AuthService.getUserByEmail(data.user.email)
+                    : null;
+                const user = byId || byEmail;
+                if (user) {
+                    return res.json({
+                        success: true,
+                        message: 'Login vía Supabase',
+                        data: {
+                            user,
+                            session: { access_token: token, token_type: 'bearer' }
+                        }
+                    });
+                }
+            }
+        }
         if (!username || !password) {
             return res.status(400).json({
                 success: false,
