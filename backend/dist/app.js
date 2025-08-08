@@ -48,7 +48,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.io = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = require("http");
-const socket_io_1 = require("socket.io");
 const logger_1 = require("./config/logger");
 const memory_monitor_1 = require("./services/monitoring/memory-monitor");
 const performance_metrics_1 = require("./services/monitoring/performance-metrics");
@@ -60,6 +59,7 @@ const whatsapp_service_1 = require("./services/whatsapp.service");
 const session_cleanup_service_1 = require("./services/session-cleanup.service");
 const failed_message_retry_service_1 = require("./services/failed-message-retry.service");
 const error_handler_1 = require("./middleware/error-handler");
+const socket_service_1 = require("./services/socket.service");
 // Importar rutas
 const chat_1 = __importDefault(require("./routes/chat"));
 const contacts_1 = __importDefault(require("./routes/contacts"));
@@ -70,6 +70,8 @@ const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const monitoring_1 = __importDefault(require("./routes/monitoring"));
 const health_1 = __importDefault(require("./routes/health"));
 const queue_1 = __importDefault(require("./routes/queue")); // ✅ AGREGADO: Rutas de cola
+const history_1 = __importDefault(require("./routes/history")); // ✅ AGREGADO: Rutas de historial
+const queue_monitor_1 = __importDefault(require("./routes/queue-monitor")); // ✅ AGREGADO: Rutas de monitoreo de colas
 // Cargar variables de entorno con soporte Unicode
 (0, env_loader_1.loadEnvWithUnicodeSupport)();
 // Debug de variables de entorno
@@ -81,145 +83,22 @@ const PORT = whatsapp_1.whatsappConfig.server.port;
 app.set('trust proxy', true);
 // Aplicar configuración de seguridad ANTES de cualquier otra cosa
 (0, security_1.applySecurity)(app);
-// ✅ CONFIGURACIÓN OPTIMIZADA DE SOCKET.IO - IMPLEMENTADO
-const io = new socket_io_1.Server(httpServer, {
-    cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:5173",
-        methods: ["GET", "POST"],
-        credentials: true,
-        allowedHeaders: ["Content-Type", "Authorization"]
-    },
-    // 🚀 OPTIMIZACIONES DE RENDIMIENTO - APLICADAS
-    transports: ['websocket', 'polling'], // Polling habilitado como fallback
-    allowEIO3: false, // Deshabilitar versión antigua
-    pingTimeout: 10000, // ⚡ OPTIMIZADO: 10 segundos (era 30)
-    pingInterval: 5000, // ⚡ OPTIMIZADO: 5 segundos (era 25)
-    upgradeTimeout: 10000, // ⚡ OPTIMIZADO: 10 segundos
-    maxHttpBufferSize: 1e6, // ⚡ OPTIMIZADO: 1MB
-    connectTimeout: 20000, // ⚡ OPTIMIZADO: 20 segundos (era 45)
-    // 📊 Configuración de compresión
-    perMessageDeflate: {
-        threshold: 1024 // Comprimir mensajes > 1KB
-    },
-    // Validación rápida de token
-    allowRequest: (req, callback) => {
-        var _a;
-        const token = req.headers.authorization || ((_a = req._query) === null || _a === void 0 ? void 0 : _a.token);
-        const isValid = token && token.length > 50;
-        callback(null, isValid);
-    }
-});
+// ✅ INICIALIZAR SOCKET.IO UNIFICADO
+const io = socket_service_1.socketService.initialize(httpServer);
 exports.io = io;
-// Middleware de autenticación para Socket.IO con JWT manual
-io.use((socket, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    try {
-        // Obtener token del handshake
-        const token = ((_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token) ||
-            ((_b = socket.handshake.query) === null || _b === void 0 ? void 0 : _b.token);
-        console.log('🔍 [Socket.IO Auth] Verificando conexión con JWT manual...');
-        if (!token) {
-            console.log('❌ Socket.IO: Sin token de autenticación');
-            return next(new Error('No authentication token'));
-        }
-        console.log('🔐 Token recibido (primeros 30 chars):', token.substring(0, 30) + '...');
-        // Limpiar token (remover "Bearer " si existe)
-        const cleanToken = token.replace('Bearer ', '');
-        // Validar JWT token generado por nuestro sistema
-        const jwt = require('jsonwebtoken');
-        const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
-        const { AuthService } = require('./services/auth.service');
-        try {
-            // Verificar y decodificar el token JWT
-            const decoded = jwt.verify(cleanToken, jwtSecret);
-            console.log('✅ [Socket.IO] Token JWT válido, datos decodificados:', {
-                sub: decoded.sub,
-                username: decoded.username,
-                role: decoded.role
-            });
-            // Obtener perfil del usuario desde la base de datos
-            const userProfile = yield AuthService.getUserById(decoded.sub);
-            if (!userProfile) {
-                console.log('❌ Socket.IO: Perfil de usuario no encontrado:', decoded.sub);
-                return next(new Error('User profile not found'));
-            }
-            if (!userProfile.is_active) {
-                console.log('❌ Socket.IO: Usuario inactivo:', userProfile.username);
-                return next(new Error('Inactive user'));
-            }
-            console.log('✅ Socket.IO: Usuario autenticado:', userProfile.username);
-            // Adjuntar usuario al socket
-            socket.userId = userProfile.id;
-            socket.userEmail = userProfile.email;
-            socket.userName = userProfile.username;
-            socket.userRole = userProfile.role;
-            next();
-        }
-        catch (jwtError) {
-            console.log('❌ Socket.IO: Token JWT inválido:', jwtError.message);
-            return next(new Error('Invalid or expired JWT token'));
-        }
-    }
-    catch (error) {
-        console.error('❌ Socket.IO: Error general en autenticación:', error);
-        next(new Error('Authentication error'));
-    }
-}));
+logger_1.logger.info('Socket.IO Service inicializado con configuración optimizada');
+// ✅ SOCKET.IO AHORA SE MANEJA EN EL SERVICIO CENTRALIZADO
+// La autenticación, eventos y limpieza están en socketService
 // Middleware para parsing JSON
 app.use(express_1.default.json());
-// Middleware para hacer disponible io en las rutas
+// Middleware para hacer disponible io en las rutas (compatibilidad)
 app.use((req, res, next) => {
     req.io = io;
     next();
 });
-// Configurar eventos de Socket.IO optimizados para tiempo real
-io.on('connection', (socket) => {
-    logger_1.logHelper.socketConnection(socket.id);
-    // Unirse a una conversación específica
-    socket.on('join_conversation', (conversationId) => {
-        logger_1.logger.debug('Cliente uniéndose a conversación', { socketId: socket.id, conversationId });
-        socket.join(conversationId);
-        socket.emit('joined_conversation', { conversationId });
-    });
-    // Salir de una conversación
-    socket.on('leave_conversation', (conversationId) => {
-        logger_1.logger.debug('Cliente saliendo de conversación', { socketId: socket.id, conversationId });
-        socket.leave(conversationId);
-        socket.emit('left_conversation', { conversationId });
-    });
-    // Heartbeat optimizado con métricas de latencia
-    socket.on('ping', (data) => {
-        const now = Date.now();
-        const latency = now - data.timestamp;
-        // SOLO log si latencia es alta (> 2 segundos)
-        if (latency > 2000) {
-            logger_1.logger.warn('Latencia alta detectada', { latency: `${latency}ms`, socketId: socket.id });
-        }
-        // Emitir respuesta con timestamp actual
-        socket.emit('pong', { timestamp: now });
-    });
-    // Manejar desconexión
-    socket.on('disconnect', (reason) => {
-        logger_1.logHelper.socketDisconnection(socket.id, reason);
-    });
-    // Manejar errores de socket
-    socket.on('error', (error) => {
-        logger_1.logger.error('Error en socket', { socketId: socket.id, error: error.message });
-    });
-});
-// NUEVO: Limpieza periódica de conexiones inactivas
+// Limpieza periódica de conexiones (delegada al servicio)
 setInterval(() => {
-    const rooms = io.sockets.adapter.rooms;
-    let inactiveCount = 0;
-    rooms.forEach((room, roomId) => {
-        if (room.size === 0) {
-            io.in(roomId).disconnectSockets();
-            inactiveCount++;
-        }
-    });
-    if (inactiveCount > 0) {
-        logger_1.logHelper.memoryCleanup('socket_rooms', inactiveCount);
-    }
+    socket_service_1.socketService.cleanupInactiveConnections();
 }, 300000); // Cada 5 minutos
 // Rutas principales
 app.get('/health', (_req, res) => {
@@ -233,6 +112,8 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', rate_limits_1.authRateLimit, auth_1.default);
 // Rutas de WhatsApp Chat
 app.use('/api/chat', rate_limits_1.whatsappRateLimit, chat_1.default);
+// Rutas de historial de mensajes
+app.use('/api/history', rate_limits_1.authRateLimit, history_1.default);
 // Rutas de gestión de contactos
 app.use('/api/contacts', contacts_1.default);
 // Rutas de multimedia
@@ -245,6 +126,8 @@ app.use('/api/dashboard', dashboard_1.default);
 app.use('/api/monitoring', monitoring_1.default);
 // Rutas de colas (Bull Queue) ✅ AGREGADO
 app.use('/api/queue', queue_1.default);
+// Rutas de monitoreo de colas Bull
+app.use('/api/queue-monitor', rate_limits_1.authRateLimit, queue_monitor_1.default);
 // Rutas de health check
 app.use('/api', health_1.default);
 // NUEVO: Rutas de logging para el frontend con structured logging
@@ -389,7 +272,7 @@ function startServer() {
             // Limpiar sesiones al inicio
             yield cleanupSessionsOnStartup();
             // Inicializar servicios con Socket.IO
-            yield whatsapp_service_1.whatsappService.initialize(io);
+            yield whatsapp_service_1.whatsappService.initialize();
             // Inicializar servicios al arrancar la aplicación
             logger_1.logger.info('Inicializando servicios');
             // Inicializar servicio de limpieza de sesiones

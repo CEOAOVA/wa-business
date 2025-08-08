@@ -208,8 +208,8 @@ export class MessageQueueService {
     try {
       context.logWebhook('processing_start', payload);
       
-      // Delegar al servicio de WhatsApp existente
-      await whatsappService.processWebhook(payload);
+      // Delegar al servicio de WhatsApp existente (compatibilidad)
+      await (whatsappService as any).processWebhookLegacy(payload);
       
       context.logWebhook('processing_success', payload);
     } catch (error) {

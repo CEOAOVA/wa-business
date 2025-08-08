@@ -35,7 +35,7 @@ export const requestLogger = (req: LoggedRequest, res: Response, next: NextFunct
     requestId: req.requestId,
     method: req.method,
     path: req.path,
-    query: req.query,
+    query: req.query as any,
     ip: req.ip || req.connection.remoteAddress,
     userAgent: req.get('user-agent'),
     userId: req.user?.id,
@@ -51,7 +51,7 @@ export const requestLogger = (req: LoggedRequest, res: Response, next: NextFunct
       method: req.method,
       path: req.path,
       statusCode: res.statusCode,
-      duration: `${duration}ms`,
+      duration,
       userId: req.user?.id,
       username: req.user?.username
     };
@@ -81,10 +81,10 @@ export const detailedRequestLogger = (req: LoggedRequest, res: Response, next: N
     requestId: req.requestId,
     method: req.method,
     path: req.path,
-    headers: req.headers,
-    query: req.query,
-    body: req.body,
-    params: req.params,
+    headers: req.headers as any,
+    query: req.query as any,
+    body: req.body as any,
+    params: req.params as any,
     ip: req.ip,
     ips: req.ips,
     protocol: req.protocol,
@@ -103,7 +103,7 @@ export const detailedRequestLogger = (req: LoggedRequest, res: Response, next: N
       requestId: req.requestId,
       statusCode: res.statusCode,
       headers: res.getHeaders(),
-      duration: `${duration}ms`,
+      duration,
       responseSize: data ? JSON.stringify(data).length : 0
     });
     

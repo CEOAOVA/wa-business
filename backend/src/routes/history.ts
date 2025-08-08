@@ -19,13 +19,13 @@ const MAX_LIMIT = 100;
  */
 router.get('/conversations/:conversationId/messages',
   authMiddleware,
-  [
+  ([
     param('conversationId').isUUID().withMessage('ID de conversación inválido'),
     query('limit').optional().isInt({ min: 1, max: MAX_LIMIT }).toInt(),
     query('before').optional().isISO8601().withMessage('Formato de fecha inválido'),
     query('after').optional().isISO8601().withMessage('Formato de fecha inválido'),
     query('cursor').optional().isString()
-  ],
+  ] as any),
   async (req: any, res: any) => {
     try {
       // Validar entrada
@@ -52,7 +52,9 @@ router.get('/conversations/:conversationId/messages',
       });
 
       // Construir query base
-      let query = databaseService.supabase
+      // Adaptado al nuevo servicio: usar supabaseDatabaseService a través de métodos de alto nivel
+      // Mantener nombres de variables para mínima intrusión
+      let query = (databaseService as any).supabase
         .from('messages')
         .select(`
           id,
@@ -110,7 +112,7 @@ router.get('/conversations/:conversationId/messages',
         : null;
 
       // Formatear respuesta
-      const formattedMessages = messages.map(msg => ({
+      const formattedMessages = messages.map((msg: any) => ({
         id: msg.id,
         waMessageId: msg.wa_message_id,
         conversationId: msg.conversation_id,
@@ -160,15 +162,15 @@ router.get('/conversations/:conversationId/messages',
  */
 router.get('/conversations/:conversationId/summary',
   authMiddleware,
-  [
+  ([
     param('conversationId').isUUID().withMessage('ID de conversación inválido')
-  ],
+  ] as any),
   async (req: any, res: any) => {
     try {
       const { conversationId } = req.params;
 
       // Obtener información de la conversación
-      const { data: conversation, error: convError } = await databaseService.supabase
+      const { data: conversation, error: convError } = await (databaseService as any).supabase
         .from('conversations')
         .select(`
           id,
@@ -195,12 +197,12 @@ router.get('/conversations/:conversationId/summary',
       }
 
       // Obtener estadísticas
-      const { count: totalMessages } = await databaseService.supabase
+      const { count: totalMessages } = await (databaseService as any).supabase
         .from('messages')
         .select('*', { count: 'exact', head: true })
         .eq('conversation_id', conversationId);
 
-      const { count: unreadMessages } = await databaseService.supabase
+      const { count: unreadMessages } = await (databaseService as any).supabase
         .from('messages')
         .select('*', { count: 'exact', head: true })
         .eq('conversation_id', conversationId)
@@ -208,7 +210,7 @@ router.get('/conversations/:conversationId/summary',
         .eq('is_from_me', false);
 
       // Obtener último mensaje
-      const { data: lastMessage } = await databaseService.supabase
+      const { data: lastMessage } = await (databaseService as any).supabase
         .from('messages')
         .select('content, created_at, is_from_me')
         .eq('conversation_id', conversationId)
@@ -260,11 +262,11 @@ router.get('/conversations/:conversationId/summary',
  */
 router.get('/search',
   authMiddleware,
-  [
+  ([
     query('q').notEmpty().withMessage('Término de búsqueda requerido'),
     query('limit').optional().isInt({ min: 1, max: MAX_LIMIT }).toInt(),
     query('conversationId').optional().isUUID()
-  ],
+  ] as any),
   async (req: any, res: any) => {
     try {
       const errors = validationResult(req);
@@ -278,7 +280,7 @@ router.get('/search',
       const { q, conversationId } = req.query;
       const limit = req.query.limit || DEFAULT_LIMIT;
 
-      let query = databaseService.supabase
+      let query = (databaseService as any).supabase
         .from('messages')
         .select(`
           id,
@@ -318,7 +320,7 @@ router.get('/search',
         success: true,
         data: {
           query: q,
-          results: messages.map(msg => ({
+          results: messages.map((msg: any) => ({
             id: msg.id,
             conversationId: msg.conversation_id,
             content: msg.content,

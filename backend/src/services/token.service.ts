@@ -49,10 +49,10 @@ export class TokenService {
           type: 'access',
           sessionId
         },
-        this.JWT_SECRET,
+        this.JWT_SECRET as any,
         {
-          expiresIn: this.ACCESS_TOKEN_EXPIRY
-        }
+          expiresIn: this.ACCESS_TOKEN_EXPIRY as any
+        } as any
       );
 
       // Generar refresh token
@@ -62,10 +62,10 @@ export class TokenService {
           type: 'refresh',
           sessionId
         },
-        this.REFRESH_SECRET,
+        this.REFRESH_SECRET as any,
         {
-          expiresIn: this.REFRESH_TOKEN_EXPIRY
-        }
+          expiresIn: this.REFRESH_TOKEN_EXPIRY as any
+        } as any
       );
 
       // Calcular tiempos de expiración en segundos
@@ -102,7 +102,7 @@ export class TokenService {
   } | null> {
     try {
       // Verificar refresh token
-      const decoded = jwt.verify(refreshToken, this.REFRESH_SECRET) as TokenPayload;
+      const decoded = jwt.verify(refreshToken, this.REFRESH_SECRET as any) as TokenPayload;
       
       if (decoded.type !== 'refresh') {
         logger.warn('Invalid token type for refresh');
@@ -129,10 +129,10 @@ export class TokenService {
           type: 'access',
           sessionId: decoded.sessionId
         },
-        this.JWT_SECRET,
+        this.JWT_SECRET as any,
         {
-          expiresIn: this.ACCESS_TOKEN_EXPIRY
-        }
+          expiresIn: this.ACCESS_TOKEN_EXPIRY as any
+        } as any
       );
 
       const expiresIn = this.getExpiryInSeconds(this.ACCESS_TOKEN_EXPIRY);
@@ -160,7 +160,7 @@ export class TokenService {
    */
   static verifyAccessToken(token: string): TokenPayload | null {
     try {
-      const decoded = jwt.verify(token, this.JWT_SECRET) as TokenPayload;
+      const decoded = jwt.verify(token, this.JWT_SECRET as any) as TokenPayload;
       
       if (decoded.type && decoded.type !== 'access') {
         logger.warn('Invalid token type for access');
@@ -183,7 +183,7 @@ export class TokenService {
    */
   static async revokeRefreshToken(refreshToken: string): Promise<boolean> {
     try {
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .update({ 
           is_active: false,
@@ -209,7 +209,7 @@ export class TokenService {
    */
   static async revokeAllUserTokens(userId: string): Promise<boolean> {
     try {
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .update({ 
           is_active: false,
@@ -236,7 +236,7 @@ export class TokenService {
    */
   static async cleanupExpiredTokens(): Promise<number> {
     try {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .delete()
         .lt('expires_at', new Date().toISOString())
@@ -268,7 +268,7 @@ export class TokenService {
     expires_at: Date;
   }): Promise<void> {
     try {
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .insert({
           id: uuidv4(),
@@ -294,7 +294,7 @@ export class TokenService {
    */
   private static async verifyRefreshToken(token: string, userId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .select('id, is_active, expires_at')
         .eq('token', token)
@@ -331,7 +331,7 @@ export class TokenService {
       if (userAgent) updateData.user_agent = userAgent;
       if (ipAddress) updateData.ip_address = ipAddress;
 
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .update(updateData)
         .eq('token', token);

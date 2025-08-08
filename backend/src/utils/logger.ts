@@ -23,6 +23,10 @@ export interface LogContext {
   operation?: string;
   securityEvent?: string;
   method?: string;
+  path?: string;
+  // Añadidos para compatibilidad de logs
+  remainingPoints?: number;
+  retryAfter?: number;
   config?: any;
   key?: string;
   pattern?: string;
@@ -55,6 +59,31 @@ export interface LogContext {
   requiredSize?: number;
   remainingItems?: number;
   userAgent?: string;
+  // Extras usados por middlewares
+  requestId?: string;
+  username?: string;
+  headers?: any;
+  query?: any;
+  body?: any;
+  params?: any;
+  ips?: string[];
+  protocol?: string;
+  secure?: boolean;
+  xhr?: boolean;
+  latency?: number;
+  jobId?: string | number;
+  priority?: string | number;
+  before?: any;
+  after?: any;
+  cursor?: any;
+  responseSize?: number;
+  // Identificadores adicionales utilizados en servicios
+  messageId?: string;
+  socketId?: string;
+  webhookCleaned?: number;
+  messageCleaned?: number;
+  // Agrupación de errores de validación
+  errors?: any;
 }
 
 export interface SystemMetrics {

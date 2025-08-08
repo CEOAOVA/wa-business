@@ -48,6 +48,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
+const token_service_1 = require("../services/token.service");
 const logger_1 = require("../utils/logger");
 const auth_jwt_1 = require("../middleware/auth-jwt");
 const session_cleanup_service_1 = require("../services/session-cleanup.service");
@@ -514,34 +515,35 @@ router.delete('/sessions/:userId', auth_jwt_1.authMiddleware, auth_jwt_1.require
 }));
 /**
  * @route POST /api/auth/refresh
- * @desc Refrescar token de autenticación
- * @access Private
+ * @desc Refrescar access token usando refresh token
+ * @access Public (requiere refresh token válido)
  */
-router.post('/refresh', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/refresh', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.user) {
-            return res.status(401).json({
+        const { refresh_token } = req.body;
+        const userAgent = req.get('User-Agent');
+        const ipAddress = req.ip || req.connection.remoteAddress;
+        if (!refresh_token) {
+            return res.status(400).json({
                 success: false,
-                message: 'Usuario no autenticado'
+                message: 'Refresh token es requerido'
             });
         }
-        // Obtener perfil completo del usuario
-        const userProfile = yield auth_service_1.AuthService.getUserById(req.user.id);
-        if (!userProfile || !userProfile.is_active) {
+        // Usar TokenService para renovar el access token
+        const result = yield token_service_1.TokenService.refreshAccessToken(refresh_token, userAgent, ipAddress);
+        if (!result) {
             return res.status(401).json({
                 success: false,
-                message: 'Usuario no encontrado o inactivo'
+                message: 'Refresh token inválido o expirado'
             });
         }
-        // Actualizar último login
-        yield auth_service_1.AuthService.updateUserProfile(req.user.id, {
-            last_login: new Date().toISOString()
-        });
         res.json({
             success: true,
-            message: 'Token refrescado exitosamente',
+            message: 'Token renovado exitosamente',
             data: {
-                user: userProfile
+                access_token: result.accessToken,
+                token_type: 'bearer',
+                expires_in: result.expiresIn
             }
         });
     }
@@ -549,7 +551,41 @@ router.post('/refresh', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 
         logger_1.logger.error('Refresh token error:', error);
         res.status(500).json({
             success: false,
-            message: 'Error al refrescar token'
+            message: 'Error al renovar token'
+        });
+    }
+}));
+/**
+ * @route POST /api/auth/revoke
+ * @desc Revocar refresh token
+ * @access Private
+ */
+router.post('/revoke', auth_jwt_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { refresh_token } = req.body;
+        if (!refresh_token) {
+            return res.status(400).json({
+                success: false,
+                message: 'Refresh token es requerido'
+            });
+        }
+        const success = yield token_service_1.TokenService.revokeRefreshToken(refresh_token);
+        if (!success) {
+            return res.status(400).json({
+                success: false,
+                message: 'Error al revocar token'
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Token revocado exitosamente'
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Revoke token error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al revocar token'
         });
     }
 }));

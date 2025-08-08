@@ -186,8 +186,8 @@ class MessageQueueService {
             const context = structured_logger_1.StructuredLogger.createContext(correlationId);
             try {
                 context.logWebhook('processing_start', payload);
-                // Delegar al servicio de WhatsApp existente
-                yield whatsapp_service_1.whatsappService.processWebhook(payload);
+                // Delegar al servicio de WhatsApp existente (compatibilidad)
+                yield whatsapp_service_1.whatsappService.processWebhookLegacy(payload);
                 context.logWebhook('processing_success', payload);
             }
             catch (error) {

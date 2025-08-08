@@ -80,7 +80,7 @@ export class SocketService {
       return this.io;
     }
 
-    this.io = new Server(httpServer, SOCKET_CONFIG);
+    this.io = new Server(httpServer, SOCKET_CONFIG as any);
     this.setupMiddleware();
     this.setupEventHandlers();
     this.startMetricsReporting();
@@ -185,7 +185,7 @@ export class SocketService {
           socketId: socket.id, 
           userId,
           error: error.message 
-        });
+        } as any);
       });
     });
   }
@@ -211,7 +211,7 @@ export class SocketService {
       socketId: socket.id,
       username: user.username,
       activeConnections: this.metrics.activeConnections
-    });
+    } as any);
 
     // Notificar a otros usuarios
     socket.broadcast.emit('user_connected', {
@@ -236,7 +236,7 @@ export class SocketService {
         username: user.username,
         reason,
         activeConnections: this.metrics.activeConnections
-      });
+      } as any);
 
       // Notificar a otros usuarios
       socket.broadcast.emit('user_disconnected', {
@@ -325,7 +325,7 @@ export class SocketService {
     
     if (latency > 2000) {
       logger.warn('Latencia alta detectada', {
-        latency: `${latency}ms`,
+        latency,
         socketId: socket.id
       });
     }
@@ -444,7 +444,7 @@ export class SocketService {
    */
   private startMetricsReporting(): void {
     setInterval(() => {
-      logger.info('Socket.IO Metrics', this.getMetrics());
+      logger.info('Socket.IO Metrics', this.getMetrics() as any);
     }, 60000); // Cada minuto
   }
 

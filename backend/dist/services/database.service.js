@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.databaseService = exports.DatabaseService = void 0;
 const supabase_database_service_1 = require("./supabase-database.service");
+const supabase_1 = require("../config/supabase");
 const product_catalog_service_1 = require("./product-catalog.service");
 /**
  * Servicio principal de base de datos - NUEVO ESQUEMA
@@ -18,6 +19,8 @@ const product_catalog_service_1 = require("./product-catalog.service");
  */
 class DatabaseService {
     constructor() {
+        // Exponer cliente Supabase para compatibilidad legacy (solo lectura de tipo)
+        this.supabase = supabase_1.supabaseAdmin;
         console.log('🗄️ DatabaseService inicializado (Nuevo esquema: agents, contacts, conversations, messages)');
         console.log('📦 ProductCatalogService integrado');
     }

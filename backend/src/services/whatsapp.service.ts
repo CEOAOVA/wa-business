@@ -533,7 +533,7 @@ export class WhatsAppService {
   /**
    * Procesar webhook de WhatsApp
    */
-  async processWebhook(body: WhatsAppWebhookMessage) {
+  async processWebhookLegacy(body: WhatsAppWebhookMessage) {
     try {
       console.log('📨 Procesando webhook de WhatsApp...');
 
@@ -552,7 +552,7 @@ export class WhatsAppService {
           if (!value.messages || value.messages.length === 0) continue;
 
           for (const message of value.messages) {
-            await this.processIncomingMessage(message, value.contacts);
+            await this.processIncomingMessageLegacy(message, value.contacts);
           }
         }
       }
@@ -564,7 +564,7 @@ export class WhatsAppService {
   /**
    * Procesar mensaje entrante individual
    */
-  private async processIncomingMessage(message: any, contacts?: any[]) {
+  private async processIncomingMessageLegacy(message: any, contacts?: any[]) {
     try {
       const from = message.from;
       const messageId = message.id;
@@ -1050,7 +1050,7 @@ export class WhatsAppService {
       // Procesar según el tipo de mensaje
       switch (message.type) {
         case 'text':
-          await this.processTextMessage({
+          await this.handleTextMessageNew({
             ...baseMessageData,
             text: message.text.body
           });
@@ -1061,38 +1061,38 @@ export class WhatsAppService {
         case 'audio':
         case 'document':
         case 'sticker':
-          await this.processMediaMessage({
+          await this.handleMediaMessageNew({
             ...baseMessageData,
             mediaType: message.type,
-            mediaId: message[message.type].id,
-            caption: message[message.type].caption
+            mediaId: (message as any)[message.type]?.id,
+            caption: (message as any)[message.type]?.caption
           });
           break;
 
         case 'location':
-          await this.processLocationMessage({
+          await this.handleLocationMessageNew({
             ...baseMessageData,
             location: message.location
           });
           break;
 
         case 'contacts':
-          await this.processContactsMessage({
+          await this.handleContactsMessageNew({
             ...baseMessageData,
             contacts: message.contacts
           });
           break;
 
         case 'interactive':
-          await this.processInteractiveMessage({
+          await this.handleInteractiveMessageNew({
             ...baseMessageData,
             interactive: message.interactive
           });
           break;
 
         default:
-          logger.warn(`Tipo de mensaje no soportado: ${message.type}`, {
-            messageId: message.id,
+      logger.warn(`Tipo de mensaje no soportado: ${String((message as any)?.type)}`, {
+        messageId: (message as any)?.id,
             requestId
           });
       }
@@ -1105,6 +1105,40 @@ export class WhatsAppService {
       });
       throw error;
     }
+  }
+
+  /**
+   * Adaptadores para el flujo nuevo → legado
+   */
+  private async handleTextMessageNew(data: { waMessageId: string; fromWaId: string; timestamp: Date; contactName: string; text: string }): Promise<void> {
+    await this.processTextMessage(data.fromWaId, data.waMessageId, data.text, data.timestamp, data.contactName);
+  }
+
+  private async handleMediaMessageNew(data: { waMessageId: string; fromWaId: string; timestamp: Date; contactName: string; mediaType: string; mediaId: string; caption?: string }): Promise<void> {
+    await this.processMediaMessage(data.fromWaId, data.waMessageId, data.mediaType, { id: data.mediaId, caption: data.caption }, data.timestamp, data.contactName);
+  }
+
+  private async handleLocationMessageNew(data: any): Promise<void> {
+    const text = `📍 Ubicación: ${data.location?.name || 'Sin nombre'}\n${data.location?.address || `Lat: ${data.location?.latitude}, Lon: ${data.location?.longitude}`}`;
+    await this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+  }
+
+  private async handleContactsMessageNew(data: any): Promise<void> {
+    const contactsText = (data.contacts || [])
+      .map((c: any) => `👤 ${c.name?.formatted_name}${c.phones?.[0] ? ` - ${c.phones[0].phone}` : ''}`)
+      .join('\n');
+    const text = `Contactos compartidos:\n${contactsText}`;
+    await this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+  }
+
+  private async handleInteractiveMessageNew(data: any): Promise<void> {
+    let text = '';
+    if (data.interactive?.type === 'button_reply') {
+      text = `Botón seleccionado: ${data.interactive?.button_reply?.title}`;
+    } else if (data.interactive?.type === 'list_reply') {
+      text = `Opción seleccionada: ${data.interactive?.list_reply?.title}`;
+    }
+    await this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
   }
 
   /**
@@ -1121,8 +1155,11 @@ export class WhatsAppService {
         recipient: status.recipient_id
       });
 
-      // Actualizar en base de datos
-      await databaseService.updateMessageStatus(status.id, status.status);
+      // Actualizar en base de datos (id local es numérico; si viene wa id, no actualizar)
+      const maybeId = Number(status.id);
+      if (!Number.isNaN(maybeId)) {
+        await databaseService.updateMessageStatus(maybeId, status.status);
+      }
 
       // Emitir evento via Socket.IO
       socketService.emitGlobal('message_status_update', {
@@ -1180,12 +1217,8 @@ export class WhatsAppService {
    * Procesar mensaje de ubicación
    */
   private async processLocationMessage(data: any): Promise<void> {
-    const messageData = {
-      ...data,
-      text: `📍 Ubicación: ${data.location.name || 'Sin nombre'}\n${data.location.address || `Lat: ${data.location.latitude}, Lon: ${data.location.longitude}`}`
-    };
-
-    await this.processTextMessage(messageData);
+    const text = `📍 Ubicación: ${data.location.name || 'Sin nombre'}\n${data.location.address || `Lat: ${data.location.latitude}, Lon: ${data.location.longitude}`}`;
+    await this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
   }
 
   /**
@@ -1195,13 +1228,8 @@ export class WhatsAppService {
     const contactsText = data.contacts
       .map((c: any) => `👤 ${c.name.formatted_name}${c.phones?.[0] ? ` - ${c.phones[0].phone}` : ''}`)
       .join('\n');
-
-    const messageData = {
-      ...data,
-      text: `Contactos compartidos:\n${contactsText}`
-    };
-
-    await this.processTextMessage(messageData);
+    const text = `Contactos compartidos:\n${contactsText}`;
+    await this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
   }
 
   /**
@@ -1209,19 +1237,12 @@ export class WhatsAppService {
    */
   private async processInteractiveMessage(data: any): Promise<void> {
     let text = '';
-    
     if (data.interactive.type === 'button_reply') {
       text = `Botón seleccionado: ${data.interactive.button_reply.title}`;
     } else if (data.interactive.type === 'list_reply') {
       text = `Opción seleccionada: ${data.interactive.list_reply.title}`;
     }
-
-    const messageData = {
-      ...data,
-      text
-    };
-
-    await this.processTextMessage(messageData);
+    await this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
   }
 }
 

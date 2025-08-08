@@ -595,7 +595,7 @@ router.post('/simulate-message', async (req: any, res: any) => {
     };
 
     console.log('🧪 Simulando mensaje entrante:', simulatedWebhook);
-    await whatsappService.processWebhook(simulatedWebhook);
+    await (whatsappService as any).processWebhookLegacy(simulatedWebhook);
     
     res.json({
       success: true,

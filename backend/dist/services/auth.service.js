@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -45,7 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const supabase_1 = require("../config/supabase");
 const logger_1 = require("../utils/logger");
-const jwt = __importStar(require("jsonwebtoken"));
+const password_utils_1 = require("../utils/password.utils");
+const token_service_1 = require("./token.service");
 class AuthService {
     /**
      * Crear un nuevo usuario
@@ -75,6 +43,8 @@ class AuthService {
                     throw new Error('No user data returned from auth creation');
                 }
                 // Crear perfil de usuario en la tabla agents usando el cliente administrativo
+                // Hashear la contraseña antes de guardarla
+                const hashedPassword = yield password_utils_1.PasswordUtils.hashPassword(userData.password);
                 const { data: profileData, error: profileError } = yield supabase_1.supabaseAdmin
                     .from('agents')
                     .insert({
@@ -83,6 +53,7 @@ class AuthService {
                     full_name: userData.full_name,
                     email: userData.email,
                     role: userData.role || 'agent',
+                    password: hashedPassword, // Guardar el hash, no la contraseña en texto plano
                     is_active: true
                 })
                     .select()
@@ -119,9 +90,20 @@ class AuthService {
                     logger_1.logger.error(`Usuario no encontrado: ${loginData.username}`);
                     throw new Error('Usuario o contraseña incorrectos');
                 }
-                // Verificar contraseña (comparación directa)
-                // NOTA: En producción deberías usar hash de contraseñas
-                if (agent.password !== loginData.password) {
+                // Verificar contraseña usando bcrypt
+                let isPasswordValid = false;
+                // Verificar si la contraseña está hasheada o en texto plano (para migración)
+                if (password_utils_1.PasswordUtils.isPasswordHashed(agent.password)) {
+                    // Si está hasheada, usar bcrypt.compare
+                    isPasswordValid = yield password_utils_1.PasswordUtils.verifyPassword(loginData.password, agent.password);
+                }
+                else {
+                    // Si está en texto plano, comparar directamente (solo durante migración)
+                    isPasswordValid = agent.password === loginData.password;
+                    // Log para identificar usuarios que necesitan migración
+                    logger_1.logger.warn(`Usuario ${loginData.username} tiene contraseña en texto plano - necesita migración`);
+                }
+                if (!isPasswordValid) {
                     logger_1.logger.error(`Contraseña incorrecta para usuario: ${loginData.username}`);
                     throw new Error('Usuario o contraseña incorrectos');
                 }
@@ -142,24 +124,22 @@ class AuthService {
                     created_at: agent.created_at,
                     updated_at: agent.updated_at
                 };
-                // Generar token JWT manualmente
-                const jwtSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
-                const expiresIn = process.env.JWT_EXPIRES_IN || '8h';
-                const token = jwt.sign({
+                // Generar par de tokens usando TokenService
+                const tokenPair = yield token_service_1.TokenService.generateTokenPair({
                     sub: agent.id,
                     email: agent.email || agent.username,
                     role: agent.role,
                     username: agent.username
-                }, jwtSecret, {
-                    expiresIn: expiresIn
                 });
-                // Crear sesión simulada compatible con el frontend
+                // Crear sesión compatible con el frontend
                 const session = {
-                    access_token: token,
+                    access_token: tokenPair.accessToken,
+                    refresh_token: tokenPair.refreshToken,
                     token_type: 'bearer',
-                    expires_in: 28800,
-                    expires_at: Math.floor(Date.now() / 1000) + 28800,
-                    refresh_token: token, // Usamos el mismo token como refresh
+                    expires_in: tokenPair.expiresIn,
+                    expires_at: Math.floor(Date.now() / 1000) + tokenPair.expiresIn,
+                    refresh_expires_in: tokenPair.refreshExpiresIn,
+                    refresh_expires_at: Math.floor(Date.now() / 1000) + tokenPair.refreshExpiresIn,
                     user: {
                         id: agent.id,
                         email: agent.email || agent.username,
@@ -391,6 +371,11 @@ class AuthService {
                 if (existingAdmin) {
                     logger_1.logger.info('Initial admin already exists');
                     return existingAdmin;
+                }
+                // Validar que la contraseña del admin sea segura
+                const passwordValidation = password_utils_1.PasswordUtils.validatePasswordStrength(adminPassword);
+                if (!passwordValidation.isValid) {
+                    logger_1.logger.warn(`Contraseña inicial del admin débil: ${passwordValidation.message}`);
                 }
                 // Crear admin inicial
                 const adminData = {

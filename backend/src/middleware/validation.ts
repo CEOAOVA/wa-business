@@ -23,6 +23,7 @@ export const validateRequest = (validations: ValidationChain[]) => {
     logger.warn('Validation errors', {
       path: req.path,
       method: req.method,
+      // Map a campo+mensaje para evitar tipos estrictos
       errors: errors.array()
     });
 

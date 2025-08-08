@@ -1,4 +1,5 @@
 import { supabaseDatabaseService, SupabaseConversation, SupabaseMessage } from './supabase-database.service';
+import { supabaseAdmin } from '../config/supabase';
 import { productCatalogService } from './product-catalog.service';
 
 /**
@@ -6,6 +7,8 @@ import { productCatalogService } from './product-catalog.service';
  * Usando las tablas: agents, contacts, conversations, messages
  */
 export class DatabaseService {
+  // Exponer cliente Supabase para compatibilidad legacy (solo lectura de tipo)
+  public readonly supabase: any = supabaseAdmin;
   constructor() {
     console.log('🗄️ DatabaseService inicializado (Nuevo esquema: agents, contacts, conversations, messages)');
     console.log('📦 ProductCatalogService integrado');

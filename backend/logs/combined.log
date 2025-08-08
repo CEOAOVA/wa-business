@@ -62658,3 +62658,62 @@
   message: 'Error fatal en migración de contraseñas:',
   timestamp: '2025-08-07 13:41:57.543'
 }
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-08T03:52:58.286Z","warningThreshold":"80%"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T03:53:02.498Z"}
+{"heapFree":"6MB","heapTotal":"234MB","heapUsed":"228MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-08T03:53:58.294Z","usagePercent":"97.39%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-07 21:53:58.320'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-08T03:53:58.295Z","usagePercent":"97.39%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-08T03:53:58.295Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-08T03:53:58.321Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-08T03:53:58.322Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T03:53:58.323Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-08T03:53:58.324Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-08T03:53:58.391Z"}
+{"level":"info","message":"SessionCleanupService inicializado","timestamp":"2025-08-08T03:53:58.407Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-08T03:53:58.407Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-08T03:53:58.407Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-08T03:53:58.408Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-08T03:53:58.408Z"}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"97.42%","timestamp":"2025-08-08T03:53:58.408Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-07 21:53:58.389'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-07 21:53:58.391'
+}
+{"heapFree":"7MB","heapTotal":"237MB","heapUsed":"230MB","level":"debug","message":"Métricas de memoria","timestamp":"2025-08-08T03:54:58.301Z","usagePercent":"97.14%"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-07 21:54:58.302'
+}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-08T03:54:58.301Z","usagePercent":"97.14%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-08T03:54:58.301Z"}
+{"level":"info","message":"Cache service limpiado","timestamp":"2025-08-08T03:54:58.302Z"}
+{"level":"info","message":"Inventory cache limpiado","timestamp":"2025-08-08T03:54:58.303Z"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T03:54:58.304Z"}
+{"level":"info","message":"Chatbot sessions limpiadas","timestamp":"2025-08-08T03:54:58.304Z"}
+{"level":"info","message":"Rate limiter reiniciado","timestamp":"2025-08-08T03:54:58.304Z"}
+{"level":"info","message":"SessionCleanupService detenido","timestamp":"2025-08-08T03:54:58.305Z"}
+{"level":"info","message":"SessionCleanupService iniciado","timestamp":"2025-08-08T03:54:58.305Z"}
+{"level":"info","message":"SessionCleanupService reiniciado","timestamp":"2025-08-08T03:54:58.305Z"}
+{"level":"info","message":"Session cleanup service reiniciado","timestamp":"2025-08-08T03:54:58.305Z"}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-07 21:54:58.304'
+}
+{"level":"info","message":"Limpieza de emergencia completada","newUsagePercent":"97.24%","timestamp":"2025-08-08T03:54:58.305Z"}

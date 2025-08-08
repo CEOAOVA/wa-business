@@ -5994,3 +5994,7 @@
   message: 'Error fatal en migración de contraseñas:',
   timestamp: '2025-08-07 13:41:57.545'
 }
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-08T03:53:58.295Z","usagePercent":"97.39%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-08T03:53:58.295Z"}
+{"level":"error","message":"CRÍTICO: Uso de memoria muy alto","threshold":"95%","timestamp":"2025-08-08T03:54:58.301Z","usagePercent":"97.14%"}
+{"level":"error","message":"Iniciando limpieza de emergencia","timestamp":"2025-08-08T03:54:58.301Z"}

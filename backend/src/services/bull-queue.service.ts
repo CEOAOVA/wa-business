@@ -133,11 +133,11 @@ export class BullQueueService {
       
       logger.debug(`Webhook agregado a cola: ${job.id}`, {
         requestId: data.requestId,
-        messageId,
+        messageId: messageId || undefined,
         priority: data.priority
       });
 
-      return job.id as string;
+      return (job.id as string) || String(job.id);
     } catch (error: any) {
       logger.error('Error agregando webhook a cola', error);
       throw error;
@@ -174,7 +174,7 @@ export class BullQueueService {
         logger.debug(`Procesando webhook ${requestId}`);
         
         // Procesar el webhook
-        await whatsappService.processWebhook({
+        await (whatsappService as any).processWebhook({
           requestId,
           payload,
           messageId
@@ -283,7 +283,7 @@ export class BullQueueService {
    */
   private async saveFailedWebhook(data: WebhookJob['data'], error: Error) {
     try {
-      await databaseService.supabase
+      await (databaseService as any).supabase
         .from('failed_webhooks')
         .insert({
           request_id: data.requestId,
@@ -364,7 +364,7 @@ export class BullQueueService {
   private async logQueueStats() {
     try {
       const stats = await this.getQueueStats();
-      logger.info('Queue Statistics', stats);
+      logger.info('Queue Statistics', stats as any);
     } catch (error) {
       logger.error('Error obteniendo estadísticas de cola', error);
     }

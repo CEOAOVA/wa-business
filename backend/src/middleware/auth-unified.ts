@@ -167,7 +167,7 @@ export const optionalAuth = async (
     next();
   } catch (error) {
     // En caso de error, continuar sin autenticación
-    logger.debug('Optional auth error, continuing without auth:', error);
+    logger.debug('Optional auth error, continuing without auth', { error });
     req.isAuthenticated = false;
     next();
   }

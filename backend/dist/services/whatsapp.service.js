@@ -19,8 +19,10 @@ const database_service_1 = require("./database.service");
 const database_1 = require("../types/database");
 const chatbot_service_1 = require("./chatbot.service"); // NUEVO: Import del chatbot
 const logger_1 = require("../config/logger");
+const socket_service_1 = require("./socket.service");
 class WhatsAppService {
     constructor() {
+        // Socket.IO ahora se maneja a través del servicio centralizado
         this.lastMessages = new Map(); // Almacenar últimos mensajes temporalmente
     }
     /**
@@ -95,12 +97,10 @@ class WhatsAppService {
     initialize(socketIo) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                this.io = socketIo;
+                // Socket.IO ahora se maneja a través del servicio centralizado
                 yield database_service_1.databaseService.connect();
                 logger_1.logger.info('WhatsApp Service inicializado con base de datos');
-                if (socketIo) {
-                    logger_1.logger.info('Socket.IO integrado con WhatsApp Service');
-                }
+                logger_1.logger.info('Socket.IO se maneja a través de socketService');
             }
             catch (error) {
                 logger_1.logger.error('Error inicializando WhatsApp Service', { error: error instanceof Error ? error.message : String(error) });
@@ -112,31 +112,17 @@ class WhatsAppService {
      * Emitir evento WebSocket optimizado (método público para uso externo)
      */
     emitSocketEvent(event, data) {
-        if (this.io) {
-            // Emitir con optimizaciones para tiempo real
-            this.io.emit(event, data, {
-                compress: true, // Comprimir datos
-                volatile: false, // Asegurar entrega
-                timeout: 5000 // Timeout de 5 segundos
-            });
-            logger_1.logger.debug('Evento WebSocket emitido', { event, data });
-        }
-        else {
-            logger_1.logger.warn('No hay conexión WebSocket para emitir evento', { event });
-        }
+        // Usar servicio centralizado de Socket.IO
+        socket_service_1.socketService.emitGlobal(event, data);
+        logger_1.logger.debug('Evento WebSocket emitido', { event, data });
     }
     /**
      * Emitir evento a una conversación específica
      */
     emitToConversation(conversationId, event, data) {
-        if (this.io) {
-            this.io.to(conversationId).emit(event, data, {
-                compress: true,
-                volatile: false,
-                timeout: 5000
-            });
-            console.log(`🌐 [Socket] Evento '${event}' emitido a conversación ${conversationId}:`, data);
-        }
+        // Usar servicio centralizado de Socket.IO
+        socket_service_1.socketService.emitToConversation(conversationId, event, data);
+        console.log(`🌐 [Socket] Evento '${event}' emitido a conversación ${conversationId}:`, data);
     }
     /**
      * Emitir evento de nuevo mensaje optimizado
@@ -312,7 +298,7 @@ class WhatsAppService {
                 }
                 // 5. BROADCAST CON CONFIRMACIÓN
                 console.log('📢 [PERSISTENCE] Paso 5: Broadcast con confirmación');
-                if (this.io && !data.isChatbotResponse) {
+                if (!data.isChatbotResponse) {
                     const sentMessage = {
                         id: dbResult.message.id,
                         waMessageId: whatsappResult.messageId,
@@ -455,7 +441,7 @@ class WhatsAppService {
     /**
      * Procesar webhook de WhatsApp
      */
-    processWebhook(body) {
+    processWebhookLegacy(body) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log('📨 Procesando webhook de WhatsApp...');
@@ -473,7 +459,7 @@ class WhatsAppService {
                         if (!value.messages || value.messages.length === 0)
                             continue;
                         for (const message of value.messages) {
-                            yield this.processIncomingMessage(message, value.contacts);
+                            yield this.processIncomingMessageLegacy(message, value.contacts);
                         }
                     }
                 }
@@ -486,7 +472,7 @@ class WhatsAppService {
     /**
      * Procesar mensaje entrante individual
      */
-    processIncomingMessage(message, contacts) {
+    processIncomingMessageLegacy(message, contacts) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
@@ -763,7 +749,7 @@ class WhatsAppService {
                     timestamp: new Date()
                 });
                 // Emitir evento de Socket.IO para mensaje multimedia enviado
-                if (this.io && result) {
+                if (result) {
                     const sentMessage = {
                         id: result.message.id,
                         waMessageId: data.whatsappMessageId,
@@ -819,7 +805,7 @@ class WhatsAppService {
                     contactName: data.contactName
                 });
                 // Emitir evento de Socket.IO para mensaje multimedia recibido
-                if (this.io && result) {
+                if (result) {
                     const receivedMessage = {
                         id: result.message.id,
                         waMessageId: data.waMessageId,
@@ -849,6 +835,262 @@ class WhatsAppService {
                 console.error('❌ Error procesando mensaje multimedia entrante:', error);
                 throw error;
             }
+        });
+    }
+    /**
+     * Procesar webhook de WhatsApp (llamado desde Bull Queue)
+     * Maneja todos los tipos de mensajes y estados
+     */
+    processWebhook(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d;
+            const { requestId, payload, messageId } = data;
+            const startTime = Date.now();
+            try {
+                logger_1.logger.info(`Procesando webhook ${requestId}`, { messageId });
+                // Validar estructura del webhook
+                if (!((_d = (_c = (_b = (_a = payload === null || payload === void 0 ? void 0 : payload.entry) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.changes) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.value)) {
+                    logger_1.logger.warn('Webhook con estructura inválida', { requestId });
+                    return;
+                }
+                const change = payload.entry[0].changes[0];
+                const value = change.value;
+                // Procesar mensajes entrantes
+                if (value.messages && value.messages.length > 0) {
+                    for (const message of value.messages) {
+                        yield this.processIncomingMessage(message, value, requestId);
+                    }
+                }
+                // Procesar actualizaciones de estado
+                if (value.statuses && value.statuses.length > 0) {
+                    for (const status of value.statuses) {
+                        yield this.processMessageStatus(status, requestId);
+                    }
+                }
+                // Procesar errores
+                if (value.errors && value.errors.length > 0) {
+                    for (const error of value.errors) {
+                        yield this.processWebhookError(error, requestId);
+                    }
+                }
+                const processingTime = Date.now() - startTime;
+                logger_1.logger.info(`Webhook procesado exitosamente en ${processingTime}ms`, {
+                    requestId,
+                    messageId
+                });
+            }
+            catch (error) {
+                logger_1.logger.error('Error procesando webhook', {
+                    requestId,
+                    messageId,
+                    error: error.message,
+                    stack: error.stack
+                });
+                throw error;
+            }
+        });
+    }
+    /**
+     * Procesar mensaje entrante según su tipo
+     */
+    processIncomingMessage(message, value, requestId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d;
+            try {
+                const contact = (_a = value.contacts) === null || _a === void 0 ? void 0 : _a[0];
+                const phoneNumberId = value.metadata.phone_number_id;
+                // Preparar datos base del mensaje
+                const baseMessageData = {
+                    waMessageId: message.id,
+                    fromWaId: message.from,
+                    phoneNumberId,
+                    timestamp: new Date(parseInt(message.timestamp) * 1000),
+                    contactName: ((_b = contact === null || contact === void 0 ? void 0 : contact.profile) === null || _b === void 0 ? void 0 : _b.name) || 'Usuario'
+                };
+                logger_1.logger.debug(`Procesando mensaje tipo: ${message.type}`, {
+                    messageId: message.id,
+                    from: message.from,
+                    type: message.type
+                });
+                // Procesar según el tipo de mensaje
+                switch (message.type) {
+                    case 'text':
+                        yield this.handleTextMessageNew(Object.assign(Object.assign({}, baseMessageData), { text: message.text.body }));
+                        break;
+                    case 'image':
+                    case 'video':
+                    case 'audio':
+                    case 'document':
+                    case 'sticker':
+                        yield this.handleMediaMessageNew(Object.assign(Object.assign({}, baseMessageData), { mediaType: message.type, mediaId: (_c = message[message.type]) === null || _c === void 0 ? void 0 : _c.id, caption: (_d = message[message.type]) === null || _d === void 0 ? void 0 : _d.caption }));
+                        break;
+                    case 'location':
+                        yield this.handleLocationMessageNew(Object.assign(Object.assign({}, baseMessageData), { location: message.location }));
+                        break;
+                    case 'contacts':
+                        yield this.handleContactsMessageNew(Object.assign(Object.assign({}, baseMessageData), { contacts: message.contacts }));
+                        break;
+                    case 'interactive':
+                        yield this.handleInteractiveMessageNew(Object.assign(Object.assign({}, baseMessageData), { interactive: message.interactive }));
+                        break;
+                    default:
+                        logger_1.logger.warn(`Tipo de mensaje no soportado: ${String(message === null || message === void 0 ? void 0 : message.type)}`, {
+                            messageId: message === null || message === void 0 ? void 0 : message.id,
+                            requestId
+                        });
+                }
+            }
+            catch (error) {
+                logger_1.logger.error('Error procesando mensaje entrante', {
+                    messageId: message.id,
+                    type: message.type,
+                    error: error.message
+                });
+                throw error;
+            }
+        });
+    }
+    /**
+     * Adaptadores para el flujo nuevo → legado
+     */
+    handleTextMessageNew(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, data.text, data.timestamp, data.contactName);
+        });
+    }
+    handleMediaMessageNew(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.processMediaMessage(data.fromWaId, data.waMessageId, data.mediaType, { id: data.mediaId, caption: data.caption }, data.timestamp, data.contactName);
+        });
+    }
+    handleLocationMessageNew(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d;
+            const text = `📍 Ubicación: ${((_a = data.location) === null || _a === void 0 ? void 0 : _a.name) || 'Sin nombre'}\n${((_b = data.location) === null || _b === void 0 ? void 0 : _b.address) || `Lat: ${(_c = data.location) === null || _c === void 0 ? void 0 : _c.latitude}, Lon: ${(_d = data.location) === null || _d === void 0 ? void 0 : _d.longitude}`}`;
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+        });
+    }
+    handleContactsMessageNew(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contactsText = (data.contacts || [])
+                .map((c) => { var _a, _b; return `👤 ${(_a = c.name) === null || _a === void 0 ? void 0 : _a.formatted_name}${((_b = c.phones) === null || _b === void 0 ? void 0 : _b[0]) ? ` - ${c.phones[0].phone}` : ''}`; })
+                .join('\n');
+            const text = `Contactos compartidos:\n${contactsText}`;
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+        });
+    }
+    handleInteractiveMessageNew(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d, _e, _f;
+            let text = '';
+            if (((_a = data.interactive) === null || _a === void 0 ? void 0 : _a.type) === 'button_reply') {
+                text = `Botón seleccionado: ${(_c = (_b = data.interactive) === null || _b === void 0 ? void 0 : _b.button_reply) === null || _c === void 0 ? void 0 : _c.title}`;
+            }
+            else if (((_d = data.interactive) === null || _d === void 0 ? void 0 : _d.type) === 'list_reply') {
+                text = `Opción seleccionada: ${(_f = (_e = data.interactive) === null || _e === void 0 ? void 0 : _e.list_reply) === null || _f === void 0 ? void 0 : _f.title}`;
+            }
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+        });
+    }
+    /**
+     * Procesar actualización de estado de mensaje
+     */
+    processMessageStatus(status, requestId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                logger_1.logger.debug('Procesando actualización de estado', {
+                    messageId: status.id,
+                    status: status.status,
+                    recipient: status.recipient_id
+                });
+                // Actualizar en base de datos (id local es numérico; si viene wa id, no actualizar)
+                const maybeId = Number(status.id);
+                if (!Number.isNaN(maybeId)) {
+                    yield database_service_1.databaseService.updateMessageStatus(maybeId, status.status);
+                }
+                // Emitir evento via Socket.IO
+                socket_service_1.socketService.emitGlobal('message_status_update', {
+                    messageId: status.id,
+                    status: status.status,
+                    recipientId: status.recipient_id,
+                    timestamp: status.timestamp
+                });
+                // Si hay errores, procesarlos
+                if (status.errors && status.errors.length > 0) {
+                    for (const error of status.errors) {
+                        logger_1.logger.error('Error en mensaje', {
+                            messageId: status.id,
+                            errorCode: error.code,
+                            errorTitle: error.title,
+                            errorMessage: error.message
+                        });
+                    }
+                }
+            }
+            catch (error) {
+                logger_1.logger.error('Error procesando estado de mensaje', {
+                    messageId: status.id,
+                    error: error.message
+                });
+            }
+        });
+    }
+    /**
+     * Procesar errores del webhook
+     */
+    processWebhookError(error, requestId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
+            logger_1.logger.error('Error recibido en webhook', {
+                requestId,
+                errorCode: error.code,
+                errorTitle: error.title,
+                errorMessage: error.message,
+                errorDetails: (_a = error.error_data) === null || _a === void 0 ? void 0 : _a.details
+            });
+            // Emitir evento de error
+            socket_service_1.socketService.emitGlobal('webhook_error', {
+                code: error.code,
+                title: error.title,
+                message: error.message,
+                details: (_b = error.error_data) === null || _b === void 0 ? void 0 : _b.details
+            });
+        });
+    }
+    /**
+     * Procesar mensaje de ubicación
+     */
+    processLocationMessage(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const text = `📍 Ubicación: ${data.location.name || 'Sin nombre'}\n${data.location.address || `Lat: ${data.location.latitude}, Lon: ${data.location.longitude}`}`;
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+        });
+    }
+    /**
+     * Procesar mensaje de contactos
+     */
+    processContactsMessage(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contactsText = data.contacts
+                .map((c) => { var _a; return `👤 ${c.name.formatted_name}${((_a = c.phones) === null || _a === void 0 ? void 0 : _a[0]) ? ` - ${c.phones[0].phone}` : ''}`; })
+                .join('\n');
+            const text = `Contactos compartidos:\n${contactsText}`;
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
+        });
+    }
+    /**
+     * Procesar mensaje interactivo
+     */
+    processInteractiveMessage(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let text = '';
+            if (data.interactive.type === 'button_reply') {
+                text = `Botón seleccionado: ${data.interactive.button_reply.title}`;
+            }
+            else if (data.interactive.type === 'list_reply') {
+                text = `Opción seleccionada: ${data.interactive.list_reply.title}`;
+            }
+            yield this.processTextMessage(data.fromWaId, data.waMessageId, text, data.timestamp, data.contactName);
         });
     }
 }
