@@ -57140,3 +57140,447 @@
   message: 'Rate limiter destroyed',
   timestamp: '2025-08-07 21:54:58.304'
 }
+{
+  service: 'whatsapp-llm',
+  level: 'warn',
+  message: '🟡 Redis deshabilitado (REDIS_DISABLED=true). BullQueueService funcionando en modo noop.',
+  timestamp: '2025-08-08 22:17:34.270'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Socket.IO inicializado correctamente',
+  timestamp: '2025-08-08 22:17:34.792'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter and circuit breaker initialized',
+  timestamp: '2025-08-08 22:17:34.820'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:17:34.835'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:17:34.836'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache service destruido',
+  timestamp: '2025-08-08 22:17:34.836'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:18:31.955'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:18:31.959'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:18:34.802'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:19:31.956'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:19:31.960'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:19:34.811'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:20:31.961'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:20:31.965'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:20:34.821'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:21:31.968'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:21:31.972'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:21:34.827'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:22:31.969'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:22:31.974'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:22:34.840'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:23:31.973'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:23:31.976'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:23:34.841'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:24:31.973'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:24:31.977'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:24:34.849'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:25:31.985'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:25:31.988'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:25:34.851'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:26:31.993'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:26:31.997'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:26:34.864'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:27:31.998'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:27:32.002'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:27:34.876'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:28:32.010'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:28:32.013'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:28:34.886'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:29:32.013'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:29:32.017'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:29:34.894'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:30:32.026'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:30:32.032'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:30:34.904'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:31:32.033'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:31:32.038'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:31:34.908'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:32:32.039'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:32:32.043'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:32:34.914'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:33:32.053'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:33:32.058'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:33:34.926'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Cache limpiado',
+  timestamp: '2025-08-08 22:34:32.055'
+}
+{
+  service: 'whatsapp-llm',
+  level: 'info',
+  message: 'Rate limiter destroyed',
+  timestamp: '2025-08-08 22:34:32.059'
+}
+{
+  service: 'whatsapp-llm',
+  totalConnections: 0,
+  activeConnections: 0,
+  messagesEmitted: 0,
+  eventsReceived: 0,
+  connectedUsers: 0,
+  rooms: 0,
+  level: 'info',
+  message: 'Socket.IO Metrics',
+  timestamp: '2025-08-08 22:34:34.941'
+}
