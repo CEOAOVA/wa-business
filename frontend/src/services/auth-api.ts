@@ -81,14 +81,18 @@ class AuthApiService {
       ...options,
     };
 
-    // Agregar token de autenticación si existe
+    // Agregar token de autenticación si existe, EXCEPTO en login para evitar bypass del backend
     const token = localStorage.getItem('authToken');
-    if (token) {
+    const method = (options.method || 'GET').toUpperCase();
+    const isLoginCall = endpoint === '/login' && method === 'POST';
+    if (token && !isLoginCall) {
       config.headers = {
         ...config.headers,
         'Authorization': `Bearer ${token}`,
       };
       console.log('🔐 [AuthApi] Token incluido en request:', token.substring(0, 20) + '...');
+    } else if (isLoginCall) {
+      console.log('🔐 [AuthApi] Login: no se envía Authorization para evitar bypass en backend');
     } else {
       console.log('⚠️ [AuthApi] No hay token disponible para request');
     }
