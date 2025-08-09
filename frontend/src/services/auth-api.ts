@@ -174,8 +174,8 @@ class AuthApiService {
         throw new Error('Respuesta inválida del servidor: response.data es undefined');
       }
 
-      // El backend devuelve { success: true, data: { user: ..., session: ... } }
-      const actualData = (response.data as any)?.data;
+      // El backend devuelve { success: true, data: { user: ... } } en modo primitivo
+      const actualData = (response.data as any)?.data ?? response.data;
       console.log('📊 [AuthApi] Datos reales:', actualData);
       console.log('📊 [AuthApi] actualData.user:', actualData?.user);
       console.log('📊 [AuthApi] actualData.session:', actualData?.session);
@@ -186,7 +186,7 @@ class AuthApiService {
         throw new Error('Respuesta inválida del servidor: no hay datos de usuario');
       }
 
-      // Guardar token de sesión con validación
+      // Guardar token si existe (modo primitivo puede no devolverlo)
       if (actualData.session?.access_token) {
         const token = actualData.session.access_token;
         localStorage.setItem('authToken', token);
@@ -199,8 +199,6 @@ class AuthApiService {
         } else {
           console.log('✅ [AuthApi] Token verificado en localStorage');
         }
-      } else {
-        console.warn('⚠️ [AuthApi] No se recibió token en la respuesta de login');
       }
 
       // Guardar refresh token si viene (para backend JWT propio)

@@ -151,45 +151,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      logger.debug('Iniciando login', { username: credentials.username }, 'AuthContext');
+      logger.debug('Iniciando login (primitivo)', { username: credentials.username }, 'AuthContext');
 
-      // 1) Intentar autenticación con Supabase (username es email)
-      let supabaseOk = false;
-      if (supabase) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: credentials.username,
-          password: credentials.password,
-        });
+      // Login primitivo contra backend (coincidencia exacta en agents)
+      const result = await authApiService.login({ username: credentials.username, password: credentials.password });
+      const agent = result?.user as any;
+      const role: 'admin' | 'agent' = agent?.role === 'admin' ? 'admin' : 'agent';
+      const user: User = {
+        id: agent.id,
+        name: agent.full_name || agent.username,
+        email: agent.email || agent.username,
+        whatsappNumber: agent.whatsapp_id || '',
+        role,
+        isOnline: true,
+        lastSeen: new Date(),
+        status: agent.is_active ? 'active' : 'inactive',
+      };
 
-        if (!signInError && signInData?.session) {
-          supabaseOk = true;
-          // Guardar access token para cliente API existente
-          localStorage.setItem('authToken', signInData.session.access_token);
-          localStorage.setItem('rememberAuth', 'true');
-        }
+      // Persistencia simple
+      localStorage.setItem('rememberAuth', credentials.rememberMe ? 'true' : 'false');
+      dispatch({ type: 'AUTH_SUCCESS', payload: user });
+
+      // Redirección por rol
+      if (user.role === 'admin') {
+        window.location.replace('/dashboard');
+      } else {
+        window.location.replace('/chats');
       }
-
-      // 2) Si falló Supabase, intentar login legacy contra backend (tabla agents/JWT propio)
-      if (!supabaseOk) {
-        logger.warn('Supabase login falló o no está configurado. Probando login legacy...');
-        const legacy = await authApiService.login({ username: credentials.username, password: credentials.password });
-        if (legacy?.session?.access_token) {
-          localStorage.setItem('authToken', legacy.session.access_token);
-          localStorage.setItem('rememberAuth', 'true');
-        }
-      }
-
-      // 3) Obtener perfil desde backend (usa el token que haya quedado)
-      const profile = await authApiService.getProfile();
-
-      // 4) Iniciar auto-refresh si Supabase está activo
-      if (supabaseOk) {
-        await authRefreshService.startAutoRefresh();
-        logger.info('✅ Auto-refresh de tokens (Supabase) activado', {}, 'AuthContext');
-      }
-
-      logger.info('Login exitoso', { userId: profile.id, email: profile.email }, 'AuthContext');
-      dispatch({ type: 'AUTH_SUCCESS', payload: profile });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido en login';
       logger.error('Error en login', { error: errorMessage }, 'AuthContext');

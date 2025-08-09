@@ -56,63 +56,41 @@ const session_cleanup_service_1 = require("../services/session-cleanup.service")
 const router = (0, express_1.Router)();
 /**
  * @route POST /api/auth/login
- * @desc Autenticar usuario
+ * @desc Autenticación PRIMITIVA: coincidencia exacta username+password en tabla agents
  * @access Public
-  */
+ */
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Aceptar tanto "username" como "email" para compatibilidad
         const { username, password, email } = req.body;
-        const loginIdentifier = username || email;
-        // Si llega un token de Supabase (por ejemplo desde frontend ya autenticado), permitir bypass
-        const authHeader = req.headers.authorization;
-        if ((authHeader === null || authHeader === void 0 ? void 0 : authHeader.startsWith('Bearer ')) && supabase_1.supabaseAdmin) {
-            const token = authHeader.substring(7);
-            const { data, error } = yield supabase_1.supabaseAdmin.auth.getUser(token);
-            if ((data === null || data === void 0 ? void 0 : data.user) && !error) {
-                // Ya autenticado con Supabase; devolver perfil y sesión simulada
-                const byId = yield auth_service_1.AuthService.getUserById(data.user.id);
-                const byEmail = !byId && data.user.email
-                    ? yield auth_service_1.AuthService.getUserByEmail(data.user.email)
-                    : null;
-                const user = byId || byEmail;
-                if (user) {
-                    return res.json({
-                        success: true,
-                        message: 'Login vía Supabase',
-                        data: {
-                            user,
-                            session: { access_token: token, token_type: 'bearer' }
-                        }
-                    });
-                }
-            }
-        }
-        // Validación de campos requeridos (email o usuario + contraseña)
+        const loginIdentifier = (username || email || '').trim();
         if (!loginIdentifier || !password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Email o usuario y contraseña son requeridos'
-            });
+            return res.status(400).json({ success: false, message: 'Email o usuario y contraseña son requeridos' });
         }
-        const result = yield auth_service_1.AuthService.login({ username: loginIdentifier, password });
-        // Incluir refresh_token también en la respuesta raíz para facilitar consumo en frontends
-        // sin romper compatibilidad (se mantiene dentro de data.session)
-        res.json({
+        if (!supabase_1.supabaseAdmin) {
+            return res.status(500).json({ success: false, message: 'Servicio de autenticación no disponible' });
+        }
+        // Coincidencia exacta en un mismo registro
+        const { data: agent, error } = yield supabase_1.supabaseAdmin
+            .from('agents')
+            .select('id, username, full_name, email, role, is_active, created_at, updated_at, whatsapp_id')
+            .eq('username', loginIdentifier)
+            .eq('password', password)
+            .single();
+        if (error || !agent) {
+            return res.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos' });
+        }
+        if (!agent.is_active) {
+            return res.status(401).json({ success: false, message: 'Usuario inactivo' });
+        }
+        return res.json({
             success: true,
             message: 'Login exitoso',
-            data: {
-                user: result.user,
-                session: result.session
-            }
+            data: { user: agent }
         });
     }
     catch (error) {
-        logger_1.logger.error('Login error:', error);
-        res.status(401).json({
-            success: false,
-            message: error instanceof Error ? error.message : 'Error de autenticación'
-        });
+        logger_1.logger.error('Login error (primitive):', error);
+        return res.status(500).json({ success: false, message: 'Error de autenticación' });
     }
 }));
 /**

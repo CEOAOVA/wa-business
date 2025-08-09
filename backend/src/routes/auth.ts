@@ -14,67 +14,46 @@ const router = Router();
 
 /**
  * @route POST /api/auth/login
- * @desc Autenticar usuario
+ * @desc Autenticación PRIMITIVA: coincidencia exacta username+password en tabla agents
  * @access Public
-  */
- router.post('/login', async (req, res) => {
+ */
+router.post('/login', async (req, res) => {
   try {
-    // Aceptar tanto "username" como "email" para compatibilidad
     const { username, password, email } = req.body as any;
-    const loginIdentifier: string | undefined = username || email;
+    const loginIdentifier: string | undefined = (username || email || '').trim();
 
-    // Si llega un token de Supabase (por ejemplo desde frontend ya autenticado), permitir bypass
-    const authHeader = req.headers.authorization;
-    if (authHeader?.startsWith('Bearer ') && supabaseAdmin) {
-      const token = authHeader.substring(7);
-      const { data, error } = await supabaseAdmin.auth.getUser(token);
-      if (data?.user && !error) {
-        // Ya autenticado con Supabase; devolver perfil y sesión simulada
-        const byId = await AuthService.getUserById(data.user.id);
-        const byEmail = !byId && (data.user as any).email
-          ? await AuthService.getUserByEmail((data.user as any).email as string)
-          : null;
-        const user = byId || byEmail;
-        if (user) {
-          return res.json({
-            success: true,
-            message: 'Login vía Supabase',
-            data: {
-              user,
-              session: { access_token: token, token_type: 'bearer' }
-            }
-          });
-        }
-      }
-    }
-
-    // Validación de campos requeridos (email o usuario + contraseña)
     if (!loginIdentifier || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email o usuario y contraseña son requeridos'
-      });
+      return res.status(400).json({ success: false, message: 'Email o usuario y contraseña son requeridos' });
     }
 
-    const result = await AuthService.login({ username: loginIdentifier, password });
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, message: 'Servicio de autenticación no disponible' });
+    }
 
-    // Incluir refresh_token también en la respuesta raíz para facilitar consumo en frontends
-    // sin romper compatibilidad (se mantiene dentro de data.session)
-    
-    res.json({
+    // Coincidencia exacta en un mismo registro
+    const { data: agent, error } = await supabaseAdmin
+      .from('agents')
+      .select('id, username, full_name, email, role, is_active, created_at, updated_at, whatsapp_id')
+      .eq('username', loginIdentifier)
+      .eq('password', password)
+      .single();
+
+    if (error || !agent) {
+      return res.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos' });
+    }
+
+    if (!agent.is_active) {
+      return res.status(401).json({ success: false, message: 'Usuario inactivo' });
+    }
+
+    return res.json({
       success: true,
       message: 'Login exitoso',
-      data: {
-        user: result.user,
-        session: result.session
-      }
+      data: { user: agent }
     });
   } catch (error) {
-    logger.error('Login error:', error);
-    res.status(401).json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Error de autenticación'
-    });
+    logger.error('Login error (primitive):', error);
+    return res.status(500).json({ success: false, message: 'Error de autenticación' });
   }
 });
 
