@@ -12,7 +12,8 @@
     "webhook:check": "node src/scripts/webhook-setup.js",
     "security:test": "node src/scripts/test-webhook-security.js",
     "cleanup:duplicates": "node cleanup-duplicate-messages.js",
-    "diagnostic": "node src/scripts/diagnostic.js"
+    "diagnostic": "node src/scripts/diagnostic.js",
+    "debug:auth": "node scripts/debug-auth-credentials.js"
   },
   "keywords": [],
   "author": "",

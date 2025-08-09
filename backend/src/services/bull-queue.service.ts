@@ -9,6 +9,7 @@ import { databaseService } from './database.service';
 import { socketService } from './socket.service';
 
 // Configuración de Redis
+const redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
 const redisConfig = {
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -56,6 +57,16 @@ export class BullQueueService {
   private deduplicationTTL = 3600000; // 1 hora en ms
 
   private constructor() {
+    if (redisDisabled) {
+      // Crear mocks para evitar errores si se llama indirectamente
+      // @ts-ignore
+      this.webhookQueue = { add: async () => 'noop', on: () => undefined, clean: async () => [], getWaitingCount: async () => 0, getActiveCount: async () => 0, getCompletedCount: async () => 0, getFailedCount: async () => 0, getDelayedCount: async () => 0, pause: async () => undefined, resume: async () => undefined, empty: async () => undefined } as any;
+      // @ts-ignore
+      this.messageQueue = { add: async () => 'noop', on: () => undefined, clean: async () => [], getWaitingCount: async () => 0, getActiveCount: async () => 0, getCompletedCount: async () => 0, getFailedCount: async () => 0, getDelayedCount: async () => 0, pause: async () => undefined, resume: async () => undefined, empty: async () => undefined } as any;
+      logger.warn('🟡 Redis deshabilitado (REDIS_DISABLED=true). BullQueueService funcionando en modo noop.');
+      return;
+    }
+
     // Crear colas separadas para diferentes tipos de trabajo
     this.webhookQueue = new Bull('webhook-processing', {
       redis: redisConfig,

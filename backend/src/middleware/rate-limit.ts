@@ -7,8 +7,11 @@ import { RateLimiterMemory, RateLimiterRedis, IRateLimiterOptions } from 'rate-l
 import Redis from 'ioredis';
 import { logger } from '../utils/logger';
 
-// Configuración de Redis (opcional)
-const redisClient = process.env.REDIS_URL ? new Redis(process.env.REDIS_URL) : null;
+// Configuración de Redis (opcional). Permite deshabilitar Redis con REDIS_DISABLED=true
+const redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
+const redisClient = (!redisDisabled && process.env.REDIS_URL)
+  ? new Redis(process.env.REDIS_URL)
+  : null;
 
 // Tipos para configuración
 interface RateLimitConfig {
@@ -80,8 +83,8 @@ function getRateLimiter(config: RateLimitConfig): RateLimiterMemory | RateLimite
     keyPrefix: config.keyPrefix,
   };
   
-  // Usar Redis si está disponible, sino memoria
-  const limiter = redisClient 
+  // Usar Redis si está disponible y no está deshabilitado, sino memoria
+  const limiter = (redisClient && !redisDisabled)
     ? new RateLimiterRedis({
         storeClient: redisClient,
         ...options

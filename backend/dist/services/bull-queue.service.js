@@ -22,6 +22,7 @@ const whatsapp_service_1 = require("./whatsapp.service");
 const database_service_1 = require("./database.service");
 const socket_service_1 = require("./socket.service");
 // Configuración de Redis
+const redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
 const redisConfig = {
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -40,6 +41,15 @@ class BullQueueService {
     constructor() {
         this.processedMessages = new Set();
         this.deduplicationTTL = 3600000; // 1 hora en ms
+        if (redisDisabled) {
+            // Crear mocks para evitar errores si se llama indirectamente
+            // @ts-ignore
+            this.webhookQueue = { add: () => __awaiter(this, void 0, void 0, function* () { return 'noop'; }), on: () => undefined, clean: () => __awaiter(this, void 0, void 0, function* () { return []; }), getWaitingCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getActiveCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getCompletedCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getFailedCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getDelayedCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), pause: () => __awaiter(this, void 0, void 0, function* () { return undefined; }), resume: () => __awaiter(this, void 0, void 0, function* () { return undefined; }), empty: () => __awaiter(this, void 0, void 0, function* () { return undefined; }) };
+            // @ts-ignore
+            this.messageQueue = { add: () => __awaiter(this, void 0, void 0, function* () { return 'noop'; }), on: () => undefined, clean: () => __awaiter(this, void 0, void 0, function* () { return []; }), getWaitingCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getActiveCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getCompletedCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getFailedCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), getDelayedCount: () => __awaiter(this, void 0, void 0, function* () { return 0; }), pause: () => __awaiter(this, void 0, void 0, function* () { return undefined; }), resume: () => __awaiter(this, void 0, void 0, function* () { return undefined; }), empty: () => __awaiter(this, void 0, void 0, function* () { return undefined; }) };
+            logger_1.logger.warn('🟡 Redis deshabilitado (REDIS_DISABLED=true). BullQueueService funcionando en modo noop.');
+            return;
+        }
         // Crear colas separadas para diferentes tipos de trabajo
         this.webhookQueue = new bull_1.default('webhook-processing', {
             redis: redisConfig,

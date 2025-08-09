@@ -35,6 +35,7 @@ export class MessageQueueService {
   private chatbotQueue: Queue<ChatbotJobData>;
   private readonly MAX_RETRIES = 3;
   private readonly config = getConfig();
+  private readonly redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
   
   // Redis configuration
   private readonly redisConfig: QueueOptions = {
@@ -62,6 +63,16 @@ export class MessageQueueService {
   private chatbotService: ChatbotService | null = null;
   
   constructor() {
+    if (this.redisDisabled) {
+      logger.warn('🟡 Redis deshabilitado (REDIS_DISABLED=true). Servicio de colas no se inicializa.');
+      // Crear dummies para evitar null checks en llamadas
+      // @ts-ignore
+      this.messageQueue = { add: async () => 'noop', on: () => undefined } as any;
+      // @ts-ignore
+      this.chatbotQueue = { add: async () => 'noop', on: () => undefined } as any;
+      return;
+    }
+
     this.messageQueue = new Bull('whatsapp-messages', this.redisConfig);
     this.chatbotQueue = new Bull('chatbot-processing', this.redisConfig);
     
@@ -196,6 +207,7 @@ export class MessageQueueService {
    */
   async addMessage(data: MessageJobData): Promise<string> {
     try {
+      if (this.redisDisabled) return 'noop';
       const jobOptions: JobOptions = {
         priority: data.priority || 0,
         delay: 0,
@@ -227,6 +239,7 @@ export class MessageQueueService {
    */
   async addChatbotMessage(data: ChatbotJobData): Promise<string> {
     try {
+      if (this.redisDisabled) return 'noop';
       const job = await this.chatbotQueue.add('process-message', data, {
         attempts: 2, // Menos reintentos para chatbot
         backoff: {

@@ -21,8 +21,11 @@ exports.getRateLimitStats = getRateLimitStats;
 const rate_limiter_flexible_1 = require("rate-limiter-flexible");
 const ioredis_1 = __importDefault(require("ioredis"));
 const logger_1 = require("../utils/logger");
-// Configuración de Redis (opcional)
-const redisClient = process.env.REDIS_URL ? new ioredis_1.default(process.env.REDIS_URL) : null;
+// Configuración de Redis (opcional). Permite deshabilitar Redis con REDIS_DISABLED=true
+const redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
+const redisClient = (!redisDisabled && process.env.REDIS_URL)
+    ? new ioredis_1.default(process.env.REDIS_URL)
+    : null;
 // Configuraciones predefinidas por tipo de endpoint
 const RATE_LIMIT_CONFIGS = {
     // Autenticación: más restrictivo
@@ -74,8 +77,8 @@ function getRateLimiter(config) {
         blockDuration: config.blockDuration,
         keyPrefix: config.keyPrefix,
     };
-    // Usar Redis si está disponible, sino memoria
-    const limiter = redisClient
+    // Usar Redis si está disponible y no está deshabilitado, sino memoria
+    const limiter = (redisClient && !redisDisabled)
         ? new rate_limiter_flexible_1.RateLimiterRedis(Object.assign({ storeClient: redisClient }, options))
         : new rate_limiter_flexible_1.RateLimiterMemory(options);
     rateLimiters.set(key, limiter);

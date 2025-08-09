@@ -23,6 +23,7 @@ class MessageQueueService {
     constructor() {
         this.MAX_RETRIES = 3;
         this.config = (0, config_1.getConfig)();
+        this.redisDisabled = (process.env.REDIS_DISABLED || '').toLowerCase() === 'true';
         // Redis configuration
         this.redisConfig = {
             redis: {
@@ -46,6 +47,15 @@ class MessageQueueService {
         };
         this.whatsappService = null;
         this.chatbotService = null;
+        if (this.redisDisabled) {
+            logger_1.logger.warn('🟡 Redis deshabilitado (REDIS_DISABLED=true). Servicio de colas no se inicializa.');
+            // Crear dummies para evitar null checks en llamadas
+            // @ts-ignore
+            this.messageQueue = { add: () => __awaiter(this, void 0, void 0, function* () { return 'noop'; }), on: () => undefined };
+            // @ts-ignore
+            this.chatbotQueue = { add: () => __awaiter(this, void 0, void 0, function* () { return 'noop'; }), on: () => undefined };
+            return;
+        }
         this.messageQueue = new bull_1.default('whatsapp-messages', this.redisConfig);
         this.chatbotQueue = new bull_1.default('chatbot-processing', this.redisConfig);
         this.setupProcessors();
@@ -154,6 +164,8 @@ class MessageQueueService {
     addMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                if (this.redisDisabled)
+                    return 'noop';
                 const jobOptions = {
                     priority: data.priority || 0,
                     delay: 0,
@@ -182,6 +194,8 @@ class MessageQueueService {
     addChatbotMessage(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                if (this.redisDisabled)
+                    return 'noop';
                 const job = yield this.chatbotQueue.add('process-message', data, {
                     attempts: 2, // Menos reintentos para chatbot
                     backoff: {

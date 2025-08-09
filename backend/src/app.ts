@@ -99,7 +99,11 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/monitoring', monitoringRoutes);
 
 // Rutas de colas (Bull Queue) ✅ AGREGADO
-app.use('/api/queue', queueRoutes);
+if ((process.env.REDIS_DISABLED || '').toLowerCase() === 'true') {
+  logger.warn('🟡 Redis deshabilitado, rutas de colas desactivadas');
+} else {
+  app.use('/api/queue', queueRoutes);
+}
 
 // Rutas de monitoreo de colas Bull
 app.use('/api/queue-monitor', authRateLimit, queueMonitorRoutes);
