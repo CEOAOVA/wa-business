@@ -134,9 +134,16 @@ class AuthApiService {
     console.log('🔐 [AuthApi] Iniciando login...');
     
     try {
+      // Enviar ambos campos para compatibilidad con backends que esperan email o username
+      const payload: any = {
+        username: credentials.username,
+        password: credentials.password,
+        email: credentials.username
+      };
+
       const response = await this.request<LoginResponse>('/login', {
         method: 'POST',
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(payload),
       });
 
       console.log('✅ [AuthApi] Login exitoso, procesando respuesta...');
@@ -192,6 +199,11 @@ class AuthApiService {
         console.warn('⚠️ [AuthApi] No se recibió token en la respuesta de login');
       }
 
+      // Guardar refresh token si viene (para backend JWT propio)
+      if (actualData.session?.refresh_token) {
+        localStorage.setItem('refreshToken', actualData.session.refresh_token);
+      }
+
       return actualData;
     } catch (error) {
       console.error('❌ [AuthApi] Error en login:', error);
@@ -226,11 +238,17 @@ class AuthApiService {
 
   async getProfile(): Promise<User> {
     console.log('🔐 [AuthApi] Obteniendo perfil...');
-    
     try {
-      const response = await this.request<User>('/profile');
+      // El backend responde { success, data: { user: User } }
+      const response = await this.request<any>('/profile');
+      const actualData = (response.data as any)?.data;
+      const rawProfile = actualData?.user ?? actualData; // tolerante por si ya viene plano
+      if (!rawProfile) {
+        throw new Error('Perfil no disponible en la respuesta');
+      }
       console.log('✅ [AuthApi] Perfil obtenido exitosamente');
-      return response.data;
+      // Convertir a tipo User del frontend si fuera necesario
+      return this.convertToUser(rawProfile as any);
     } catch (error) {
       console.error('❌ [AuthApi] Error obteniendo perfil:', error);
       throw error;

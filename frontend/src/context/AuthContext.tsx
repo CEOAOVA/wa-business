@@ -194,6 +194,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido en login';
       logger.error('Error en login', { error: errorMessage }, 'AuthContext');
       dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
+      // Rethrow para que el caller (Login.tsx) pueda reaccionar y no muestre "completado exitosamente"
+      throw new Error(errorMessage);
     }
   };
 

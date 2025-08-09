@@ -203,20 +203,46 @@ export const refreshTokenIfNeeded = async (): Promise<boolean> => {
   try {
     console.log('🔄 Iniciando refresh token...');
     
+    // Intentar usar refresh de Supabase si está disponible en el navegador
+    try {
+      // @ts-ignore opcional según disponibilidad global
+      const supabase = (await import('../config/supabase')).supabase;
+      if (supabase) {
+        const { data, error } = await supabase.auth.refreshSession();
+        if (!error && data?.session?.access_token) {
+          localStorage.setItem('authToken', data.session.access_token);
+          refreshState.lastRefresh = Date.now();
+          refreshState.isRefreshing = false;
+          refreshState.retryCount = 0;
+          refreshState.lastError = null;
+          console.log('✅ Token refrescado exitosamente (Supabase)');
+          return true;
+        }
+      }
+    } catch (_) {
+      // Si falla Supabase, continuar con backend
+    }
+
+    // Fallback: usar endpoint del backend con refresh token propio
+    const storedRefreshToken = localStorage.getItem('refreshToken');
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'https://dev-apiwaprueba.aova.mx'}/api/auth/refresh`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({ refresh_token: storedRefreshToken })
     });
     
     if (response.ok) {
       const data = await response.json();
-      
-      // Actualizar token si se devuelve uno nuevo
-      if (data.token) {
-        localStorage.setItem('authToken', data.token);
+      // Backend responde con data.access_token; guardar también refresh si llega
+      const newAccess = data?.data?.access_token || data?.access_token || data?.token;
+      if (newAccess) {
+        localStorage.setItem('authToken', newAccess);
+      }
+      const newRefresh = data?.data?.refresh_token || data?.refresh_token;
+      if (newRefresh) {
+        localStorage.setItem('refreshToken', newRefresh);
       }
       
       // Resetear estado de refresh

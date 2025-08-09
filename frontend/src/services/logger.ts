@@ -127,13 +127,14 @@ class LoggerService {
       const logsToSend = [...this.logBuffer];
       this.logBuffer = [];
 
-      // Enviar logs al endpoint de logging del backend
-      await fetch('/api/logging/batch', {
+      // Enviar logs al endpoint de logging del backend (usar URL absoluta si está configurada)
+      const baseUrl = import.meta.env.VITE_BACKEND_URL || '';
+      await fetch(`${baseUrl}/api/logging/batch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ logs: logsToSend })
+        body: JSON.stringify(logsToSend)
       });
     } catch (error) {
       // En caso de error, restaurar logs al buffer
