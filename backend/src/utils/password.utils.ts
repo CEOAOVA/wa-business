@@ -1,4 +1,20 @@
-import * as bcrypt from 'bcrypt';
+// Carga perezosa de bcrypt con fallback a bcryptjs para evitar problemas de compilación en Windows
+let bcryptLib: any;
+function getBcrypt(): any {
+  if (bcryptLib) return bcryptLib;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    bcryptLib = require('bcrypt');
+  } catch (_) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      bcryptLib = require('bcryptjs');
+    } catch (e) {
+      throw new Error('No se pudo cargar bcrypt ni bcryptjs. Instala al menos uno de ellos.');
+    }
+  }
+  return bcryptLib;
+}
 import { logger } from './logger';
 
 /**
@@ -19,6 +35,7 @@ export class PasswordUtils {
         throw new Error('La contraseña debe tener al menos 6 caracteres');
       }
 
+      const bcrypt = getBcrypt();
       const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
       const hashedPassword = await bcrypt.hash(plainPassword, salt);
       
@@ -42,6 +59,7 @@ export class PasswordUtils {
         return false;
       }
 
+      const bcrypt = getBcrypt();
       const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
       logger.debug(`Verificación de contraseña: ${isMatch ? 'exitosa' : 'fallida'}`);
       

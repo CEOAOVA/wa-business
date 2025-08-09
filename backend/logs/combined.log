@@ -62721,3 +62721,5 @@
 {"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T19:29:37.873Z"}
 {"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-08T19:38:32.330Z","warningThreshold":"80%"}
 {"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T19:38:34.244Z"}
+{"checkIntervalMs":60000,"criticalThreshold":"95%","level":"info","message":"Memory monitor iniciado","timestamp":"2025-08-08T23:10:39.380Z","warningThreshold":"80%"}
+{"level":"info","message":"ChatbotService inicializado","timestamp":"2025-08-08T23:10:41.615Z"}

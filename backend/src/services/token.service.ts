@@ -27,8 +27,8 @@ interface RefreshTokenData {
 export class TokenService {
   private static readonly ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN || '15m';
   private static readonly REFRESH_TOKEN_EXPIRY = '7d';
-  private static readonly JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-production';
-  private static readonly REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || `${TokenService.JWT_SECRET}-refresh`;
+  private static readonly JWT_SECRET = process.env.JWT_SECRET as string;
+  private static readonly REFRESH_SECRET = (process.env.JWT_REFRESH_SECRET || `${process.env.JWT_SECRET}-refresh`) as string;
 
   /**
    * Generar un par de tokens (access + refresh)
@@ -160,6 +160,10 @@ export class TokenService {
    */
   static verifyAccessToken(token: string): TokenPayload | null {
     try {
+      if (!this.JWT_SECRET) {
+        logger.error('JWT_SECRET is not set');
+        return null;
+      }
       const decoded = jwt.verify(token, this.JWT_SECRET as any) as TokenPayload;
       
       if (decoded.type && decoded.type !== 'access') {
@@ -268,6 +272,9 @@ export class TokenService {
     expires_at: Date;
   }): Promise<void> {
     try {
+      if (!supabaseAdmin) {
+        throw new Error('Supabase admin client not configured');
+      }
       const { error } = await (supabaseAdmin as any)
         .from('refresh_tokens')
         .insert({

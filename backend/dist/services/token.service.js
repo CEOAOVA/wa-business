@@ -143,6 +143,10 @@ class TokenService {
      */
     static verifyAccessToken(token) {
         try {
+            if (!this.JWT_SECRET) {
+                logger_1.logger.error('JWT_SECRET is not set');
+                return null;
+            }
             const decoded = jwt.verify(token, this.JWT_SECRET);
             if (decoded.type && decoded.type !== 'access') {
                 logger_1.logger.warn('Invalid token type for access');
@@ -246,6 +250,9 @@ class TokenService {
     static saveRefreshToken(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                if (!supabase_1.supabaseAdmin) {
+                    throw new Error('Supabase admin client not configured');
+                }
                 const { error } = yield supabase_1.supabaseAdmin
                     .from('refresh_tokens')
                     .insert({
@@ -330,5 +337,5 @@ class TokenService {
 exports.TokenService = TokenService;
 TokenService.ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN || '15m';
 TokenService.REFRESH_TOKEN_EXPIRY = '7d';
-TokenService.JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-production';
-TokenService.REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || `${TokenService.JWT_SECRET}-refresh`;
+TokenService.JWT_SECRET = process.env.JWT_SECRET;
+TokenService.REFRESH_SECRET = (process.env.JWT_REFRESH_SECRET || `${process.env.JWT_SECRET}-refresh`);

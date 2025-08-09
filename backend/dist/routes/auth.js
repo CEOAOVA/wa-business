@@ -58,10 +58,12 @@ const router = (0, express_1.Router)();
  * @route POST /api/auth/login
  * @desc Autenticar usuario
  * @access Public
- */
+  */
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, password } = req.body;
+        // Aceptar tanto "username" como "email" para compatibilidad
+        const { username, password, email } = req.body;
+        const loginIdentifier = username || email;
         // Si llega un token de Supabase (por ejemplo desde frontend ya autenticado), permitir bypass
         const authHeader = req.headers.authorization;
         if ((authHeader === null || authHeader === void 0 ? void 0 : authHeader.startsWith('Bearer ')) && supabase_1.supabaseAdmin) {
@@ -86,13 +88,16 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 }
             }
         }
-        if (!username || !password) {
+        // Validación de campos requeridos (email o usuario + contraseña)
+        if (!loginIdentifier || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Usuario y contraseña son requeridos'
+                message: 'Email o usuario y contraseña son requeridos'
             });
         }
-        const result = yield auth_service_1.AuthService.login({ username, password });
+        const result = yield auth_service_1.AuthService.login({ username: loginIdentifier, password });
+        // Incluir refresh_token también en la respuesta raíz para facilitar consumo en frontends
+        // sin romper compatibilidad (se mantiene dentro de data.session)
         res.json({
             success: true,
             message: 'Login exitoso',
