@@ -2,7 +2,7 @@
 
 ## 🎯 Para Pruebas Locales (Sin WhatsApp)
 
-### 1. Configurar Variables de Entorno (2 minutos)
+### 1. Configurar Variables de Entorno (2 minutos
 
 ```bash
 # Copiar archivos de ejemplo
