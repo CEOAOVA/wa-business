@@ -80,6 +80,58 @@ class AuthService {
                 if (!supabase_1.supabaseAdmin) {
                     throw new Error('Servicio de autenticación no disponible');
                 }
+                // MODO SIMPLE: Coincidencia exacta username/password en tabla agents (opcional)
+                const isExactMatchMode = (process.env.AUTH_EXACT_MATCH || '').toLowerCase() === 'true';
+                if (isExactMatchMode) {
+                    const { data: agentExact, error: agentExactError } = yield supabase_1.supabaseAdmin
+                        .from('agents')
+                        .select('*')
+                        .eq('username', loginData.username)
+                        .eq('password', loginData.password)
+                        .eq('is_active', true)
+                        .single();
+                    if (agentExactError || !agentExact) {
+                        logger_1.logger.warn('Login exact match falló', { username: loginData.username, error: (agentExactError === null || agentExactError === void 0 ? void 0 : agentExactError.message) || 'no match' });
+                        throw new Error('Usuario o contraseña incorrectos');
+                    }
+                    const profileData = {
+                        id: agentExact.id,
+                        username: agentExact.username,
+                        full_name: agentExact.full_name || agentExact.username,
+                        email: agentExact.email || `${agentExact.username}@local`,
+                        role: agentExact.role || 'agent',
+                        whatsapp_id: agentExact.whatsapp_id,
+                        is_active: agentExact.is_active,
+                        created_at: agentExact.created_at,
+                        updated_at: agentExact.updated_at
+                    };
+                    const tokenPair = yield token_service_1.TokenService.generateTokenPair({
+                        sub: agentExact.id,
+                        email: agentExact.email || agentExact.username,
+                        role: agentExact.role,
+                        username: agentExact.username
+                    });
+                    const session = {
+                        access_token: tokenPair.accessToken,
+                        refresh_token: tokenPair.refreshToken,
+                        token_type: 'bearer',
+                        expires_in: tokenPair.expiresIn,
+                        expires_at: Math.floor(Date.now() / 1000) + tokenPair.expiresIn,
+                        refresh_expires_in: tokenPair.refreshExpiresIn,
+                        refresh_expires_at: Math.floor(Date.now() / 1000) + tokenPair.refreshExpiresIn,
+                        user: {
+                            id: agentExact.id,
+                            email: agentExact.email || agentExact.username,
+                            user_metadata: {
+                                username: agentExact.username,
+                                full_name: agentExact.full_name,
+                                role: agentExact.role
+                            }
+                        }
+                    };
+                    logger_1.logger.info('Login exitoso (exact match)', { username: loginData.username });
+                    return { user: profileData, session };
+                }
                 // Buscar usuario por username en tabla agents
                 const { data: agent, error: agentError } = yield supabase_1.supabaseAdmin
                     .from('agents')
